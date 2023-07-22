@@ -1,0 +1,59 @@
+{% extends 'adminlte/base.html' %}
+
+<!-- Set title of app -->
+{% block title %}Arslan Alüminyum{% endblock %}
+
+<!-- Specify content of main body of page -->
+{% block content %}
+<h1>Arslan Alüminyum</h1>
+
+<p>Test site for Arslan Alüminyum</p>
+  
+  {% if user.is_authenticated %}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+          <a href="/location" class="small-box-footer">
+            <i class="fas fa-arrow-circle-right"></i>
+            <span>KALIP ARŞİVİ</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-3 col-6">
+          <div class="small-box bg-info">
+            <a href="/kalip" class="small-box-footer">
+              <i class="fas fa-arrow-circle-right"></i>
+              <span>KALIP LİSTESİ</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+          <a href="/stockCard" class="small-box-footer">
+            <i class="fas fa-arrow-circle-right"></i>
+            <span>STOK KARTI</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+          <a href="/qr" class="small-box-footer">
+            <i class="fas fa-arrow-circle-right"></i>
+            <span>QR</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  {% endblock %}

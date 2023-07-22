@@ -1,0 +1,250 @@
+{% extends 'adminlte/base.html' %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum Lokasyon{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <h1 class="col-lg-12">Arslan Alüminyum Kalıp Arşivi</h1>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card" id="location-tree-table"></div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card" id="kalip-table"></div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card" id="kalip-receive-table"></div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card" id="location-receive-tree-table"></div>
+        </div>
+    </div>
+    <div class="card">
+        <form src="http://127.0.0.1:8000/location" name= "kalip" method="post" >
+          {% csrf_token %}
+          <input type="hidden" id="dieList" name="dieList" value="">
+          <input type="hidden" id="dieTo" name="dieTo" value="">
+          <button class="btn btn-block bg-gradient-secondary btn-lg" id="kalip-gonder" disabled>Kalıp Gönder</button>
+        </form>
+      </div>
+    <div class="card" id="hareket-table"></div>
+</div>
+
+
+
+<!-- Write your comments here -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+
+//initialize table
+var data = JSON.parse('{{ location_json|escapejs }}');
+var tableLoc = new Tabulator("#location-tree-table", {
+    height:"350px",
+    layout:"fitColumns",
+    placeholder:"No Data Set",
+    data:data,
+    dataTree:true,
+    dataTreeStartExpanded:true,
+    selectable:1,
+    columns:[
+    {title:"LOKASYON ADLARI", field:"locationName",responsive:0, headerSort:false},
+    ],
+});
+
+var loc =0; //Location içindeki kalıplar filtrele
+tableLoc.on("rowClick", (e, rows) =>{
+    var rdata = rows.getData().id;
+    var rda = JSON.stringify(rdata);
+    if(loc == rda){
+        tableKalip.clearFilter();
+        loc =0;
+    }
+    else if(loc != rda){
+        loc = rda;
+        tableKalip.setFilter([,
+                  { field: 'kalipVaris_id', type: '=', value: loc },
+               ]);
+    }
+});
+
+tableLoc.on("headerClick", function(e, column){
+    loc = "";
+    tableKalip.setFilter([]); //izni olan lokasyonlardaki bütün kalıpları listeler
+});
+
+var listIcon = function(cell, formatterParams, onRendered){ 
+    return "<i class='fa fa-list-ul'></i>"; //icon değiştir
+};
+ var tableKalip = new Tabulator("#kalip-table", {
+    height:"350px",
+    layout:"fitColumns",
+    placeholder:"Lokasyon Kalıp Listesi Boş",
+    ajaxURL:"/location/kalip", 
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    rowFormatter: row => {
+        let data = row.getData();
+        if (data.Hatali === 1) {
+            row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
+        }
+    },
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[{formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+        cell.getRow().toggleSelect();
+    }},
+    {title:"KALIP NO", field:"kalipNo",  headerFilter:"input"},
+    {formatter:listIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){ 
+            var hareketKonumId = 0;
+            hareketKonumId=cell.getData().kalipNo;
+            tableHareket.setFilter([{ field: 'kalipNo', type: '=', value: hareketKonumId }, 
+                ]);
+    }},
+    ],
+}); 
+
+var sdata = [];
+
+tableKalip.on("rowSelected", (rows) =>{
+    var da = rows.getData().kalipNo;
+    var dat = { kalipNo: da};
+    if (!sdata.includes(da)){
+        sdata.push(da);
+        tableKalipReceive.addRow( dat )
+        $('#dieList').val(sdata)
+                    .trigger('change');
+    }
+});
+
+tableKalip.on("rowDeselected", function(rows){
+    var da = rows.getData().kalipNo;
+    var index = sdata.indexOf(da);
+    if (index > -1) { // only splice array when item is found
+        sdata.splice(index, 1); // 2nd parameter means remove one item only
+    }
+    tableKalipReceive.getRows().forEach(row => {
+        if (row.getData().kalipNo == da) row.delete();
+    });
+    $('#dieList').val(sdata)
+                 .trigger('change');
+});
+
+var tableHareket = new Tabulator("#hareket-table", {
+    height:"350px",
+    layout:"fitColumns",
+    placeholder:"Kalıp Harketleri",
+    ajaxURL:"/location/hareket",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[ //clickPopup: ""
+    {title:"KALIP NO", field:"kalipNo", headerSort:false},
+    {title:"NEREDEN", field:"kalipKonum", formatter:"html", headerSort:false},
+    {title:"NEREYE", field:"kalipVaris", formatter:"html", headerSort:false},
+    {title:"GÖNDEREN", field:"kimTarafindan", headerSort:false},
+    {title:"HAREKET TARİHİ", field:"hareketTarihi"},
+    ],
+}); 
+
+
+var deleteIcon = function(cell, formatterParams, onRendered){ 
+    return "<i class='fa fa-trash'></i>";
+};
+
+var tableKalipReceive = new Tabulator("#kalip-receive-table", {
+        height:"350px",
+        layout:"fitColumns",
+        placeholder:"Seçilmiş Kalıp Yok",
+        data:[],
+        columns:[
+        {title:"SEÇİLEN KALIP", field:"kalipNo",  headerFilter:"input"},
+        {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+            cell.getRow().delete();
+            var da = cell.getData().kalipNo;
+            var index = sdata.indexOf(da);
+            if (index > -1) { // only splice array when item is found
+                sdata.splice(index, 1); // 2nd parameter means remove one item only
+            }
+            $('#dieList').val(sdata)
+                    .trigger('change');
+        }},
+        ],
+    });
+
+var tableLocReceive = new Tabulator("#location-receive-tree-table", {
+    height:"350px",
+    layout:"fitColumns",
+    placeholder:"No Data Set",
+    data:data,
+    dataTree:true,
+    dataTreeStartExpanded:true,
+    selectable:1,
+    columns:[
+    {title:"GÖNDERİLEN LOKASYON", field:"locationName", responsive:0, headerSort:false},
+    ],
+});
+
+tableLocReceive.on("rowSelected", (rows) =>{
+    var selectedData = tableLocReceive.getSelectedData();
+    //document.getElementById("dieTo").value = selectedData[0]["id"];
+    if (!selectedData[0]["isPhysical"]){
+        rows.deselect();
+    } else {
+        $('#dieTo').val(selectedData[0]["id"])
+                 .trigger('change');
+    }
+});
+
+tableLocReceive.on("rowDeselected", function(row){
+    $('#dieTo').val("")
+                 .trigger('change');
+    //document.getElementById("dieTo").value = "";
+});
+
+$('#dieList').change(function(){
+    formControl();
+})
+
+$('#dieTo').change(function(){
+    formControl();
+})
+
+function formControl(){
+    if (document.getElementById("dieList").value == "" || document.getElementById("dieTo").value == ""){
+        document.getElementById("kalip-gonder").disabled = true;
+        document.getElementById("kalip-gonder").classList = "btn btn-block bg-gradient-secondary btn-lg";
+    } else {
+        document.getElementById("kalip-gonder").disabled = false;
+        document.getElementById("kalip-gonder").classList = "btn btn-block bg-gradient-primary btn-lg";
+    } 
+}
+
+
+
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+{% endblock %}

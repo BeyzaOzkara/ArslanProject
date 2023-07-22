@@ -1,0 +1,356 @@
+{% extends 'adminlte/base.html' %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
+<style>
+    .tabulator-menu{
+        width: 200px;
+        height: 150px;
+        overflow-y: auto;
+    }
+    .tabulator { 
+        background-color: #ccc;
+        font-weight: bold;
+    }
+</style>
+    
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid col-lg-11">
+    <h1 class="col-lg-11">Arslan Alüminyum Kalıp Listesi</h1>
+    <div class="row">
+        <div class="card" id="kalipListe-table"></div>
+        <div class="container-fluid col-lg-7">
+                <div class="card container-fluid " id="kalipKart">
+                <!-- Kalıp Kartı -->
+                    <div class="row">
+                        <div class="row col-lg-6">
+                            <div class="container-fluid col-lg-12">
+                        <div class="card col-lg-12">
+                            <div class="card-body">  <!-- Fotoğraflar  -->
+                                <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40790/Teknik1.JPG" class="product-image" alt="Product Image">
+                                <div class="col-6 product-image-thumbs">
+                                    <div class="product-image-thumb active"><img src="https://i.stack.imgur.com/Cgm7x.jpg?s=128&g=1&g&s=32" alt="Product Image"></div>
+                                    <div class="product-image-thumb" ><img src="https://i.stack.imgur.com/Wi9nq.jpg?s=128&g=1&g&s=32" alt="Product Image"></div>
+                                    <div class="product-image-thumb" ><img src="file://C:/Users/beyza.ozkara/Desktop/beyza/aaLogo.png" alt="Product Image"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="row col-lg-6">
+                            <div class="container-fluid col-lg-12">
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                    <span class="info-box-text">KALIP NO:</span>
+                                    <span class="info-box-number" id="infoKalipNo">Kalıp No</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                    <span class="info-box-text">MÜŞTERİ (FİRMA) ADI:</span>
+                                    <span class="info-box-number" id="infoFirmaAdi">Firma Adı</span>
+                                    </div>
+                                </div>
+                                <div class="container-fluid col-lg-12">
+                                <div class="row">
+                                        <div class="info-box col-lg-6">
+                                            <div class="info-box-content">
+                                            <span class="info-box-text">RESİM GRAMAJ:</span>
+                                            <span class="info-box-number" id="infoGramaj">Resim Gramaj</span>
+                                            </div>
+                                        </div>
+                                        <div class="info-box col-lg-6">
+                                            <div class="info-box-content">
+                                            <span class="info-box-text">SON ÜRETİM GRAMAJ:</span>
+                                            <span class="info-box-number" id="infoSonUretimGramaj">Son Üretim Gramaj</span>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="container-fluid">
+                        <div class="row ">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">ÜRETİCİ FİRMA:</span>
+                                <span class="info-box-number" id="infoUreticiFirma">Üretici Firma</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">CİNSİ:</span>
+                                <span class="info-box-number" id="infoCins">Cinsi</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">FİGÜR:</span>
+                                <span class="info-box-number" id="infoFigür">Figür</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                    <div class="row">
+                                        <span class="info-box-text col-lg-5" style="line-height: 30px; vertical-align: middle;">Ø ÇAPI:</span>
+                                        <span class="info-box-text col-lg-2">x</span>
+                                        <span class="info-box-text col-lg-5" style="line-height: 30px; vertical-align: middle;">PAKET BOYU:</span>
+                                    </div>
+                                    <div class="row">
+                                        <span class="info-box-number col-lg-5" id="infoCap">Ø ÇAPI</span>
+                                        <span class="info-box-text col-lg-2">x</span>
+                                        <span class="info-box-number col-lg-5" id="infoPaket">PAKET BOYU</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">SON ÜRETİM TARİHİ:</span>
+                                <span class="info-box-number" id="infoSonUretimTarihi">Son Üretim Tarihi</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">SON TEN. TARİHİ:</span>
+                                <span class="info-box-number" id="infoSonTenTarihi">Son Ten Tarihi</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">ÜRETİM TOPLAM KG:</span>
+                                <span class="info-box-number" id="infoUretimTopKG">Üretim Toplam Kg</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">TEN KALAN OMUR KG:</span>
+                                <span class="info-box-number" id="infoSonTen"></span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">Sıradaki Tenifer:</span>
+                                <span class="info-box-number" id="infoTeniferNo">Sıradaki Tenifer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">DURUMU:</span>
+                                <span class="info-box-number" id="infoDurum">Durumu</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">KALIP AÇIKLAMA:</span>
+                                <span class="info-box-number" id="infoKalipAciklama">Kalıp Açıklama</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">KALİTE AÇIKLAMA:</span>
+                                <span class="info-box-number" id="infoKaliteAciklama">Kalite Açıklama</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <!--row end-->
+                </div>
+                <!--kalipKart end-->
+        </div>
+            <!--container kart end-->
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+
+/* var elem = document.getElementById('kalipKart');
+elem.style.display = 'none';
+ */
+//define column header menu as column visibility toggle
+var headerMenu = function(){
+    var menu = [];
+    var columns = this.getColumns();
+
+    for(let column of columns){
+        if (column.getDefinition().title != ""){
+        //create checkbox element using font awesome icons
+            let icon = document.createElement("i");
+            icon.classList.add("fas");
+            
+            icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
+            
+            //build label
+            let label = document.createElement("span");
+            let title = document.createElement("span");
+
+            
+            title.textContent = " " + column.getDefinition().title;
+            label.appendChild(icon);
+            label.appendChild(title);
+
+            //create menu item
+            menu.push({
+                label:label,
+                action:function(e){
+                    //prevent menu closing
+                    e.stopPropagation();
+                    //toggle current column visibility
+                    column.toggle();
+
+                    //change menu item icon
+                    if(column.isVisible()){
+                        icon.classList.remove("fa-square");
+                        icon.classList.add("fa-check-square");
+                    }else{
+                        icon.classList.remove("fa-check-square");
+                        icon.classList.add("fa-square");
+                    }
+                }
+            });
+    }};
+
+   return menu;
+};
+
+var listIcon = function(cell, formatterParams, onRendered){ 
+    return "<i class='fa fa-list-ul'></i>"; //icon değiştir
+};
+
+var tableKalip = new Tabulator("#kalipListe-table", {
+    height:"700px",
+    layout:"fitData",
+    placeholder:"Kalıp Liste",
+    ajaxURL:"/kalip/liste",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    popupContainer:true,
+    rowFormatter: row => {
+        let data = row.getData();
+        if (data.Hatali === 1) {
+            row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
+        }
+        if (data.AktifPasif === "Pasif") {
+            row.getElement().style.color = "#a3050a"
+        }
+    },
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+        {
+            title:"Gösterilen Sütunlar",
+            headerMenu:headerMenu, //add a menu to this column header
+            columns:[
+            {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+            //e - the click event object
+            //cell - cell component
+                kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
+                if (kal.Silindi == 1){
+                    kal.Silindi = "Silindi"
+                }
+                document.getElementById("infoKalipNo").innerText = kal.KalipNo;
+                document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
+                document.getElementById("infoGramaj").innerText = kal.ResimGramaj;
+                document.getElementById("infoSonUretimGramaj").innerText = kal.SonUretimGr;
+                document.getElementById("infoUreticiFirma").innerText = kal.UreticiFirma;
+                document.getElementById("infoSonUretimTarihi").innerText = kal.SonUretimTarih; 
+                document.getElementById("infoKaliteAciklama").innerText = kal.KaliteAciklama;
+                document.getElementById("infoKalipAciklama").innerText = kal.KalipAciklama;
+                document.getElementById("infoCins").innerText = kal.Cinsi;
+                document.getElementById("infoFigür").innerText = kal.GozAdedi;
+                document.getElementById("infoUretimTopKG").innerText = kal.UretimToplamKg;
+                document.getElementById("infoSonTen").innerText = kal.TeniferKalanOmurKg; 
+                document.getElementById("infoSonTenTarihi").innerText = kal.SonTeniferTarih; //ten numarası
+                document.getElementById("infoTeniferNo").innerText = kal.TeniferNo;
+                document.getElementById("infoCap").innerText = kal.Capi;
+                document.getElementById("infoPaket").innerText = kal.PaketBoyu;
+            },
+/*             cellMouseMove:function(e, cell){
+                //e - the event object
+                //cell - cell component
+                cell.getElement().style.backgroundColor = "#ff0000";
+                display();
+
+            },
+            cellMouseOut:function(e, cell){
+                //e - the event object
+                //cell - cell component
+                //cell.getData().ResimDizini
+                cell.getElement().style.backgroundColor = "#160357";
+                display()
+            }, */
+            },
+            {title:"KALIP NO", field:"KalipNo", headerFilter:"input"},
+            {title:"KONUM", field:"kalipLocation", formatter:"html"},
+            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input", visible:false},
+            {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
+            {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
+            {title:"CİNSİ", field:"Cinsi", headerFilter:"input", visible:false},
+            {title:"GRAMAJ", field:"Miktar", headerFilter:"input", visible:false},
+            {title:"CAPİ", field:"Capi", headerFilter:"input", visible:false},
+            {title:"URETİM TARİHİ", field:"UretimTarihi", headerFilter:"input", visible:false},
+            {title:"FİGÜR", field:"GozAdedi", headerFilter:"input", visible:false},
+            {title:"BOLSTER", field:"Bolster", headerFilter:"input", visible:false},
+            {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
+            {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
+            {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
+            {title:"TENİFER KALAN ÖMÜR KG", field:"TeniferKalanOmurKg", headerFilter:"input"},
+            {title:"TENİFER ÖMRÜ MT", field:"TeniferOmruMt", headerFilter:"input", visible:false},
+            {title:"TENİFER ÖMRÜ KG", field:"TeniferOmruKg", headerFilter:"input", visible:false},
+            {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
+            {title:"SON TENİFER KG", field:"SonTeniferKg", headerFilter:"input", visible:false},
+            {title:"SON TENİFER SEBEBİ", field:"SonTeniferSebebi", headerFilter:"input", visible:false},
+            {title:"SIRADAKİ TENİFER NO", field:"TeniferNo", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
+            {title:"ÜRETİM TEN SONRASI KG", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false},
+            {title:"ÜRETİM TOPLAM KG", field:"UretimToplamKg", headerFilter:"input", visible:false},
+            {title:"RESİM GRAMAJ", field:"ResimGramaj", headerFilter:"input", visible:false},
+            {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
+            {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
+            {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
+            {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
+            {title:"AKTİF PASİF", field:"AktifPasif", headerFilter:"input", visible:false},
+            {title:"HATALI", field:"Hatali", headerFilter:"input", visible:false},
+            {title:"PRES KODU", field:"PresKodu", headerFilter:"input", visible:false},
+            {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
+            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
+            ],
+        }
+    
+    ],
+}); 
+
+
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+{% endblock %}

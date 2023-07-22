@@ -1,0 +1,104 @@
+{% extends 'adminlte/lib/_main_sidebar.html' %}
+{% load static %}
+
+<!-- Set upper left corner logo -->
+{% block logo %}
+    <a href="/" class="brand-link">
+        <img src="{% static '/ArslanTakipApp/aaLogo.png' %}" alt="My Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        {% block logo_text %}<span class="brand-text font-weight-light">Arslan Takip</span>{% endblock %}
+    </a>
+{% endblock logo %}
+
+<!-- Set header for side navbar -->
+{% block nav_heading %}
+{% endblock nav_heading %}
+
+<!-- Define navbar links -->
+{% block nav_links %}
+    {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+        <li class="nav-item">
+            <a href="/admin" class="nav-link active">
+                <i class="nav-icon fas fa-user"></i> 
+                <p>ADMİN</p>
+            </a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+            <a href="/" class="nav-link">
+                <i class="nav-icon fa fa-home"></i> 
+                <p>HOME</p>
+            </a>
+        </li>
+        <li class="nav-item has-tree-view ">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-object-group"></i> <p>KALIPHANE</p>
+                <p><i class="right fas fa-angle-left"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview menu-open">
+                <li class="nav-item">
+                    <a href="/location" class="nav-link">
+                        <i class="nav-icon fas fa-table"></i> KALIP ARŞİVİ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/kalip" class="nav-link">
+                        <i class="nav-icon fas fa-database"></i> KALIP LİSTESİ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-database"></i> PROFİL LİSTESİ
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="nav-item has-tree-view ">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-wrench"></i> <p>BAKIM</p>
+                <p><i class="right fas fa-angle-left"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview menu-open">
+                <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-wrench"></i> ARIZA LİSTESİ
+                        </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-wrench"></i> YEDEK PARÇA STOK
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-wrench"></i> ARIZA BİLDİRİM
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="nav-item has-tree-view ">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-box-open"></i> <p>HAMMADDE</p>
+                <p><i class="right fas fa-angle-left"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview menu-open">
+                    <li class="nav-item">
+                            <a href="/stockCard" class="nav-link">
+                                <i class="nav-icon fas fa-table"></i> STOK
+                            </a>
+                    </li>
+            </ul>
+        </li>
+    {% else %}
+    <li class="nav-item">
+        <a href="/login" class="nav-link active">
+            <i class="nav-icon fas fa-user"></i> 
+            <p>GİRİŞ YAP</p>
+        </a>
+    </li>
+    {% endif %}
+    
+{% endblock nav_links %}
