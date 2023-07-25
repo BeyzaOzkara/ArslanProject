@@ -95,8 +95,8 @@ DATABASES = {
         'NAME': 'ARSLAN_2023',
         'USER': 'arsbyz',
         'PASSWORD': '123',
-        'HOST': 'MSSQLSERVER\ARSLANALUMINYUM', 
-        'PORT': '',
+        'HOST': '192.168.180.200', 
+        'PORT': '1433',
         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
         },
     }

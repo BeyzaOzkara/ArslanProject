@@ -17,6 +17,7 @@
     .tabulator { 
         background-color: #ccc;
         font-weight: bold;
+        width: 535px;
     }
 </style>
     
@@ -26,27 +27,34 @@
 
 <div class="container-fluid col-lg-11">
     <h1 class="col-lg-11">Arslan Alüminyum Kalıp Listesi</h1>
+    <div>
+        <button id="download-xlsx">Download XLSX</button>
+        <button id="download-html">Download HTML</button>
+    </div>
     <div class="row">
         <div class="card" id="kalipListe-table"></div>
         <div class="container-fluid col-lg-7">
                 <div class="card container-fluid " id="kalipKart">
                 <!-- Kalıp Kartı -->
                     <div class="row">
-                        <div class="row col-lg-6">
+                        <div class="row col-lg-4">
                             <div class="container-fluid col-lg-12">
                         <div class="card col-lg-12">
                             <div class="card-body">  <!-- Fotoğraflar  -->
-                                <a href="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG">teknik</a>
-                                <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image">
-                                <div class="col-6 product-image-thumbs">
+                                <!-- <a href="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG">teknik</a>
+                                <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image"> -->
+                                <a href="file://///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG">
+                                    <img alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" width="200" height="235">
+                                </a>
+                                <!-- <div class="col-6 product-image-thumbs">
                                     <div class="product-image-thumb active"><img src="https://i.stack.imgur.com/Cgm7x.jpg?s=128&g=1&g&s=32" alt="Product Image"></div>
                                     <div class="product-image-thumb" ><img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" alt="Product Image"></div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
                         </div>
-                        <div class="row col-lg-6">
+                        <div class="row col-lg-8">
                             <div class="container-fluid col-lg-12">
                                 <div class="info-box">
                                     <div class="info-box-content">
@@ -239,7 +247,7 @@ var listIcon = function(cell, formatterParams, onRendered){
 
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
-    layout:"fitData",
+    layout:"fitDataFill",
     placeholder:"Kalıp Liste",
     ajaxURL:"/kalip/liste",
     progressiveLoad:"scroll",
@@ -269,24 +277,42 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             //cell - cell component
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
                 if (kal.Silindi == 1){
-                    kal.Silindi = "Silindi"
+                    kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
                 }
+                else if (kal.Silindi == 0){
+                    if (kal.AktifPasif == "Pasif"){
+                        if (kal.Hatali == 1){
+                            kal.Silindi = "Hatalı ve Pasif"
+                        }else{
+                            kal.Silindi = "Pasif"
+                        }
+                    }
+                    else if (kal.AktifPasif == "Aktif") {
+                    if (kal.Hatali == 1){
+                        kal.Silindi = "Hatalı ve Aktif"
+                    }else{
+                        kal.Silindi = "Aktif"
+                    }
+                }
+                }
+                
+                document.getElementById("infoDurum").innerText = kal.Silindi;
                 document.getElementById("infoKalipNo").innerText = kal.KalipNo;
                 document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
-                document.getElementById("infoGramaj").innerText = kal.ResimGramaj;
-                document.getElementById("infoSonUretimGramaj").innerText = kal.SonUretimGr;
+                document.getElementById("infoGramaj").innerText = kal.ResimGramaj + " kg/m";
+                document.getElementById("infoSonUretimGramaj").innerText = kal.SonUretimGr + " kg/m";
                 document.getElementById("infoUreticiFirma").innerText = kal.UreticiFirma;
                 document.getElementById("infoSonUretimTarihi").innerText = kal.SonUretimTarih; 
                 document.getElementById("infoKaliteAciklama").innerText = kal.KaliteAciklama;
                 document.getElementById("infoKalipAciklama").innerText = kal.KalipAciklama;
                 document.getElementById("infoCins").innerText = kal.Cinsi;
                 document.getElementById("infoFigür").innerText = kal.GozAdedi;
-                document.getElementById("infoUretimTopKG").innerText = kal.UretimToplamKg;
-                document.getElementById("infoSonTen").innerText = kal.TeniferKalanOmurKg; 
+                document.getElementById("infoUretimTopKG").innerText = kal.UretimToplamKg + " kg";
+                document.getElementById("infoSonTen").innerText = kal.TeniferKalanOmurKg + " kg"; 
                 document.getElementById("infoSonTenTarihi").innerText = kal.SonTeniferTarih; //ten numarası
                 document.getElementById("infoTeniferNo").innerText = kal.TeniferNo;
-                document.getElementById("infoCap").innerText = kal.Capi;
-                document.getElementById("infoPaket").innerText = kal.PaketBoyu;
+                document.getElementById("infoCap").innerText = kal.Capi + " mm";
+                document.getElementById("infoPaket").innerText = kal.PaketBoyu + " mm";
             },
 /*             cellMouseMove:function(e, cell){
                 //e - the event object
@@ -317,7 +343,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
             {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
             {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
-            {title:"TENİFER KALAN ÖMÜR KG", field:"TeniferKalanOmurKg", headerFilter:"input"},
+            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input"},
             {title:"TENİFER ÖMRÜ MT", field:"TeniferOmruMt", headerFilter:"input", visible:false},
             {title:"TENİFER ÖMRÜ KG", field:"TeniferOmruKg", headerFilter:"input", visible:false},
             {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
@@ -333,6 +359,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
             {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
             {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
+            {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
             {title:"AKTİF PASİF", field:"AktifPasif", headerFilter:"input", visible:false},
             {title:"HATALI", field:"Hatali", headerFilter:"input", visible:false},
             {title:"PRES KODU", field:"PresKodu", headerFilter:"input", visible:false},
@@ -344,6 +371,16 @@ var tableKalip = new Tabulator("#kalipListe-table", {
     ],
 }); 
 
+//trigger download of data.xlsx file
+document.getElementById("download-xlsx").addEventListener("click", function(){
+    tableKalip.download("xlsx", "data.xlsx", {sheetName:"My Data"});
+});
+
+//trigger download of data.html file
+document.getElementById("download-html").addEventListener("click", function(){
+    tableKalip.download("html", "data.html", {style:true});
+});
+
 
 </script>
 
@@ -352,5 +389,6 @@ var tableKalip = new Tabulator("#kalipListe-table", {
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
-
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<!-- indirmek zournda kalmayacağımız bir yolunu bul -->
 {% endblock %}
