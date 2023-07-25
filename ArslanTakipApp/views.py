@@ -14,10 +14,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
 from django.db.models import Q
 from django.db import transaction 
-import cv2
-from pyzbar.pyzbar import decode
-
-
 
 # Create your views here.
 
