@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'StokApp',
     'adminlte3',
     'adminlte3_theme',
-    'tabulator',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
