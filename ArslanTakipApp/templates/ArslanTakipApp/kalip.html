@@ -312,9 +312,8 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 document.getElementById("infoTeniferNo").innerText = kal.TeniferNo;
                 document.getElementById("infoCap").innerText = kal.Capi + " mm";
                 document.getElementById("infoPaket").innerText = kal.PaketBoyu + " mm";
-                var image = document.getElementById("TeknikResim");
                 var rdizin = kal.ResimDizini + "Teknik1.jpg";
-                image.src = "/static" + rdizin.slice(13);
+                document.getElementById("TeknikResim").src = "/static" + rdizin.slice(13);
             },
 /*             cellMouseMove:function(e, cell){
                 //e - the event object
