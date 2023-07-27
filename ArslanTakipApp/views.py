@@ -158,7 +158,7 @@ def kalip_liste(request):
                 elif i["type"] == "=":
                     q[i['field']] = i['value']
 
-    query = query.filter(**q).order_by('-UretimTarihi') #.exclude(Silindi=1)
+    query = query.filter(**q).order_by('-UretimTarihi') 
 
     g = list(query.values()[(page-1)*size:page*size])
 
@@ -180,11 +180,9 @@ def kalip_liste(request):
         #print(b)
         try:
             c['kalipLocation'] = list(location_list.filter(id=list(location_list.filter(id=b))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=b))[0]["locationName"]
-            #c['kalipLocation'] =list(location_list.filter(id=list(location_list.filter(id=i['kalipLocation_id']))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=i['kalipLocation_id']))[0]["locationName"]
         except:
             try:
                 c['kalipLocation'] = list(location_list.filter(id=b))[0]["locationName"]
-                #c['kalipLocation'] = list(location_list.filter(id=i['kalipLocation_id']))[0]["locationName"]
             except:
                 c['kalipLocation'] = ""
         #print(c)
