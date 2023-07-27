@@ -1,5 +1,7 @@
 import math
+import os
 from urllib.parse import unquote
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -190,6 +192,12 @@ def kalip_liste(request):
     lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
     lastData['data'] = g
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    """ file_path = os.path.join(settings.PHOTOS_DIR, '39001-39500/39001-39100/39025/Teknik1.jpg')
+    context = {
+        "data" : data,
+        "foto" : file_path,
+    }
+    return HttpResponse(render(request, 'ArslanTakipApp/kalip.html', context)) """
     return HttpResponse(data)
 
 #gelen id başka konumların parenti ise altındakileri listele??
