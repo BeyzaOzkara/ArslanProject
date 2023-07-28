@@ -85,7 +85,7 @@ def guncelle(i, b, u):
     return True
 
 @login_required #user must be logged in
-@permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
+#@permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
     loc_list = list(loc.values().order_by('id'))
