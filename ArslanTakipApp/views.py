@@ -156,7 +156,7 @@ def kalip_liste(request):
         for i in filter_list:
             if i['type'] != 'kalipLocation':
                 if i["type"] == "like":
-                    q[i['field']+"__contains"] = i['value']
+                    q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
                     q[i['field']] = i['value']
 
@@ -336,7 +336,7 @@ def location_kalip(request):
         if len(filter_list)>0:
             for i in filter_list:
                 if i["type"] == "like":
-                    q[i['field']+"__contains"] = i['value']
+                    q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
                     #q[i['field']] = i['value']
                     loca = loc.values().get(id = i['value'])
