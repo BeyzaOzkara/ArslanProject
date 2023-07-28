@@ -88,7 +88,7 @@ def guncelle(i, b, u):
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
-    loc_list = list(loc.values())
+    loc_list = list(loc.values().order_by('id'))
     loc_list_rev = list(reversed(loc_list))
     for item in loc_list_rev:
         for i in loc_list:
@@ -98,7 +98,9 @@ def location(request):
                 except:
                     i['_children'] = [item]
                 loc_list.remove(item)
+
     childData = loc_list
+    #print (childData)
 
     if request.method == "POST":
         dieList = request.POST.get("dieList")
@@ -111,7 +113,7 @@ def location(request):
         for i in dieList:
             k = DiesLocation.objects.get(kalipNo = i)
             print(k.kalipVaris.id)
-            if k.kalipVaris != lRec.id:
+            if k.kalipVaris.id != lRec.id:
                 hareket = Hareket()
                 hareket.kalipKonum_id = k.kalipVaris.id
                 hareket.kalipVaris_id = dieTo
@@ -121,6 +123,7 @@ def location(request):
                 print("Hareket saved")
             else:
                 print("Hareket not saved")
+                
             
     data = json.dumps(childData)
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data})
@@ -389,6 +392,18 @@ def qrKalite(request):
             "type" : ty,
             "no" : no,
         }
+        
+        """ query = KalipMs.objects.using('dies').all()
+        query = query.order_by('-UretimTarihi') 
+        harLi = list(query.values())
+        for j in harLi:
+                hareket = Hareket()
+                hareket.kalipVaris_id = 48
+                hareket.kalipNo = j['KalipNo']
+                hareket.kimTarafindan_id = request.user.id
+                hareket.save()
+                print("Hareket saved") """
+
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 class qrKaliteView(generic.TemplateView):
