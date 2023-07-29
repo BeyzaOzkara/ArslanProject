@@ -28,14 +28,14 @@
 
 <div class="container-fluid col-lg-11">
     <h1 class="col-lg-11">Arslan Alüminyum Kalıp Listesi</h1>
-    <div>
-        <button id="download-xlsx">Download XLSX</button>
-        <button id="download-html">Download HTML</button>
-    </div>
     <div class="row">
-        <div class="card" id="kalipListe-table"></div>
+        <div class="container-fluid col-lg-12">
+            <button id="download-xlsx">Download XLSX</button>
+            <button id="download-html">Download HTML</button>
+            <div class="card" id="kalipListe-table"></div>
+        </div>
         <div class="container-fluid col-lg-7">
-                <div class="card container-fluid " id="kalipKart">
+                <div class="card container-fluid " id="kalip_karti" style="visibility: hidden;">
                 <!-- Kalıp Kartı -->
                     <div class="row">
                         <div class="row col-lg-4">
@@ -43,9 +43,9 @@
                         <div class="card col-lg-12">
                             <div class="card-body">  <!-- Fotoğraflar  -->
                                 <a href="{% static '/ArslanTakipApp/arslanLogo.png' %}" data-toggle="lightbox" id="TeknikA">
-                                <!-- <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image"> -->
                                     <img id="TeknikResim" alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" width="200" height="235"> </a>
-                                <!-- <div class="col-6 product-image-thumbs">
+                                <!-- <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image">
+                                    <div class="col-6 product-image-thumbs">
                                     <div class="product-image-thumb active"><img src="https://i.stack.imgur.com/Cgm7x.jpg?s=128&g=1&g&s=32" alt="Product Image"></div>
                                     <div class="product-image-thumb" ><img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" alt="Product Image"></div>
                                 </div> -->
@@ -182,6 +182,9 @@
                 </div>
                 <!--kalipKart end-->
         </div>
+        <div class="container-fluid col-lg-5">
+
+        </div>
         
             <!--container kart end-->
     </div>
@@ -242,9 +245,13 @@ var headerMenu = function(){
 };
 
 var listIcon = function(cell, formatterParams, onRendered){ 
-    return "<i class='fa fa-list-ul'></i>"; //icon değiştir
+    //<a href="#kalip_karti"></a>
+    return "<a href='#kalip_karti'><i class='fa fa-list-ul'></i></a> "; //icon değiştir
 };
-
+var aktifIcon = function(cell, formatterParams, onRendered){ 
+    //<a href="#kalip_karti"></a>
+    return "<i class='fa fa-list-ul'></i> "; //icon değiştir
+};
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
     layout:"fitDataFill",
@@ -275,6 +282,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
             //e - the click event object
             //cell - cell component
+            document.getElementById("kalip_karti").style.visibility = 'visible';
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
                 if (kal.Silindi == 1){
                     kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
@@ -333,20 +341,20 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             }, */
             },
             {title:"KALIP NO", field:"KalipNo", headerFilter:"input"},
-            {title:"KONUM", field:"kalipLocation", formatter:"html"},
-            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input", visible:false},
+            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
             {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
             {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
             {title:"CİNSİ", field:"Cinsi", headerFilter:"input", visible:false},
             {title:"GRAMAJ", field:"Miktar", headerFilter:"input", visible:false},
             {title:"CAPİ", field:"Capi", headerFilter:"input", visible:false},
+            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
             {title:"URETİM TARİHİ", field:"UretimTarihi", headerFilter:"input", visible:false},
             {title:"FİGÜR", field:"GozAdedi", headerFilter:"input", visible:false},
             {title:"BOLSTER", field:"Bolster", headerFilter:"input", visible:false},
             {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
             {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
             {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
-            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input"},
+            {title:"KALANTENİFER", field:"TeniferKalanOmurKg", headerFilter:"input"},
             {title:"TENİFER ÖMRÜ MT", field:"TeniferOmruMt", headerFilter:"input", visible:false},
             {title:"TENİFER ÖMRÜ KG", field:"TeniferOmruKg", headerFilter:"input", visible:false},
             {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
@@ -356,7 +364,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
             {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
             {title:"ÜRETİM TEN SONRASI KG", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false},
-            {title:"ÜRETİM TOPLAM KG", field:"UretimToplamKg", headerFilter:"input", visible:false},
+            {title:"ÜRETİM TOPLAM KG", field:"UretimToplamKg", headerFilter:"input"},
             {title:"RESİM GRAMAJ", field:"ResimGramaj", headerFilter:"input", visible:false},
             {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
             {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
@@ -365,11 +373,13 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
             {title:"AKTİF PASİF", field:"AktifPasif", headerFilter:"input", visible:false},
             {title:"HATALI", field:"Hatali", headerFilter:"input", visible:false},
-            {title:"PRES KODU", field:"PresKodu", headerFilter:"input", visible:false},
+            {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+            {title:"KONUM", field:"kalipLocation", formatter:"html"},
             {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
-            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
             ],
-        }
+            
+        },
+        //{formatter:aktifIcon, title: "Pasifleri Göster", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){}},
     
     ],
 }); 

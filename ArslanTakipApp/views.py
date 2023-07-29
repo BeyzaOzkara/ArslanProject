@@ -102,19 +102,14 @@ def location(request):
     childData = loc_list
     #print (childData)
     gonderData = location_list(request.user)
-    print(gonderData)
 
     if request.method == "POST":
         dieList = request.POST.get("dieList")
-        print("diesList: "+ dieList)
         dieList = dieList.split(",")
         dieTo = request.POST.get("dieTo")
         lRec = Location.objects.get(id = dieTo)
-        print("lRec: ")
-        print(lRec.id)
         for i in dieList:
             k = DiesLocation.objects.get(kalipNo = i)
-            print(k.kalipVaris.id)
             if k.kalipVaris.id != lRec.id:
                 hareket = Hareket()
                 hareket.kalipKonum_id = k.kalipVaris.id
@@ -126,7 +121,6 @@ def location(request):
             else:
                 print("Hareket not saved")
                 
-            
     data = json.dumps(childData)
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
@@ -149,23 +143,26 @@ def location_list(a):
 
 def kalip_liste(request):
     #Kalıp Listesi Detaylı
-    #Tıklayınca Kalıp Teknik resimleri göster Popup?
     params = json.loads(unquote(request.GET.get('params')))
+    for i in params:
+        value = params[i]
+        print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
     query = KalipMs.objects.using('dies').all()
-    #query = Kalip.objects.all()
     location_list = Location.objects.values()
     q = {} 
     
     if len(filter_list)>0:
         for i in filter_list:
-            if i['type'] != 'kalipLocation':
+            if i['field'] != 'ProfilNo':
                 if i["type"] == "like":
                     q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
                     q[i['field']] = i['value']
+            else:
+                q[i['field']] = i['value']
 
     query = query.filter(**q).order_by('-UretimTarihi') 
 
