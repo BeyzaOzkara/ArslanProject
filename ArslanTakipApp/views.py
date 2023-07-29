@@ -101,6 +101,8 @@ def location(request):
 
     childData = loc_list
     #print (childData)
+    gonderData = location_list(request.user)
+    print(gonderData)
 
     if request.method == "POST":
         dieList = request.POST.get("dieList")
@@ -128,20 +130,22 @@ def location(request):
     data = json.dumps(childData)
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data})
 
-def location_list(request):
-    loc_list = list(request.values())
-    loc_list_rev = list(reversed(loc_list))
-    for item in loc_list_rev:
-        for i in loc_list:
+def location_list(a):
+    gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
+    gonderLoc_list = list(gonderLoc.values().order_by('id'))
+    gonderLoc_list_rev = list(reversed(gonderLoc_list))
+    for item in gonderLoc_list_rev:
+        for i in gonderLoc_list:
             if item['locationRelationID_id'] == i['id']:
                 try:
                     i['_children'].append(item)
                 except:
                     i['_children'] = [item]
-                loc_list.remove(item)
-    childData = loc_list
+                gonderLoc_list.remove(item)
+
+    childData = gonderLoc_list
     data = json.dumps(childData)
-    return loc_list
+    return data
 
 def kalip_liste(request):
     #Kalıp Listesi Detaylı

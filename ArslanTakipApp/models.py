@@ -12,7 +12,7 @@ class Location(models.Model):
         return self.locationName
     
     class Meta:
-        permissions = [("dg_view_location", "OLP can view location")]
+        permissions = [("dg_view_location", "Gorme Yetkisi Var"), ("gonder_view_location", "Gonderme Yetkisi Var")]
 
     
 #veritabanı isimlerini ingilizce yap
