@@ -128,7 +128,7 @@ def location(request):
                 
             
     data = json.dumps(childData)
-    return render(request, 'ArslanTakipApp/location.html', {'location_json':data})
+    return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)

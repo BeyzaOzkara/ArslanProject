@@ -189,11 +189,12 @@ var tableKalipReceive = new Tabulator("#kalip-receive-table", {
         ],
     });
 
+var gonderData = JSON.parse('{{ gonder_json|escapejs }}');
 var tableLocReceive = new Tabulator("#location-receive-tree-table", {
     height:"350px",
     layout:"fitColumns",
     placeholder:"No Data Set",
-    data:data,
+    data:gonderData,
     dataTree:true,
     dataTreeStartExpanded:false,
     selectable:1,
