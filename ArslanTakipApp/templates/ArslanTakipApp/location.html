@@ -34,7 +34,7 @@
           <input type="hidden" id="dieTo" name="dieTo" value="">
           <button class="btn btn-block bg-gradient-secondary btn-lg" id="kalip-gonder" disabled>Kalıp Gönder</button>
         </form>
-      </div>
+    </div>
     <div class="card" id="hareket-table"></div>
 </div>
 
@@ -195,7 +195,7 @@ var tableLocReceive = new Tabulator("#location-receive-tree-table", {
     placeholder:"No Data Set",
     data:data,
     dataTree:true,
-    dataTreeStartExpanded:true,
+    dataTreeStartExpanded:false,
     selectable:1,
     columns:[
     {title:"GÖNDERİLEN LOKASYON", field:"locationName", responsive:0, headerSort:false},

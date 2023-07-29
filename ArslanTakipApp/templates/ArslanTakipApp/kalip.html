@@ -7,6 +7,7 @@
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.css' %}">
 
 <style>
     .tabulator-menu{
@@ -41,9 +42,9 @@
                             <div class="container-fluid col-lg-12">
                         <div class="card col-lg-12">
                             <div class="card-body">  <!-- Fotoğraflar  -->
-                                <!-- <a href="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG">teknik</a>
-                                <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image"> -->
-                                <img id="TeknikResim" alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" width="200" height="235">
+                                <a href="{% static '/ArslanTakipApp/arslanLogo.png' %}" data-toggle="lightbox" id="TeknikA">
+                                <!-- <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image"> -->
+                                    <img id="TeknikResim" alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" width="200" height="235"> </a>
                                 <!-- <div class="col-6 product-image-thumbs">
                                     <div class="product-image-thumb active"><img src="https://i.stack.imgur.com/Cgm7x.jpg?s=128&g=1&g&s=32" alt="Product Image"></div>
                                     <div class="product-image-thumb" ><img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" alt="Product Image"></div>
@@ -314,6 +315,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 document.getElementById("infoPaket").innerText = kal.PaketBoyu + " mm";
                 var rdizin = kal.ResimDizini.replace(/\s/g,'') + "Teknik1.jpg";
                 document.getElementById("TeknikResim").src = "/static" + rdizin.slice(13);
+                document.getElementById("TeknikA").href = "/static" + rdizin.slice(13);
             },
 /*             cellMouseMove:function(e, cell){
                 //e - the event object
@@ -382,6 +384,15 @@ document.getElementById("download-html").addEventListener("click", function(){
     tableKalip.download("html", "data.html", {style:true});
 });
 
+$(function () {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox({
+        alwaysShowClose: true
+        });
+    });
+});
+
 
 </script>
 
@@ -391,5 +402,6 @@ document.getElementById("download-html").addEventListener("click", function(){
 {% include 'adminlte/lib/_scripts.html' %}
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<script type="text/javascript" src="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.min.js' %}"></script>
 <!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
 {% endblock %}
