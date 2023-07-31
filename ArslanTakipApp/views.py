@@ -160,6 +160,10 @@ def kalip_liste(request):
                 if i["type"] == "like":
                     q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
+                    if i['field'] == 'AktifPasif':
+                        if i['value'] == True:
+                            i['value'] = 'Aktif'
+                        else: i['value'] = 'Pasif'
                     q[i['field']] = i['value']
             else:
                 q[i['field']] = i['value']
@@ -173,6 +177,14 @@ def kalip_liste(request):
             c['UretimTarihi'] = c['UretimTarihi'].strftime("%d-%m-%Y")
             c['SonTeniferTarih'] =c['SonTeniferTarih'].strftime("%d-%m-%Y %H:%M:%S")
             c['SonUretimTarih'] =c['SonUretimTarih'].strftime("%d-%m-%Y")
+        if c['AktifPasif'] == "Aktif":
+            c['AktifPasif'] = True
+        elif c['AktifPasif'] == "Pasif":
+            c['AktifPasif'] = False
+        if c['Hatali'] == 1:
+            c['Hatali'] = 0
+        elif c['Hatali'] == 0:
+            c['Hatali'] = 1
         try: 
             b = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
         except:

@@ -30,10 +30,18 @@
     <h1 class="col-lg-11">Arslan Alüminyum Kalıp Listesi</h1>
     <div class="row">
         <div class="container-fluid col-lg-12">
-            <button id="download-xlsx">Download XLSX</button>
-            <button id="download-html">Download HTML</button>
+            <div class="row col-lg-12">
+                <div class="col-lg-6">
+                </div>
+                <div class="col-lg-6">
+                    <a class="btn btn-app bg-success" style="float: right;" id="download-xlsx" >
+                        <i class="fas fa-file-excel"></i>
+                        excell
+                    </a>
+                </div>
+            </div>
             <div class="card" id="kalipListe-table"></div>
-        </div>
+            </div>
         <div class="container-fluid col-lg-7">
                 <div class="card container-fluid " id="kalip_karti" style="visibility: hidden;">
                 <!-- Kalıp Kartı -->
@@ -194,6 +202,7 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+    
 
 /* var elem = document.getElementById('kalipKart');
 elem.style.display = 'none';
@@ -252,6 +261,25 @@ var aktifIcon = function(cell, formatterParams, onRendered){
     //<a href="#kalip_karti"></a>
     return "<i class='fa fa-list-ul'></i> "; //icon değiştir
 };
+var hatAccessor = function(value, data, type, params, column){
+    if (value == params.Hatasiz){
+        value = 'Hatasız';
+    }
+    else if (value == params.Hatali){
+        value = 'Hatalı';
+    };
+    return value;
+};
+var aktAccessor = function(value, data, type, params, column) {
+    if (value == params.Akt){
+        value = 'Aktif';
+    }
+    else if (value == params.Pas){
+        value = 'Pasif';
+    };
+    return value;
+}
+
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
     layout:"fitDataFill",
@@ -264,10 +292,10 @@ var tableKalip = new Tabulator("#kalipListe-table", {
     popupContainer:true,
     rowFormatter: row => {
         let data = row.getData();
-        if (data.Hatali === 1) {
+        if (data.Hatali === 0) {
             row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
         }
-        if (data.AktifPasif === "Pasif") {
+        if (data.AktifPasif === false) {
             row.getElement().style.color = "#a3050a"
         }
     },
@@ -282,7 +310,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
             //e - the click event object
             //cell - cell component
-            document.getElementById("kalip_karti").style.visibility = 'visible';
+                document.getElementById("kalip_karti").style.visibility = 'visible';
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
                 if (kal.Silindi == 1){
                     kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
@@ -325,22 +353,12 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 document.getElementById("TeknikResim").src = "/static" + rdizin.slice(13);
                 document.getElementById("TeknikA").href = "/static" + rdizin.slice(13);
             },
-/*             cellMouseMove:function(e, cell){
-                //e - the event object
-                //cell - cell component
-                cell.getElement().style.backgroundColor = "#ff0000";
-                display();
-
             },
-            cellMouseOut:function(e, cell){
-                //e - the event object
-                //cell - cell component
-                //cell.getData().ResimDizini
-                cell.getElement().style.backgroundColor = "#160357";
-                display()
-            }, */
-            },
-            {title:"KALIP NO", field:"KalipNo", headerFilter:"input"},
+            {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
+            accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
+            {title:"HATA", field:"Hatali", headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
+            accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
+            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc:"count"},
             {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
             {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
             {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
@@ -354,44 +372,43 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
             {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
             {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
-            {title:"KALANTENİFER", field:"TeniferKalanOmurKg", headerFilter:"input"},
-            {title:"TENİFER ÖMRÜ MT", field:"TeniferOmruMt", headerFilter:"input", visible:false},
-            {title:"TENİFER ÖMRÜ KG", field:"TeniferOmruKg", headerFilter:"input", visible:false},
+            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruMt", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
             {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
-            {title:"SON TENİFER KG", field:"SonTeniferKg", headerFilter:"input", visible:false},
+            {title:"SON TENİFER", field:"SonTeniferKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
             {title:"SON TENİFER SEBEBİ", field:"SonTeniferSebebi", headerFilter:"input", visible:false},
             {title:"SIRADAKİ TENİFER NO", field:"TeniferNo", headerFilter:"input", visible:false},
             {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
             {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
-            {title:"ÜRETİM TEN SONRASI KG", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false},
-            {title:"ÜRETİM TOPLAM KG", field:"UretimToplamKg", headerFilter:"input"},
+            {title:"ÜRETİM TEN SONRASI", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"ÜRETİM TOPLAM", field:"UretimToplamKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
             {title:"RESİM GRAMAJ", field:"ResimGramaj", headerFilter:"input", visible:false},
             {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
             {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
             {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
             {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
             {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
-            {title:"AKTİF PASİF", field:"AktifPasif", headerFilter:"input", visible:false},
-            {title:"HATALI", field:"Hatali", headerFilter:"input", visible:false},
             {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
             {title:"KONUM", field:"kalipLocation", formatter:"html"},
             {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
             ],
             
         },
-        //{formatter:aktifIcon, title: "Pasifleri Göster", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){}},
-    
     ],
 }); 
+
+
 
 //trigger download of data.xlsx file
 document.getElementById("download-xlsx").addEventListener("click", function(){
     tableKalip.download("xlsx", "data.xlsx", {sheetName:"My Data"});
-});
-
-//trigger download of data.html file
-document.getElementById("download-html").addEventListener("click", function(){
-    tableKalip.download("html", "data.html", {style:true});
 });
 
 $(function () {
@@ -403,6 +420,10 @@ $(function () {
     });
 });
 
+$("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    });
+
 
 </script>
 
@@ -413,5 +434,7 @@ $(function () {
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
 <script type="text/javascript" src="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
+
 <!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
 {% endblock %}
