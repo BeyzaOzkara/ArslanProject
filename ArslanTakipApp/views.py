@@ -192,7 +192,7 @@ def kalip_liste(request):
             hareket = Hareket()
             hareket.kalipVaris_id = 48
             hareket.kalipNo = c['KalipNo']
-            hareket.kimTarafindan_id = request.user.id
+            hareket.kimTarafindan_id = 1
             hareket.save()
             print("Hareket saved")
         #print(b)
