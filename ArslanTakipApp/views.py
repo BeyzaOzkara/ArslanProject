@@ -167,7 +167,7 @@ def kalip_liste(request):
                     q[i['field']] = i['value']
             else:
                 q[i['field']] = i['value']
-
+    
     query = query.filter(**q).order_by('-UretimTarihi') 
 
     g = list(query.values()[(page-1)*size:page*size])
@@ -344,7 +344,6 @@ def location_kalip(request):
         loc_list = list(loc.values())
         locs = [l['id'] for l in loc_list]
         query = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
-        #query = Kalip.objects.filter(kalipLocation_id__in=locs).order_by('KalipNo')
         lfil =[]
         if request.user.is_superuser:
             query = DiesLocation.objects.all().order_by('kalipNo')
@@ -358,7 +357,6 @@ def location_kalip(request):
                     loca = loc.values().get(id = i['value'])
                     if loca['isPhysical']: 
                         q[i['field']] = i['value']
-                        #print("1.if")
                     else :
                         lo = loc.values().filter(locationRelationID_id = i['value'])
                         for j in list(lo):
@@ -369,6 +367,12 @@ def location_kalip(request):
                                 for f in list(filo):
                                     if f['isPhysical']:
                                         lfil.append(f['id'])
+                                    else :
+                                        filo2 = loc.values().filter(locationRelationID_id = f['id'])
+                                        print(filo2)
+                                        for b in list(filo2):
+                                            if b['isPhysical']:
+                                                lfil.append(b['id'])
                         #print(lfil)
                         query = DiesLocation.objects.filter(kalipVaris_id__in=lfil)
 
@@ -405,18 +409,39 @@ def qrKalite(request):
             "type" : ty,
             "no" : no,
         }
-        
-        """ query = KalipMs.objects.using('dies').all()
-        query = query.order_by('-UretimTarihi') 
-        harLi = list(query.values())
-        for j in harLi:
-                hareket = Hareket()
-                hareket.kalipVaris_id = 48
-                hareket.kalipNo = j['KalipNo']
-                hareket.kimTarafindan_id = request.user.id
-                hareket.save()
-                print("Hareket saved") """
-
+        olmayan = []
+        notsaved = []
+        query = KalipMs.objects.using('dies').all() #['SIRA 5','11497'], ['SIRA 6','402-3'], ['SIRA 8','12773-3'],['SIRA 9','4405-31'],['SIRA 9','4471-33'],
+        sira1 = [
+                 ]
+        for i in sira1:
+            try:
+                print(i[1])
+                a = list(KalipMs.objects.using('dies').filter(KalipNo__startswith = i[1]).values())
+                if not a:
+                    olmayan.append(i)
+                for j in a:
+                    kno = j['KalipNo']
+                    if kno.strip()==i[1]:
+                        if DiesLocation.objects.get(kalipNo = kno).kalipVaris_id != Location.objects.get(locationName = i[0]).id:
+                            hareket = Hareket()
+                            print(kno+'if ici')
+                            hareket.kalipKonum_id = DiesLocation.objects.get(kalipNo = kno).kalipVaris_id
+                            #print(DiesLocation.objects.get(kalipNo = kno).kalipVaris_id)
+                            hareket.kalipVaris_id = Location.objects.get(locationName = i[0]).id
+                            #print(hareket.kalipVaris_id)
+                            hareket.kalipNo = query.get(KalipNo = kno).KalipNo
+                            hareket.kimTarafindan_id = request.user.id
+                            hareket.save()
+                            print("Hareket saved")
+                            print()
+            except:
+                print(KalipMs.objects.using('dies').get(KalipNo = i[1]).KalipNo)
+                notsaved.append(i)
+                print("Hareket not saved")
+    
+    print(olmayan)
+    print(notsaved)
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 class qrKaliteView(generic.TemplateView):
