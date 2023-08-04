@@ -1,6 +1,11 @@
 {% extends 'adminlte/lib/_main_header.html' %}
 {% load static %}
 
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="icon" type="image/png" href="{% static '/favicon.ico' %}"/>
+{% endblock %}
+
 {% block header_dropdowns %}
 
 {% block user_info %}

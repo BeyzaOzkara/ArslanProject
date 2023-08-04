@@ -17,5 +17,6 @@ urlpatterns = [
     path('hareket', views.HareketView.as_view()),
     path('kalip/', views.KalipView.as_view()),
     path('kalip/liste', views.kalip_liste),
+    path('kalip/rapor', views.kalip_rapor),
     path('qr', views.qrKalite),
 ]

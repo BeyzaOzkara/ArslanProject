@@ -32,6 +32,7 @@
         <div class="container-fluid col-lg-12">
             <div class="row col-lg-12">
                 <div class="col-lg-6">
+                    <span id="deneme"></span>
                 </div>
                 <div class="col-lg-6">
                     <a class="btn btn-app bg-success" style="float: right;" id="download-xlsx" >
@@ -41,10 +42,11 @@
                 </div>
             </div>
             <div class="card" id="kalipListe-table"></div>
-            </div>
+        </div>
         <div class="container-fluid col-lg-7">
                 <div class="card container-fluid " id="kalip_karti" style="visibility: hidden;">
                 <!-- Kalıp Kartı -->
+                <div class="card-body">
                     <div class="row">
                         <div class="row col-lg-4">
                             <div class="container-fluid col-lg-12">
@@ -52,17 +54,12 @@
                             <div class="card-body">  <!-- Fotoğraflar  -->
                                 <a href="{% static '/ArslanTakipApp/arslanLogo.png' %}" data-toggle="lightbox" id="TeknikA">
                                     <img id="TeknikResim" alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" width="200" height="235"> </a>
-                                <!-- <img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" class="product-image" alt="Product Image">
-                                    <div class="col-6 product-image-thumbs">
-                                    <div class="product-image-thumb active"><img src="https://i.stack.imgur.com/Cgm7x.jpg?s=128&g=1&g&s=32" alt="Product Image"></div>
-                                    <div class="product-image-thumb" ><img src="file:///mssqlserver/ProfilDesign/40501-41000/40701-40800/40786/Teknik1.JPG" alt="Product Image"></div>
-                                </div> -->
                             </div>
                         </div>
                     </div>
                         </div>
                         <div class="row col-lg-8">
-                            <div class="container-fluid col-lg-12">
+                            <div class="container-fluid">
                                 <div class="info-box">
                                     <div class="info-box-content">
                                     <span class="info-box-text">KALIP NO:</span>
@@ -75,7 +72,7 @@
                                     <span class="info-box-number" id="infoFirmaAdi">Firma Adı</span>
                                     </div>
                                 </div>
-                                <div class="container-fluid col-lg-12">
+                                <div class="container-fluid">
                                 <div class="row">
                                         <div class="info-box col-lg-6">
                                             <div class="info-box-content">
@@ -168,7 +165,7 @@
                             <div class="info-box col-lg-4">
                                 <div class="info-box-content">
                                 <span class="info-box-text">DURUMU:</span>
-                                <span class="info-box-number" id="infoDurum">Durumu</span>
+                                <span class="info-box-number" id="infoDurumu">Durumu</span>
                                 </div>
                             </div>
                             <div class="info-box col-lg-4">
@@ -188,13 +185,14 @@
                     </div>
                     <!--row end-->
                 </div>
+            </div>
                 <!--kalipKart end-->
         </div>
+        <!--Pres Üretim Raporu start -->
         <div class="container-fluid col-lg-5">
-
+            <div class="card" id="presURaporListe-table" style="visibility: hidden;"></div>
         </div>
         
-            <!--container kart end-->
     </div>
 </div>
 
@@ -278,7 +276,7 @@ var aktAccessor = function(value, data, type, params, column) {
         value = 'Pasif';
     };
     return value;
-}
+};
 
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
@@ -310,21 +308,24 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
             //e - the click event object
             //cell - cell component
+                presURaporu.setFilter([{ field: 'KalipNo', type: '=', value: cell.getData().KalipNo }, 
+                    ]);
                 document.getElementById("kalip_karti").style.visibility = 'visible';
+                document.getElementById("presURaporListe-table").style.visibility = 'visible';
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
                 if (kal.Silindi == 1){
                     kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
                 }
                 else if (kal.Silindi == 0){
-                    if (kal.AktifPasif == "Pasif"){
+                    if (kal.AktifPasif == false){
                         if (kal.Hatali == 1){
                             kal.Silindi = "Hatalı ve Pasif"
                         }else{
                             kal.Silindi = "Pasif"
                         }
                     }
-                    else if (kal.AktifPasif == "Aktif") {
-                    if (kal.Hatali == 1){
+                    else if (kal.AktifPasif == true) {
+                    if (kal.Hatali == 0){
                         kal.Silindi = "Hatalı ve Aktif"
                     }else{
                         kal.Silindi = "Aktif"
@@ -332,7 +333,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 }
                 }
                 
-                document.getElementById("infoDurum").innerText = kal.Silindi;
+                document.getElementById("infoDurumu").innerText = kal.Silindi;
                 document.getElementById("infoKalipNo").innerText = kal.KalipNo;
                 document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
                 document.getElementById("infoGramaj").innerText = kal.ResimGramaj + " kg/m";
@@ -404,6 +405,25 @@ var tableKalip = new Tabulator("#kalipListe-table", {
     ],
 }); 
 
+var presURaporu = new Tabulator("#presURaporListe-table", {
+    height:"720px",
+    layout:"fitDataFill",
+    placeholder:"Pres Üretim Raporu",
+    ajaxURL:"/kalip/rapor",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+        {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+        {title:"TARİH", field:"Tarih",formatter:"html", headerFilter:"input"},
+        {title:"DURUM", field:"Durum", headerFilter:"input"},
+        {title:"AÇIKLAMA", field:"HataAciklama", headerFilter:"input"},
+    ]
+});
 
 
 //trigger download of data.xlsx file

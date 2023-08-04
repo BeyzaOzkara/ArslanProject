@@ -6,23 +6,82 @@
 
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
-  <!-- Tempusdominus Bbootstrap 4 -->
-  <link rel="stylesheet" href="{% static 'admin-lte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
-  <!-- Bootstrap4 Duallistbox -->
-  <link rel="stylesheet" href="{% static 'admin-lte/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css'%}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
 
 {% endblock %}
 {% block content %}
     
 <h1>~~YAPIM AŞAMASINDA~~</h1>
 
+<div class="container-fluid-lg-12">
+  <h1 class="col-lg-11">Arslan Alüminyum Stok Kartı</h1>
+  <div class="row">
+    <div class="container-fluid col-lg-12">
+      <div class="card container-fluid " id="stok_karti">
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-7">
+              <div class="form-group">
+                <label>Depo</label>
+                <select class="form-control select2-lg" style="width: 100%;">
+                  <option selected="selected">HAM Mlz.ler (İlk Maddeler)</option>
+                  <option>YARIMAMUL (Aramamül) Mallar</option>
+                  <option>MAMUL (Bitmiş Ürünler)</option>
+                  <option>TİCARİ MALLAR</option>
+                  <option>YARDIMCI İMALAT MALZEMELERİ</option>
+                  <option>MLZ. TAŞIYICILAR (Kasa/Amb./Palet)</option>
+                  <option>FİRE ve HURDA Mlz.ler</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-7">
+              <div class="form-group">
+                <label>Tür</label>
+                <select class="form-control select2-lg" style="width: 100%;">
+                  <option selected="selected">HAM Mlz.ler (İlk Maddeler)</option>
+                  <option>YARIMAMUL (Aramamül) Mallar</option>
+                  <option>MAMUL (Bitmiş Ürünler)</option>
+                  <option>TİCARİ MALLAR</option>
+                  <option>YARDIMCI İMALAT MALZEMELERİ</option>
+                  <option>MLZ. TAŞIYICILAR (Kasa/Amb./Palet)</option>
+                  <option>FİRE ve HURDA Mlz.ler</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-7">
+              <div class="form-group">
+                <label>Grup</label>
+                <select class="form-control select2-lg" id="datas" style="width: 100%;">
+                  {% for l in loc_json %}
+                  <option value="{{l}}">{{l}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            {{loc_json|escapejs}}
+            <h2></h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block javascript %}
 
 {% include 'adminlte/lib/_scripts.html' %}
-<!-- Bootstrap4 Duallistbox -->
-<script src="{% static 'admin-lte/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
 <!-- InputMask -->
 <script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/inputmask/min/jquery.inputmask.bundle.min.js' %}"></script>
@@ -44,9 +103,9 @@
     //Money Euro
     $('[data-mask]').inputmask()
 
-    //Bootstrap Duallistbox
-    $('.duallistbox').bootstrapDualListbox()
+  });
 
-  })
+  var data = JSON.parse('{{ loc_json|escapejs }}');
+
 </script>
 {% endblock %}

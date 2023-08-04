@@ -127,3 +127,23 @@ class KalipMs(models.Model):
     class Meta:
         managed = False
         db_table = 'View020_KalipListe'
+
+class PresUretimRaporu(models.Model):
+    KalipNo = models.CharField(primary_key=True)
+    KartNo = models.IntegerField(null=True)
+    Tarih = models.DateTimeField(null=True)
+    Operator = models.CharField(null=True)
+    StokKodu = models.CharField(null=True)
+    StokCinsi = models.CharField(null=True)
+    PartiNo = models.CharField(null=True)
+    PresKodu = models.CharField(null=True)
+    PresAdi = models.CharField(null=True)
+    Gerceklesen = models.FloatField(null=True)
+    BaslamaSaati = models.DateTimeField(null=True)
+    BitisSaati = models.DateTimeField(null=True)
+    HataAciklama = models.CharField(null=True)
+    Durum = models.CharField(null=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'View062_PresUretimRaporu'

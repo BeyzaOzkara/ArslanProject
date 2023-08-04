@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -100,7 +100,7 @@ def location(request):
                 loc_list.remove(item)
 
     childData = loc_list
-    #print (childData)
+    print (childData)
     gonderData = location_list(request.user)
 
     if request.method == "POST":
@@ -146,7 +146,7 @@ def kalip_liste(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
-        print("Key and Value pair are ({}) = ({})".format(i, value))
+        #print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
@@ -207,6 +207,43 @@ def kalip_liste(request):
     kalip_count = query.count()
     lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
     lastData['data'] = g
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+def kalip_rapor(request):
+    params = json.loads(unquote(request.GET.get('params')))
+    for i in params:
+        value = params[i]
+        print("Key and Value pair are ({}) = ({})".format(i, value))
+    size = params["size"]
+    page = params["page"]
+    filter_list = params["filter"]
+    q = {} 
+    kalip_count = 0
+    lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+
+    if len(filter_list)>0:
+        print(filter_list)
+        for i in filter_list:
+            if i["type"] == "like":
+                q[i['field']+"__startswith"] = i['value']
+            elif i["type"] == "=":
+                q[i['field']] = i['value']
+    
+        query = PresUretimRaporu.objects.using('dies').all()
+        query = query.filter(**q).order_by('-Tarih') 
+
+        g = list(query.values()[(page-1)*size:page*size])
+        for c in g:
+            if c['Tarih'] != None:
+                c['Tarih'] = c['Tarih'].strftime("%d-%m-%Y") + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
+                c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
+                c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
+            #print(c)
+        kalip_count = query.count()
+        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+        lastData['data'] = g
+
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
