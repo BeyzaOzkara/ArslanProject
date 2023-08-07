@@ -359,7 +359,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             },
             {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
             accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
-            {title:"HATA", field:"Hatali", headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
+            {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
             accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
             {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc:"count"},
             {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
