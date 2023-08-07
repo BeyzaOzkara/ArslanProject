@@ -1,10 +1,13 @@
+import base64
+import binascii
 import math
 import os
 from urllib.parse import unquote
+import zlib
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -16,6 +19,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
 from django.db.models import Q
 from django.db import transaction 
+from aes_cipher import *
 
 # Create your views here.
 
@@ -100,7 +104,6 @@ def location(request):
                 loc_list.remove(item)
 
     childData = loc_list
-    print (childData)
     gonderData = location_list(request.user)
 
     if request.method == "POST":
@@ -406,7 +409,7 @@ def location_kalip(request):
                                         lfil.append(f['id'])
                                     else :
                                         filo2 = loc.values().filter(locationRelationID_id = f['id'])
-                                        print(filo2)
+                                        #print(filo2)
                                         for b in list(filo2):
                                             if b['isPhysical']:
                                                 lfil.append(b['id'])
@@ -434,19 +437,48 @@ def location_kalip(request):
 
 def qrKalite(request):
     if request.method == "GET":
-        ty = request.GET.get('type')
-        no = request.GET.get('no')
-        if ty==None and no==None:
-            print("sepet yok")
-            ty = ""
-            no = ""
+        path = request.get_full_path()
+        print(path)
+        print(path.rsplit('/', 1)[-1])
+
+        data = 'sepet=998'
+        test_salt = '998'
+        test_pwd = 'arslan98'
+        data_encrypter = DataEncrypter(
+            Pbkdf2Sha512(512 * 512)
+        )
+        data_encrypter.Encrypt(data, [test_pwd], [test_salt])
+        enc_data = data_encrypter.GetEncryptedData()
+
+        print(enc_data)
+        hexli = binascii.hexlify(enc_data)
+        z = base64.b64encode(enc_data)
+        de = z.decode("ascii")
+        
+        """ string = hexli.decode('utf-8')
+        stri =  zlib.compress(string.encode())
+        print("stri")
+        print(stri) """
+        #print(z)
+        """ print("string")
+        print(string) """
+        print("z")
+        print(z)
+        print("de")
+        print(de)
+        ##print(hexli)
+        #print(binascii.unhexlify(hexli))
+
+        ty = request.GET.get('type', '')
+        no = request.GET.get('no', '')
         print(ty + " " + no)
         
         context = {
             "type" : ty,
             "no" : no,
         }
-        olmayan = []
+
+        """ olmayan = []
         notsaved = []
         query = KalipMs.objects.using('dies').all() #['SIRA 5','11497'], ['SIRA 6','402-3'], ['SIRA 8','12773-3'],['SIRA 9','4405-31'],['SIRA 9','4471-33'],
         sira1 = [
@@ -478,7 +510,7 @@ def qrKalite(request):
                 print("Hareket not saved")
     
     print(olmayan)
-    print(notsaved)
+    print(notsaved) """
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 class qrKaliteView(generic.TemplateView):
@@ -488,4 +520,5 @@ class qrKaliteView(generic.TemplateView):
 class HareketView(generic.TemplateView):
     template_name = 'ArslanTakipApp/hareket.html'
 
-
+def qrDeneme(request):
+    return

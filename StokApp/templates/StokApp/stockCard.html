@@ -8,6 +8,7 @@
 {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'treeselectjs/dist/treeselectjs.css' %}" />
 
 {% endblock %}
 {% block content %}
@@ -55,18 +56,13 @@
           </div>
           <div class="row">
             <div class="col-lg-7">
-              <div class="form-group">
-                <label>Grup</label>
-                <select class="form-control select2-lg" id="datas" style="width: 100%;">
-                  {% for l in loc_json %}
-                  <option value="{{l}}">{{l}}</option>
-                  {% endfor %}
-                </select>
+              <div class="example">
+                
               </div>
             </div>
           </div>
           <div class="row">
-            {{loc_json|escapejs}}
+            <span id="deneme"></span>
             <h2></h2>
           </div>
         </div>
@@ -74,6 +70,10 @@
     </div>
   </div>
 </div>
+
+<!-- {% for i in data %}
+                    <option value="{{i.locationName}}">{{i.locationName}}</option>
+                  {% endfor %} -->
 
 {% endblock %}
 
@@ -87,6 +87,7 @@
 <script src="{% static 'admin-lte/plugins/inputmask/min/jquery.inputmask.bundle.min.js' %}"></script>
 <!-- Tempusdominus Bootstrap 4 -->
 <script src="{% static 'admin-lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script src="{% static 'treeselectjs/dist/treeselectjs.mjs' %}"></script>
 <!-- Page script -->
 <script>
   $(function () {
@@ -105,7 +106,41 @@
 
   });
 
-  var data = JSON.parse('{{ loc_json|escapejs }}');
+  var options = JSON.parse('{{ data|escapejs }}');
+  var treeselect = new Treeselect({
+    parentHtmlContainer: document.querySelector('.example'),
+    options: options,
+    isSingleSelect: false,
+  });
+
+  treeselect.srcElement.addEventListener('input', (e) => {
+    console.log(e.detail)
+  });
+
+
+
+  /*var tree = JSON.parse('{{ data|escapejs }}');
+   function makeTreeOption(tree) {
+    let ouput =''
+    for (let i = 0 ; i < tree.length ; i++){
+      ouput += `<optgroup label="${tree[i].locationName}" value="${tree[i].locationName}">`;
+      if (tree[i]._children) {
+        tree[i]._children.forEach(_children => {
+          if (_children._children) {
+            ouput += makeTreeOption(_children);
+          } else {
+            ouput += `<option>${_children.locationName}</option>`;
+          }
+        });
+      }
+      ouput += `</optgroup>`;
+    };
+    
+    document.getElementById("deneme").innerText = ouput;
+    return ouput;
+  }; 
+  document.getElementById("datas").innerHTML = makeTreeOption(tree);*/
+  
 
 </script>
 {% endblock %}

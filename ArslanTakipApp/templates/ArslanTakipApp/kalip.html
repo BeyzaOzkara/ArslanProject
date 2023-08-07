@@ -75,18 +75,18 @@
                                 </div>
                                 <div class="container-fluid">
                                 <div class="row">
-                                        <div class="info-box col-lg-6">
-                                            <div class="info-box-content">
-                                            <span class="info-box-text">RESİM GRAMAJ:</span>
-                                            <span class="info-box-number" id="infoGramaj">Resim Gramaj</span>
-                                            </div>
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">RESİM GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoGramaj">Resim Gramaj</span>
                                         </div>
-                                        <div class="info-box col-lg-6">
-                                            <div class="info-box-content">
-                                            <span class="info-box-text">SON ÜRETİM GRAMAJ:</span>
-                                            <span class="info-box-number" id="infoSonUretimGramaj">Son Üretim Gramaj</span>
-                                            </div>
+                                    </div>
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">SON ÜRETİM GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoSonUretimGramaj">Son Üretim Gramaj</span>
                                         </div>
+                                    </div>
                                 </div>
                             </div>
                             </div>
@@ -311,6 +311,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             //cell - cell component
                 presURaporu.setFilter([{ field: 'KalipNo', type: '=', value: cell.getData().KalipNo }, 
                     ]);
+                presURaporu.redraw(true);
                 document.getElementById("kalip_karti").style.visibility = 'visible';
                 document.getElementById("presURaporListe-table").style.visibility = 'visible';
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
@@ -408,7 +409,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
 
 var presURaporu = new Tabulator("#presURaporListe-table", {
     height:"720px",
-    layout:"fitDataFill",
+    layout:"fitData",
     placeholder:"Pres Üretim Raporu",
     ajaxURL:"/kalip/rapor",
     progressiveLoad:"scroll",
