@@ -21,6 +21,14 @@
         font-weight: bold;
         /* width: 535px; */
     }
+    #photos{
+        width:100%;
+        height:100%;
+    }
+    img {
+        width:100%;
+        height:100%;
+    }
 </style>
     
 {% endblock %}
@@ -52,9 +60,9 @@
                         <div class="row col-lg-4">
                             <div class="container-fluid col-lg-12">
                         <div class="card col-lg-12">
-                            <div class="card-body">  <!-- Fotoğraflar  -->
+                            <div class="card-body" id="photos">  <!-- Fotoğraflar  -->
                                 <a href="{% static '/ArslanTakipApp/arslanLogo.png' %}" data-toggle="lightbox" id="TeknikA">
-                                    <img id="TeknikResim" alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" width="200" height="235"> </a>
+                                    <img id="TeknikResim" alt="Teknik1" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" > </a>
                             </div>
                         </div>
                     </div>
@@ -353,8 +361,8 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 document.getElementById("infoCap").innerText = kal.Capi + " mm";
                 document.getElementById("infoPaket").innerText = kal.PaketBoyu + " mm";
                 var rdizin = kal.ResimDizini.replace(/\s/g,'') + "Teknik1.jpg";
-                document.getElementById("TeknikResim").src = "/static" + rdizin.slice(13);
-                document.getElementById("TeknikA").href = "/static" + rdizin.slice(13);
+                document.getElementById("TeknikResim").src = "http://arslan/static" + rdizin.slice(13);
+                document.getElementById("TeknikA").href = "http://arslan/static" + rdizin.slice(13);
             },
             },
             {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
@@ -409,7 +417,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
 
 var presURaporu = new Tabulator("#presURaporListe-table", {
     height:"720px",
-    layout:"fitData",
+    layout:"fitDataFill",
     placeholder:"Pres Üretim Raporu",
     ajaxURL:"/kalip/rapor",
     progressiveLoad:"scroll",

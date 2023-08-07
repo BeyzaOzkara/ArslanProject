@@ -8,7 +8,7 @@
 {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
-  <link rel="stylesheet" href="{% static 'treeselectjs/dist/treeselectjs.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'treeselect/dist/treeselectjs.css' %}" />
 
 {% endblock %}
 {% block content %}
@@ -87,9 +87,12 @@
 <script src="{% static 'admin-lte/plugins/inputmask/min/jquery.inputmask.bundle.min.js' %}"></script>
 <!-- Tempusdominus Bootstrap 4 -->
 <script src="{% static 'admin-lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
-<script src="{% static 'treeselectjs/dist/treeselectjs.mjs' %}"></script>
+
+<script src="{% static 'treeselect/dist/treeselectjs.mjs' %}"></script>
+<script  src="{% static 'treeselect/dist/treeselectjs.umd.js' %}"></script>
 <!-- Page script -->
 <script>
+
   $(function () {
     //Initialize Select2 Elements
     $('.select2').select2()
