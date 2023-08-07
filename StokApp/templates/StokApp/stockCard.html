@@ -8,7 +8,6 @@
 {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
-<!--   <link rel="stylesheet" type="text/css" href="{% static 'treeselect/dist/treeselectjs.css' %}" /> -->
 
 {% endblock %}
 {% block content %}
@@ -88,8 +87,6 @@
 <!-- Tempusdominus Bootstrap 4 -->
 <script src="{% static 'admin-lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
 
-<!-- <script src="{% static 'treeselect/dist/treeselectjs.mjs' %}"></script>
-<script  src="{% static 'treeselect/dist/treeselectjs.umd.js' %}"></script> -->
 <!-- Page script -->
 <script>
 
@@ -110,17 +107,6 @@
   });
 
   var options = JSON.parse('{{ data|escapejs }}');
-/*   var treeselect = new Treeselect({
-    parentHtmlContainer: document.querySelector('.example'),
-    options: options,
-    isSingleSelect: false,
-  });
-
-  treeselect.srcElement.addEventListener('input', (e) => {
-    console.log(e.detail)
-  }); */
-
-
 
   /*var tree = JSON.parse('{{ data|escapejs }}');
    function makeTreeOption(tree) {
