@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
 from django.db.models import Q
 from django.db import transaction 
-from aes_cipher import *
+#from aes_cipher import *
 
 # Create your views here.
 
@@ -441,7 +441,7 @@ def qrKalite(request):
         print(path)
         print(path.rsplit('/', 1)[-1])
 
-        data = 'sepet=998'
+        """ data = 'sepet=998'
         test_salt = '998'
         test_pwd = 'arslan98'
         data_encrypter = DataEncrypter(
@@ -453,7 +453,7 @@ def qrKalite(request):
         print(enc_data)
         hexli = binascii.hexlify(enc_data)
         z = base64.b64encode(enc_data)
-        de = z.decode("ascii")
+        de = z.decode("ascii") """
         
         """ string = hexli.decode('utf-8')
         stri =  zlib.compress(string.encode())
@@ -462,10 +462,10 @@ def qrKalite(request):
         #print(z)
         """ print("string")
         print(string) """
-        print("z")
+        """ print("z")
         print(z)
         print("de")
-        print(de)
+        print(de) """
         ##print(hexli)
         #print(binascii.unhexlify(hexli))
 
