@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
 
+  <link rel="stylesheet" type="text/css"  href="{% static 'node_modules/treeselectjs/dist/treeselectjs.css' %}"></script>
 {% endblock %}
 {% block content %}
     
@@ -52,17 +53,43 @@
                 </select>
               </div>
             </div>
+          </div>          
+          <div class="row">
+            <span id="deneme"></span>
+          </div>
+          <div class="row">
+            <span id="deneme2"></span>
+          </div>
+          <div class="row">
+            <span id="deneme3"></span>
           </div>
           <div class="row">
             <div class="col-lg-7">
               <div class="example">
-                
               </div>
             </div>
           </div>
-          <div class="row">
-            <span id="deneme"></span>
-            <h2></h2>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-7">
+          <div class="example">
+            <label>Birim</label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-7">
+          <div class="example">
+            <label>Ambalaj Birimi</label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-7">
+          <div class="example">
+            <label>Paket İçi Miktar</label>
           </div>
         </div>
       </div>
@@ -87,6 +114,7 @@
 <!-- Tempusdominus Bootstrap 4 -->
 <script src="{% static 'admin-lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
 
+<script type="text/javascript" src="{% static 'node_modules/treeselectjs/dist/treeselectjs.umd.js' %}"></script>
 <!-- Page script -->
 <script>
 
@@ -105,8 +133,32 @@
     $('[data-mask]').inputmask()
 
   });
+  const d = new Date();
+  let time0 = d.getTime();
+  document.getElementById("deneme").innerHTML = time0;
+  //var data = JSON.parse('{{ data|escapejs }}');
+  const options = JSON.parse('{{ data|escapejs }}');
 
-  var options = JSON.parse('{{ data|escapejs }}');
+  const b = new Date();
+  let time2 = b.getTime();
+  
+  let t1 = (time2 - time0)
+  document.getElementById("deneme2").innerHTML =time2 + ' ' + t1;
+
+  var domElement = document.querySelector('.example')
+  //options = [{value, name, children[{}]}] şeklinde
+  const treeselect = new Treeselect({
+    parentHtmlContainer: domElement,
+    isSingleSelect: true,
+    options: options,
+  })
+
+  console.log(time2);
+  const c = new Date();
+  let time3 = c.getTime();
+
+  document.getElementById("deneme3").innerHTML = time3;
+
 
   /*var tree = JSON.parse('{{ data|escapejs }}');
    function makeTreeOption(tree) {

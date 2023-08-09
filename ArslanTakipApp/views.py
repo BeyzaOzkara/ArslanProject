@@ -269,6 +269,7 @@ def location_hareket(request):
         kalip_l = list(DiesLocation.objects.filter(kalipNo=hareketK).values())
         users = User.objects.values()
         harAr = []
+        print(hareketQuery)
         for h in hareketQuery:
             har ={}
             har['id'] = h['id']
@@ -287,6 +288,9 @@ def location_hareket(request):
             har['kimTarafindan'] = list(users.filter(id=int(h['kimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(h['kimTarafindan_id'])))[0]["last_name"] 
             har['hareketTarihi'] = h['hareketTarihi'].strftime("%d-%m-%Y %H:%M:%S")
             harAr.append(har)
+            print(h)
+            print(har)
+        print(harAr)
         hareket_count = len(harAr)
 
         lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
