@@ -561,12 +561,15 @@ def siparis_list(request):
 
         a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
         a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
-
+        if tkal > 0:
+            a['children'] = True
+        else: a['children'] = False
 
     sip_count = sq.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
     lastData['data'] = sip
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    print(data)
     return HttpResponse(data)
 
 
@@ -577,4 +580,4 @@ def siparis_child(request, pNo):
     print()
 
     data = json.dumps(list(child))
-    return JsonResponse(data, safe=False)
+    return HttpResponse(data)

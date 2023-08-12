@@ -43,7 +43,7 @@
             return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
         },
         columns: [
-            { title: "Kart No", field: "KartNo", headerFilter: "input"},
+            { title: "Kart No", field: "KartNo", headerFilter: "input", },
             { title: "Profil No", field: "ProfilNo", headerFilter: "input" },
             { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input" },
             { title: "Sipariş Kg", field: "GirenKg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
@@ -62,38 +62,68 @@
             tableEl.style.border = "1px solid #333";
             holderEl.appendChild(tableEl);
             row.getElement().appendChild(holderEl);
-
+             
             row.getElement().addEventListener("click", function(){
-                if (!row.getTreeParent()){
-                    console.log(row.isTreeExpanded())
-                    if (row.isTreeExpanded()){
+                if(!row.getTreeParent()){
+                    if(row.isTreeExpanded()){
                         row.treeCollapse();
                     } else {
-                        var subTableURL = "child/" + row.getData().ProfilNo;
+                        var subTableURL = "child/"+ row.getData().ProfilNo;
                         $.ajax({
                             url:subTableURL,
                             dataType: "json",
-                            success: function (subTableData){
-                                var subTable = new Tabulator(tableEl, {
-                                    layout: "fitColumns",
-                                    data: subTableData,
-                                    columns: [
-                                        { title: "Kalıp No", field: "KalipNo" },
-                                        { title: "Üretici", field: "UreticiFirma" },
-                                        { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                        { title: "Toplam Uretim", field: "UretimToplamKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                    ],
-                                });
-                            }
+                            success: function(subTableData){
+                                if(row.getData().children==true){
+                                    row.update({ children: subTableData})
+                                        .then(function(){
+                                            //run code after data has been updated
+                                            var subTable = new Tabulator(tableEl, {
+                                                data: row.getData().children,
+                                                layout: "fitColumns",
+                                                dataType:"json",
+                                                columns: [
+                                                    { title: "Kalıp No", field: "KalipNo" },
+                                                    { title: "Üretici", field: "UreticiFirma" },
+                                                    { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                    { title: "Toplam Uretim", field: "UretimToplamKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                ],
+                                            });
+                                        });
+                                }else{
+                                    console.log()
+                                    $(".subTable" + row.getData().ProfilNo + "").toggle();
+                                };
+                                
+                            },
                         });
-                    };
-
+                    }
                 }
+
+
+
+                //$(".subTable" + row.getData().ProfilNo + "").toggle(); 
+                /* if ($(".subTable" + row.getData().ProfilNo + "").isExpanded()){
+                    console.log("expanded")
+                } */
+
+                /* var subTable = new Tabulator(tableEl, {
+                    ajaxURL: "child/" + row.getData().ProfilNo,
+                    layout: "fitColumns",
+                    dataType:"json",
+                    columns: [
+                        { title: "Kalıp No", field: "KalipNo" },
+                        { title: "Üretici", field: "UreticiFirma" },
+                        { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                        { title: "Toplam Uretim", field: "UretimToplamKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                    ],
+                }); */
+
             })
 
-            
+
         },
     });
+           
 
 </script>
 
