@@ -552,9 +552,10 @@ def siparis_list(request):
     sq = s.filter(**q).order_by('-SonTermin')
     #print(sq)
     sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg')[(page-1)*size:page*size])
+    k = KalipMs.objects.using('dies').all()
 
     for a in sip:
-        kal = KalipMs.objects.using('dies').filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
+        kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
         skal = len(kal)
 
