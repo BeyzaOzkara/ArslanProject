@@ -4,7 +4,9 @@ import time
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import generic
-from ArslanTakipApp.models import Location
+from ArslanTakipApp.models import Location, Hareket
+from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 
 def transform_data(raw_data):
     location_map = {}
@@ -23,6 +25,29 @@ def transform_data(raw_data):
             parent['children'].append(location_map[item['id']])
 
     return options
+
+def transform_data2(raw_data):
+    location_map = {}
+    options = []
+
+    """ # Create a map of location IDs to their corresponding dictionaries
+    for item in raw_data:
+        location_map[item['id']] = {'value': item['id'], 'name': item['kalipNo'], 'children': []}
+
+    # Populate the children list for each location
+    for item in raw_data:
+            options.append(location_map[item['id']])
+    return options """
+    for item in raw_data:
+        location_map[item['id']] = {'value': item['id'], 'name': item['locationName'], 'children': []}
+
+    # Populate the children list for each location
+    for item in raw_data:
+        if item['locationRelationID_id'] is None:
+            options.append(location_map[item['id']])
+        else:
+            parent = location_map[item['locationRelationID_id']]
+            parent['children'].append(location_map[item['id']])
 
 # rawDatas'ı rastgele çoğalt
 def duplicate_raw_data(raw_data, num_duplicates):
@@ -43,41 +68,50 @@ def stockCard(request):
 
     #options = [{value, name, children[{}]}] şeklinde
 
-    rawData = [
-        {'id': 1, 'locationName': '1.Fabrika', 'locationRelationID_id': None},
-        {'id': 2, 'locationName': '2.Fabrika', 'locationRelationID_id': None},
-        {'id': 48, 'locationName': 'YERİ BELLİ OLMAYANLAR', 'locationRelationID_id': None},
-        {'id': 542, 'locationName': '1600 TON PRES', 'locationRelationID_id': 1},
-        {'id': 543, 'locationName': '1200 TON PRES', 'locationRelationID_id': 1},
-        {'id': 544, 'locationName': '1100 TON PRES', 'locationRelationID_id': 1},
-        {'id': 545, 'locationName': 'KALIP HAZIRLAMA', 'locationRelationID_id': 1},
-        {'id': 547, 'locationName': 'MEYDAN', 'locationRelationID_id': 545},
-        {'id': 548, 'locationName': 'KALIP FIRINI 2', 'locationRelationID_id': 544},
-        {'id': 549, 'locationName': 'KALIP FIRINI 1', 'locationRelationID_id': 544},
-        {'id': 550, 'locationName': 'PRES', 'locationRelationID_id': 544},
-        {'id': 551, 'locationName': 'PRES MEYDAN', 'locationRelationID_id': 544},
-        {'id': 552, 'locationName': 'KALIP FIRINI 3', 'locationRelationID_id': 543},
-        {'id': 553, 'locationName': 'KALIP FIRINI 2', 'locationRelationID_id': 543}
-    ]
+    rawData = list(Location.objects.values('id', 'locationName', 'locationRelationID_id').order_by('id')) #list(Hareket.objects.values('id', 'kalipNo').order_by('id')[0:29])
 
-    num_duplicates = 1000
-    duplicated_raw_data = duplicate_raw_data(rawData, num_duplicates)
+    """ num_duplicates = 1000
+    duplicated_raw_data = duplicate_raw_data(rawData, num_duplicates) """
     #print(duplicated_raw_data)
-    time0 = time.time()
     #childData = list(Location.objects.values('id', 'locationName', 'locationRelationID_id').order_by('id'))
-    print("Sorgu : " + str((time.time() - time0)) + " sn")
-    
     time0 = time.time()
-    opti = transform_data(duplicated_raw_data)
+    
+    #print("Sorgu : " + str((time.time() - time0)) + " sn")
+    #print(rawData)
+
+    time0 = time.time()
+    opti = transform_data(rawData) #(duplicated_raw_data)
     #print(opti)
 
-    data = json.dumps(opti)
-    print("Format : " + str((time.time() - time0)) + " sn")
+    data = json.dumps(opti, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    #print("Format : " + str((time.time() - time0)) + " sn")
     
     context = {
         "data":data,
     } 
+    #print("Format2 : " + str((time.time() - time0)) + " sn")
+    
     return render(request, 'StokApp/stockCard.html', context)
+
+def stockCard_deneme(request):
+    if request.method == 'GET':
+           id = request.GET['id']
+           print(id)
+    time0 = time.time()
+    #rawData = serializers.serialize("json", Hareket.objects.all().order_by('id')[0:29], fields=["kalipNo"])
+    rawData = list(Location.objects.values('id', 'locationName', 'locationRelationID_id').order_by('id'))
+    #rawData = list(Hareket.objects.values('id', 'kalipNo').filter(kalipVaris_id=id).order_by('id')[29:50])
+    print("Sorgu : " + str((time.time() - time0)) + " sn")
+
+    time0 = time.time()
+    opti = transform_data(rawData) #(duplicated_raw_data)
+    #print(opti)s
+
+    data2 = json.dumps(opti, indent=1)
+    print("Format : " + str((time.time() - time0)) + " sn")
+    
+    print(data2)
+    return HttpResponse(data2, content_type="application/json")
 
 
 """  class StokCardView(generic.TemplateView):

@@ -1,9 +1,7 @@
-import base64
-import binascii
+import base64, binascii, zlib
 import math
-import os
+import os, csv
 from urllib.parse import unquote
-import zlib
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -11,15 +9,17 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.db import transaction 
-#from aes_cipher import *
+from aes_cipher import *
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 # Create your views here.
 
@@ -439,39 +439,32 @@ def location_kalip(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
+
+key = b'arslandenemebyz1'
+
+def encrypt_aes_ecb(key, plaintext):
+    cipher = AES.new(key, AES.MODE_ECB)
+    padded_plaintext = pad(plaintext.encode('utf8'), AES.block_size)
+    ciphertext = cipher.encrypt(padded_plaintext)
+    return ciphertext
+
+def decrypt_aes_ecb(key, ciphertext):
+    cipher = AES.new(key, AES.MODE_ECB)
+    decrypted_data = cipher.decrypt(ciphertext)
+    unpadded_data = unpad(decrypted_data, AES.block_size)
+    return unpadded_data.decode('utf-8')
+
 def qrKalite(request):
     if request.method == "GET":
-        path = request.get_full_path()
+        """ path = request.get_full_path()
         print(path)
-        print(path.rsplit('/', 1)[-1])
+        print(path.rsplit('/', 1)[-1]) """
 
-        """ data = 'sepet=998'
-        test_salt = '998'
-        test_pwd = 'arslan98'
-        data_encrypter = DataEncrypter(
-            Pbkdf2Sha512(512 * 512)
-        )
-        data_encrypter.Encrypt(data, [test_pwd], [test_salt])
-        enc_data = data_encrypter.GetEncryptedData()
-
-        print(enc_data)
-        hexli = binascii.hexlify(enc_data)
-        z = base64.b64encode(enc_data)
-        de = z.decode("ascii") """
-        
-        """ string = hexli.decode('utf-8')
-        stri =  zlib.compress(string.encode())
-        print("stri")
-        print(stri) """
-        #print(z)
-        """ print("string")
-        print(string) """
-        """ print("z")
-        print(z)
-        print("de")
-        print(de) """
-        ##print(hexli)
-        #print(binascii.unhexlify(hexli))
+        # Şifre çözme
+        unhexli = binascii.unhexlify('2a1ab2e62423112531ab5c0b795c4638')
+        print(unhexli)
+        decrypted_text = decrypt_aes_ecb(key, unhexli)
+        print("Çözülmüş Veri:", decrypted_text)        
 
         ty = request.GET.get('type', '')
         no = request.GET.get('no', '')
@@ -526,3 +519,61 @@ class HareketView(generic.TemplateView):
 
 def qrDeneme(request):
     return
+
+class SiparisView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/siparisList.html'
+
+
+def siparis_list(request):
+    s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+
+    params = json.loads(unquote(request.GET.get('params')))
+    for i in params:
+        value = params[i]
+        print("Key and Value pair are ({}) = ({})".format(i, value))
+    size = params["size"]
+    page = params["page"]
+    filter_list = params["filter"]
+    q ={}
+    #([{'field': 'KartNo', 'type': 'like', 'value': '117'}])
+    if len(filter_list)>0:
+        for i in filter_list:
+            if i['field'] != 'ProfilNo':
+                if i["type"] == "like":
+                    q[i['field']+"__startswith"] = i['value']
+                elif i["type"] == "=":
+                    if i['field'] == 'AktifPasif':
+                        if i['value'] == True:
+                            i['value'] = 'Aktif'
+                        else: i['value'] = 'Pasif'
+                    q[i['field']] = i['value']
+            else:
+                q[i['field']] = i['value']
+    sq = s.filter(**q).order_by('-SonTermin')
+    #print(sq)
+    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg')[(page-1)*size:page*size])
+
+    for a in sip:
+        kal = KalipMs.objects.using('dies').filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
+        tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
+        skal = len(kal)
+
+        a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
+        a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
+
+
+    sip_count = sq.count()
+    lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
+    lastData['data'] = sip
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+
+def siparis_child(request, pNo):
+    #Kalıp Listesi Detaylı
+    kalip = KalipMs.objects.using('dies').all()
+    child = kalip.filter(ProfilNo=pNo, AktifPasif="Aktif", Hatali=0).values('KalipNo','UreticiFirma', 'TeniferKalanOmurKg', 'UretimToplamKg')
+    print()
+
+    data = json.dumps(list(child))
+    return JsonResponse(data, safe=False)

@@ -19,4 +19,8 @@ urlpatterns = [
     path('kalip/liste', views.kalip_liste),
     path('kalip/rapor', views.kalip_rapor),
     path('qr/', views.qrKalite, name='qr'),
+    path('siparis/', views.SiparisView.as_view()),
+    path('siparis/list', views.siparis_list),
+    path('siparis/child/<str:pNo>', views.siparis_child),
+
 ]

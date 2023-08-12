@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+from django.db.models import Index, Q
 
 # Create your models here.
 class Location(models.Model):
@@ -147,3 +148,25 @@ class PresUretimRaporu(models.Model):
     class Meta:
         managed = False
         db_table = 'View062_PresUretimRaporu'
+
+#siparistamam bloke
+class SiparisList(models.Model):
+    KartNo = models.IntegerField(primary_key=True)
+    ProfilNo = models.CharField(null=True)
+    BulunduguYer = models.CharField(null=True)
+    Adet = models.FloatField(null=True)
+    KartAktif = models.IntegerField(null=True)
+    SiparisTamam = models.CharField(null=True)
+    GirenKg = models.FloatField(null=True, verbose_name="Sipariş Kg")
+    Kg = models.FloatField(null=True, verbose_name="Kalan Kg")
+    SonTermin = models.DateTimeField(null=True)
+    FirmaAdi = models.CharField(null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View051_ProsesDepoListesi'
+"""         indexes =[
+            Index(name='adet_con',fields=['Adet'], condition = Q(Adet__gt=0)),
+            Index(name='yer_con',fields=['BulunduguYer'], condition = Q(BuludunguYer='TESTERE')),
+            Index(name='kartaktif_con',fields=['KartAktif', 'BulunduguYer', 'Adet'], condition = (Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)),
+        ] """

@@ -1,0 +1,108 @@
+{% extends 'adminlte/base.html' %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid col-lg-11">
+    <h1 class="col-lg-11">Arslan Alüminyum Sipariş Listesi</h1>
+    <div class="card" id="siparisList-table"></div>
+    <!-- row 1 -->
+</div> 
+<!-- cont 1 -->
+
+{% endblock %}
+
+{% block extra_js %}
+
+
+<script>
+
+//var sip = JSON.parse('{{ sipData|escapejs }}');
+
+    var table = new Tabulator("#siparisList-table", {
+        height: "700px",
+        layout: "fitColumns",
+        columnDefaults: {resizable: true,},
+        ajaxURL:"/siparis/list",
+        progressiveLoad:"scroll",
+        paginationMode:"remote",
+        filterMode:"remote",
+        paginationSize:40,
+        dataTree: true,
+        dataTreeStartExpanded: false,
+        ajaxURLGenerator:function(url, config, params){
+            return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+        },
+        columns: [
+            { title: "Kart No", field: "KartNo", headerFilter: "input"},
+            { title: "Profil No", field: "ProfilNo", headerFilter: "input" },
+            { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input" },
+            { title: "Sipariş Kg", field: "GirenKg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
+            { title: "Kalan Kg", field: "Kg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
+            { title: "Kalıp", field: "kalipSayisi"},
+            { title: "Kalan Tenifer", field: "TopTenKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+        ],
+        rowFormatter: function (row) {
+            var holderEl = document.createElement("div");
+            var tableEl = document.createElement("div");
+
+            holderEl.style.boxSizing = "border-box";
+            holderEl.style.padding = "10px 30px 10px 10px";
+            holderEl.style.borderTop = "1px solid #333";
+            holderEl.style.borderBotom = "1px solid #333";
+            tableEl.style.border = "1px solid #333";
+            holderEl.appendChild(tableEl);
+            row.getElement().appendChild(holderEl);
+
+            row.getElement().addEventListener("click", function(){
+                if (!row.getTreeParent()){
+                    console.log(row.isTreeExpanded())
+                    if (row.isTreeExpanded()){
+                        row.treeCollapse();
+                    } else {
+                        var subTableURL = "child/" + row.getData().ProfilNo;
+                        $.ajax({
+                            url:subTableURL,
+                            dataType: "json",
+                            success: function (subTableData){
+                                var subTable = new Tabulator(tableEl, {
+                                    layout: "fitColumns",
+                                    data: subTableData,
+                                    columns: [
+                                        { title: "Kalıp No", field: "KalipNo" },
+                                        { title: "Üretici", field: "UreticiFirma" },
+                                        { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                        { title: "Toplam Uretim", field: "UretimToplamKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                    ],
+                                });
+                            }
+                        });
+                    };
+
+                }
+            })
+
+            
+        },
+    });
+
+</script>
+
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+<!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
+{% endblock %}
