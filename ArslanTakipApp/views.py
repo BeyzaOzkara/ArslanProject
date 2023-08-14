@@ -530,7 +530,7 @@ def siparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
-        #print("Key and Value pair are ({}) = ({})".format(i, value))
+        print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
@@ -542,22 +542,30 @@ def siparis_list(request):
                 if i["type"] == "like":
                     q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
-                    if i['field'] == 'AktifPasif':
+                    """ if i['field'] == 'SiparisTamam':
                         if i['value'] == True:
-                            i['value'] = 'Aktif'
-                        else: i['value'] = 'Pasif'
+                            i['value'] = 'Evet'
+                        else: i['value'] = 'Hayır' """
                     q[i['field']] = i['value']
             else:
                 q[i['field']] = i['value']
-    sq = s.filter(**q).order_by('-SonTermin')
+        sq = s.filter(**q).order_by('-SonTermin')
+    else:
+        sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
     #print(sq)
-    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru')[(page-1)*size:page*size])
+    #if(Tamam!='BLOKE')
+    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam')[(page-1)*size:page*size])
     k = KalipMs.objects.using('dies').all()
 
     for a in sip:
         kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
         skal = len(kal)
+        """ if a['SiparisTamam']== 'EVET':
+            a['SiparisTamam']= True
+            print("true")
+        elif a['SiparisTamam']== 'HAYIR':
+            a['SiparisTamam']= False """
 
         a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
         a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']

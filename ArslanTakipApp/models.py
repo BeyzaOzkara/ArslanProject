@@ -162,6 +162,7 @@ class SiparisList(models.Model):
     SonTermin = models.DateTimeField(null=True)
     FirmaAdi = models.CharField(null=True)
     KondusyonTuru = models.CharField(null=True)
+    PresKodu = models.CharField(null=True)
 
     class Meta:
         managed = False

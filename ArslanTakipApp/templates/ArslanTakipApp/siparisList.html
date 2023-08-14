@@ -67,16 +67,18 @@
         pagination:true,
         paginationMode:"remote",
         paginationInitialPage:1,
-        paginationSize:20,
-        paginationSizeSelector:[10, 20, 40, 100],
+        paginationSize:15,
+        paginationSizeSelector:[15, 30, 60, 100],
         dataTree: true,
         ajaxURLGenerator:function(url, config, params){
             return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
         },
         columns: [
+            { title: "Sip Tamam", field: "SiparisTamam", headerFilter: "input"},
             { title: "Kart No", field: "KartNo", headerFilter: "input"},
             { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
             { title: "Profil No", field: "ProfilNo", headerFilter: "input"},
+            { title: "Pres Kodu", field: "PresKodu", headerFilter: "input"},
             { title: "Kondüsyon", field: "KondusyonTuru", headerFilter: "input"},
             { title: "Sipariş Kg", field: "GirenKg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
             { title: "Kalan Kg", field: "Kg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
@@ -96,7 +98,7 @@
             
             row.getElement().appendChild(holderEl);
             holderEl.appendChild(tableEl);
-             
+
             row.getElement().addEventListener("click", function(){
                 if(!row.getTreeParent()){
                     if(row.isTreeExpanded()){
@@ -115,7 +117,7 @@
                                         .then(function(){
                                             //run code after data has been updated
                                             var subTable = new Tabulator(tableEl, {
-                                                data: row.getData().children,
+                                                data: subTableData,
                                                 layout: "fitColumns",
                                                 dataType:"json",
                                                 columns: [
@@ -129,13 +131,14 @@
                                                     { title: "Konum", field: "Konum", headerSort: false, formatter:"html"},
                                                 ],
                                             });
+
                                         });
 
                             }   })}
                             
                         else{
-                            console.log("else")
-                            $(".subTable" + row.getData().ProfilNo + "").toggle();
+                            console.log("else");
+                            //$("#subTable" + row.getData().ProfilNo + "").toggle();
                             };
                         }
                     }
