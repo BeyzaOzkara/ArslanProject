@@ -530,7 +530,7 @@ def siparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
-        print("Key and Value pair are ({}) = ({})".format(i, value))
+        #print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
@@ -551,7 +551,7 @@ def siparis_list(request):
                 q[i['field']] = i['value']
     sq = s.filter(**q).order_by('-SonTermin')
     #print(sq)
-    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg')[(page-1)*size:page*size])
+    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru')[(page-1)*size:page*size])
     k = KalipMs.objects.using('dies').all()
 
     for a in sip:
@@ -569,15 +569,29 @@ def siparis_list(request):
     lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
     lastData['data'] = sip
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    print(data)
+    #print(data)
     return HttpResponse(data)
 
 
 def siparis_child(request, pNo):
     #Kalıp Listesi Detaylı
-    kalip = KalipMs.objects.using('dies').all()
-    child = kalip.filter(ProfilNo=pNo, AktifPasif="Aktif", Hatali=0).values('KalipNo','UreticiFirma', 'TeniferKalanOmurKg', 'UretimToplamKg')
-    print()
+    kalip = KalipMs.objects.using('dies').values('KalipNo','UreticiFirma', 'TeniferKalanOmurKg', 'UretimToplamKg', 'PresKodu', 'Capi')
+    child = kalip.filter(ProfilNo=pNo, AktifPasif="Aktif", Hatali=0)
+    location_list = Location.objects.values()
+    #print()
+    gonder = list(child)
+    for c in gonder:
+        pkodu = PresUretimRaporu.objects.using('dies').filter(KalipNo=c["KalipNo"]).order_by("-Tarih", "-BitisSaati").values("PresKodu","Tarih", "BitisSaati")
+        k = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
+        if pkodu:
+            c['SonPresKodu'] = pkodu[0]['PresKodu']
+        try:
+            c['Konum'] = list(location_list.filter(id=list(location_list.filter(id=k))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=k))[0]["locationName"]
+        except:
+            try:
+                c['Konum'] = list(location_list.filter(id=k))[0]["locationName"]
+            except:
+                c['Konum'] = ""
 
-    data = json.dumps(list(child))
+    data = json.dumps(gonder)
     return HttpResponse(data)

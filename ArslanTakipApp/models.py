@@ -161,6 +161,7 @@ class SiparisList(models.Model):
     Kg = models.FloatField(null=True, verbose_name="Kalan Kg")
     SonTermin = models.DateTimeField(null=True)
     FirmaAdi = models.CharField(null=True)
+    KondusyonTuru = models.CharField(null=True)
 
     class Meta:
         managed = False

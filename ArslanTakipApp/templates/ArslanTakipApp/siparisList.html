@@ -30,22 +30,46 @@
 
     var table = new Tabulator("#siparisList-table", {
         height: "700px",
-        layout: "fitColumns",
+        layout: "fitDataFill",
         columnDefaults: {resizable: true,},
         ajaxURL:"/siparis/list",
-        progressiveLoad:"scroll",
-        paginationMode:"remote",
+        locale:true,
+        langs:{
+            "tr":{
+                "data":{
+                    "loading":"Yükleniyor", //data loader text
+                    "error":"Hata", //data error text
+                },
+                "pagination":{
+                    "first":"İlk",
+                    "first_title":"İlk Sayfa",
+                    "last":"Son",
+                    "last_title":"Son Sayfa",
+                    "prev":"Önceki",
+                    "prev_title":"Önceki Sayfa",
+                    "next":"Sonraki",
+                    "next_title":"Sonraki Sayfa",
+                    "all":"Hepsi",
+                    "page_size":"Sayı",
+                },
+            },
+        },
+        //progressiveLoad:"scroll",
         filterMode:"remote",
-        paginationSize:40,
+        pagination:true,
+        paginationMode:"remote",
+        paginationInitialPage:1,
+        paginationSize:20,
+        paginationSizeSelector:[10, 20, 40, 100],
         dataTree: true,
-        dataTreeStartExpanded: false,
         ajaxURLGenerator:function(url, config, params){
             return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
         },
         columns: [
-            { title: "Kart No", field: "KartNo", headerFilter: "input", },
-            { title: "Profil No", field: "ProfilNo", headerFilter: "input" },
-            { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input" },
+            { title: "Kart No", field: "KartNo", headerFilter: "input"},
+            { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
+            { title: "Profil No", field: "ProfilNo", headerFilter: "input"},
+            { title: "Kondüsyon", field: "KondusyonTuru", headerFilter: "input"},
             { title: "Sipariş Kg", field: "GirenKg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
             { title: "Kalan Kg", field: "Kg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
             { title: "Kalıp", field: "kalipSayisi"},
@@ -60,20 +84,25 @@
             holderEl.style.borderTop = "1px solid #333";
             holderEl.style.borderBotom = "1px solid #333";
             tableEl.style.border = "1px solid #333";
-            holderEl.appendChild(tableEl);
+            //run code after data has been updated
+            
             row.getElement().appendChild(holderEl);
+            holderEl.appendChild(tableEl);
              
             row.getElement().addEventListener("click", function(){
                 if(!row.getTreeParent()){
                     if(row.isTreeExpanded()){
                         row.treeCollapse();
+                        console.log("if");
                     } else {
-                        var subTableURL = "child/"+ row.getData().ProfilNo;
-                        $.ajax({
-                            url:subTableURL,
-                            dataType: "json",
-                            success: function(subTableData){
-                                if(row.getData().children==true){
+                        
+                        console.log(row.getData().children);
+                        var subTableURL = "child/" + row.getData().ProfilNo;
+                        if(row.getData().children==true){
+                            $.ajax({
+                                url:subTableURL,
+                                dataType: "json",
+                                success: function(subTableData){
                                     row.update({ children: subTableData})
                                         .then(function(){
                                             //run code after data has been updated
@@ -82,45 +111,28 @@
                                                 layout: "fitColumns",
                                                 dataType:"json",
                                                 columns: [
-                                                    { title: "Kalıp No", field: "KalipNo" },
-                                                    { title: "Üretici", field: "UreticiFirma" },
-                                                    { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                                    { title: "Toplam Uretim", field: "UretimToplamKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                    { title: "Kalıp No", field: "KalipNo", headerSort: false },
+                                                    { title: "Pres Kodu", field: "PresKodu", headerSort: false},
+                                                    { title: "Ø", field: "Capi", headerSort: false},
+                                                    { title: "Son Basılan", field: "SonPresKodu", headerSort: false},
+                                                    { title: "Üretici", field: "UreticiFirma", headerSort: false },
+                                                    { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                    { title: "Toplam Uretim", field: "UretimToplamKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                    { title: "Konum", field: "Konum", headerSort: false, formatter:"html"},
                                                 ],
                                             });
                                         });
-                                }else{
-                                    console.log()
-                                    $(".subTable" + row.getData().ProfilNo + "").toggle();
-                                };
-                                
-                            },
-                        });
+
+                            }   })}
+                            
+                        else{
+                            console.log("else")
+                            $(".subTable" + row.getData().ProfilNo + "").toggle();
+                            };
+                        }
                     }
-                }
-
-
-
-                //$(".subTable" + row.getData().ProfilNo + "").toggle(); 
-                /* if ($(".subTable" + row.getData().ProfilNo + "").isExpanded()){
-                    console.log("expanded")
-                } */
-
-                /* var subTable = new Tabulator(tableEl, {
-                    ajaxURL: "child/" + row.getData().ProfilNo,
-                    layout: "fitColumns",
-                    dataType:"json",
-                    columns: [
-                        { title: "Kalıp No", field: "KalipNo" },
-                        { title: "Üretici", field: "UreticiFirma" },
-                        { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                        { title: "Toplam Uretim", field: "UretimToplamKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                    ],
-                }); */
-
             })
-
-
+            
         },
     });
            

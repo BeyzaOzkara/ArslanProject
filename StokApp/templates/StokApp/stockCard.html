@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
 
   <link rel="stylesheet" type="text/css"  href="{% static 'node_modules/treeselectjs/dist/treeselectjs.css' %}"></script>
-  <link rel="stylesheet" href="{% static 'node_modules/jstree/dist/themes/default/style.min.css' %}">
 {% endblock %}
 {% block content %}
     
@@ -114,10 +113,26 @@
 <script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
 
 <script type="text/javascript" src="{% static 'node_modules/treeselectjs/dist/treeselectjs.umd.js' %}"></script>
-<script type="text/javascript" src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'node_modules/jstree/dist/jstree.min.js' %}"></script>
 <!-- Page script -->
 <script>
+
+  function getChildren(groupValue) {
+    return $.ajax({
+      url: '',
+      method: 'GET',
+      dataType: 'json'
+    });
+  }
+
+  function initTS(optionsData) {
+    const domElement = document.querySelector('.example') ;
+    const treeselect = new Treeselect({
+      parentHtmlContainer: domElement,
+      value: [],
+      options: optionsData,
+      isSingleSelect: true,
+    });
+  }
 
 /*   $(function () {
     //Initialize Select2 Elements
@@ -130,7 +145,7 @@
 
   }); */
 
-  var data = JSON.parse('{{ data|escapejs }}');
+  //var data = JSON.parse('{{ data|escapejs }}');
 
 /*  const options = JSON.parse('{{ data|escapejs }}');
    var domElement = document.querySelector('.example') 
