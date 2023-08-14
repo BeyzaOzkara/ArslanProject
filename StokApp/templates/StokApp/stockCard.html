@@ -1,4 +1,5 @@
 {% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
 
 {% load static %}
 
@@ -132,7 +133,13 @@
       options: optionsData,
       isSingleSelect: true,
     });
+
+    treeselect.srcElement.addEventListener('input', (e) => {
+      console.log('secilen deger')
+    })
   }
+
+
 
 /*   $(function () {
     //Initialize Select2 Elements

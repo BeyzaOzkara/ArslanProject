@@ -1,4 +1,5 @@
 {% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
 
 {% load static %}
 
@@ -7,6 +8,13 @@
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
+<style>
+    .tabulator .tabulator-row .tabulator-cell[tabulator-field="Kg"]{
+        font-weight: bold;
+        color:rgb(0, 38, 255);
+    }
+</style>
 
 {% endblock %}
 
