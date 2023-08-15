@@ -22,6 +22,19 @@
 
 <div class="container-fluid col-lg-11">
     <h1 class="col-lg-11">Arslan Alüminyum Sipariş Listesi</h1>
+    <div class="container-fluid col-lg-12">
+        <div class="row col-lg-12">
+            <div class="col-lg-6">
+                <span id="deneme"></span>
+            </div>
+            <div class="col-lg-6">
+                <a class="btn btn-app bg-success" style="float: right;" id="download-xlsx" >
+                    <i class="fas fa-file-excel"></i>
+                    excell
+                </a>
+            </div>
+        </div>
+    </div>
     <div class="card" id="siparisList-table"></div>
     <!-- row 1 -->
 </div> 
@@ -67,14 +80,14 @@
         pagination:true,
         paginationMode:"remote",
         paginationInitialPage:1,
-        paginationSize:15,
-        paginationSizeSelector:[15, 30, 60, 100],
+        paginationSize:10,
+        paginationSizeSelector:[1, 5, 10, 15, 30, 60, 100],
         dataTree: true,
         ajaxURLGenerator:function(url, config, params){
             return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
         },
         columns: [
-            { title: "Sip Tamam", field: "SiparisTamam", headerFilter: "input"},
+            { title: "Bloke", field: "SiparisTamam", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}},
             { title: "Kart No", field: "KartNo", headerFilter: "input"},
             { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
             { title: "Profil No", field: "ProfilNo", headerFilter: "input"},
@@ -106,7 +119,7 @@
                         console.log("if");
                     } else {
                         
-                        console.log(row.getData().children);
+                        console.log(row.getData());
                         var subTableURL = "child/" + row.getData().ProfilNo;
                         if(row.getData().children==true){
                             $.ajax({
@@ -146,6 +159,11 @@
             
         },
     });
+
+    //trigger download of data.xlsx file
+document.getElementById("download-xlsx").addEventListener("click", function(){
+    table.download("xlsx", "siparis.xlsx", {sheetName:"My Data"});
+});
            
 
 </script>
@@ -155,6 +173,8 @@
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 
 <!-- indirmek zorunda kalmayacağımız bir yolunu bul -->

@@ -542,11 +542,12 @@ def siparis_list(request):
                 if i["type"] == "like":
                     q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
-                    """ if i['field'] == 'SiparisTamam':
-                        if i['value'] == True:
-                            i['value'] = 'Evet'
-                        else: i['value'] = 'Hayır' """
-                    q[i['field']] = i['value']
+                    if i['field'] == 'SiparisTamam':
+                        if i['value'] == False:
+                            i['value'] = 'BLOKE'
+                            q[i['field']] = i['value']
+                            print(q)
+                        else: s = s.exclude(SiparisTamam ='BLOKE')
             else:
                 q[i['field']] = i['value']
         sq = s.filter(**q).order_by('-SonTermin')
@@ -561,11 +562,10 @@ def siparis_list(request):
         kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
         skal = len(kal)
-        """ if a['SiparisTamam']== 'EVET':
+        if a['SiparisTamam']== 'BLOKE':
+            a['SiparisTamam']= False
+        else :
             a['SiparisTamam']= True
-            print("true")
-        elif a['SiparisTamam']== 'HAYIR':
-            a['SiparisTamam']= False """
 
         a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
         a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
