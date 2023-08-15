@@ -22,7 +22,7 @@
 
 <div class="container-fluid col-lg-11">
     <h1 class="col-lg-11">Arslan Alüminyum Sipariş Listesi</h1>
-<!--     <div class="container-fluid col-lg-12">
+    <div class="container-fluid col-lg-12">
         <div class="row col-lg-12">
             <div class="col-lg-6">
                 <span id="deneme"></span>
@@ -34,7 +34,7 @@
                 </a>
             </div>
         </div>
-    </div> -->
+    </div>
     <div class="card" id="siparisList-table"></div>
     <!-- row 1 -->
 </div> 
@@ -46,9 +46,6 @@
 
 
 <script>
-
-//var sip = JSON.parse('{{ sipData|escapejs }}');
-
     var table = new Tabulator("#siparisList-table", {
         height: "100%",
         layout: "fitDataFill",
@@ -82,15 +79,18 @@
         paginationInitialPage:1,
         paginationSize:10,
         paginationSizeSelector:[1, 5, 10, 15, 30, 60, 100],
+        dataTree: true,
         ajaxURLGenerator:function(url, config, params){
             return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
         },
         columns: [
-            { title: "Bloke", field: "SiparisTamam", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}},
+        { title: "Bloke", field: "SiparisTamam", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}},
             { title: "Kart No", field: "KartNo", headerFilter: "input"},
             { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
+            { title: "Termin", field: "SonTermin", headerFilter: "input"},
             { title: "Profil No", field: "ProfilNo", headerFilter: "input"},
             { title: "Pres Kodu", field: "PresKodu", headerFilter: "input"},
+            { title: "Billet Türü", field: "BilletTuru", headerFilter: "input"},
             { title: "Kondüsyon", field: "KondusyonTuru", headerFilter: "input"},
             { title: "Sipariş Kg", field: "GirenKg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
             { title: "Kalan Kg", field: "Kg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
@@ -107,11 +107,17 @@
             holderEl.style.borderBotom = "1px solid #333";
             tableEl.style.border = "1px solid #333";
             //run code after data has been updated
-            
+
             row.getElement().appendChild(holderEl);
             holderEl.appendChild(tableEl);
 
             row.getElement().addEventListener("click", function(){
+                if(!row.getTreeParent()){
+                    if(row.isTreeExpanded()){
+                        row.treeCollapse();
+                        console.log("if");
+                    } else {
+
                         console.log(row.getData());
                         var subTableURL = "child/" + row.getData().ProfilNo;
                         if(row.getData().children==true){
@@ -123,37 +129,40 @@
                                         .then(function(){
                                             //run code after data has been updated
                                             var subTable = new Tabulator(tableEl, {
-                                                data: row.getData().children,
+                                                data: subTableData,
                                                 layout: "fitColumns",
                                                 dataType:"json",
                                                 columns: [
-                                                    { title: "Kalıp No", field: "KalipNo", headerSort: false },
-                                                    { title: "Pres Kodu", field: "PresKodu", headerSort: false},
-                                                    { title: "Ø", field: "Capi", headerSort: false},
-                                                    { title: "Son Basılan", field: "SonPresKodu", headerSort: false},
-                                                    { title: "Üretici", field: "UreticiFirma", headerSort: false },
-                                                    { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                                    { title: "Toplam Uretim", field: "UretimToplamKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                                    { title: "Konum", field: "Konum", headerSort: false, formatter:"html"},
-                                                ],
+                                                { title: "Kalıp No", field: "KalipNo", headerSort: false },
+                                                { title: "Pres Kodu", field: "PresKodu", headerSort: false},
+                                                { title: "Ø", field: "Capi", headerSort: false},
+                                                { title: "Son Basılan", field: "SonPresKodu", headerSort: false},
+                                                { title: "Üretici", field: "UreticiFirma", headerSort: false },
+                                                { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                { title: "Toplam Uretim", field: "UretimToplamKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
+                                                { title: "Konum", field: "Konum", headerSort: false, formatter:"html"},
+                                            ],
                                             });
+
                                         });
 
-                            }   })
-                        }
+                            }   })}
+
                         else{
-                            console.log(row.getElement().tableEl.getData());
+                            console.log("else");
                             //$("#subTable" + row.getData().ProfilNo + "").toggle();
                             };
+                        }
+                    }
             })
-            
+
         },
     });
 
     //trigger download of data.xlsx file
-/* document.getElementById("download-xlsx").addEventListener("click", function(){
+document.getElementById("download-xlsx").addEventListener("click", function(){
     table.download("xlsx", "siparis.xlsx", {sheetName:"My Data"});
-}); */
+});
            
 
 </script>

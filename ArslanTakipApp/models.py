@@ -162,13 +162,9 @@ class SiparisList(models.Model):
     SonTermin = models.DateTimeField(null=True)
     FirmaAdi = models.CharField(null=True)
     KondusyonTuru = models.CharField(null=True)
+    BilletTuru = models.CharField(null=True)
     PresKodu = models.CharField(null=True)
 
     class Meta:
         managed = False
         db_table = 'View051_ProsesDepoListesi'
-"""         indexes =[
-            Index(name='adet_con',fields=['Adet'], condition = Q(Adet__gt=0)),
-            Index(name='yer_con',fields=['BulunduguYer'], condition = Q(BuludunguYer='TESTERE')),
-            Index(name='kartaktif_con',fields=['KartAktif', 'BulunduguYer', 'Adet'], condition = (Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)),
-        ] """

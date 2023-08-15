@@ -556,7 +556,7 @@ def siparis_list(request):
         sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
     #print(sq)
     #if(Tamam!='BLOKE')
-    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam')[(page-1)*size:page*size])
+    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
     k = KalipMs.objects.using('dies').all()
 
     for a in sip:
@@ -567,7 +567,8 @@ def siparis_list(request):
             a['SiparisTamam']= False
         else :
             a['SiparisTamam']= True
-
+        a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
+        
         a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
         a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
         if tkal > 0:
