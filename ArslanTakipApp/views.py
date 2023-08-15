@@ -456,12 +456,13 @@ def decrypt_aes_ecb(key, ciphertext):
 
 def qrKalite(request):
     if request.method == "GET":
+        print("qr sayfası")
         """ path = request.get_full_path()
         print(path)
         print(path.rsplit('/', 1)[-1]) """
 
         # Şifre çözme
-        unhexli = binascii.unhexlify('2a1ab2e62423112531ab5c0b795c4638')
+        unhexli = binascii.unhexlify('b23d7cad6447841b177fe5610114b374')
         print(unhexli)
         decrypted_text = decrypt_aes_ecb(key, unhexli)
         print("Çözülmüş Veri:", decrypted_text)        
@@ -471,8 +472,8 @@ def qrKalite(request):
         print(ty + " " + no)
         
         context = {
-            "type" : ty,
-            "no" : no,
+            "type" : unhexli,
+            "no" : decrypted_text,
         }
 
         """ olmayan = []
