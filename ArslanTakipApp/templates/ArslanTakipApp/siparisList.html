@@ -13,10 +13,11 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" href="{% static 'ArslanTakipApp/printTable.css' %}">
   <style>
     /* Add your custom styles here */
     .table {
-      width: 100%;
+      width: 98%;
         border-collapse: collapse;
         border: 1px solid #4a4a4a;
         background-color: #f9f9f9;
@@ -41,11 +42,12 @@
         background-color: #e6f7ff;
     }
 
-    .akordeon {
+    tr.akordeon {
+      width: 70%;
         max-height: 100%;
     }
 
-    .akordeon table th {
+    tr.akordeon table th {
         background-color: #5cb85c;
         border: 1px solid #4cae4c;
         padding: 8px;
@@ -54,19 +56,80 @@
         color: #ffffff;
     }
 
-    .akordeon table td {
+    tr.akordeon table td {
         border: 1px solid #ddd;
         padding: 6px;
         text-align: left;
         color: #555;
     }
 
-    .akordeon table tr:nth-child(even) {
+    tr.akordeon table tr:nth-child(even) {
         background-color: #e6e6e6;
     }
 
-    .akordeon table tr:hover {
+    tr.akordeon table tr:hover {
         background-color: #d1d1d1;
+    }
+
+    @media print {
+      .table {
+          width: 98%;
+          border-collapse: collapse;
+          border: 1px solid #4a4a4a;
+          background-color: #f9f9f9;
+      }
+      .table th{
+          background-color: #007bff;
+          border: 1px solid #0056b3;
+          padding: 4px;
+          text-align: left;
+          font-weight: bold;
+          color: #232b79;
+      } 
+
+      .table td {
+          border: 1px solid #e0e0e0;
+          padding: 3px;
+          text-align: left;
+          color: #333;
+      }
+
+      tr.akordeon {
+          width: 50%;
+          max-height: 100%;
+      }
+
+      tr.akordeon table th {
+          background-color: #5cb85c;
+          border: 1px solid #4cae4c;
+          padding: 2px;
+          text-align: left;
+          font-weight: bold;
+          color: #232b79;
+      }
+
+      tr.akordeon table td {
+          border: 1px solid #ddd;
+          padding: 2px;
+          text-align: left;
+          color: #555;
+      }
+
+      tr.akordeon table tr:nth-child(even) {
+          background-color: #e6e6e6;
+      }
+      body {
+        visibility: hidden;
+      }
+      .content{
+        visibility: visible;
+        left: 0;
+        top: 0;
+      }
+
+      input, select, .pagination-container ,#pageSelectLabel, .btn{
+        display: none;
+      }
     }
 
   </style>
@@ -74,7 +137,10 @@
 
 {% block content %}
 <div class="container col-lg-12">
-    <label for="perPageSelect">Sayfa Başına Sipariş Sayısı:</label>
+  <h1 class="col-lg-11" style="text-align: center;">Arslan Alüminyum Sipariş Listesi</h1>
+  <div class="row">
+    <div class="container-fluid col-lg 10">
+    <label for="perPageSelect" id="pageSelectLabel">Sayfa Başına Sipariş Sayısı:</label>
     <select id="perPageSelect">
       <option value="5">5</option>
       <option value="10">10</option>
@@ -85,7 +151,9 @@
       <option value="200">200</option>
       <!-- Diğer seçenekleri ekleyebilirsiniz -->
     </select>
-    <table class="table resizable">
+  </div>
+  </div>
+    <table class="table">
       <thead>
         <tr>
             <th scope="col"  style="width: 6%;">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
@@ -94,13 +162,13 @@
               <option value="hepsi">hepsi</option>
             </select></th>
           <th scope="col" style="width: 6%;">Kart No <input type="text" size="3" class="search-input" data-field="KartNo"></th>
-          <th scope="col" style="width: 14%;">Firma Adı <input type="text" class="search-input" data-field="FirmaAdi"></th>
+          <th scope="col" style="width: 12%;">Firma Adı <input type="text" size="9" class="search-input" data-field="FirmaAdi"></th>
           <th scope="col" style="width: 8%;">Profil No <input type="text" size="5" class="search-input" data-field="ProfilNo"></th>
           <th scope="col" style="width: 6%;">Pres Kodu <input type="text" size="4" class="search-input" data-field="PresKodu"></th>
           <th scope="col" style="width: 6%;">Billet Turu <input type="text" size="7" class="search-input" data-field="BilletTuru"></th>
           <th scope="col" style="width: 8%;">GirenKg</th>
           <th scope="col" style="width: 8%;">Kg</th>
-          <th scope="col" style="width: 14%;">KondusyonTuru <input type="text" class="search-input" data-field="KondusyonTuru"></th>
+          <th scope="col" style="width: 12%;">KondusyonTuru <input type="text" size="9" class="search-input" data-field="KondusyonTuru"></th>
           <th scope="col" style="width: 10%;">Termin <input type="date" class="search-date-input" data-field="SonTermin"></th>
           <th scope="col" style="width: 8%;">TopTenKg </th>
           <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
@@ -266,10 +334,6 @@
         loadPage(currentPage);
         });
 
-// Set default value to "true"
-//$('.filter-dropdown[data-field="SiparisTamam"]').val("true").change();
-
-
     $('.search-input').on('input', function(){
         const field = $(this).data('field');
         const value = $(this).val();
@@ -303,12 +367,8 @@
         const accordionRow = mainTableRow.next('.akordeon');
 
         if (accordionRow.length) { 
-            /* if (accordionRow.hasClass('active')){
-                accordionRow.removeClass('active');
-            } else {
-                accordionRow.addClass('active');
-            } */
-            accordionRow.find('.container').slideToggle();
+            accordionRow.slideToggle();
+            console.log(accordionRow);
         } else {
           // Load and render accordion table data
           loadAccordionTable(profilNo, mainTableRow);
@@ -317,7 +377,7 @@
     });
 
     const renderAccordionTable = (accordionData, mainTableRow) => {
-        const accordionRow = $('<tr class="akordeon active"><td colspan="12"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th>Kalıp No</th><th>Üretici Firma</th><th>Tenifer Kalan Ömür Kg</th><th>Üretim Toplam Kg</th><th>Pres Kodu</th><th>Çapı</th><th>Son Pres Kodu</th><th>Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
+        const accordionRow = $('<tr class="akordeon"><td colspan="12"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
         mainTableRow.after(accordionRow);
       const accordionTableBody = accordionRow.find('#accordionTableBody');
       accordionTableBody.empty();  // Clear existing accordion table data
@@ -364,5 +424,28 @@
 
     let currentPage = 1;
     loadPage(currentPage);  // İlk sayfa yüklendiğinde verileri ve pagination'ı getir
+
+    function printTable(){
+      var printWindow = window.open('', '_blank');
+      var tableHtml = document.querySelector('.table').outerHTML;
+
+      /* var styles = document.querySelectorAll('link[rel="stylesheet"], style');
+ */
+      printWindow.document.write('<html><head><title>Yazdır</title>');
+
+      /* styles.forEach(function(style){
+        printWindow.document.write(style.outerHTML);
+      }) */
+
+      printWindow.document.write('</head><body>')
+
+      printWindow.document.write(tableHtml);
+      printWindow.document.write('</body></html>');
+
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    };
   </script>
 {% endblock %}
