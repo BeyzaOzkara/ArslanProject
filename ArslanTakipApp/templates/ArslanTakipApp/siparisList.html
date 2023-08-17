@@ -16,7 +16,7 @@
   <style>
     /* Add your custom styles here */
     .table {
-        width: 100%;
+      width: 100%;
         border-collapse: collapse;
         border: 1px solid #4a4a4a;
         background-color: #f9f9f9;
@@ -88,22 +88,22 @@
     <table class="table resizable">
       <thead>
         <tr>
-            <th scope="col">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
+            <th scope="col"  style="width: 6%;">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
               <option value="true">değil</option>
               <option value="BLOKE">bloke</option>
               <option value="hepsi">hepsi</option>
             </select></th>
-          <th scope="col">Kart No <input type="text" size="3" class="search-input" data-field="KartNo"></th>
-          <th scope="col">Firma Adı <input type="text" class="search-input" data-field="FirmaAdi"></th>
-          <th scope="col">Profil No <input type="text" size="7" class="search-input" data-field="ProfilNo"></th>
-          <th scope="col">Pres Kodu <input type="text" size="7" class="search-input" data-field="PresKodu"></th>
-          <th scope="col">Billet Turu <input type="text" size="7" class="search-input" data-field="BilletTuru"></th>
-          <th scope="col">GirenKg</th>
-          <th scope="col">Kg</th>
-          <th scope="col">KondusyonTuru <input type="text" class="search-input" data-field="KondusyonTuru"></th>
-          <th scope="col">Termin <input type="date" class="search-date-input" data-field="SonTermin"></th>
-          <th scope="col">TopTenKg </th>
-          <th scope="col">Kalıp Sayısı</th>
+          <th scope="col" style="width: 6%;">Kart No <input type="text" size="3" class="search-input" data-field="KartNo"></th>
+          <th scope="col" style="width: 14%;">Firma Adı <input type="text" class="search-input" data-field="FirmaAdi"></th>
+          <th scope="col" style="width: 8%;">Profil No <input type="text" size="5" class="search-input" data-field="ProfilNo"></th>
+          <th scope="col" style="width: 6%;">Pres Kodu <input type="text" size="4" class="search-input" data-field="PresKodu"></th>
+          <th scope="col" style="width: 6%;">Billet Turu <input type="text" size="7" class="search-input" data-field="BilletTuru"></th>
+          <th scope="col" style="width: 8%;">GirenKg</th>
+          <th scope="col" style="width: 8%;">Kg</th>
+          <th scope="col" style="width: 14%;">KondusyonTuru <input type="text" class="search-input" data-field="KondusyonTuru"></th>
+          <th scope="col" style="width: 10%;">Termin <input type="date" class="search-date-input" data-field="SonTermin"></th>
+          <th scope="col" style="width: 8%;">TopTenKg </th>
+          <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
 
         </tr>
       </thead>
@@ -137,7 +137,7 @@
         <td>${item.PresKodu}</td>
         <td>${item.BilletTuru}</td>
         <td>${item.GirenKg}</td>
-        <td>${item.Kg}</td>
+        <td style="color: blue;font-weight:bold;">${item.Kg}</td>
         <td>${item.KondusyonTuru}</td>
         <td>${item.SonTermin}</td>
         <td>${topten}</td>
