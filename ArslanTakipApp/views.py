@@ -375,6 +375,8 @@ class KalipView(generic.TemplateView):
 def location_kalip(request):
     #kalıp arşivi sayfasındaki kalıplar
     if request.method == "GET":
+        path = request.get_full_path()
+        print(path)
         params = json.loads(unquote(request.GET.get('params')))
         for i in params:
             value = params[i]
@@ -536,26 +538,26 @@ def siparis_list(request):
     page = params["page"]
     filter_list = params["filter"]
     q ={}
-    #([{'field': 'KartNo', 'type': 'like', 'value': '117'}])
     if len(filter_list)>0:
+        print("filterbuyuk")
         for i in filter_list:
             if i['field'] != 'ProfilNo':
                 if i["type"] == "like":
-                    q[i['field']+"__startswith"] = i['value']
+                    if i['field'] != 'FirmaAdi':
+                        q[i['field']+"__startswith"] = i['value']
+                    else: q[i['field']+"__contains"] = i['value']
                 elif i["type"] == "=":
                     if i['field'] == 'SiparisTamam':
-                        if i['value'] == False:
-                            i['value'] = 'BLOKE'
+                        if i['value'] == 'BLOKE':
                             q[i['field']] = i['value']
-                            print(q)
-                        else: s = s.exclude(SiparisTamam ='BLOKE')
-            else:
-                q[i['field']] = i['value']
+                        elif i['value'] == 'true':
+                            s = s.exclude(SiparisTamam ='BLOKE')
+                        else: s =s
+                    else: q[i['field']] = i['value']
+            else: q[i['field']] = i['value']
         sq = s.filter(**q).order_by('-SonTermin')
     else:
         sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
-    #print(sq)
-    #if(Tamam!='BLOKE')
     sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
     k = KalipMs.objects.using('dies').all()
 

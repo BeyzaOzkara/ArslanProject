@@ -1,180 +1,368 @@
 {% extends 'adminlte/base.html' %}
-{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
 
 {% load static %}
 
-{% block title %}Arslan Alüminyum{% endblock %}
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
 
 {% block stylesheets %}
-{% include 'adminlte/lib/_styles.html' %}
-<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
-
-<style>
-    .tabulator .tabulator-row .tabulator-cell[tabulator-field="Kg"]{
-        font-weight: bold;
-        color:rgb(0, 38, 255);
+  {% include 'adminlte/lib/_styles.html' %}
+  <style>
+    /* Add your custom styles here */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #4a4a4a;
+        background-color: #f9f9f9;
     }
-</style>
+    .table th{
+        background-color: #007bff;
+        border: 1px solid #0056b3;
+        padding: 10px;
+        text-align: left;
+        font-weight: 500;
+        color: #ffffff;
+    } 
+    
+    .table td {
+        border: 1px solid #e0e0e0;
+        padding: 8px;
+        text-align: left;
+        color: #333;
+    }
 
+    .table tr.main-row:hover{
+        background-color: #e6f7ff;
+    }
+
+    .akordeon {
+        max-height: 100%;
+    }
+
+    .akordeon table th {
+        background-color: #5cb85c;
+        border: 1px solid #4cae4c;
+        padding: 8px;
+        text-align: left;
+        font-weight: 500;
+        color: #ffffff;
+    }
+
+    .akordeon table td {
+        border: 1px solid #ddd;
+        padding: 6px;
+        text-align: left;
+        color: #555;
+    }
+
+    .akordeon table tr:nth-child(even) {
+        background-color: #e6e6e6;
+    }
+
+    .akordeon table tr:hover {
+        background-color: #d1d1d1;
+    }
+
+  </style>
 {% endblock %}
 
 {% block content %}
+<div class="container col-lg-12">
+    <label for="perPageSelect">Sayfa Başına Sipariş Sayısı:</label>
+    <select id="perPageSelect">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="40">40</option>
+      <option value="100">100</option>
+      <option value="150">150</option>
+      <option value="200">200</option>
+      <!-- Diğer seçenekleri ekleyebilirsiniz -->
+    </select>
+    <table class="table resizable">
+      <thead>
+        <tr>
+            <th scope="col">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
+              <option value="true">değil</option>
+              <option value="BLOKE">bloke</option>
+              <option value="hepsi">hepsi</option>
+            </select></th>
+          <th scope="col">Kart No <input type="text" size="3" class="search-input" data-field="KartNo"></th>
+          <th scope="col">Firma Adı <input type="text" class="search-input" data-field="FirmaAdi"></th>
+          <th scope="col">Profil No <input type="text" size="7" class="search-input" data-field="ProfilNo"></th>
+          <th scope="col">Pres Kodu <input type="text" size="7" class="search-input" data-field="PresKodu"></th>
+          <th scope="col">Billet Turu <input type="text" size="7" class="search-input" data-field="BilletTuru"></th>
+          <th scope="col">GirenKg</th>
+          <th scope="col">Kg</th>
+          <th scope="col">KondusyonTuru <input type="text" class="search-input" data-field="KondusyonTuru"></th>
+          <th scope="col">Termin <input type="date" class="search-date-input" data-field="SonTermin"></th>
+          <th scope="col">TopTenKg </th>
+          <th scope="col">Kalıp Sayısı</th>
 
-<div class="container-fluid col-lg-11">
-    <h1 class="col-lg-11">Arslan Alüminyum Sipariş Listesi</h1>
-    <div class="container-fluid col-lg-12">
-        <div class="row col-lg-12">
-            <div class="col-lg-6">
-                <span id="deneme"></span>
-            </div>
-            <div class="col-lg-6">
-                <a class="btn btn-app bg-success" style="float: right;" id="download-xlsx" >
-                    <i class="fas fa-file-excel"></i>
-                    excell
-                </a>
-            </div>
-        </div>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Veriler buraya -->
+      </tbody>
+    </table>
+    <div class="pagination-container">
+      <ul class="pagination"></ul>
     </div>
-    <div class="card" id="siparisList-table"></div>
-    <!-- row 1 -->
-</div> 
-<!-- cont 1 -->
+  </div>
 
 {% endblock %}
 
 {% block extra_js %}
+  <script>
+    const tableBody = $('#tableBody');
+    let itemsPerPage = 5;  // Başlangıçta varsayılan değer
+    let filter = [];
+    const renderData = (data) => {
+      tableBody.empty();  // Önceki verileri temizle
+      data.forEach(item => {
+        let topten = parseFloat(item.TopTenKg).toFixed(2)
+        // Verileri render et...
+        const SiparisTamamSymbol = item.SiparisTamam  ? '✓' : '✗';
+        const row = $('<tr class="main-row"></tr>').html(`
+        <td>${SiparisTamamSymbol}</td>
+        <td>${item.KartNo}</td>
+        <td>${item.FirmaAdi}</td>
+        <td>${item.ProfilNo}</td>
+        <td>${item.PresKodu}</td>
+        <td>${item.BilletTuru}</td>
+        <td>${item.GirenKg}</td>
+        <td>${item.Kg}</td>
+        <td>${item.KondusyonTuru}</td>
+        <td>${item.SonTermin}</td>
+        <td>${topten}</td>
+        <td>${item.kalipSayisi || "-"}</td>
+        `);
 
+        tableBody.append(row);
+      });
+    };
 
-<script>
-    var table = new Tabulator("#siparisList-table", {
-        height: "100%",
-        layout: "fitDataFill",
-        columnDefaults: {resizable: true,},
-        ajaxURL:"/siparis/list",
-        locale:true,
-        langs:{
-            "tr":{
-                "data":{
-                    "loading":"Yükleniyor", //data loader text
-                    "error":"Hata", //data error text
-                },
-                "pagination":{
-                    "first":"İlk",
-                    "first_title":"İlk Sayfa",
-                    "last":"Son",
-                    "last_title":"Son Sayfa",
-                    "prev":"Önceki",
-                    "prev_title":"Önceki Sayfa",
-                    "next":"Sonraki",
-                    "next_title":"Sonraki Sayfa",
-                    "all":"Hepsi",
-                    "page_size":"Sayı",
-                },
-            },
+    const loadPage = (page) => {
+        const params = {
+            page: page,
+            size: itemsPerPage,
+            filter: filter
+        };
+      $.ajax({
+        url: `/siparis/list`,
+        method: 'GET',
+        data: { params: JSON.stringify(params)},
+        dataType: 'json',
+        success: function (paginatedData) {
+          renderData(paginatedData.data);
+          console.log(paginatedData.data);
+          renderPagination(paginatedData.last_page);
         },
-        //progressiveLoad:"scroll",
-        filterMode:"remote",
-        pagination:true,
-        paginationMode:"remote",
-        paginationInitialPage:1,
-        paginationSize:10,
-        paginationSizeSelector:[1, 5, 10, 15, 30, 60, 100],
-        dataTree: true,
-        ajaxURLGenerator:function(url, config, params){
-            return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
-        },
-        columns: [
-        { title: "Bloke", field: "SiparisTamam", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}},
-            { title: "Kart No", field: "KartNo", headerFilter: "input"},
-            { title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
-            { title: "Termin", field: "SonTermin", headerFilter: "input"},
-            { title: "Profil No", field: "ProfilNo", headerFilter: "input"},
-            { title: "Pres Kodu", field: "PresKodu", headerFilter: "input"},
-            { title: "Billet Türü", field: "BilletTuru", headerFilter: "input"},
-            { title: "Kondüsyon", field: "KondusyonTuru", headerFilter: "input"},
-            { title: "Sipariş Kg", field: "GirenKg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
-            { title: "Kalan Kg", field: "Kg", headerFilter: "input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,} },
-            { title: "Kalıp", field: "kalipSayisi"},
-            { title: "Kalan Tenifer", field: "TopTenKg", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-        ],
-        rowFormatter: function (row) {
-            var holderEl = document.createElement("div");
-            var tableEl = document.createElement("div");
+        error: function (error) {
+          console.error('Error loading paginated data:', error);
+        }
+      });
+    };
+    
 
-            holderEl.style.boxSizing = "border-box";
-            holderEl.style.padding = "10px 30px 10px 10px";
-            holderEl.style.borderTop = "1px solid #333";
-            holderEl.style.borderBotom = "1px solid #333";
-            tableEl.style.border = "1px solid #333";
-            //run code after data has been updated
+    const renderPagination = (totalPages) => {
+      const paginationUl = $('.pagination');
+      paginationUl.empty();  // Önceki pagination'ı temizle
 
-            row.getElement().appendChild(holderEl);
-            holderEl.appendChild(tableEl);
+      const prevButton = `
+      <li class="page-item prev ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+      `;
+      
+      const nextButton = `
+      <li class="page-item next ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+      `;
 
-            row.getElement().addEventListener("click", function(){
-                if(!row.getTreeParent()){
-                    if(row.isTreeExpanded()){
-                        row.treeCollapse();
-                        console.log("if");
-                    } else {
+      paginationUl.append(prevButton);
 
-                        console.log(row.getData());
-                        var subTableURL = "child/" + row.getData().ProfilNo;
-                        if(row.getData().children==true){
-                            $.ajax({
-                                url:subTableURL,
-                                dataType: "json",
-                                success: function(subTableData){
-                                    row.update({ children: subTableData})
-                                        .then(function(){
-                                            //run code after data has been updated
-                                            var subTable = new Tabulator(tableEl, {
-                                                data: subTableData,
-                                                layout: "fitColumns",
-                                                dataType:"json",
-                                                columns: [
-                                                { title: "Kalıp No", field: "KalipNo", headerSort: false },
-                                                { title: "Pres Kodu", field: "PresKodu", headerSort: false},
-                                                { title: "Ø", field: "Capi", headerSort: false},
-                                                { title: "Son Basılan", field: "SonPresKodu", headerSort: false},
-                                                { title: "Üretici", field: "UreticiFirma", headerSort: false },
-                                                { title: "Kalan Ten Ömrü", field: "TeniferKalanOmurKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                                { title: "Toplam Uretim", field: "UretimToplamKg", headerSort: false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}  },
-                                                { title: "Konum", field: "Konum", headerSort: false, formatter:"html"},
-                                            ],
-                                            });
+      const visiblePages = calculateVisiblePages(totalPages);
 
-                                        });
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || visiblePages.includes(i)) {
+          const liClass = i === currentPage ? 'page-item active' : 'page-item';
+          const li = `<li class="${liClass}"><a class="page-link" href="#">${i}</a></li>`;
+          paginationUl.append(li);
+        } else if (i === visiblePages[0] - 1 || i === visiblePages[visiblePages.length - 1] + 1) {
+          paginationUl.append(`
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+          `);
+        }
+      }
 
-                            }   })}
+      paginationUl.append(nextButton);
 
-                        else{
-                            console.log("else");
-                            //$("#subTable" + row.getData().ProfilNo + "").toggle();
-                            };
-                        }
-                    }
-            })
+      paginationUl.find('.page-link').on('click', function (e) {
+        const parentLi = $(this).closest('.page-item');
 
-        },
+        if (parentLi.hasClass('disabled')) {
+          return;
+        }
+
+        if (parentLi.hasClass('prev')) {
+          currentPage = Math.max(1, currentPage - 1);
+        } else if (parentLi.hasClass('next')) {
+          currentPage = Math.min(totalPages, currentPage + 1);
+        } else {
+          currentPage = parseInt($(this).text());
+        }
+
+        loadPage(currentPage);
+      });
+    };
+
+    const calculateVisiblePages = (totalPages) => {
+      const visiblePages = [];
+      const maxVisiblePages = 20; // You can adjust this value
+
+      const middlePage = Math.floor(maxVisiblePages / 2);
+      const lowerBound = Math.max(1, currentPage - middlePage);
+      const upperBound = Math.min(totalPages, lowerBound + maxVisiblePages - 1);
+
+      for (let i = lowerBound; i <= upperBound; i++) {
+        visiblePages.push(i);
+      }
+
+      return visiblePages;
+    };
+
+    
+    $('.filter-dropdown').on('change', function(){
+        const field = $(this).data('field');
+        const value = $(this).val();
+
+        // Remove existing filter for the field if it exists
+        filter = filter.filter(f => f.field !== field);
+
+        // Add new filter for the field based on the selected value
+        if (value === "true") {
+            filter.push({ field: field, type: '=', value: true });
+        } else if (value === "BLOKE") {
+            filter.push({ field: field, type: '=', value: 'BLOKE' });
+        } else if (value === "hepsi") {
+            filter.push({ field: field, type: '=', value: 'hepsi' });
+        }
+
+        // Reload the current page with the updated filter
+        loadPage(currentPage);
+        });
+
+// Set default value to "true"
+//$('.filter-dropdown[data-field="SiparisTamam"]').val("true").change();
+
+
+    $('.search-input').on('input', function(){
+        const field = $(this).data('field');
+        const value = $(this).val();
+
+        filter = filter.filter(f => f.field !== field);
+
+        if (value) {
+            filter.push({ field: field, type: 'like', value: value});
+        }
+
+        loadPage(currentPage);
+    });
+    $('.search-date-input').on('input', function(){
+        const field = $(this).data('field');
+        const value = $(this).val();
+
+        filter = filter.filter(f => f.field !== field);
+
+        if (value) {
+            filter.push({ field: field, type: '=', value: value});
+        }
+
+        loadPage(currentPage);
     });
 
-    //trigger download of data.xlsx file
-document.getElementById("download-xlsx").addEventListener("click", function(){
-    table.download("xlsx", "siparis.xlsx", {sheetName:"My Data"});
-});
-           
+    
+    tableBody.on('click', '.main-row', function () {
+      const profilNo = $(this).find('td:nth-child(4)').text();  // Assuming ProfilNo is in the 3rd column
+      if (profilNo) {
+        const mainTableRow = $(this);
+        const accordionRow = mainTableRow.next('.akordeon');
 
-</script>
+        if (accordionRow.length) { 
+            /* if (accordionRow.hasClass('active')){
+                accordionRow.removeClass('active');
+            } else {
+                accordionRow.addClass('active');
+            } */
+            accordionRow.find('.container').slideToggle();
+        } else {
+          // Load and render accordion table data
+          loadAccordionTable(profilNo, mainTableRow);
+        }
+      }
+    });
+
+    const renderAccordionTable = (accordionData, mainTableRow) => {
+        const accordionRow = $('<tr class="akordeon active"><td colspan="12"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th>Kalıp No</th><th>Üretici Firma</th><th>Tenifer Kalan Ömür Kg</th><th>Üretim Toplam Kg</th><th>Pres Kodu</th><th>Çapı</th><th>Son Pres Kodu</th><th>Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
+        mainTableRow.after(accordionRow);
+      const accordionTableBody = accordionRow.find('#accordionTableBody');
+      accordionTableBody.empty();  // Clear existing accordion table data
+      accordionData.forEach(item => {
+        // Render accordion table row
+        const row = $('<tr></tr>').html(`
+            <td>${item.KalipNo || '-'}</td>
+            <td>${item.UreticiFirma || '-'}</td>
+            <td>${item.TeniferKalanOmurKg || '-'}</td>
+            <td>${item.UretimToplamKg || '-'}</td>
+            <td>${item.PresKodu || '-'}</td>
+            <td>${item.Capi || '-'}</td>
+            <td>${item.SonPresKodu || '-'}</td>
+            <td>${item.Konum || '-'}</td>
+          <!-- Add more columns as needed -->
+        `);
+        accordionTableBody.append(row);
+      });
+      //accordionRow.find('.container').slideToggle();
+    };
+
+    // Function to load accordion table data
+    const loadAccordionTable = (profilNo, mainTableRow) => {
+      $.ajax({
+      url: `/siparis/child/${profilNo}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (accordionData) {
+          console.log(accordionData)
+          renderAccordionTable(accordionData, mainTableRow);
+      },
+      error: function (error) {
+          console.error('Error loading accordion table data:', error);
+      }
+      });
+    };
 
 
-{% endblock %}
+    $('#perPageSelect').on('change', function () {
+      itemsPerPage = parseInt($(this).val());
+      currentPage = 1;  // Sayfa değiştiğinde ilk sayfaya geç
+      loadPage(currentPage);
+    });
 
-{% block javascript %}
-{% include 'adminlte/lib/_scripts.html' %}
-<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
-
-<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
-
-<!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
+    let currentPage = 1;
+    loadPage(currentPage);  // İlk sayfa yüklendiğinde verileri ve pagination'ı getir
+  </script>
 {% endblock %}
