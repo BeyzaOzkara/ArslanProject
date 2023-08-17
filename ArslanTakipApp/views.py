@@ -539,7 +539,6 @@ def siparis_list(request):
     filter_list = params["filter"]
     q ={}
     if len(filter_list)>0:
-        print("filterbuyuk")
         for i in filter_list:
             if i['field'] != 'ProfilNo':
                 if i["type"] == "like":
@@ -550,7 +549,7 @@ def siparis_list(request):
                     if i['field'] == 'SiparisTamam':
                         if i['value'] == 'BLOKE':
                             q[i['field']] = i['value']
-                        elif i['value'] == 'true':
+                        elif i['value'] == 'degil':
                             s = s.exclude(SiparisTamam ='BLOKE')
                         else: s =s
                     else: q[i['field']] = i['value']
@@ -565,17 +564,11 @@ def siparis_list(request):
         kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
         skal = len(kal)
-        if a['SiparisTamam']== 'BLOKE':
-            a['SiparisTamam']= False
-        else :
-            a['SiparisTamam']= True
+        
         a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
         
         a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
         a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
-        if tkal > 0:
-            a['children'] = True
-        else: a['children'] = False
 
     sip_count = sq.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': []}

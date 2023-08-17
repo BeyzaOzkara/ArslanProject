@@ -23,7 +23,7 @@
         background-color: #f9f9f9;
     }
     .table th{
-        background-color: #007bff;
+        background-color: #96B6C5;
         border: 1px solid #0056b3;
         padding: 10px;
         text-align: left;
@@ -39,7 +39,7 @@
     }
 
     .table tr.main-row:hover{
-        background-color: #e6f7ff;
+        background-color: #EEE0C9;
     }
 
     tr.akordeon {
@@ -48,8 +48,8 @@
     }
 
     tr.akordeon table th {
-        background-color: #5cb85c;
-        border: 1px solid #4cae4c;
+        background-color: #ADC4CE;
+        border: 1px solid #96B6C5;
         padding: 8px;
         text-align: left;
         font-weight: 500;
@@ -68,7 +68,7 @@
     }
 
     tr.akordeon table tr:hover {
-        background-color: #d1d1d1;
+        background-color: #F1F0E8;
     }
 
     @media print {
@@ -157,7 +157,7 @@
       <thead>
         <tr>
             <th scope="col"  style="width: 6%;">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
-              <option value="true">değil</option>
+              <option value="degil">değil</option>
               <option value="BLOKE">bloke</option>
               <option value="hepsi">hepsi</option>
             </select></th>
@@ -196,7 +196,8 @@
       data.forEach(item => {
         let topten = parseFloat(item.TopTenKg).toFixed(2)
         // Verileri render et...
-        const SiparisTamamSymbol = item.SiparisTamam  ? '✓' : '✗';
+        let SiparisTamamSymbol = ""
+        if (item.SiparisTamam == 'BLOKE'){ SiparisTamamSymbol = '✗'}else { SiparisTamamSymbol ='✓'} ;
         const row = $('<tr class="main-row"></tr>').html(`
         <td>${SiparisTamamSymbol}</td>
         <td>${item.KartNo}</td>
@@ -322,8 +323,8 @@
         filter = filter.filter(f => f.field !== field);
 
         // Add new filter for the field based on the selected value
-        if (value === "true") {
-            filter.push({ field: field, type: '=', value: true });
+        if (value === "degil") {
+            filter.push({ field: field, type: '=', value: 'degil' });
         } else if (value === "BLOKE") {
             filter.push({ field: field, type: '=', value: 'BLOKE' });
         } else if (value === "hepsi") {
