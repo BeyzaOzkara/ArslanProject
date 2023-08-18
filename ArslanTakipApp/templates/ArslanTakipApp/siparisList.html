@@ -23,8 +23,8 @@
         background-color: #f9f9f9;
     }
     .table th{
-        background-color: #96B6C5;
-        border: 1px solid #0056b3;
+        background-color: #82AAE3;
+        border: 1px solid #6eabc7;
         padding: 10px;
         text-align: left;
         font-weight: 500;
@@ -39,7 +39,7 @@
     }
 
     .table tr.main-row:hover{
-        background-color: #EEE0C9;
+        background-color: #BFEAF5;
     }
 
     tr.akordeon {
@@ -48,7 +48,7 @@
     }
 
     tr.akordeon table th {
-        background-color: #ADC4CE;
+        background-color: #91D8E4;
         border: 1px solid #96B6C5;
         padding: 8px;
         text-align: left;
@@ -68,55 +68,55 @@
     }
 
     tr.akordeon table tr:hover {
-        background-color: #F1F0E8;
+        background-color: #EAFDFC;
     }
 
     @media print {
       .table {
-          width: 98%;
-          border-collapse: collapse;
-          border: 1px solid #4a4a4a;
-          background-color: #f9f9f9;
+        width: 98%;
+        border-collapse: collapse;
+        border: 1px solid #4a4a4a;
+        background-color: #f9f9f9;
       }
+      
       .table th{
-          background-color: #007bff;
-          border: 1px solid #0056b3;
-          padding: 4px;
-          text-align: left;
-          font-weight: bold;
-          color: #232b79;
+        background-color: #96B6C5;
+        padding: 4px;
+        text-align: left;
+        font-weight: bold;
+        color: #2E8A99;
       } 
 
       .table td {
-          border: 1px solid #e0e0e0;
-          padding: 3px;
-          text-align: left;
-          color: #333;
+        border: 1px solid #e0e0e0;
+        padding: 3px;
+        text-align: left;
+        color: #333;
       }
 
       tr.akordeon {
-          width: 50%;
-          max-height: 100%;
+        width: 50%;
+        max-height: 100%;
       }
 
       tr.akordeon table th {
-          background-color: #5cb85c;
-          border: 1px solid #4cae4c;
-          padding: 2px;
-          text-align: left;
-          font-weight: bold;
-          color: #232b79;
+        background-color: #ADC4CE;
+        border: 1px solid #96B6C5;
+        padding: 2px;
+        text-align: left;
+        font-weight: bold;
+        color: #2E8A99;
       }
 
       tr.akordeon table td {
-          border: 1px solid #ddd;
-          padding: 2px;
-          text-align: left;
-          color: #555;
+        border: 1px solid #ddd;
+        padding: 2px;
+        text-align: left;
+        color: #555;
       }
 
       tr.akordeon table tr:nth-child(even) {
-          background-color: #e6e6e6;
+        background-color: #e6e6e6;
       }
       body {
         visibility: hidden;
@@ -157,9 +157,9 @@
       <thead>
         <tr>
             <th scope="col"  style="width: 6%;">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
-              <option value="degil">değil</option>
-              <option value="BLOKE">bloke</option>
-              <option value="hepsi">hepsi</option>
+              <option value="degil">✓</option>
+              <option value="BLOKE">✗</option>
+              <option value="hepsi">∀</option>
             </select></th>
           <th scope="col" style="width: 6%;">Kart No <input type="text" size="3" class="search-input" data-field="KartNo"></th>
           <th scope="col" style="width: 12%;">Firma Adı <input type="text" size="9" class="search-input" data-field="FirmaAdi"></th>
@@ -206,7 +206,7 @@
         <td>${item.PresKodu}</td>
         <td>${item.BilletTuru}</td>
         <td>${item.GirenKg}</td>
-        <td style="color: blue;font-weight:bold;">${item.Kg}</td>
+        <td style="color: #1F6E8C;font-weight:bold;">${item.Kg}</td>
         <td>${item.KondusyonTuru}</td>
         <td>${item.SonTermin}</td>
         <td>${topten}</td>
@@ -246,7 +246,7 @@
 
       const prevButton = `
       <li class="page-item prev ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" aria-label="Previous">
+            <a class="page-link" href="#" aria-label="Previous" style="color: #96B6C5;">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -254,7 +254,7 @@
       
       const nextButton = `
       <li class="page-item next ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" aria-label="Next">
+            <a class="page-link" href="#" aria-label="Next" style="color: #96B6C5;">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>
@@ -267,12 +267,12 @@
       for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || visiblePages.includes(i)) {
           const liClass = i === currentPage ? 'page-item active' : 'page-item';
-          const li = `<li class="${liClass}"><a class="page-link" href="#">${i}</a></li>`;
+          const li = `<li class="${liClass}"><a class="page-link" href="#" style="color: #96B6C5;">${i}</a></li>`;
           paginationUl.append(li);
         } else if (i === visiblePages[0] - 1 || i === visiblePages[visiblePages.length - 1] + 1) {
           paginationUl.append(`
             <li class="page-item disabled">
-              <span class="page-link">...</span>
+              <span class="page-link" style="color: #96B6C5;">...</span>
             </li>
           `);
         }
