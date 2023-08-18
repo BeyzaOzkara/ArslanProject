@@ -13,7 +13,9 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
-  <link rel="stylesheet" href="{% static 'ArslanTakipApp/printTable.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.min.css' %}">
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
   <style>
     /* Add your custom styles here */
     .table {
@@ -139,55 +141,338 @@
 <div class="container col-lg-12">
   <h1 class="col-lg-11" style="text-align: center;">Arslan Alüminyum Sipariş Listesi</h1>
   <div class="row">
-    <div class="container-fluid col-lg 10">
-    <label for="perPageSelect" id="pageSelectLabel">Sayfa Başına Sipariş Sayısı:</label>
-    <select id="perPageSelect">
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="40">40</option>
-      <option value="100">100</option>
-      <option value="150">150</option>
-      <option value="200">200</option>
-      <!-- Diğer seçenekleri ekleyebilirsiniz -->
-    </select>
-  </div>
-  </div>
-    <table class="table">
-      <thead>
-        <tr>
-            <th scope="col"  style="width: 6%;">Bloke <select class="filter-dropdown" data-field="SiparisTamam">
-              <option value="degil">✓</option>
-              <option value="BLOKE">✗</option>
-              <option value="hepsi">∀</option>
-            </select></th>
-          <th scope="col" style="width: 6%;">Kart No <input type="text" size="3" class="search-input" data-field="KartNo"></th>
-          <th scope="col" style="width: 12%;">Firma Adı <input type="text" size="9" class="search-input" data-field="FirmaAdi"></th>
-          <th scope="col" style="width: 8%;">Profil No <input type="text" size="5" class="search-input" data-field="ProfilNo"></th>
-          <th scope="col" style="width: 6%;">Pres Kodu <input type="text" size="4" class="search-input" data-field="PresKodu"></th>
-          <th scope="col" style="width: 6%;">Billet Turu <input type="text" size="7" class="search-input" data-field="BilletTuru"></th>
-          <th scope="col" style="width: 8%;">GirenKg</th>
-          <th scope="col" style="width: 8%;">Kg</th>
-          <th scope="col" style="width: 12%;">KondusyonTuru <input type="text" size="9" class="search-input" data-field="KondusyonTuru"></th>
-          <th scope="col" style="width: 10%;">Termin <input type="date" class="search-date-input" data-field="SonTermin"></th>
-          <th scope="col" style="width: 8%;">TopTenKg </th>
-          <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
-
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <!-- Veriler buraya -->
-      </tbody>
-    </table>
-    <div class="pagination-container">
-      <ul class="pagination"></ul>
+    <div class="container-fluid col-lg-12">
+      <button type="button" id="btnModal" class="btn bg-gradient-info">Arama</button>
+        <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
+        <select id="perPageSelect">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="40">40</option>
+          <option value="100">100</option>
+          <option value="150">150</option>
+          <option value="200">200</option>
+          <!-- Diğer seçenekleri ekleyebilirsiniz -->
+        </select>
     </div>
   </div>
+  <div class="row">
+    <div class="container-fluid col-lg-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"  style="width: 6%;">Bloke</th>
+            <th scope="col" style="width: 6%;">Kart No</th>
+            <th scope="col" style="width: 12%;">Firma Adı</th>
+            <th scope="col" style="width: 8%;">Profil No</th>
+            <th scope="col" style="width: 6%;">Pres Kodu</th>
+            <th scope="col" style="width: 6%;">Billet Turu</th>
+            <th scope="col" style="width: 8%;">Sipariş Kg</th>
+            <th scope="col" style="width: 8%;">Kalan Kg</th>
+            <th scope="col" style="width: 12%;">Kondusyon Türü</th>
+            <th scope="col" style="width: 10%;">Termin</th>
+            <th scope="col" style="width: 8%;">Top Ten Kg </th>
+            <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
+
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Veriler buraya -->
+        </tbody>
+      </table>
+      <div class="pagination-container">
+        <ul class="pagination"></ul>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Gelişmiş Arama</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="" id="formID"></form>
+          <div class="row">
+            <div class="col-md-10 offset-md-1">
+              <div class="row">
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label>Kart No</label>
+                    <input type="search" id="inKartNo" data-field="KartNo" class="form-control form-control-lg">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Pres Kodu</label>
+                    <input type="search" id="inPresK" data-field="PresKodu" class="form-control form-control-lg">
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <label>Firma Adı</label>
+                    <input type="search" id="inFirma" data-field="FirmaAdi" class="form-control form-control-lg">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label>Profil No</label>
+                    <input type="search" id="inProfilNo" data-field="ProfilNo" class="form-control form-control-lg">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Billet Türü</label>
+                    <input type="search" id="inBillet" data-field="BilletTuru" class="form-control form-control-lg">
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <label>Kondüsyon</label>
+                    <input type="search" id="inKondus" data-field="KondusyonTuru" class="form-control form-control-lg">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label>Sipariş Kg</label>
+                    <input id="range_1" type="text" data-field="SiparisKg" name="range_1" value="">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label>Kalan Kg</label>
+                    <input id="range_2" type="text" data-field="Kg" name="range_2" value="">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label>TopTenKg</label>
+                    <input id="range_3" type="text" data-field="TopTenKg" name="range_3" value="">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-7">
+                  <div class="form-group">
+                    <label>Termin</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="far fa-calendar-alt"></i>
+                        </span>
+                      </div>
+                      <input type="text" class="form-control float-right" data-field="SonTermin" id="terminDate">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <label>Bloke Durumu</label>
+                    <select class="form-control" id="blokeDurumu" data-field="SiparisTamam">
+                      <option value="degil">Bloke Olmayanlar</option>
+                      <option value="BLOKE">Bloke</option>
+                      <option value="hepsi">Hepsi</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnTemizle" class="btn btn-secondary">Temizle</button>
+          <button type="button" id="btnFiltre" class="btn btn-primary">Filtrele</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
   <script>
+        /* ION SLIDER */
+    $('#range_1, #range_2, #range_3').ionRangeSlider({
+      min     : 0,
+      max     : 5000000,
+      from    : 0,
+      to      : 5000000,
+      type    : 'double',
+      step    : 1,
+      postfix  : ' kg',
+      prettify: false,
+      hasGrid : true
+    });
+
+    //Date range picker
+    $('#terminDate').daterangepicker({
+      "locale": {
+        "format": "DD-MM-YYYY",
+        "separator": " | ",
+        "applyLabel": "Uygula",
+        "cancelLabel": "İptal Et",
+        "fromLabel": "From",
+        "toLabel": "To",
+        "customRangeLabel": "Custom",
+        "weekLabel": "H",
+        "daysOfWeek": [
+            "Pa",
+            "Pt",
+            "Sa",
+            "Ça",
+            "Pe",
+            "Cu",
+            "Ct"
+        ],
+        "monthNames": [
+            "Ocak",
+            "Şubat",
+            "Mart",
+            "Nisan",
+            "Mayıs",
+            "Haziran",
+            "Temmuz",
+            "Ağustos",
+            "Eylül",
+            "Ekim",
+            "Kasım",
+            "Aralık"
+        ],
+        "firstDay": 1,
+        
+    },"autoUpdateInput": false,
+  });
+
+    btnMod = document.getElementById('btnModal');
+    btnMod.addEventListener('click', () => {
+      $('#searchModal').modal('show');
+    });
+
+    $('#terminDate').on('apply.daterangepicker', function(ev, picker) {
+      var start = picker.startDate;
+      var end = picker.endDate;
+      var field = $( "#terminDate" ).data('field');
+      filter = filter.filter(f => f.field !== field);
+      filter.push({ field: field, type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')});
+      $( "#terminDate" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
+    });
+
+    btnFiltre = document.getElementById('btnFiltre');
+    btnFiltre.addEventListener('click', () => {
+      
+      console.log($("#blokeDurumu").val());
+      var blokeValue = $("#blokeDurumu").val();
+      var field = $( "#blokeDurumu" ).data('field');
+      filter = filter.filter(f => f.field !== field);
+      if (blokeValue != 'degil'){
+        filter.push({ field: field, type: '=', value: blokeValue});
+      }
+      var kartNoValue = $( "#inKartNo" ).val();
+      if (kartNoValue.length > 0){
+        var field = $( "#inKartNo" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (kartNoValue) {
+            filter.push({ field: field, type: 'like', value: kartNoValue});
+            console.log('if2 içi kartno')
+        }
+      };
+      console.log('if dışı kartno')
+
+      var PresValue = $( "#inPresK" ).val();
+      if (PresValue.length > 0){
+        var field = $( "#inPresK" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (PresValue) {
+            filter.push({ field: field, type: 'like', value: PresValue});
+        }
+      };
+
+      var FirmaAdiValue = $( "#inFirma" ).val();
+      console.log(FirmaAdiValue);
+      if (FirmaAdiValue.length > 0){
+        console.log('if içi firma')
+        var field = $( "#inFirma" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (FirmaAdiValue) {
+            filter.push({ field: field, type: 'like', value: FirmaAdiValue});
+            console.log('if2 içi firma')
+        }
+      };
+      
+      var profilNoValue = $( "#inProfilNo" ).val();
+      if (profilNoValue.length > 0){
+        var field = $( "#inProfilNo" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (profilNoValue) {
+            filter.push({ field: field, type: '=', value: profilNoValue});
+        }
+      };
+      
+      var billetValue = $( "#inBillet" ).val();
+      if (billetValue.length > 0){
+        var field = $( "#inBillet" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (billetValue) {
+            filter.push({ field: field, type: 'like', value: billetValue});
+        }
+      };
+      
+      var kondusValue = $( "#inKondus" ).val();
+      if (kondusValue.length > 0){
+        var field = $( "#inKondus" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (kondusValue) {
+            filter.push({ field: field, type: 'like', value: kondusValue});
+        }
+      };
+      $('#searchModal').modal('hide');
+
+      loadPage(currentPage);
+
+      /* const field = $(this).data('field');
+      const value = $(this).val(); */
+
+      /* filter = filter.filter(f => f.field !== field);
+
+      if (value) {
+          filter.push({ field: field, type: 'like', value: value});
+      }
+      if (value) {
+            filter.push({ field: field, type: '=', value: value});
+        } DATE
+
+        // Add new filter for the field based on the selected value
+        if (value === "degil") {
+            filter.push({ field: field, type: '=', value: 'degil' });
+        } else if (value === "BLOKE") {
+            filter.push({ field: field, type: '=', value: 'BLOKE' });
+        } else if (value === "hepsi") {
+            filter.push({ field: field, type: '=', value: 'hepsi' });
+        }
+
+
+      loadPage(currentPage); */
+
+    });
+
+    btnTemiz = document.getElementById('btnTemizle');
+    btnTemiz.addEventListener('click', () => {
+      filter = [];
+      $( "#inKartNo, #inPresK, #inFirma, #inProfilNo, #inBillet, #inKondus, #range_1, #range_2, #range_3, #terminDate" ).val("");
+    });
+
     const tableBody = $('#tableBody');
     let itemsPerPage = 5;  // Başlangıçta varsayılan değer
     let filter = [];
@@ -449,4 +734,11 @@
       printWindow.close();
     };
   </script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
 {% endblock %}

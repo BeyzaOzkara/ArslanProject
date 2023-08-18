@@ -540,7 +540,7 @@ def siparis_list(request):
     q ={}
     if len(filter_list)>0:
         for i in filter_list:
-            if i['field'] != 'ProfilNo':
+            if i['field'] != "SonTermin":
                 if i["type"] == "like":
                     if i['field'] != 'FirmaAdi':
                         q[i['field']+"__startswith"] = i['value']
@@ -553,6 +553,8 @@ def siparis_list(request):
                             s = s.exclude(SiparisTamam ='BLOKE')
                         else: s =s
                     else: q[i['field']] = i['value']
+            elif i['type'] != i['value']:
+                s = s.filter(SonTermin__gte = i['type'], SonTermin__lt = i['value'])
             else: q[i['field']] = i['value']
         sq = s.filter(**q).order_by('-SonTermin')
     else:
@@ -564,9 +566,7 @@ def siparis_list(request):
         kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
         skal = len(kal)
-        
         a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
-        
         a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
         a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
 
