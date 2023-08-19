@@ -560,8 +560,9 @@ def siparis_list(request):
                 q[i['field'] +"__lt"] = i['value']
                 print(q)
             else:q[i['field']] = i['value']
-
-        sq = s.filter(**q).order_by('-SonTermin')
+        if i['field'] != 'SiparisTamam':
+            sq = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
+        else: sq = s.filter(**q).order_by('-SonTermin')
     else:
         sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
     sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
