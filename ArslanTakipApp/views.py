@@ -1,4 +1,5 @@
 import base64, binascii, zlib
+import time
 import math
 import os, csv
 from urllib.parse import unquote
@@ -15,7 +16,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Max
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -529,6 +530,7 @@ class SiparisView(generic.TemplateView):
 
 def siparis_list(request):
     s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    k = KalipMs.objects.using('dies').all()
 
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
@@ -537,31 +539,32 @@ def siparis_list(request):
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
-    q ={}
+    q={} 
+    
     if len(filter_list)>0:
         for i in filter_list:
-            if i['field'] != "SonTermin":
-                if i["type"] == "like":
-                    if i['field'] != 'FirmaAdi':
-                        q[i['field']+"__startswith"] = i['value']
-                    else: q[i['field']+"__contains"] = i['value']
-                elif i["type"] == "=":
-                    if i['field'] == 'SiparisTamam':
-                        if i['value'] == 'BLOKE':
-                            q[i['field']] = i['value']
-                        elif i['value'] == 'degil':
-                            s = s.exclude(SiparisTamam ='BLOKE')
-                        else: s =s
-                    else: q[i['field']] = i['value']
+            if i["type"] == "like":
+                if i['field'] != 'FirmaAdi':
+                    q[i['field']+"__startswith"] = i['value']
+                else: q[i['field']+"__contains"] = i['value']
+            elif i["type"] == "=":
+                if i['field'] == 'SiparisTamam':
+                    if i['value'] == 'BLOKE':
+                        q[i['field']] = i['value']
+                    elif i['value'] == 'degil':
+                        s = s.exclude(SiparisTamam ='BLOKE')
+                    else: s =s
+                else: q[i['field']] = i['value']
             elif i['type'] != i['value']:
-                s = s.filter(SonTermin__gte = i['type'], SonTermin__lt = i['value'])
-            else: q[i['field']] = i['value']
+                q[i['field'] +"__gte"] = i['type']
+                q[i['field'] +"__lt"] = i['value']
+                print(q)
+            else:q[i['field']] = i['value']
+
         sq = s.filter(**q).order_by('-SonTermin')
     else:
         sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
     sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
-    k = KalipMs.objects.using('dies').all()
-
     for a in sip:
         kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
@@ -577,6 +580,13 @@ def siparis_list(request):
     #print(data)
     return HttpResponse(data)
 
+def siparis_max(request):
+    s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    e ={}
+    e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
+    e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
+    
+    return JsonResponse(e)
 
 def siparis_child(request, pNo):
     #Kalıp Listesi Detaylı

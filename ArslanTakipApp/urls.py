@@ -21,6 +21,7 @@ urlpatterns = [
     path('qr/', views.qrKalite, name='qr'),
     path('siparis/', views.SiparisView.as_view()),
     path('siparis/list', views.siparis_list),
+    path('siparis/max', views.siparis_max),
     path('siparis/child/<str:pNo>', views.siparis_child),
 
 ]

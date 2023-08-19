@@ -242,7 +242,7 @@
                 <div class="col-lg-12">
                   <div class="form-group">
                     <label>Sipariş Kg</label>
-                    <input id="range_1" type="text" data-field="SiparisKg" name="range_1" value="">
+                    <input id="range_1" type="text" data-field="GirenKg" name="range_1" value="">
                   </div>
                 </div>
               </div>
@@ -251,14 +251,6 @@
                   <div class="form-group">
                     <label>Kalan Kg</label>
                     <input id="range_2" type="text" data-field="Kg" name="range_2" value="">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="form-group">
-                    <label>TopTenKg</label>
-                    <input id="range_3" type="text" data-field="TopTenKg" name="range_3" value="">
                   </div>
                 </div>
               </div>
@@ -303,18 +295,51 @@
 
 {% block extra_js %}
   <script>
-        /* ION SLIDER */
-    $('#range_1, #range_2, #range_3').ionRangeSlider({
-      min     : 0,
-      max     : 5000000,
-      from    : 0,
-      to      : 5000000,
-      type    : 'double',
-      step    : 1,
-      postfix  : ' kg',
-      prettify: false,
-      hasGrid : true
-    });
+    
+    /* ION SLIDER */
+    $('#range_1').ionRangeSlider({
+        min     : 0,
+        max     : 500000,
+        from    : 0,
+        to      : 10000,
+        type    : 'double',
+        step    : 1,
+        postfix  : ' kg',
+        prettify: false,
+        hasGrid : true,
+        onFinish: function(data){
+          console.log("finish");   // input value in format FROM;TO
+          var from = data.from;   // input data-from attribute
+          var to = data.to;       // input data-to attribute
+          console.log(from);
+          console.log(to);       // all values
+          var field = $( "#range_1" ).data('field');
+          filter = filter.filter(f => f.field !== field);
+          filter.push({ field: field, type: from, value: to});
+        }
+      });
+
+      $('#range_2').ionRangeSlider({
+        min     : 0,
+        max     : 500000,
+        from    : 0,
+        to      : 10000,
+        type    : 'double',
+        step    : 1,
+        postfix  : ' kg',
+        prettify: false,
+        hasGrid : true,
+        onFinish: function(data){
+          console.log("finish");   // input value in format FROM;TO
+          var from = data.from;   // input data-from attribute
+          var to = data.to;       // input data-to attribute
+          console.log(from);
+          console.log(to);       // all values
+          var field = $( "#range_2" ).data('field');
+          filter = filter.filter(f => f.field !== field);
+          filter.push({ field: field, type: from, value: to});
+        }
+      });
 
     //Date range picker
     $('#terminDate').daterangepicker({
@@ -374,11 +399,14 @@
       
       console.log($("#blokeDurumu").val());
       var blokeValue = $("#blokeDurumu").val();
-      var field = $( "#blokeDurumu" ).data('field');
-      filter = filter.filter(f => f.field !== field);
-      if (blokeValue != 'degil'){
-        filter.push({ field: field, type: '=', value: blokeValue});
-      }
+      if (blokeValue != null) {
+        var field = $( "#blokeDurumu" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        if (blokeValue != 'degil'){
+          filter.push({ field: field, type: '=', value: blokeValue});
+        }
+      };
+      
       var kartNoValue = $( "#inKartNo" ).val();
       if (kartNoValue.length > 0){
         var field = $( "#inKartNo" ).data('field');
@@ -437,40 +465,29 @@
             filter.push({ field: field, type: 'like', value: kondusValue});
         }
       };
+
+
       $('#searchModal').modal('hide');
-
       loadPage(currentPage);
-
-      /* const field = $(this).data('field');
-      const value = $(this).val(); */
-
-      /* filter = filter.filter(f => f.field !== field);
-
-      if (value) {
-          filter.push({ field: field, type: 'like', value: value});
-      }
-      if (value) {
-            filter.push({ field: field, type: '=', value: value});
-        } DATE
-
-        // Add new filter for the field based on the selected value
-        if (value === "degil") {
-            filter.push({ field: field, type: '=', value: 'degil' });
-        } else if (value === "BLOKE") {
-            filter.push({ field: field, type: '=', value: 'BLOKE' });
-        } else if (value === "hepsi") {
-            filter.push({ field: field, type: '=', value: 'hepsi' });
-        }
-
-
-      loadPage(currentPage); */
 
     });
 
     btnTemiz = document.getElementById('btnTemizle');
     btnTemiz.addEventListener('click', () => {
+      $( "#inKartNo, #inPresK, #inFirma, #inProfilNo, #inBillet, #inKondus, #terminDate, #blokeDurumu" ).val("");
+      slider = $("#range_1").data("ionRangeSlider");
+      slider.update({
+        from:0,
+        to:girenMax
+      });
+      slider.reset();
+      slider2 = $("#range_2").data("ionRangeSlider");
+      slider2.update({
+        from:0,
+        to:kgMax
+      });
+      slider2.reset();
       filter = [];
-      $( "#inKartNo, #inPresK, #inFirma, #inProfilNo, #inBillet, #inKondus, #range_1, #range_2, #range_3, #terminDate" ).val("");
     });
 
     const tableBody = $('#tableBody');
@@ -502,6 +519,9 @@
       });
     };
 
+    let girenMax =0;
+    let kgMax =0;
+
     const loadPage = (page) => {
         const params = {
             page: page,
@@ -520,6 +540,27 @@
         },
         error: function (error) {
           console.error('Error loading paginated data:', error);
+        }
+      });
+      $.ajax({
+        url: `/siparis/max`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(maxData) {
+          girenMax = maxData.GirenMax;
+          kgMax = maxData.KgMax;
+          console.log(maxData);
+          var slider1 = $("#range_1").data("ionRangeSlider");
+          slider1.update({
+              max: girenMax,
+          });
+          var slider2 = $("#range_2").data("ionRangeSlider");
+          slider2.update({
+              max: kgMax,
+          });
+        },
+        error: function (error) {
+          console.error('Error loading max data:', error);
         }
       });
     };
