@@ -309,11 +309,8 @@
         prettify: false,
         hasGrid : true,
         onFinish: function(data){
-          console.log("finish");   // input value in format FROM;TO
           var from = data.from;   // input data-from attribute
           var to = data.to;       // input data-to attribute
-          console.log(from);
-          console.log(to);       // all values
           var field = $( "#range_1" ).data('field');
           filter = filter.filter(f => f.field !== field);
           filter.push({ field: field, type: from, value: to});
@@ -331,11 +328,8 @@
         prettify: false,
         hasGrid : true,
         onFinish: function(data){
-          console.log("finish");   // input value in format FROM;TO
           var from = data.from;   // input data-from attribute
           var to = data.to;       // input data-to attribute
-          console.log(from);
-          console.log(to);       // all values
           var field = $( "#range_2" ).data('field');
           filter = filter.filter(f => f.field !== field);
           filter.push({ field: field, type: from, value: to});
@@ -398,7 +392,6 @@
     btnFiltre = document.getElementById('btnFiltre');
     btnFiltre.addEventListener('click', () => {
       
-      console.log($("#blokeDurumu").val());
       var blokeValue = $("#blokeDurumu").val();
       if (blokeValue != null) {
         var field = $( "#blokeDurumu" ).data('field');
@@ -414,10 +407,8 @@
         filter = filter.filter(f => f.field !== field);
         if (kartNoValue) {
             filter.push({ field: field, type: 'like', value: kartNoValue});
-            console.log('if2 içi kartno')
         }
       };
-      console.log('if dışı kartno')
 
       var PresValue = $( "#inPresK" ).val();
       if (PresValue.length > 0){
@@ -429,14 +420,11 @@
       };
 
       var FirmaAdiValue = $( "#inFirma" ).val();
-      console.log(FirmaAdiValue);
       if (FirmaAdiValue.length > 0){
-        console.log('if içi firma')
         var field = $( "#inFirma" ).data('field');
         filter = filter.filter(f => f.field !== field);
         if (FirmaAdiValue) {
             filter.push({ field: field, type: 'like', value: FirmaAdiValue});
-            console.log('if2 içi firma')
         }
       };
       
@@ -550,7 +538,6 @@
         success: function(maxData) {
           girenMax = maxData.GirenMax;
           kgMax = maxData.KgMax;
-          console.log(maxData);
           var slider1 = $("#range_1").data("ionRangeSlider");
           slider1.update({
               max: girenMax,

@@ -558,7 +558,6 @@ def siparis_list(request):
             elif i['type'] != i['value']:
                 q[i['field'] +"__gte"] = i['type']
                 q[i['field'] +"__lt"] = i['value']
-                print(q)
             else:q[i['field']] = i['value']
         if i['field'] != 'SiparisTamam':
             sq = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
