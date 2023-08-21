@@ -384,7 +384,7 @@
                   <div class="form-group">
                     <div class="row">
                       <label style="padding-right: 10px;">Firma Adı</label>
-                      <select class="form-control col-lg-7" id="FirmaAdiSelect" data-field="FirmaAdi">
+                      <select class="form-control col-lg-7" id="firmaAdiSelect" data-field="FirmaAdi">
                         <option value="" disabled selected>Sıralama Seçin</option>
                         <option value="artan">Artan</option>
                         <option value="azalan">Azalan</option>
@@ -446,18 +446,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Toplam Kalan Termin</label>
-                      <select class="form-control col-lg-7" id="topKalanSelect" data-field="TopTenKg">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
+
                 <div class="col-lg-5">
                   <div class="form-group">
                     <div class="row">
@@ -470,12 +459,25 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Top Ten. Kg</label>
+                      <select class="form-control col-lg-7" id="topKalanSelect" data-field="TopTenKg">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="btnSort" class="btn btn-secondary">Sırala</button>
+          <button type="button" id="btnTemizSort" class="btn btn-secondary">Temizle</button>
+          <button type="button" id="btnSort" class="btn btn-primary">Sırala</button>
         </div>
       </div>
     </div>
@@ -704,6 +706,94 @@
     btnModSirala = document.getElementById('btnModalSirala');
     btnModSirala.addEventListener('click', () => {
       $('#sortModal').modal('show');
+    });
+
+    btnSort = document.getElementById('btnSort');
+    btnSort.addEventListener('click', () => {
+      var kartNoS = $('#kartNoSelect').val();
+      if (kartNoS != null){
+        console.log(kartNoS);
+        var field = $('#kartNoSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:kartNoS});
+      };
+
+      var profilNoS = $('#profilNoSelect').val();
+      if (profilNoS != null){
+        console.log(profilNoS);
+        var field = $('#profilNoSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:profilNoS});
+      };
+
+      var presKoduS = $('#presKoduSelect').val();
+      if (presKoduS != null){
+        console.log(presKoduS);
+        var field = $('#presKoduSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:presKoduS});
+      };
+
+      var firmaAdiS = $('#firmaAdiSelect').val();
+      if (firmaAdiS != null){
+        console.log(firmaAdiS);
+        var field = $('#firmaAdiSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:firmaAdiS});
+      };
+
+      var billetS = $('#billetTuruSelect').val();
+      if (billetS != null){
+        console.log(billetS);
+        var field = $('#billetTuruSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:billetS});
+      };
+      
+      var konS = $('#kondusyonSelect').val();
+      if (konS != null){
+        console.log(konS);
+        var field = $('#kondusyonSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:konS});
+      };
+
+      var sipS = $('#siparisKgSelect').val();
+      if (sipS != null){
+        console.log(sipS);
+        var field = $('#siparisKgSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:sipS});
+      };
+
+      var kalanS = $('#kalanKgSelect').val();
+      if (kalanS != null){
+        console.log(kalanS);
+        var field = $('#kalanKgSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:kalanS});
+      };
+
+      var topkalanS = $('#topKalanSelect').val();
+      if (topkalanS != null){
+        console.log(topkalanS);
+        var field = $('#topKalanSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:topkalanS});
+      };
+      
+      var terS = $('#terminSelect').val();
+      if (terS != null){
+        console.log(terS);
+        var field = $('#terminSelect').data('field');
+        sorterList = sorterList.filter(f => f.field !== field);
+        sorterList.push({field:field, type:terS});
+      };
+
+      console.log(sorterList);
+
+      $('#sortModal').modal('hide');
+      loadPage(currentPage);
     });
 
     $('#terminDate').on('apply.daterangepicker', function(ev, picker) {

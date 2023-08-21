@@ -540,7 +540,7 @@ def siparis_list(request):
     page = params["page"]
     filter_list = params["filter"]
     sorter_List = params["sorterList"]
-    q={} 
+    q={}
     
     if len(filter_list)>0:
         for i in filter_list:
@@ -564,23 +564,40 @@ def siparis_list(request):
             else:q[i['field']] = i['value']
 
             if i['field'] != 'SiparisTamam':
-                sq = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
-            else: sq = s.filter(**q).order_by('-SonTermin')
+                s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
+            else: s = s.filter(**q).order_by('-SonTermin')
     else:
-        sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
-    sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
+        s = s.exclude(SiparisTamam = 'BLOKE')
+    sor =[]
+    if len(sorter_List)>0:
+        for j in sorter_List:
+            if j['field'] != 'TopTenKg':
+                if j['type'] == 'azalan':
+                    sor.append( "-"+j['field'])
+                else: sor.append(j['field'])
+                print(sor)
+            #else: 
+        s = s.order_by(*sor)
+
+    else: s= s.order_by('-SonTermin')
+                
+    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
     for a in sip:
-        kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('ProfilNo')
-        tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
-        skal = len(kal)
-        a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
+        kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('ProfilNo', 'TeniferKalanOmurKg')
+        tkal =0
+        skal =0
+        ttk =0
+        if kal.filter(TeniferKalanOmurKg__gte = 0):
+            tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
+            skal = len(kal)
+            ttk = math.ceil(kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum'])
         a['kalipSayisi'] = str(tkal) + " / " + str(skal)
-        ttk = math.ceil(kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum'])
+        a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
         a['GirenKg'] = f'{math.ceil(a["GirenKg"]):,}'
         a['Kg'] = f'{math.ceil(a["Kg"]):,}'
         a['TopTenKg'] = f'{ttk:,}'
 
-    sip_count = sq.count()
+    sip_count = s.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
     lastData['data'] = sip
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -611,6 +628,10 @@ def siparis_max(request):
     e['TopTenMax']  = math.ceil(sonuc)
     
     return JsonResponse(e)
+
+def siparisSorter(j):
+    print(j)
+    return
 
 def siparis_child(request, pNo):
     #Kalıp Listesi Detaylı
