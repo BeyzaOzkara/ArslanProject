@@ -143,6 +143,7 @@
   <div class="row">
     <div class="container-fluid col-lg-12">
       <button type="button" id="btnModal" class="btn bg-gradient-info">Arama</button>
+      <button type="button" id="btnModalSirala" class="btn bg-gradient-info">Sırala</button>
         <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
         <select id="perPageSelect">
           <option value="5">5</option>
@@ -323,6 +324,158 @@
         <div class="modal-footer">
           <button type="button" id="btnTemizle" class="btn btn-secondary">Temizle</button>
           <button type="button" id="btnFiltre" class="btn btn-primary">Filtrele</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Sırala</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="" id="formID2"></form>
+          <div class="row">
+            <div class="col-md-10 offset-md-1">
+              <div class="row">
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Kart No</label>
+                      <select class="form-control col-lg-7" id="kartNoSelect" data-field="KartNo">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Profil No</label>
+                      <select class="form-control col-lg-7" id="profilNoSelect" data-field="ProfilNo">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Pres Kodu</label>
+                      <select class="form-control col-lg-7" id="presKoduSelect" data-field="PresKodu">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Firma Adı</label>
+                      <select class="form-control col-lg-7" id="FirmaAdiSelect" data-field="FirmaAdi">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Billet Türü</label>
+                      <select class="form-control col-lg-7" id="billetTuruSelect" data-field="BilletTuru">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Kondüsyon</label>
+                      <select class="form-control col-lg-7" id="kondusyonSelect" data-field="KondusyonTuru">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Sipariş Kg</label>
+                      <select class="form-control col-lg-7" id="siparisKgSelect" data-field="GirenKg">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Kalan Kg</label>
+                      <select class="form-control col-lg-7" id="kalanKgSelect" data-field="Kg">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Toplam Kalan Termin</label>
+                      <select class="form-control col-lg-7" id="topKalanSelect" data-field="TopTenKg">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Termin</label>
+                      <select class="form-control col-lg-7" id="terminSelect" data-field="SonTermin">
+                        <option value="" disabled selected>Sıralama Seçin</option>
+                        <option value="artan">Artan</option>
+                        <option value="azalan">Azalan</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnSort" class="btn btn-secondary">Sırala</button>
         </div>
       </div>
     </div>
@@ -548,6 +701,11 @@
       $('#searchModal').modal('show');
     });
 
+    btnModSirala = document.getElementById('btnModalSirala');
+    btnModSirala.addEventListener('click', () => {
+      $('#sortModal').modal('show');
+    });
+
     $('#terminDate').on('apply.daterangepicker', function(ev, picker) {
       var start = picker.startDate;
       var end = picker.endDate;
@@ -651,6 +809,7 @@
     const tableBody = $('#tableBody');
     let itemsPerPage = 5;  // Başlangıçta varsayılan değer
     let filter = [];
+    let sorterList = [];
     const renderData = (data) => {
       tableBody.empty();  // Önceki verileri temizle
       data.forEach(item => {
@@ -685,7 +844,8 @@
         const params = {
             page: page,
             size: itemsPerPage,
-            filter: filter
+            filter: filter,
+            sorterList:sorterList,
         };
       $.ajax({
         url: `/siparis/list`,

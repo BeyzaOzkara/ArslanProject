@@ -539,6 +539,7 @@ def siparis_list(request):
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
+    sorter_List = params["sorterList"]
     q={} 
     
     if len(filter_list)>0:
