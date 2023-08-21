@@ -16,7 +16,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
-from django.db.models import Q, Sum, Max
+from django.db.models import Q, Sum, Max, Count
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -543,7 +543,9 @@ def siparis_list(request):
     
     if len(filter_list)>0:
         for i in filter_list:
-            if i["type"] == "like":
+            if i['field'] == 'TopTenKg':
+                q["ProfilNo"+"__in"] = siparis_TopTenFiltre(i)
+            elif i["type"] == "like":
                 if i['field'] != 'FirmaAdi':
                     q[i['field']+"__startswith"] = i['value']
                 else: q[i['field']+"__contains"] = i['value']
@@ -559,32 +561,53 @@ def siparis_list(request):
                 q[i['field'] +"__gte"] = i['type']
                 q[i['field'] +"__lt"] = i['value']
             else:q[i['field']] = i['value']
-        if i['field'] != 'SiparisTamam':
-            sq = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
-        else: sq = s.filter(**q).order_by('-SonTermin')
+
+            if i['field'] != 'SiparisTamam':
+                sq = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
+            else: sq = s.filter(**q).order_by('-SonTermin')
     else:
         sq = s.exclude(SiparisTamam = 'BLOKE').order_by('-SonTermin')
     sip = list(sq.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
     for a in sip:
-        kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('TeniferKalanOmurKg')
+        kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('ProfilNo')
         tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
         skal = len(kal)
         a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
-        a['kalipSayisi'] = str(tkal) + " / " + str(skal) 
-        a['TopTenKg'] = kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum']
+        a['kalipSayisi'] = str(tkal) + " / " + str(skal)
+        ttk = math.ceil(kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum'])
+        a['GirenKg'] = f'{math.ceil(a["GirenKg"]):,}'
+        a['Kg'] = f'{math.ceil(a["Kg"]):,}'
+        a['TopTenKg'] = f'{ttk:,}'
 
     sip_count = sq.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
     lastData['data'] = sip
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    #print(data)
     return HttpResponse(data)
+
+def siparis_TopTenFiltre(i):
+    sProfil = list(SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).values_list('ProfilNo', flat=True).distinct())
+    k= KalipMs.objects.using('dies').filter(ProfilNo__in = sProfil, TeniferKalanOmurKg__gte = 0, AktifPasif="Aktif", Hatali=0)
+    kal = k.values('ProfilNo').annotate(pcount=Sum('TeniferKalanOmurKg'))
+    if i['type'] != i['value']:
+        profilList = list(kal.filter(pcount__gte = i['type'], pcount__lt = i['value']).values_list('ProfilNo', flat=True))
+    else: profilList = list(kal.filter(pcount__gte = i['type']-1, pcount__lt = i['value']+1).values_list('ProfilNo', flat=True))
+    return profilList
 
 def siparis_max(request):
     s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    k= KalipMs.objects.using('dies').filter(TeniferKalanOmurKg__gte = 0, AktifPasif="Aktif", Hatali=0)
     e ={}
     e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
     e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
+
+    e['GirenSum'] = math.ceil(s.aggregate(Sum('GirenKg'))['GirenKg__sum'])
+    e['KgSum'] = math.ceil(s.aggregate(Sum('Kg'))['Kg__sum'])
+
+    sProfil = list(s.values_list('ProfilNo', flat=True).distinct())
+    proTop = k.filter(ProfilNo__in = sProfil).values('ProfilNo').annotate(psum = Sum('TeniferKalanOmurKg'))
+    sonuc = proTop.aggregate(Max('psum'))['psum__max']
+    e['TopTenMax']  = math.ceil(sonuc)
     
     return JsonResponse(e)
 

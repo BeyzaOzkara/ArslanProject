@@ -175,6 +175,20 @@
             <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
 
           </tr>
+          <tr>
+            <th scope="col"  style="width: 6%;"></th>
+            <th scope="col" style="width: 6%;"></th>
+            <th scope="col" style="width: 12%;"></th>
+            <th scope="col" style="width: 8%;"></th>
+            <th scope="col" style="width: 6%;"></th>
+            <th scope="col" style="width: 6%;"></th>
+            <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipTopKg"></th>
+            <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipKalKg"></th>
+            <th scope="col" style="width: 12%;"></th>
+            <th scope="col" style="width: 10%;"></th>
+            <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipTopTen"></th>
+            <th scope="col" style="width: 6%;"></th>
+          </tr>
         </thead>
         <tbody id="tableBody">
           <!-- Veriler buraya -->
@@ -241,7 +255,12 @@
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
-                    <label>Sipariş Kg</label>
+                    <div class="row">
+                      <label style="padding-right: 10px;">Sipariş Kg</label>
+                      <input type="text" id="sip1" class="form-control form-control-sm col-lg-2">
+                      <label>-</label>
+                      <input type="text" id="sip2" class="form-control form-control-sm col-lg-2">
+                    </div>
                     <input id="range_1" type="text" data-field="GirenKg" name="range_1" value="">
                   </div>
                 </div>
@@ -249,8 +268,26 @@
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
-                    <label>Kalan Kg</label>
+                    <div class="row">
+                      <label style="padding-right: 10px;">Kalan Kg</label>
+                      <input type="text" id="kalan1" class="form-control form-control-sm col-lg-2">
+                      <label>-</label>
+                      <input type="text" id="kalan2" class="form-control form-control-sm col-lg-2">
+                    </div>
                     <input id="range_2" type="text" data-field="Kg" name="range_2" value="">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <div class="row">
+                      <label style="padding-right: 10px;">Toplam Kalan Tenifer </label>
+                      <input type="text" id="topten1" class="form-control form-control-sm col-lg-2">
+                      <label>-</label>
+                      <input type="text" id="topten2" class="form-control form-control-sm col-lg-2">
+                    </div>
+                    <input id="range_3" type="text" data-field="TopTenKg" name="range_3" value="">
                   </div>
                 </div>
               </div>
@@ -299,42 +336,173 @@
     
     /* ION SLIDER */
     $('#range_1').ionRangeSlider({
-        min     : 0,
-        max     : 500000,
-        from    : 0,
-        to      : 10000,
-        type    : 'double',
-        step    : 1,
-        postfix  : ' kg',
-        prettify: false,
-        hasGrid : true,
-        onFinish: function(data){
-          var from = data.from;   // input data-from attribute
-          var to = data.to;       // input data-to attribute
-          var field = $( "#range_1" ).data('field');
-          filter = filter.filter(f => f.field !== field);
-          filter.push({ field: field, type: from, value: to});
-        }
-      });
+      min     : 0,
+      max     : 500000,
+      from    : 0,
+      to      : 10000,
+      type    : 'double',
+      step    : 1,
+      postfix  : ' kg',
+      prettify: false,
+      hasGrid : true,
+      onFinish: function(data){
+        var from = data.from;   // input data-from attribute
+        var to = data.to;       // input data-to attribute
+        var field = $( "#range_1" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        filter.push({ field: field, type: from, value: to});
+        updateInputs1;
+      },
+      onChange: updateInputs1
+    });
+    
+    var sliders1 = $("#range_1").data("ionRangeSlider");
+    var from1 =0;
+    var to1=0;
+    var min1 = 0;
 
-      $('#range_2').ionRangeSlider({
-        min     : 0,
-        max     : 500000,
-        from    : 0,
-        to      : 10000,
-        type    : 'double',
-        step    : 1,
-        postfix  : ' kg',
-        prettify: false,
-        hasGrid : true,
-        onFinish: function(data){
-          var from = data.from;   // input data-from attribute
-          var to = data.to;       // input data-to attribute
-          var field = $( "#range_2" ).data('field');
-          filter = filter.filter(f => f.field !== field);
-          filter.push({ field: field, type: from, value: to});
-        }
+    function updateInputs1(data){
+      from1 = data.from;
+      to1 = data.to;
+      $('#sip1').prop("value", from1);
+      $('#sip2').prop("value", to1);
+    };
+
+    $('#sip1').on("change", function () {
+      var val = $(this).prop("value");
+      console.log(val);
+      // validate
+      if (val < min1) {val = min1;
+      } else if (val > to1) {val = to1;}
+      sliders1.update({
+          from: val
       });
+      $(this).prop("value", val);
+    });
+
+    $('#sip2').on("change", function () {
+      var val = $(this).prop("value");
+      // validate
+      if (val < from1) {val = from1;
+      } else if (val > to1) {val = to1;}
+      sliders1.update({
+          to: val
+      });
+      $(this).prop("value", val);
+    });
+
+    $('#range_2').ionRangeSlider({
+      min     : 0,
+      max     : 500000,
+      from    : 0,
+      to      : 10000,
+      type    : 'double',
+      step    : 1,
+      postfix  : ' kg',
+      prettify: false,
+      hasGrid : true,
+      onFinish: function(data){
+        var from = data.from;   // input data-from attribute
+        var to = data.to;       // input data-to attribute
+        var field = $( "#range_2" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        filter.push({ field: field, type: from, value: to});
+        updateInputs2;
+      },
+      onChange: updateInputs2
+    });
+        
+    var sliders2 = $("#range_2").data("ionRangeSlider");
+    var from2 =0;
+    var to2=0;
+    var min2 = 0;
+
+    function updateInputs2(data){
+      from2 = data.from;
+      to2 = data.to;
+      $('#kalan1').prop("value", from1);
+      $('#kalan2').prop("value", to1);
+    };
+
+    $('#kalan1').on("change", function () {
+      var val = $(this).prop("value");
+      console.log(val);
+      // validate
+      if (val < min1) {val = min2;
+      } else if (val > to2) {val = to2;}
+      sliders2.update({
+          from: val
+      });
+      $(this).prop("value", val);
+    });
+
+    $('#kalan2').on("change", function () {
+      var val = $(this).prop("value");
+      // validate
+      if (val < from2) {val = from2;
+      } else if (val > to2) {val = to2;}
+      sliders2.update({
+          to: val
+      });
+      $(this).prop("value", val);
+    });
+
+    
+    $('#range_3').ionRangeSlider({
+      min     : 0,
+      max     : 500000,
+      type    : 'double',
+      step    : 1,
+      postfix  : ' kg',
+      prettify: false,
+      hasGrid : true,
+      onFinish: function(data){
+        var from = data.from;   // input data-from attribute
+        var to = data.to;       // input data-to attribute
+        var field = $( "#range_3" ).data('field');
+        filter = filter.filter(f => f.field !== field);
+        filter.push({ field: field, type: from, value: to});
+        updateInputs3;
+      },
+      onChange: updateInputs3,
+    });
+    
+    var slider3 = $("#range_3").data("ionRangeSlider");
+    var from3 =0;
+    var to3=0;
+    var min3 = 0;
+
+    function updateInputs3(data){
+      from3 = data.from;
+      to3 = data.to;
+      $('#topten1').prop("value", from3);
+      $('#topten2').prop("value", to3);
+
+    };
+
+    $('#topten1').on("change", function () {
+      var sliders3 = $("#range_3").data("ionRangeSlider");
+      var val = $('#topten1').prop("value");
+      console.log(val);
+      // validate
+      if (val < min3) {val = min3;
+      } else if (val > to3) {val = to3;}
+      sliders3.update({
+          from: val
+      });
+      $(this).prop("value", val);
+    });
+
+    $('#topten2').on("change", function () {
+      var val = $(this).prop("value");
+      // validate
+      if (val < from3) {val = from3;
+      } else if (val > to3) {val = to3;}
+      slider3.update({
+          to: val
+      });
+      $(this).prop("value", val);
+    });
 
     //Date range picker
     $('#terminDate').daterangepicker({
@@ -455,6 +623,7 @@
         }
       };
 
+      console.log(filter);
 
       $('#searchModal').modal('hide');
       loadPage(currentPage);
@@ -485,7 +654,7 @@
     const renderData = (data) => {
       tableBody.empty();  // Önceki verileri temizle
       data.forEach(item => {
-        let topten = parseFloat(item.TopTenKg).toFixed(2)
+        //let topten = parseFloat(item.TopTenKg).toFixed(2)
         // Verileri render et...
         let SiparisTamamSymbol = ""
         if (item.SiparisTamam == 'BLOKE'){ SiparisTamamSymbol = '✗'}else { SiparisTamamSymbol ='✓'} ;
@@ -496,11 +665,11 @@
         <td>${item.ProfilNo}</td>
         <td>${item.PresKodu}</td>
         <td>${item.BilletTuru}</td>
-        <td>${item.GirenKg}</td>
-        <td style="color: #1F6E8C;font-weight:bold;">${item.Kg}</td>
+        <td>${item.GirenKg} kg</td>
+        <td style="color: #1F6E8C;font-weight:bold;">${item.Kg} kg</td>
         <td>${item.KondusyonTuru}</td>
         <td>${item.SonTermin}</td>
-        <td>${topten}</td>
+        <td>${item.TopTenKg} kg</td>
         <td>${item.kalipSayisi || "-"}</td>
         `);
 
@@ -510,6 +679,7 @@
 
     let girenMax =0;
     let kgMax =0;
+    let topMax = 0;
 
     const loadPage = (page) => {
         const params = {
@@ -538,14 +708,39 @@
         success: function(maxData) {
           girenMax = maxData.GirenMax;
           kgMax = maxData.KgMax;
+          topMax = maxData.TopTenMax;
           var slider1 = $("#range_1").data("ionRangeSlider");
           slider1.update({
               max: girenMax,
+              to: girenMax,
           });
           var slider2 = $("#range_2").data("ionRangeSlider");
           slider2.update({
               max: kgMax,
+              to: kgMax,
           });
+          var slider3 = $("#range_3").data("ionRangeSlider");
+          slider3.update({
+              max: topMax,
+              to: topMax,
+          });
+          from1 = 0;
+          from2 = 0;
+          from3 = 0;
+          to1 = girenMax;
+          to2 = kgMax;
+          to3 = topMax;
+          $('#sip1').prop("value", from1);
+          $('#sip2').prop("value", to1);
+          $('#kalan1').prop("value", from2);
+          $('#kalan2').prop("value", to2);
+          $('#topten1').prop("value", from3);
+          $('#topten2').prop("value", to3);
+          let girenSum = maxData.GirenSum;
+          let kgSum = maxData.KgSum;
+          $('#sipTopKg').html(girenSum);
+          $('#sipKalKg').html(kgSum);
+          $('#sipTopTen').html(topMax);
         },
         error: function (error) {
           console.error('Error loading max data:', error);
