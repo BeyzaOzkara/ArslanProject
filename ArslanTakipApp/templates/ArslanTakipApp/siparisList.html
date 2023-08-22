@@ -525,7 +525,6 @@
 
     $('#sip1').on("change", function () {
       var val = $(this).prop("value");
-      console.log(val);
       // validate
       if (val < min1) {val = min1;
       } else if (val > to1) {val = to1;}
@@ -581,7 +580,6 @@
 
     $('#kalan1').on("change", function () {
       var val = $(this).prop("value");
-      console.log(val);
       // validate
       if (val < min1) {val = min2;
       } else if (val > to2) {val = to2;}
@@ -638,7 +636,6 @@
     $('#topten1').on("change", function () {
       var sliders3 = $("#range_3").data("ionRangeSlider");
       var val = $('#topten1').prop("value");
-      console.log(val);
       // validate
       if (val < min3) {val = min3;
       } else if (val > to3) {val = to3;}
@@ -712,7 +709,6 @@
     btnSort.addEventListener('click', () => {
       var kartNoS = $('#kartNoSelect').val();
       if (kartNoS != null){
-        console.log(kartNoS);
         var field = $('#kartNoSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:kartNoS});
@@ -720,7 +716,6 @@
 
       var profilNoS = $('#profilNoSelect').val();
       if (profilNoS != null){
-        console.log(profilNoS);
         var field = $('#profilNoSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:profilNoS});
@@ -728,7 +723,6 @@
 
       var presKoduS = $('#presKoduSelect').val();
       if (presKoduS != null){
-        console.log(presKoduS);
         var field = $('#presKoduSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:presKoduS});
@@ -736,7 +730,6 @@
 
       var firmaAdiS = $('#firmaAdiSelect').val();
       if (firmaAdiS != null){
-        console.log(firmaAdiS);
         var field = $('#firmaAdiSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:firmaAdiS});
@@ -744,7 +737,6 @@
 
       var billetS = $('#billetTuruSelect').val();
       if (billetS != null){
-        console.log(billetS);
         var field = $('#billetTuruSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:billetS});
@@ -752,7 +744,6 @@
       
       var konS = $('#kondusyonSelect').val();
       if (konS != null){
-        console.log(konS);
         var field = $('#kondusyonSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:konS});
@@ -760,7 +751,6 @@
 
       var sipS = $('#siparisKgSelect').val();
       if (sipS != null){
-        console.log(sipS);
         var field = $('#siparisKgSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:sipS});
@@ -768,7 +758,6 @@
 
       var kalanS = $('#kalanKgSelect').val();
       if (kalanS != null){
-        console.log(kalanS);
         var field = $('#kalanKgSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:kalanS});
@@ -776,7 +765,6 @@
 
       var topkalanS = $('#topKalanSelect').val();
       if (topkalanS != null){
-        console.log(topkalanS);
         var field = $('#topKalanSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:topkalanS});
@@ -784,16 +772,19 @@
       
       var terS = $('#terminSelect').val();
       if (terS != null){
-        console.log(terS);
         var field = $('#terminSelect').data('field');
         sorterList = sorterList.filter(f => f.field !== field);
         sorterList.push({field:field, type:terS});
       };
 
-      console.log(sorterList);
-
       $('#sortModal').modal('hide');
       loadPage(currentPage);
+    });
+
+    btnTemizSort = document.getElementById('btnTemizSort');
+    btnTemizSort.addEventListener('click', () => {
+      $( "#kartNoSelect, #profilNoSelect, #presKoduSelect, #firmaAdiSelect, #billetTuruSelect, #kondusyonSelect, #siparisKgSelect, #kalanKgSelect, #topKalanSelect, #terminSelect" ).val("");
+      sorterList = []
     });
 
     $('#terminDate').on('apply.daterangepicker', function(ev, picker) {
@@ -871,8 +862,6 @@
         }
       };
 
-      console.log(filter);
-
       $('#searchModal').modal('hide');
       loadPage(currentPage);
 
@@ -944,7 +933,6 @@
         dataType: 'json',
         success: function (paginatedData) {
           renderData(paginatedData.data);
-          console.log(paginatedData.data);
           renderPagination(paginatedData.last_page);
         },
         error: function (error) {
@@ -1128,7 +1116,6 @@
 
         if (accordionRow.length) { 
             accordionRow.slideToggle();
-            console.log(accordionRow);
         } else {
           // Load and render accordion table data
           loadAccordionTable(profilNo, mainTableRow);
@@ -1166,7 +1153,6 @@
       method: 'GET',
       dataType: 'json',
       success: function (accordionData) {
-          console.log(accordionData)
           renderAccordionTable(accordionData, mainTableRow);
       },
       error: function (error) {

@@ -583,7 +583,6 @@ def siparis_list(request):
                 if j['type'] == 'azalan':
                     sor.append( "-kg_sum")
                 else: sor.append("kg_sum")
-        print(sor)
         s = s.order_by(*sor)
 
     else: s= s.order_by('-SonTermin')
