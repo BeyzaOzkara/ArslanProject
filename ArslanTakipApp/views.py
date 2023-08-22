@@ -1,7 +1,6 @@
 import base64, binascii, zlib
 import time
 import math
-import os, csv
 from urllib.parse import unquote
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
@@ -16,7 +15,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
-from django.db.models import Q, Sum, Max, Count
+from django.db.models import Q, Sum, Max, Count, Case, When
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -575,12 +574,20 @@ def siparis_list(request):
                 if j['type'] == 'azalan':
                     sor.append( "-"+j['field'])
                 else: sor.append(j['field'])
-                print(sor)
-            #else: 
+            else: 
+                s = s.extra(
+                    select={
+                        "kg_sum": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))"
+                    },
+                )
+                if j['type'] == 'azalan':
+                    sor.append( "-kg_sum")
+                else: sor.append("kg_sum")
+        print(sor)
         s = s.order_by(*sor)
 
     else: s= s.order_by('-SonTermin')
-                
+
     sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
     for a in sip:
         kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('ProfilNo', 'TeniferKalanOmurKg')
@@ -605,11 +612,18 @@ def siparis_list(request):
 
 def siparis_TopTenFiltre(i):
     sProfil = list(SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).values_list('ProfilNo', flat=True).distinct())
-    k= KalipMs.objects.using('dies').filter(ProfilNo__in = sProfil, TeniferKalanOmurKg__gte = 0, AktifPasif="Aktif", Hatali=0)
-    kal = k.values('ProfilNo').annotate(pcount=Sum('TeniferKalanOmurKg'))
+    k= KalipMs.objects.using('dies').filter(ProfilNo__in = sProfil, AktifPasif="Aktif", Hatali=0)
+    kal = k.values('ProfilNo').filter(TeniferKalanOmurKg__gte = 0).annotate(pcount=Sum('TeniferKalanOmurKg'))
+    kPList = set(list(kal.values_list('ProfilNo', flat=True).distinct()))
     if i['type'] != i['value']:
         profilList = list(kal.filter(pcount__gte = i['type'], pcount__lt = i['value']).values_list('ProfilNo', flat=True))
     else: profilList = list(kal.filter(pcount__gte = i['type']-1, pcount__lt = i['value']+1).values_list('ProfilNo', flat=True))
+    diff = [x for x in sProfil if x not in kPList]
+    if len(diff)>0 :
+        profilList += diff #azalan sıralarken böyle artan sıralarken diff +=profilList return diff
+        print(diff)
+        print(profilList)
+    
     return profilList
 
 def siparis_max(request):
@@ -628,10 +642,6 @@ def siparis_max(request):
     e['TopTenMax']  = math.ceil(sonuc)
     
     return JsonResponse(e)
-
-def siparisSorter(j):
-    print(j)
-    return
 
 def siparis_child(request, pNo):
     #Kalıp Listesi Detaylı
