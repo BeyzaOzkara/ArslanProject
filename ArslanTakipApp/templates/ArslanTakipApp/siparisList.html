@@ -174,7 +174,7 @@
             <th scope="col" style="width: 10%;">Termin</th>
             <th scope="col" style="width: 8%;">Top Ten Kg </th>
             <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
-
+            
           </tr>
           <tr>
             <th scope="col"  style="width: 6%;"></th>
@@ -908,7 +908,7 @@
         <td>${item.KondusyonTuru}</td>
         <td>${item.SonTermin}</td>
         <td>${item.TopTenKg} kg</td>
-        <td>${item.kalipSayisi || "-"}</td>
+        <td>${item.AktifKalipSayisi + "/" + item.ToplamKalipSayisi || "-"}</td>
         `);
 
         tableBody.append(row);

@@ -528,9 +528,16 @@ class SiparisView(generic.TemplateView):
 
 
 def siparis_list(request):
-    s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    start1 = time.time()
+    s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
+        select={
+            "TopTenKg": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
+            "AktifKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
+            "ToplamKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0))"
+        },
+    )
     k = KalipMs.objects.using('dies').all()
-
+    
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
@@ -541,6 +548,7 @@ def siparis_list(request):
     sorter_List = params["sorterList"]
     q={}
     
+    start3 = time.time()
     if len(filter_list)>0:
         for i in filter_list:
             if i['field'] == 'TopTenKg':
@@ -567,7 +575,12 @@ def siparis_list(request):
             else: s = s.filter(**q).order_by('-SonTermin')
     else:
         s = s.exclude(SiparisTamam = 'BLOKE')
+    
+    end3 = time.time()
+    print("3: ")
+    print(end3 - start3)
     sor =[]
+    start5 = time.time()
     if len(sorter_List)>0:
         for j in sorter_List:
             if j['field'] != 'TopTenKg':
@@ -575,38 +588,38 @@ def siparis_list(request):
                     sor.append( "-"+j['field'])
                 else: sor.append(j['field'])
             else: 
-                s = s.extra(
-                    select={
-                        "kg_sum": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))"
-                    },
-                )
                 if j['type'] == 'azalan':
-                    sor.append( "-kg_sum")
-                else: sor.append("kg_sum")
+                    sor.append( "-TopTenKg")
+                else: sor.append("TopTenKg")
         s = s.order_by(*sor)
-
     else: s= s.order_by('-SonTermin')
-
-    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru')[(page-1)*size:page*size])
+    end5 = time.time()
+    print("5: ")
+    print(end5-start5)
+    start6 = time.time()
+    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi')[(page-1)*size:page*size])
+    end6 = time.time()
+    print("6: ")
+    print(end6-start6)
+    start7 = time.time()
     for a in sip:
-        kal = k.filter(ProfilNo=a['ProfilNo'], AktifPasif="Aktif", Hatali=0).values('ProfilNo', 'TeniferKalanOmurKg')
-        tkal =0
-        skal =0
         ttk =0
-        if kal.filter(TeniferKalanOmurKg__gte = 0):
-            tkal = len(kal.filter(TeniferKalanOmurKg__gte = 0))
-            skal = len(kal)
-            ttk = math.ceil(kal.filter(TeniferKalanOmurKg__gte = 0).aggregate(Sum('TeniferKalanOmurKg'))['TeniferKalanOmurKg__sum'])
-        a['kalipSayisi'] = str(tkal) + " / " + str(skal)
+        if a['AktifKalipSayisi']:
+            ttk = math.ceil(a['TopTenKg'])
         a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
         a['GirenKg'] = f'{math.ceil(a["GirenKg"]):,}'
         a['Kg'] = f'{math.ceil(a["Kg"]):,}'
         a['TopTenKg'] = f'{ttk:,}'
-
+    end7 = time.time()
+    print("7: ")
+    print(end7-start7)
     sip_count = s.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
     lastData['data'] = sip
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    end1 = time.time()
+    print("1: ")
+    print(end1-start1)
     return HttpResponse(data)
 
 def siparis_TopTenFiltre(i):
