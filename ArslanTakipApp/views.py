@@ -1,4 +1,6 @@
 import base64, binascii, zlib
+from types import NoneType
+from itertools import groupby
 import time
 import math
 from urllib.parse import unquote
@@ -545,9 +547,15 @@ def siparis_list(request):
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
-    sorter_List = params["sorterList"]
+    sorter_List = params["sL"]
+    hesap = params["h"]
     q={}
     
+    e ={}
+    e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
+    e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
+    e['TopTenMax'] = s.values_list('TopTenKg',flat=True).order_by('-TopTenKg').first()
+
     start3 = time.time()
     if len(filter_list)>0:
         for i in filter_list:
@@ -576,11 +584,7 @@ def siparis_list(request):
     else:
         s = s.exclude(SiparisTamam = 'BLOKE')
     
-    end3 = time.time()
-    print("3: ")
-    print(end3 - start3)
     sor =[]
-    start5 = time.time()
     if len(sorter_List)>0:
         for j in sorter_List:
             if j['field'] != 'TopTenKg':
@@ -593,15 +597,18 @@ def siparis_list(request):
                 else: sor.append("TopTenKg")
         s = s.order_by(*sor)
     else: s= s.order_by('-SonTermin')
-    end5 = time.time()
-    print("5: ")
-    print(end5-start5)
-    start6 = time.time()
-    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg','Kg', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi')[(page-1)*size:page*size])
-    end6 = time.time()
-    print("6: ")
-    print(end6-start6)
-    start7 = time.time()
+
+    e['GirenSum'] = math.ceil(s.aggregate(Sum('GirenKg'))['GirenKg__sum'])
+    e['KgSum'] = math.ceil(s.aggregate(Sum('Kg'))['Kg__sum'])
+    e['TopTenSum'] = ""
+
+    if hesap == 1:
+        TenVList = list(s.values_list('TopTenKg',flat=True).order_by('-TopTenKg'))
+        out = [sum(g) for t, g in groupby(TenVList, type)if t is not NoneType]
+        e['TopTenSum'] = math.ceil(out[0])
+
+    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Mm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi')[(page-1)*size:page*size])
+
     for a in sip:
         ttk =0
         if a['AktifKalipSayisi']:
@@ -610,16 +617,10 @@ def siparis_list(request):
         a['GirenKg'] = f'{math.ceil(a["GirenKg"]):,}'
         a['Kg'] = f'{math.ceil(a["Kg"]):,}'
         a['TopTenKg'] = f'{ttk:,}'
-    end7 = time.time()
-    print("7: ")
-    print(end7-start7)
     sip_count = s.count()
-    lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
+    lastData= {'last_page': math.ceil(sip_count/size), 'data': [], 'e':e}
     lastData['data'] = sip
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    end1 = time.time()
-    print("1: ")
-    print(end1-start1)
     return HttpResponse(data)
 
 def siparis_TopTenFiltre(i):

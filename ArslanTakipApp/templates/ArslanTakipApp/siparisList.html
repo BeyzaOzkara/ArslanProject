@@ -162,14 +162,15 @@
       <table class="table">
         <thead>
           <tr>
-            <th scope="col"  style="width: 6%;">Bloke</th>
-            <th scope="col" style="width: 6%;">Kart No</th>
-            <th scope="col" style="width: 12%;">Firma Adı</th>
+            <th scope="col" style="width: 5%;">Bloke</th>
+            <th scope="col" style="width: 5%;">Kart No</th>
+            <th scope="col" style="width: 10%;">Firma Adı</th>
             <th scope="col" style="width: 8%;">Profil No</th>
             <th scope="col" style="width: 6%;">Pres Kodu</th>
             <th scope="col" style="width: 6%;">Billet Turu</th>
-            <th scope="col" style="width: 8%;">Sipariş Kg</th>
-            <th scope="col" style="width: 8%;">Kalan Kg</th>
+            <th scope="col" colspan="2" style="width: 4%;">Sipariş Kg</th>
+            <th scope="col" colspan="2" style="width: 4%;">Kalan Kg</th>
+            <th scope="col" colspan="2" style="width: 2%;">Boy</th>
             <th scope="col" style="width: 12%;">Kondusyon Türü</th>
             <th scope="col" style="width: 10%;">Termin</th>
             <th scope="col" style="width: 8%;">Top Ten Kg </th>
@@ -177,14 +178,15 @@
             
           </tr>
           <tr>
-            <th scope="col"  style="width: 6%;"></th>
-            <th scope="col" style="width: 6%;"></th>
-            <th scope="col" style="width: 12%;"></th>
+            <th scope="col"  style="width: 5%;"></th>
+            <th scope="col" style="width: 5%;"></th>
+            <th scope="col" style="width: 10%;"></th>
             <th scope="col" style="width: 8%;"></th>
             <th scope="col" style="width: 6%;"></th>
             <th scope="col" style="width: 6%;"></th>
-            <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipTopKg"></th>
-            <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipKalKg"></th>
+            <th scope="col"  colspan="2" style="width: 4%; background-color: #a8ccdd;" id="sipTopKg"></th>
+            <th scope="col" colspan="2" style="width: 4%; background-color: #a8ccdd;" id="sipKalKg"></th>
+            <th scope="col" colspan="2" style="width: 2%;"></th>
             <th scope="col" style="width: 12%;"></th>
             <th scope="col" style="width: 10%;"></th>
             <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipTopTen"></th>
@@ -904,7 +906,11 @@
         <td>${item.PresKodu}</td>
         <td>${item.BilletTuru}</td>
         <td>${item.GirenKg} kg</td>
+        <td>${item.GirenAdet} adet</td>
         <td style="color: #1F6E8C;font-weight:bold;">${item.Kg} kg</td>
+        <td>${item.Adet} adet</td>
+        <td>${item.PlanlananMm} mm</td>
+        <td>${item.Mm} mm</td>
         <td>${item.KondusyonTuru}</td>
         <td>${item.SonTermin}</td>
         <td>${item.TopTenKg} kg</td>
@@ -918,13 +924,16 @@
     let girenMax =0;
     let kgMax =0;
     let topMax = 0;
+    let topSum = 0;
+    let h = 0;
 
     const loadPage = (page) => {
         const params = {
             page: page,
             size: itemsPerPage,
             filter: filter,
-            sorterList:sorterList,
+            sL:sorterList,
+            h:h,
         };
       $.ajax({
         url: `/siparis/list`,
@@ -934,19 +943,10 @@
         success: function (paginatedData) {
           renderData(paginatedData.data);
           renderPagination(paginatedData.last_page);
-        },
-        error: function (error) {
-          console.error('Error loading paginated data:', error);
-        }
-      });
-      $.ajax({
-        url: `/siparis/max`,
-        method: 'GET',
-        dataType: 'json',
-        success: function(maxData) {
-          girenMax = maxData.GirenMax;
-          kgMax = maxData.KgMax;
-          topMax = maxData.TopTenMax;
+          girenMax = paginatedData.e.GirenMax;
+          kgMax = paginatedData.e.KgMax;
+          topMax = paginatedData.e.TopTenMax;
+          topSum = paginatedData.e.TopTenSum;
           var slider1 = $("#range_1").data("ionRangeSlider");
           slider1.update({
               max: girenMax,
@@ -974,17 +974,29 @@
           $('#kalan2').prop("value", to2);
           $('#topten1').prop("value", from3);
           $('#topten2').prop("value", to3);
-          let girenSum = maxData.GirenSum;
-          let kgSum = maxData.KgSum;
-          $('#sipTopKg').html(girenSum);
-          $('#sipKalKg').html(kgSum);
-          $('#sipTopTen').html(topMax);
+          let girenSum = paginatedData.e.GirenSum;
+          let kgSum = paginatedData.e.KgSum;
+          $('#sipTopKg').html(girenSum+" kg");
+          $('#sipKalKg').html(kgSum+" kg");
+          if (h==1){
+            $('#sipTopTen').html(topSum+" kg");
+            h = 0;
+          }
+          else {$('#sipTopTen').html("hesapla");}
         },
         error: function (error) {
-          console.error('Error loading max data:', error);
+          console.error('Error loading paginated data:', error);
         }
       });
+      
     };
+
+    hesap = document.getElementById('sipTopTen');
+    hesap.addEventListener('click', () => {
+      h = 1;
+      $('#sipTopTen').html("hesaplanıyor");
+      loadPage(currentPage);
+    });
     
 
     const renderPagination = (totalPages) => {

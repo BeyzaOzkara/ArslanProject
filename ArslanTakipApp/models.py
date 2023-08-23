@@ -154,16 +154,20 @@ class SiparisList(models.Model):
     KartNo = models.IntegerField(primary_key=True)
     ProfilNo = models.CharField(null=True)
     BulunduguYer = models.CharField(null=True)
-    Adet = models.FloatField(null=True)
     KartAktif = models.IntegerField(null=True)
     SiparisTamam = models.CharField(null=True)
     GirenKg = models.FloatField(null=True, verbose_name="Sipariş Kg")
+    GirenAdet = models.FloatField(null=True)
     Kg = models.FloatField(null=True, verbose_name="Kalan Kg")
+    Adet = models.FloatField(null=True)
+    PlanlananMm = models.FloatField(null=True)
+    Mm = models.FloatField(null=True)
     SonTermin = models.DateTimeField(null=True)
     FirmaAdi = models.CharField(null=True)
     KondusyonTuru = models.CharField(null=True)
     BilletTuru = models.CharField(null=True)
     PresKodu = models.CharField(null=True)
+
 
     class Meta:
         managed = False
