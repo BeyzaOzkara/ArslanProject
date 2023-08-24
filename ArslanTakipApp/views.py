@@ -28,7 +28,7 @@ import locale
 # Create your views here.
 
 
-locale.setlocale(locale.LC_ALL, 'tr_tr')
+locale.setlocale(locale.LC_ALL, "tr_TR")
 
 class IndexView(generic.TemplateView):
     template_name = 'ArslanTakipApp/index.html'
