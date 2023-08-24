@@ -1,4 +1,5 @@
 import base64, binascii, zlib
+from decimal import Decimal
 from types import NoneType
 from itertools import groupby
 import time
@@ -22,8 +23,12 @@ from django.db import transaction
 from aes_cipher import *
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+import locale
 
 # Create your views here.
+
+
+locale.setlocale(locale.LC_ALL, 'tr_Tr')
 
 class IndexView(generic.TemplateView):
     template_name = 'ArslanTakipApp/index.html'
@@ -598,14 +603,14 @@ def siparis_list(request):
         s = s.order_by(*sor)
     else: s= s.order_by('-SonTermin')
 
-    e['GirenSum'] = math.ceil(s.aggregate(Sum('GirenKg'))['GirenKg__sum'])
-    e['KgSum'] = math.ceil(s.aggregate(Sum('Kg'))['Kg__sum'])
+    e['GirenSum'] =locale.format_string("%.0f",  math.ceil(s.aggregate(Sum('GirenKg'))['GirenKg__sum']), grouping=True)
+    e['KgSum'] = locale.format_string("%.0f", math.ceil(s.aggregate(Sum('Kg'))['Kg__sum']), grouping=True)
     e['TopTenSum'] = ""
 
     if hesap == 1:
         TenVList = list(s.values_list('TopTenKg',flat=True).order_by('-TopTenKg'))
         out = [sum(g) for t, g in groupby(TenVList, type)if t is not NoneType]
-        e['TopTenSum'] = math.ceil(out[0])
+        e['TopTenSum'] =locale.format_string("%.0f", math.ceil(out[0]), grouping=True)
 
     sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Mm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi')[(page-1)*size:page*size])
 
@@ -614,9 +619,10 @@ def siparis_list(request):
         if a['AktifKalipSayisi']:
             ttk = math.ceil(a['TopTenKg'])
         a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
-        a['GirenKg'] = f'{math.ceil(a["GirenKg"]):,}'
-        a['Kg'] = f'{math.ceil(a["Kg"]):,}'
-        a['TopTenKg'] = f'{ttk:,}'
+        a['GirenKg'] = locale.format_string("%.0f", math.ceil(a["GirenKg"]), grouping=True)
+        a['Kg'] = locale.format_string("%.0f", math.ceil(a["Kg"]), grouping=True)
+        a['TopTenKg'] = locale.format_string("%.0f", ttk, grouping=True)
+        #a['TopTenKg'] = f'{ttk:,}'
     sip_count = s.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': [], 'e':e}
     lastData['data'] = sip

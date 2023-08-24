@@ -163,12 +163,12 @@
         <thead>
           <tr>
             <th scope="col" style="width: 5%;">Bloke</th>
-            <th scope="col" style="width: 5%;">Kart No</th>
+            <th scope="col" style="width: 6%;">Kart No</th>
             <th scope="col" style="width: 10%;">Firma Adı</th>
-            <th scope="col" style="width: 8%;">Profil No</th>
+            <th scope="col" style="width: 7%;">Profil No</th>
             <th scope="col" style="width: 6%;">Pres Kodu</th>
             <th scope="col" style="width: 6%;">Billet Turu</th>
-            <th scope="col" colspan="2" style="width: 4%;">Sipariş Kg</th>
+            <th scope="col" colspan="2" style="width: 5%;">Sipariş Kg</th>
             <th scope="col" colspan="2" style="width: 4%;">Kalan Kg</th>
             <th scope="col" colspan="2" style="width: 2%;">Boy</th>
             <th scope="col" style="width: 12%;">Kondusyon Türü</th>
@@ -179,12 +179,12 @@
           </tr>
           <tr>
             <th scope="col"  style="width: 5%;"></th>
-            <th scope="col" style="width: 5%;"></th>
+            <th scope="col" style="width: 6%;"></th>
             <th scope="col" style="width: 10%;"></th>
-            <th scope="col" style="width: 8%;"></th>
+            <th scope="col" style="width: 7%;"></th>
             <th scope="col" style="width: 6%;"></th>
             <th scope="col" style="width: 6%;"></th>
-            <th scope="col"  colspan="2" style="width: 4%; background-color: #a8ccdd;" id="sipTopKg"></th>
+            <th scope="col"  colspan="2" style="width: 5%; background-color: #a8ccdd;" id="sipTopKg"></th>
             <th scope="col" colspan="2" style="width: 4%; background-color: #a8ccdd;" id="sipKalKg"></th>
             <th scope="col" colspan="2" style="width: 2%;"></th>
             <th scope="col" style="width: 12%;"></th>
@@ -1136,7 +1136,7 @@
     });
 
     const renderAccordionTable = (accordionData, mainTableRow) => {
-        const accordionRow = $('<tr class="akordeon"><td colspan="12"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
+        const accordionRow = $('<tr class="akordeon"><td colspan="16"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
         mainTableRow.after(accordionRow);
       const accordionTableBody = accordionRow.find('#accordionTableBody');
       accordionTableBody.empty();  // Clear existing accordion table data
