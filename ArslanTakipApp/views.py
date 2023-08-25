@@ -593,11 +593,11 @@ def siparis_list(request):
     if len(sorter_List)>0:
         for j in sorter_List:
             if j['field'] != 'TopTenKg':
-                if j['type'] == 'azalan':
+                if j['type'] == 'Azalan':
                     sor.append( "-"+j['field'])
                 else: sor.append(j['field'])
             else: 
-                if j['type'] == 'azalan':
+                if j['type'] == 'Azalan':
                     sor.append( "-TopTenKg")
                 else: sor.append("TopTenKg")
         s = s.order_by(*sor)

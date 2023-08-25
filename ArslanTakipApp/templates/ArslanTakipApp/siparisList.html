@@ -13,6 +13,7 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.min.css' %}">
   <!-- daterange picker -->
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
@@ -144,6 +145,7 @@
     <div class="container-fluid col-lg-12">
       <button type="button" id="btnModal" class="btn bg-gradient-info">Arama</button>
       <button type="button" id="btnModalSirala" class="btn bg-gradient-info">Sırala</button>
+      <button type="button" id="btnModalTabulator" class="btn bg-gradient-info">Tabulator</button>
         <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
         <select id="perPageSelect">
           <option value="5">5</option>
@@ -199,6 +201,46 @@
       </table>
       <div class="pagination-container">
         <ul class="pagination"></ul>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="tabulatorModal" tabindex="-1" aria-labelledby="tabulatorModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tabulator Gelişmiş Arama</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div>
+            <select name="kriter" id="kriter">
+              <option value="" id="selected" disabled>Kriter Seçin</option>
+              <option value="Kart No" data-field="KartNo" id="Kart No">Kart No</option>
+              <option value="Profil No" data-field="ProfilNo" id="Profil No">Profil No</option>
+              <option value="Pres Kodu" data-field="PresKodu" id="Pres Kodu">Pres Kodu</option>
+              <option value="Firma Adı" data-field="FirmaAdi" id="Firma Adı">Firma Adı</option>
+              <option value="Billet Türü" data-field="BilletTuru"id="Billet Türü">Billet Türü</option>
+              <option value="Son Termin" data-field="SonTermin" id="Son Termin">Termin</option>
+              <option value="Sipariş Kg" data-field="GirenKg" id="Sipariş Kg">Sipariş Kg</option>
+              <option value="Kalan Kg" data-field="Kg" id="Kalan Kg">Kalan Kg</option>
+              <option value="Kondüsyon Türü" data-field="KondusyonTuru" id="Kondüsyon Türü">Kondüsyon Türü</option>
+              <option value="Toplam Kalan Tenifer" data-field="TopTenKg" id="Toplam Kalan Tenifer">Toplam Kalan Tenifer</option>
+            </select>
+            <select name="sıralama" id="yon">
+              <option value="Artan" id="Artan">Artan</option>
+              <option value="Azalan" id="Azalan">Azalan</option>
+            </select>
+            <button type="button" id="add-row" class="btn btn-outline-info btn-sm" >Sıralama Kriteri Ekle</button>
+            <span id="deneme"></span>
+          </div>
+          <div id="modalTable"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnTabTemizle" class="btn btn-outline-secondary">Temizle</button>
+          <button type="button" id="btnTabSirala" class="btn btn-primary">Sırala</button>
+        </div>
       </div>
     </div>
   </div>
@@ -350,8 +392,8 @@
                       <label style="padding-right: 10px;">Kart No</label>
                       <select class="form-control col-lg-7" id="kartNoSelect" data-field="KartNo">
                         <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
+                        <option value="Artan">Artan</option>
+                        <option value="Azalan">Azalan</option>
                       </select>
                     </div>
                   </div>
@@ -489,7 +531,53 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script>
+<script>
+  
+  var deleteIcon = function(cell, formatterParams, onRendered){ 
+      return "<i class='fa fa-trash'></i>";
+  };
+
+  //Build Tabulator
+  var modalTable = new Tabulator("#modalTable", {
+      layout:"fitColumns",
+      data:[],
+      movableRows:true,
+      columns:[
+          {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+          {title:"İsim", field:"isim"},
+          {title:"Filtre", field:"type"},
+          {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+            cell.getRow().delete();}
+          }
+      ],
+  });
+
+  document.getElementById("add-row").addEventListener('click', function(){
+    if (document.getElementById("kriter").value != ""){
+        deger = document.getElementById(document.getElementById("kriter").value).getAttribute("data-field");
+        modalTable.addData({field:deger,isim:document.getElementById("kriter").value, type:document.getElementById("yon").value, }, false);
+        console.log(document.getElementById("kriter").value);
+        document.getElementById(document.getElementById("kriter").value).disabled = true;
+        document.getElementById("selected").selected = true;
+    }
+  });
+  
+  document.getElementById("btnTabTemizle").addEventListener("click", function(){
+      modalTable.clearData()
+  });
+
+  document.getElementById("btnTabSirala").addEventListener("click", function(){
+    console.log(modalTable.getData());
+    let modalData = modalTable.getData();
+    for( i in modalData) {
+      console.log(modalData[i])
+    };
+    sorterList = modalData;
+    console.log(sorterList);
+
+    $('#tabulatorModal').modal('hide');
+    loadPage(currentPage);
+  });
     
     /* ION SLIDER */
     $('#range_1').ionRangeSlider({
@@ -696,6 +784,11 @@
         
     },"autoUpdateInput": false,
   });
+
+    btnTab = document.getElementById('btnModalTabulator');
+    btnTab.addEventListener('click', () => {
+      $('#tabulatorModal').modal('show');
+    });
 
     btnMod = document.getElementById('btnModal');
     btnMod.addEventListener('click', () => {
@@ -1133,7 +1226,7 @@
           loadAccordionTable(profilNo, mainTableRow);
         }
       }
-    });
+    }, {once : true});
 
     const renderAccordionTable = (accordionData, mainTableRow) => {
         const accordionRow = $('<tr class="akordeon"><td colspan="16"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
@@ -1205,11 +1298,14 @@
       printWindow.print();
       printWindow.close();
     };
+
   </script>
 {% endblock %}
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
 <script src="{% static 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
