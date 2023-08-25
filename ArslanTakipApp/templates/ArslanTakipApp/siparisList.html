@@ -144,8 +144,7 @@
   <div class="row">
     <div class="container-fluid col-lg-12">
       <button type="button" id="btnModal" class="btn bg-gradient-info">Arama</button>
-      <button type="button" id="btnModalSirala" class="btn bg-gradient-info">Sırala</button>
-      <button type="button" id="btnModalTabulator" class="btn bg-gradient-info">Tabulator</button>
+      <button type="button" id="btnModalTabulator" class="btn bg-gradient-info">Sırala</button>
         <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
         <select id="perPageSelect">
           <option value="5">5</option>
@@ -208,38 +207,50 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Tabulator Gelişmiş Arama</h5>
+          <h5 class="modal-title">Sıralama</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <div>
-            <select name="kriter" id="kriter">
-              <option value="" id="selected" disabled>Kriter Seçin</option>
-              <option value="Kart No" data-field="KartNo" id="Kart No">Kart No</option>
-              <option value="Profil No" data-field="ProfilNo" id="Profil No">Profil No</option>
-              <option value="Pres Kodu" data-field="PresKodu" id="Pres Kodu">Pres Kodu</option>
-              <option value="Firma Adı" data-field="FirmaAdi" id="Firma Adı">Firma Adı</option>
-              <option value="Billet Türü" data-field="BilletTuru"id="Billet Türü">Billet Türü</option>
-              <option value="Son Termin" data-field="SonTermin" id="Son Termin">Termin</option>
-              <option value="Sipariş Kg" data-field="GirenKg" id="Sipariş Kg">Sipariş Kg</option>
-              <option value="Kalan Kg" data-field="Kg" id="Kalan Kg">Kalan Kg</option>
-              <option value="Kondüsyon Türü" data-field="KondusyonTuru" id="Kondüsyon Türü">Kondüsyon Türü</option>
-              <option value="Toplam Kalan Tenifer" data-field="TopTenKg" id="Toplam Kalan Tenifer">Toplam Kalan Tenifer</option>
-            </select>
-            <select name="sıralama" id="yon">
-              <option value="Artan" id="Artan">Artan</option>
-              <option value="Azalan" id="Azalan">Azalan</option>
-            </select>
-            <button type="button" id="add-row" class="btn btn-outline-info btn-sm" >Sıralama Kriteri Ekle</button>
-            <span id="deneme"></span>
+          <div class="row">
+            <div class="col-sm-5">
+              <div class="form-group">
+                <select name="kriter" class="form-control" id="kriter">
+                  <option value="" id="selected" selected disabled>Kriter Seçin</option>
+                  <option value="Kart No" data-field="KartNo" id="Kart No">Kart No</option>
+                  <option value="Profil No" data-field="ProfilNo" id="Profil No">Profil No</option>
+                  <option value="Pres Kodu" data-field="PresKodu" id="Pres Kodu">Pres Kodu</option>
+                  <option value="Firma Adı" data-field="FirmaAdi" id="Firma Adı">Firma Adı</option>
+                  <option value="Billet Türü" data-field="BilletTuru"id="Billet Türü">Billet Türü</option>
+                  <option value="Son Termin" data-field="SonTermin" id="Son Termin">Termin</option>
+                  <option value="Sipariş Kg" data-field="GirenKg" id="Sipariş Kg">Sipariş Kg</option>
+                  <option value="Kalan Kg" data-field="Kg" id="Kalan Kg">Kalan Kg</option>
+                  <option value="Kondüsyon Türü" data-field="KondusyonTuru" id="Kondüsyon Türü">Kondüsyon Türü</option>
+                  <option value="Toplam Kalan Tenifer" data-field="TopTenKg" id="Toplam Kalan Tenifer">Toplam Kalan Tenifer</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <select name="sıralama" class="form-control" id="yon">
+                  <option value="Artan" id="Artan">Artan</option>
+                  <option value="Azalan" id="Azalan">Azalan</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <button type="button" id="add-row" class="btn btn-outline-info" >Kriter Ekle</button>
+              </div>
+            </div>
           </div>
           <div id="modalTable"></div>
         </div>
         <div class="modal-footer">
           <button type="button" id="btnTabTemizle" class="btn btn-outline-secondary">Temizle</button>
           <button type="button" id="btnTabSirala" class="btn btn-primary">Sırala</button>
+        </div>
         </div>
       </div>
     </div>
@@ -372,160 +383,6 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Sırala</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="" id="formID2"></form>
-          <div class="row">
-            <div class="col-md-10 offset-md-1">
-              <div class="row">
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Kart No</label>
-                      <select class="form-control col-lg-7" id="kartNoSelect" data-field="KartNo">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="Artan">Artan</option>
-                        <option value="Azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Profil No</label>
-                      <select class="form-control col-lg-7" id="profilNoSelect" data-field="ProfilNo">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Pres Kodu</label>
-                      <select class="form-control col-lg-7" id="presKoduSelect" data-field="PresKodu">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Firma Adı</label>
-                      <select class="form-control col-lg-7" id="firmaAdiSelect" data-field="FirmaAdi">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Billet Türü</label>
-                      <select class="form-control col-lg-7" id="billetTuruSelect" data-field="BilletTuru">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Kondüsyon</label>
-                      <select class="form-control col-lg-7" id="kondusyonSelect" data-field="KondusyonTuru">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Sipariş Kg</label>
-                      <select class="form-control col-lg-7" id="siparisKgSelect" data-field="GirenKg">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Kalan Kg</label>
-                      <select class="form-control col-lg-7" id="kalanKgSelect" data-field="Kg">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Termin</label>
-                      <select class="form-control col-lg-7" id="terminSelect" data-field="SonTermin">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-5">
-                  <div class="form-group">
-                    <div class="row">
-                      <label style="padding-right: 10px;">Top Ten. Kg</label>
-                      <select class="form-control col-lg-7" id="topKalanSelect" data-field="TopTenKg">
-                        <option value="" disabled selected>Sıralama Seçin</option>
-                        <option value="artan">Artan</option>
-                        <option value="azalan">Azalan</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" id="btnTemizSort" class="btn btn-secondary">Temizle</button>
-          <button type="button" id="btnSort" class="btn btn-primary">Sırala</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 {% endblock %}
@@ -547,6 +404,8 @@
           {title:"İsim", field:"isim"},
           {title:"Filtre", field:"type"},
           {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+            var data = cell.getData();
+            document.getElementById(data.isim).disabled = false;
             cell.getRow().delete();}
           }
       ],
@@ -563,7 +422,18 @@
   });
   
   document.getElementById("btnTabTemizle").addEventListener("click", function(){
-      modalTable.clearData()
+      modalTable.clearData();
+      $('#kriter option').each(function(){
+        if($(this).val() != ""){
+          document.getElementById($(this).val()).disabled = false;
+        }
+        //console.log($(this).val());
+      });
+      sorterList = [];
+      $('#tabulatorModal').modal('hide');
+      loadPage(currentPage);
+
+      //document.getElementById(document.getElementById("kriter").value).disabled = false;
   });
 
   document.getElementById("btnTabSirala").addEventListener("click", function(){
@@ -793,93 +663,6 @@
     btnMod = document.getElementById('btnModal');
     btnMod.addEventListener('click', () => {
       $('#searchModal').modal('show');
-    });
-
-    btnModSirala = document.getElementById('btnModalSirala');
-    btnModSirala.addEventListener('click', () => {
-      $('#sortModal').modal('show');
-    });
-
-    btnSort = document.getElementById('btnSort');
-    btnSort.addEventListener('click', () => {
-      var kartNoS = $('#kartNoSelect').val();
-      if (kartNoS != null){
-        var field = $('#kartNoSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:kartNoS});
-      };
-
-      var profilNoS = $('#profilNoSelect').val();
-      if (profilNoS != null){
-        var field = $('#profilNoSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:profilNoS});
-      };
-
-      var presKoduS = $('#presKoduSelect').val();
-      if (presKoduS != null){
-        var field = $('#presKoduSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:presKoduS});
-      };
-
-      var firmaAdiS = $('#firmaAdiSelect').val();
-      if (firmaAdiS != null){
-        var field = $('#firmaAdiSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:firmaAdiS});
-      };
-
-      var billetS = $('#billetTuruSelect').val();
-      if (billetS != null){
-        var field = $('#billetTuruSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:billetS});
-      };
-      
-      var konS = $('#kondusyonSelect').val();
-      if (konS != null){
-        var field = $('#kondusyonSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:konS});
-      };
-
-      var sipS = $('#siparisKgSelect').val();
-      if (sipS != null){
-        var field = $('#siparisKgSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:sipS});
-      };
-
-      var kalanS = $('#kalanKgSelect').val();
-      if (kalanS != null){
-        var field = $('#kalanKgSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:kalanS});
-      };
-
-      var topkalanS = $('#topKalanSelect').val();
-      if (topkalanS != null){
-        var field = $('#topKalanSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:topkalanS});
-      };
-      
-      var terS = $('#terminSelect').val();
-      if (terS != null){
-        var field = $('#terminSelect').data('field');
-        sorterList = sorterList.filter(f => f.field !== field);
-        sorterList.push({field:field, type:terS});
-      };
-
-      $('#sortModal').modal('hide');
-      loadPage(currentPage);
-    });
-
-    btnTemizSort = document.getElementById('btnTemizSort');
-    btnTemizSort.addEventListener('click', () => {
-      $( "#kartNoSelect, #profilNoSelect, #presKoduSelect, #firmaAdiSelect, #billetTuruSelect, #kondusyonSelect, #siparisKgSelect, #kalanKgSelect, #topKalanSelect, #terminSelect" ).val("");
-      sorterList = []
     });
 
     $('#terminDate').on('apply.daterangepicker', function(ev, picker) {
