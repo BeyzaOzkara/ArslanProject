@@ -995,25 +995,10 @@
         loadPage(currentPage);
     });
 
-    
-    tableBody.on('click', '.main-row', function () {
-      const profilNo = $(this).find('td:nth-child(4)').text();  // Assuming ProfilNo is in the 3rd column
-      if (profilNo) {
-        const mainTableRow = $(this);
-        const accordionRow = mainTableRow.next('.akordeon');
-
-        if (accordionRow.length) { 
-            accordionRow.slideToggle();
-        } else {
-          // Load and render accordion table data
-          loadAccordionTable(profilNo, mainTableRow);
-        }
-      }
-    });
-
+    let okaySign = 0;
     const renderAccordionTable = (accordionData, mainTableRow) => {
-        const accordionRow = $('<tr class="akordeon"><td colspan="16"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
-        mainTableRow.after(accordionRow);
+      const accordionRow = $('<tr class="akordeon"><td colspan="16"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
+      mainTableRow.after(accordionRow);
       const accordionTableBody = accordionRow.find('#accordionTableBody');
       accordionTableBody.empty();  // Clear existing accordion table data
       accordionData.forEach(item => {
@@ -1030,8 +1015,9 @@
           <!-- Add more columns as needed -->
         `);
         accordionTableBody.append(row);
+        document.getElementById('tableBody').style="";
       });
-      //accordionRow.find('.container').slideToggle();
+      
     };
 
     // Function to load accordion table data
@@ -1049,6 +1035,23 @@
       });
     };
 
+    tableBody.on('click', '.main-row', function () {
+      document.getElementById('tableBody').style="pointer-events:none;";
+      const profilNo = $(this).find('td:nth-child(4)').text();  // Assuming ProfilNo is in the 3rd column
+      if (profilNo) {
+        const mainTableRow = $(this);
+        const accordionRow = mainTableRow.next('.akordeon');
+        
+        if (accordionRow.length) { 
+          accordionRow.slideToggle();
+          document.getElementById('tableBody').style="";
+        } else {
+          // Load and render accordion table data
+          loadAccordionTable(profilNo, mainTableRow);
+        }
+        
+      }
+    });
 
     $('#perPageSelect').on('change', function () {
       itemsPerPage = parseInt($(this).val());
