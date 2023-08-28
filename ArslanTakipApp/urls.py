@@ -23,5 +23,6 @@ urlpatterns = [
     path('siparis/list', views.siparis_list),
     path('siparis/max', views.siparis_max),
     path('siparis/child/<str:pNo>', views.siparis_child),
+    path('eksiparis/', views.EkSiparisView.as_view()),
 
 ]

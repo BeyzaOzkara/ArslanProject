@@ -894,13 +894,10 @@
       document.getElementById("ekleTermin").innerHTML =terminTD.innerHTML;
       document.getElementById("ekleTopTen").innerHTML = topTenTD.innerHTML;
       document.getElementById("ekleKSayisi").innerHTML = kSayisiTD.innerHTML;
+      
       loadKalipTable(profilNoTD.innerHTML);
       $('#siparisEkleModal').modal('show'); 
 
-      /* var getKartNo1 = $(this).closest("td").find("kartTableBody");
-      var getKartNo = getKartNo1.text();
-      console.log(getKartNo);
-      */
     };
 
     $('#siparisEkleModal').on('hidden.bs.modal', function() {

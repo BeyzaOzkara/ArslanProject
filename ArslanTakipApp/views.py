@@ -684,3 +684,6 @@ def siparis_child(request, pNo):
 
     data = json.dumps(gonder)
     return HttpResponse(data)
+
+class EkSiparisView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/eksiparis.html'
