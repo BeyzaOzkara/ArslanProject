@@ -74,6 +74,16 @@
         background-color: #EAFDFC;
     }
 
+    .modal.fade table.kalip th {
+      background-color: #91D8E4;
+        border: 1px solid #96B6C5;
+        padding: 8px;
+        text-align: left;
+        font-weight: 500;
+        color: #ffffff;
+    }
+    
+
     @media print {
       .table {
         width: 98%;
@@ -163,6 +173,7 @@
       <table class="table">
         <thead>
           <tr>
+            <th scope="col" style="width: 1%;"></th>
             <th scope="col" style="width: 5%;">Bloke</th>
             <th scope="col" style="width: 6%;">Kart No</th>
             <th scope="col" style="width: 10%;">Firma Adı</th>
@@ -173,12 +184,13 @@
             <th scope="col" colspan="2" style="width: 4%;">Kalan Kg</th>
             <th scope="col" colspan="2" style="width: 2%;">Boy</th>
             <th scope="col" style="width: 12%;">Kondusyon Türü</th>
-            <th scope="col" style="width: 10%;">Termin</th>
+            <th scope="col" style="width: 9%;">Termin</th>
             <th scope="col" style="width: 8%;">Top Ten Kg </th>
             <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
             
           </tr>
           <tr>
+            <th scope="col"  style="width: 1%;"></th>
             <th scope="col"  style="width: 5%;"></th>
             <th scope="col" style="width: 6%;"></th>
             <th scope="col" style="width: 10%;"></th>
@@ -189,7 +201,7 @@
             <th scope="col" colspan="2" style="width: 4%; background-color: #a8ccdd;" id="sipKalKg"></th>
             <th scope="col" colspan="2" style="width: 2%;"></th>
             <th scope="col" style="width: 12%;"></th>
-            <th scope="col" style="width: 10%;"></th>
+            <th scope="col" style="width: 9%;"></th>
             <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipTopTen"></th>
             <th scope="col" style="width: 6%;"></th>
           </tr>
@@ -379,6 +391,89 @@
         <div class="modal-footer">
           <button type="button" id="btnTemizle" class="btn btn-secondary">Temizle</button>
           <button type="button" id="btnFiltre" class="btn btn-primary">Filtrele</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="siparisEkleModal" tabindex="-1" aria-labelledby="siparisEkleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ek Sipariş Kartı Ekle</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="ekleBilgi" class="modal-body">
+          <div class="row">
+            <div class="container-fluid">
+              <label for="KartNo" style=" padding-right: 30px;">Kart No: <label style="font-weight: 500;" id="ekleKartNo" data-field="KartNo"></label></label>
+              <label for="ProfilNo" style=" padding-right: 30px;">Profil No: <label style="font-weight: 500;" id="ekleProfilNo" data-field="ProfilNo"></label></label>
+              <label for="SiparisTamam">Bloke Durumu: <label id="ekleBloke" data-field="SiparisTamam" style="font-weight: 500;" ></label></label>
+            </div>
+          </div>
+          <label for="FirmaAdi">Firma Adı: <label style="font-weight: 500;" id="ekleFirmaAdi" data-field="FirmaAdi"></label></label>
+          <div style="overflow: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 6%;">Pres Kodu</th>
+                  <th scope="col" style="width: 6%;">Billet Turu</th>
+                  <th scope="col" colspan="2" style="width: 7%;">Sipariş Kg</th>
+                  <th scope="col" colspan="2" style="width: 6%;">Kalan Kg</th>
+                  <th scope="col" colspan="2" style="width: 3%;">Boy</th>
+                  <th scope="col" style="width: 10%;">Kondusyon Türü</th>
+                  <th scope="col" style="width: 10%;">Termin</th>
+                  <th scope="col" style="width: 8%;">Top Ten Kg </th>
+                  <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
+                  
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <td id="eklePresKodu" data-field="PresKodu"></td>
+                <td id="ekleBilletTuru" data-field="BilletTuru"></td>
+                <td id="ekleGirenKg" data-field="GirenKg"></td>
+                <td id="ekleGirenAdet" data-field="GirenAdet"></td>
+                <td id="ekleKalanKg" data-field="KalanKg"></td>
+                <td id="ekleKalanAdet" data-field="KalanAdet"></td>
+                <td id="eklePlanlananMm" data-field="PlanlananMm"></td>
+                <td id="ekleMm" data-field="Mm"></td>
+                <td id="ekleKonusyonTuru" data-field="KondusyonTuru"></td>
+                <td id="ekleTermin" data-field="SonTermin"></td>
+                <td id="ekleTopTen" data-field="TopTenKg"></td>
+                <td id="ekleKSayisi" data-field="KalipSayisi"></td>
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+        <div id="ekleKaliplar" class="modal-body">
+          <div style="overflow: auto;">
+            <table class="table kalip table-bordered">
+              <thead>
+                <tr>
+                  <th style="width: 1%;"><input type="checkbox" name="selectAll" id="selectAll"></th>
+                  <th style="width: 6%;">Kalıp No</th>
+                  <th style="width: 5%;">Üretici Firma</th>
+                  <th style="width: 8%;">Tenifer Kalan Ömür Kg</th>
+                  <th style="width: 8%;">Üretim Toplam Kg</th>
+                  <th style="width: 5%;">Pres Kodu</th>
+                  <th style="width: 3%;">Çapı</th>
+                  <th style="width: 5%;">Son Pres Kodu</th>
+                  <th style="width: 9%;">Konum</th>
+                </tr>
+              </thead>
+              <tbody id="kalipTableBody">
+
+              </tbody>
+            </table>
+            <label for="sipEkleKg">KG: <input type="number" name="sipEkleKg" id="siparisEkleKg"></label>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnSiparisEkle" class="btn btn-primary">Ekle</button>
         </div>
       </div>
     </div>
@@ -763,6 +858,122 @@
       filter = [];
     });
 
+    const kalipTableBody = $('#kalipTableBody');
+    function myFunction (e) {
+      kalipTableBody.empty();
+      var blokeTD = e.nextSibling.nextSibling;
+      var kartNoTD = blokeTD.nextSibling.nextSibling;
+      var firmaAdiTD = kartNoTD.nextSibling.nextSibling;
+      var profilNoTD = firmaAdiTD.nextSibling.nextSibling;
+      var presKoduTD =profilNoTD.nextSibling.nextSibling;
+      var billetTuruTD =presKoduTD.nextSibling.nextSibling;
+      var girenKgTD = billetTuruTD.nextSibling.nextSibling;
+      var girenAdetTD = girenKgTD.nextSibling.nextSibling;
+      var kalanKgTD = girenAdetTD.nextSibling.nextSibling;
+      var kalanAdetTD = kalanKgTD.nextSibling.nextSibling;
+      var planlananMmTD = kalanAdetTD.nextSibling.nextSibling;
+      var mmTD = planlananMmTD.nextSibling.nextSibling;
+      var kondusTD = mmTD.nextSibling.nextSibling;
+      var terminTD = kondusTD.nextSibling.nextSibling;
+      var topTenTD = terminTD.nextSibling.nextSibling;
+      var kSayisiTD = topTenTD.nextSibling.nextSibling;
+
+      document.getElementById("ekleBloke").innerHTML = blokeTD.innerHTML;
+      document.getElementById("ekleKartNo").innerHTML = kartNoTD.innerHTML;
+      document.getElementById("ekleFirmaAdi").innerHTML = firmaAdiTD.innerHTML;
+      document.getElementById("ekleProfilNo").innerHTML = profilNoTD.innerHTML;
+      document.getElementById("eklePresKodu").innerHTML = presKoduTD.innerHTML;
+      document.getElementById("ekleBilletTuru").innerHTML = billetTuruTD.innerHTML;
+      document.getElementById("ekleGirenKg").innerHTML = girenKgTD.innerHTML;
+      document.getElementById("ekleGirenAdet").innerHTML = girenAdetTD.innerHTML;
+      document.getElementById("ekleKalanKg").innerHTML = kalanKgTD.innerHTML;
+      document.getElementById("ekleKalanAdet").innerHTML = kalanAdetTD.innerHTML;
+      document.getElementById("eklePlanlananMm").innerHTML = planlananMmTD.innerHTML;
+      document.getElementById("ekleMm").innerHTML = mmTD.innerHTML;
+      document.getElementById("ekleKonusyonTuru").innerHTML = kondusTD.innerHTML;
+      document.getElementById("ekleTermin").innerHTML =terminTD.innerHTML;
+      document.getElementById("ekleTopTen").innerHTML = topTenTD.innerHTML;
+      document.getElementById("ekleKSayisi").innerHTML = kSayisiTD.innerHTML;
+      loadKalipTable(profilNoTD.innerHTML);
+      $('#siparisEkleModal').modal('show'); 
+
+      /* var getKartNo1 = $(this).closest("td").find("kartTableBody");
+      var getKartNo = getKartNo1.text();
+      console.log(getKartNo);
+      */
+    };
+
+    $('#siparisEkleModal').on('hidden.bs.modal', function() {
+      $('#selectAll').prop('checked', false);
+    });
+
+    const renderKalipTable = (kalipData) => {
+      kalipTableBody.empty();  // Clear existing accordion table data
+      kalipData.forEach(item => {
+        // Render accordion table row
+        const row = $('<tr></tr>').html(`
+            <td><input type="checkbox" name="dieCb" value=${item.KalipNo}/></td>
+            <td>${item.KalipNo || '-'}</td>
+            <td>${item.UreticiFirma || '-'}</td>
+            <td>${item.TeniferKalanOmurKg || '-'}</td>
+            <td>${item.UretimToplamKg || '-'}</td>
+            <td>${item.PresKodu || '-'}</td>
+            <td>${item.Capi || '-'}</td>
+            <td>${item.SonPresKodu || '-'}</td>
+            <td>${item.Konum || '-'}</td>
+        `);
+        kalipTableBody.append(row);
+      });
+      
+    };
+
+    // Function to load accordion table data
+    const loadKalipTable = (profilNo) => {
+      $.ajax({
+      url: `/siparis/child/${profilNo}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (kalipData) {
+          renderKalipTable(kalipData);
+      },
+      error: function (error) {
+          console.error('Error loading die table data:', error);
+      }
+      });
+    };
+
+    $('#selectAll').change(function () {
+        $('tbody tr td input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+    });
+
+    function getSelected() {
+      var selectDies = [];
+      let cbs = $('tbody tr td input[name="dieCb"]:checked');
+      cbs.each(function(i, obj){
+        selectDies.push(cbs[i].value.replace("/",""));
+      });
+      return selectDies
+    };
+
+    document.getElementById("btnSiparisEkle").addEventListener("click", function(){
+      let selectedDies = getSelected();
+      let siparisEkleKg = document.getElementById('siparisEkleKg').value;
+      console.log(siparisEkleKg);
+      if (siparisEkleKg != "" && selectedDies != "") {
+        $('#siparisEkleModal').modal('hide'); 
+      }
+      else if (siparisEkleKg == "" && selectedDies == ""){
+        alert("Lütfen kalıp seçip, kilogram değeri giriniz!");
+      }
+      else if (siparisEkleKg == "") {
+        alert("Lütfen kilogram değeri giriniz!");
+      }
+      else if (selectedDies == "") {
+        alert("Lütfen kalıp seçiniz!");
+      }
+
+    });
+    
     const tableBody = $('#tableBody');
     let itemsPerPage = 5;  // Başlangıçta varsayılan değer
     let filter = [];
@@ -775,22 +986,23 @@
         let SiparisTamamSymbol = ""
         if (item.SiparisTamam == 'BLOKE'){ SiparisTamamSymbol = '✗'}else { SiparisTamamSymbol ='✓'} ;
         const row = $('<tr class="main-row"></tr>').html(`
-        <td>${SiparisTamamSymbol}</td>
-        <td>${item.KartNo}</td>
-        <td>${item.FirmaAdi}</td>
-        <td>${item.ProfilNo}</td>
-        <td>${item.PresKodu}</td>
-        <td>${item.BilletTuru}</td>
-        <td>${item.GirenKg} kg</td>
-        <td>${item.GirenAdet} adet</td>
-        <td style="color: #1F6E8C;font-weight:bold;">${item.Kg} kg</td>
-        <td>${item.Adet} adet</td>
-        <td>${item.PlanlananMm} mm</td>
-        <td>${item.Mm} mm</td>
-        <td>${item.KondusyonTuru}</td>
-        <td>${item.SonTermin}</td>
-        <td>${item.TopTenKg} kg</td>
-        <td>${item.AktifKalipSayisi + "/" + item.ToplamKalipSayisi || "-"}</td>
+        <td class="ekleTableBody" onclick="myFunction(this)">+</td>
+        <td class="blokeTableBody">${SiparisTamamSymbol}</td>
+        <td class="kartTableBody">${item.KartNo}</td>
+        <td class="firmaTableBody">${item.FirmaAdi}</td>
+        <td class="profilNoTableBody">${item.ProfilNo}</td>
+        <td class="presTableBody">${item.PresKodu}</td>
+        <td class="billetTableBody">${item.BilletTuru}</td>
+        <td class="girenKgTableBody">${item.GirenKg} kg</td>
+        <td class="girenAdetTableBody">${item.GirenAdet} adet</td>
+        <td class="kKgTableBody" style="color: #1F6E8C;font-weight:bold;">${item.Kg} kg</td>
+        <td class="kAdetTableBody">${item.Adet} adet</td>
+        <td class="planlananMmTableBody">${item.PlanlananMm} mm</td>
+        <td class="mmTableBody">${item.Mm} mm</td>
+        <td class="kondusTableBody">${item.KondusyonTuru}</td>
+        <td class="terminTableBody">${item.SonTermin}</td>
+        <td class="topTenTableBody">${item.TopTenKg} kg</td>
+        <td class="kSayisiTableBody">${item.AktifKalipSayisi + "/" + item.ToplamKalipSayisi || "-"}</td>
         `);
 
         tableBody.append(row);
@@ -995,9 +1207,8 @@
         loadPage(currentPage);
     });
 
-    let okaySign = 0;
     const renderAccordionTable = (accordionData, mainTableRow) => {
-      const accordionRow = $('<tr class="akordeon"><td colspan="16"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
+      const accordionRow = $('<tr class="akordeon"><td colspan="17"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
       mainTableRow.after(accordionRow);
       const accordionTableBody = accordionRow.find('#accordionTableBody');
       accordionTableBody.empty();  // Clear existing accordion table data
@@ -1037,7 +1248,7 @@
 
     tableBody.on('click', '.main-row', function () {
       document.getElementById('tableBody').style="pointer-events:none;";
-      const profilNo = $(this).find('td:nth-child(4)').text();  // Assuming ProfilNo is in the 3rd column
+      const profilNo = $(this).find('td:nth-child(5)').text();  // Assuming ProfilNo is in the 3rd column
       if (profilNo) {
         const mainTableRow = $(this);
         const accordionRow = mainTableRow.next('.akordeon');
@@ -1062,28 +1273,6 @@
     let currentPage = 1;
     loadPage(currentPage);  // İlk sayfa yüklendiğinde verileri ve pagination'ı getir
 
-    function printTable(){
-      var printWindow = window.open('', '_blank');
-      var tableHtml = document.querySelector('.table').outerHTML;
-
-      /* var styles = document.querySelectorAll('link[rel="stylesheet"], style');
- */
-      printWindow.document.write('<html><head><title>Yazdır</title>');
-
-      /* styles.forEach(function(style){
-        printWindow.document.write(style.outerHTML);
-      }) */
-
-      printWindow.document.write('</head><body>')
-
-      printWindow.document.write(tableHtml);
-      printWindow.document.write('</body></html>');
-
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
-    };
 
   </script>
 {% endblock %}

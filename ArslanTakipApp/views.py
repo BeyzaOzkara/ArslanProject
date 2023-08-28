@@ -603,7 +603,7 @@ def siparis_list(request):
         s = s.order_by(*sor)
     else: s= s.order_by('-SonTermin')
 
-    e['GirenSum'] =locale.format_string("%.0f",  math.ceil(s.aggregate(Sum('GirenKg'))['GirenKg__sum']), grouping=True)
+    e['GirenSum'] =locale.format_string("%.0f",  s.aggregate(Sum('GirenKg'))['GirenKg__sum'], grouping=True)
     e['KgSum'] = locale.format_string("%.0f", math.ceil(s.aggregate(Sum('Kg'))['Kg__sum']), grouping=True)
     e['TopTenSum'] = ""
 
