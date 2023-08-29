@@ -685,5 +685,23 @@ def siparis_child(request, pNo):
     data = json.dumps(gonder)
     return HttpResponse(data)
 
+def siparis_presKodu(request, pNo):
+    kalip = KalipMs.objects.using('dies').values('KalipNo', 'PresKodu', 'Capi')
+    child = kalip.filter(ProfilNo=pNo, AktifPasif="Aktif", Hatali=0)
+    kodlar = {}
+    kalipNoList = list(child.order_by().values_list('KalipNo', flat=True).distinct())
+
+    kalipPresKodu = list(child.order_by().values_list('PresKodu', flat=True).distinct())
+    uRaporuPresKodu = list(PresUretimRaporu.objects.using('dies').filter(KalipNo__in = kalipNoList).order_by().values_list('PresKodu', flat=True).distinct())
+    uRaporuPresKodu = [x.strip(' ') for x in uRaporuPresKodu]
+
+    diff = [x for x in uRaporuPresKodu if x not in kalipPresKodu]
+
+    kodlar = kalipPresKodu + diff
+    print(kodlar)
+  
+    return JsonResponse(kodlar, safe=False)
+
+
 class EkSiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/eksiparis.html'

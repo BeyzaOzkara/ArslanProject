@@ -82,7 +82,24 @@
         font-weight: 500;
         color: #ffffff;
     }
+
+    .modal.fade form {
+      width: 80%;
+    }
     
+    .modal.fade form label, .modal.fade form input, .modal.fade form select {
+      display: inline-block;
+    }
+
+    .modal.fade form label {
+      width: 30%;
+      text-align: left;
+    }
+
+    .modal.fade form label+input, .modal.fade form label+select {
+      width: 30%;
+      margin: 0 30% 0 4%;
+    }
 
     @media print {
       .table {
@@ -446,31 +463,30 @@
             </table>
           </div>
 
-
         </div>
-        <div id="ekleKaliplar" class="modal-body">
-          <div style="overflow: auto;">
-            <table class="table kalip table-bordered">
-              <thead>
-                <tr>
-                  <th style="width: 1%;"><input type="checkbox" name="selectAll" id="selectAll"></th>
-                  <th style="width: 6%;">Kalıp No</th>
-                  <th style="width: 5%;">Üretici Firma</th>
-                  <th style="width: 8%;">Tenifer Kalan Ömür Kg</th>
-                  <th style="width: 8%;">Üretim Toplam Kg</th>
-                  <th style="width: 5%;">Pres Kodu</th>
-                  <th style="width: 3%;">Çapı</th>
-                  <th style="width: 5%;">Son Pres Kodu</th>
-                  <th style="width: 9%;">Konum</th>
-                </tr>
-              </thead>
-              <tbody id="kalipTableBody">
-
-              </tbody>
-            </table>
-            <label for="sipEkleKg">KG: <input type="number" name="sipEkleKg" id="siparisEkleKg"></label>
-
-          </div>
+        <div id="ekle" class="modal-body">
+          <form action="" method="post">
+            <div class="row">
+              <div class="container-fluid">
+                <label for="planlananPresKodu">Pres Kodu: </label>
+                <select name="presKodu" id="planlananPresKodu">
+                  <option value="" selected disabled>Seçiniz</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="container-fluid">
+                <label for="planlananTermin">Planlanan Termin: </label>
+                <input type="date" class="date-input" id="planlananTermin" data-field="planlananTermin">
+              </div>
+            </div>
+            <div class="row">
+              <div class="container-fluid">
+                <label for="siparisEkleKg">Planlanan Miktar(kg): </label>
+                <input type="number" name="sipEkleKg" id="siparisEkleKg">
+              </div>
+            </div>
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button" id="btnSiparisEkle" class="btn btn-primary">Ekle</button>
@@ -877,8 +893,12 @@
       var terminTD = kondusTD.nextSibling.nextSibling;
       var topTenTD = terminTD.nextSibling.nextSibling;
       var kSayisiTD = topTenTD.nextSibling.nextSibling;
-
-      document.getElementById("ekleBloke").innerHTML = blokeTD.innerHTML;
+      if (blokeTD.innerHTML == "✓"){
+        document.getElementById("ekleBloke").innerHTML = "Bloke Değil";
+      }
+      else {
+        document.getElementById("ekleBloke").innerHTML = "Bloke";
+      }
       document.getElementById("ekleKartNo").innerHTML = kartNoTD.innerHTML;
       document.getElementById("ekleFirmaAdi").innerHTML = firmaAdiTD.innerHTML;
       document.getElementById("ekleProfilNo").innerHTML = profilNoTD.innerHTML;
@@ -895,78 +915,71 @@
       document.getElementById("ekleTopTen").innerHTML = topTenTD.innerHTML;
       document.getElementById("ekleKSayisi").innerHTML = kSayisiTD.innerHTML;
       
-      loadKalipTable(profilNoTD.innerHTML);
+      loadPresKodu(profilNoTD.innerHTML);
       $('#siparisEkleModal').modal('show'); 
 
     };
 
     $('#siparisEkleModal').on('hidden.bs.modal', function() {
-      $('#selectAll').prop('checked', false);
+      $('#planlananPresKodu').find('option').remove().end().append('<option value="">Seçiniz</option>');
     });
 
-    const renderKalipTable = (kalipData) => {
-      kalipTableBody.empty();  // Clear existing accordion table data
-      kalipData.forEach(item => {
-        // Render accordion table row
-        const row = $('<tr></tr>').html(`
-            <td><input type="checkbox" name="dieCb" value=${item.KalipNo}/></td>
-            <td>${item.KalipNo || '-'}</td>
-            <td>${item.UreticiFirma || '-'}</td>
-            <td>${item.TeniferKalanOmurKg || '-'}</td>
-            <td>${item.UretimToplamKg || '-'}</td>
-            <td>${item.PresKodu || '-'}</td>
-            <td>${item.Capi || '-'}</td>
-            <td>${item.SonPresKodu || '-'}</td>
-            <td>${item.Konum || '-'}</td>
-        `);
-        kalipTableBody.append(row);
-      });
-      
-    };
-
-    // Function to load accordion table data
-    const loadKalipTable = (profilNo) => {
+    const loadPresKodu = (profilNo) => {
+      console.log("LAOD PRES KODU");
       $.ajax({
-      url: `/siparis/child/${profilNo}`,
+      url: `/siparis/presKodu/${profilNo}`,
       method: 'GET',
       dataType: 'json',
-      success: function (kalipData) {
-          renderKalipTable(kalipData);
+      success: function (presData) {
+          //$("#planlananPresKodu").attr('disabled', false);
+          console.log(presData);
+          $.each(presData, function(key, value) {
+            console.log(key, value);
+            $('#planlananPresKodu').append('<option value=' + value + '>' + value + '</option>');
+          });
       },
       error: function (error) {
-          console.error('Error loading die table data:', error);
+          console.error('Error loading pres kodu data:', error);
       }
       });
+
     };
 
-    $('#selectAll').change(function () {
-        $('tbody tr td input[type="checkbox"]').prop('checked', $(this).prop('checked'));
-    });
-
-    function getSelected() {
-      var selectDies = [];
-      let cbs = $('tbody tr td input[name="dieCb"]:checked');
-      cbs.each(function(i, obj){
-        selectDies.push(cbs[i].value.replace("/",""));
-      });
-      return selectDies
+    function getSelectedPresKodu() {
+      var e = document.getElementById('planlananPresKodu');
+      var selectPresKodu = e.value;
+      return selectPresKodu
     };
 
     document.getElementById("btnSiparisEkle").addEventListener("click", function(){
-      let selectedDies = getSelected();
+      let selectedPresKodu = getSelectedPresKodu();
+      let terminDate = $('.date-input').val();
+       console.log(terminDate);
       let siparisEkleKg = document.getElementById('siparisEkleKg').value;
       console.log(siparisEkleKg);
-      if (siparisEkleKg != "" && selectedDies != "") {
+      if (siparisEkleKg != "" && selectedPresKodu != "" && terminDate != "") {
         $('#siparisEkleModal').modal('hide'); 
       }
-      else if (siparisEkleKg == "" && selectedDies == ""){
-        alert("Lütfen kalıp seçip, kilogram değeri giriniz!");
+      else if (siparisEkleKg == "" && selectedPresKodu == "" && terminDate == ""){
+        alert("Lütfen pres ve termin seçip, kilogram değeri giriniz!");
+      }
+      else if (siparisEkleKg == "" && selectedPresKodu == "") {
+        alert("Lütfen pres seçip, kilogram değeri giriniz!");
+      }
+      else if (siparisEkleKg == "" && terminDate == ""){
+        alert("Lütfen termin seçip, kilogram değeri giriniz!");
+      }
+      else if (selectedPresKodu == "" && terminDate == ""){
+        alert("Lütfen pres ve termin seçiniz!");
       }
       else if (siparisEkleKg == "") {
         alert("Lütfen kilogram değeri giriniz!");
       }
-      else if (selectedDies == "") {
-        alert("Lütfen kalıp seçiniz!");
+      else if (selectedPresKodu == "") {
+        alert("Lütfen pres seçiniz!");
+      }
+      else if (terminDate == "") {
+        alert("Lütfen planlanan termin seçiniz!");
       }
 
     });
