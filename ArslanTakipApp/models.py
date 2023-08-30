@@ -151,7 +151,8 @@ class PresUretimRaporu(models.Model):
 
 #siparistamam bloke
 class SiparisList(models.Model):
-    KartNo = models.IntegerField(primary_key=True)
+    Kimlik = models.IntegerField(primary_key=True)
+    KartNo = models.IntegerField(null=True)
     ProfilNo = models.CharField(null=True)
     BulunduguYer = models.CharField(null=True)
     KartAktif = models.IntegerField(null=True)
@@ -172,3 +173,17 @@ class SiparisList(models.Model):
     class Meta:
         managed = False
         db_table = 'View051_ProsesDepoListesi'
+
+class EkSiparis(models.Model):
+    EkNo = models.IntegerField(null=True)
+    SipKartNo = models.IntegerField(null=True)
+    SipKimlik = models.IntegerField(null=True)
+    EkPresKodu = models.CharField(null=True)
+    EkTermin = models.DateTimeField(null=True)
+    EkKg = models.FloatField(null=True, verbose_name="Ek Kg")
+    EkKalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
+    Ekleyen = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        verbose_name="EkSiparis"
+        verbose_name_plural="EkSiparisler"

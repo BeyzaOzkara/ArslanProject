@@ -465,7 +465,9 @@
 
         </div>
         <div id="ekle" class="modal-body">
-          <form action="" method="post">
+          <form action="" method="post" id="ekleForm">
+            {% csrf_token %}
+            <input type="hidden" name="sipKimlik" value="" id="sipKimlik">
             <div class="row">
               <div class="container-fluid">
                 <label for="planlananPresKodu">Pres Kodu: </label>
@@ -477,7 +479,7 @@
             <div class="row">
               <div class="container-fluid">
                 <label for="planlananTermin">Planlanan Termin: </label>
-                <input type="date" class="date-input" id="planlananTermin" data-field="planlananTermin">
+                <input type="date" name="ekTermin" class="date-input" id="planlananTermin" data-field="planlananTermin">
               </div>
             </div>
             <div class="row">
@@ -893,6 +895,7 @@
       var terminTD = kondusTD.nextSibling.nextSibling;
       var topTenTD = terminTD.nextSibling.nextSibling;
       var kSayisiTD = topTenTD.nextSibling.nextSibling;
+      var sipKimlik = kSayisiTD.nextSibling.nextSibling;
       if (blokeTD.innerHTML == "✓"){
         document.getElementById("ekleBloke").innerHTML = "Bloke Değil";
       }
@@ -914,7 +917,8 @@
       document.getElementById("ekleTermin").innerHTML =terminTD.innerHTML;
       document.getElementById("ekleTopTen").innerHTML = topTenTD.innerHTML;
       document.getElementById("ekleKSayisi").innerHTML = kSayisiTD.innerHTML;
-      
+      document.getElementById('sipKimlik').value = sipKimlik.value;
+      console.log(sipKimlik.value);
       loadPresKodu(profilNoTD.innerHTML);
       $('#siparisEkleModal').modal('show'); 
 
@@ -945,18 +949,9 @@
 
     };
 
-    function getSelectedPresKodu() {
-      var e = document.getElementById('planlananPresKodu');
-      var selectPresKodu = e.value;
-      return selectPresKodu
-    };
-
     document.getElementById("btnSiparisEkle").addEventListener("click", function(){
-      let selectedPresKodu = getSelectedPresKodu();
-      let terminDate = $('.date-input').val();
-       console.log(terminDate);
-      let siparisEkleKg = document.getElementById('siparisEkleKg').value;
-      console.log(siparisEkleKg);
+      let selectedPresKodu =document.getElementById('planlananPresKodu').value;
+      
       if (siparisEkleKg != "" && selectedPresKodu != "" && terminDate != "") {
         $('#siparisEkleModal').modal('hide'); 
       }
@@ -981,8 +976,23 @@
       else if (terminDate == "") {
         alert("Lütfen planlanan termin seçiniz!");
       }
+      SubForm();
 
     });
+
+    function SubForm (){
+    $.ajax({
+        url: '/siparis/ekle',
+        type: 'post',
+        data: $('#ekleForm').serialize(),
+        success: function(){
+            alert("Ek Sipariş Kaydedildi!");
+        },
+        error: function (error) {
+          console.error('Error posting data:', error);
+        }
+    });
+};
     
     const tableBody = $('#tableBody');
     let itemsPerPage = 5;  // Başlangıçta varsayılan değer
@@ -1013,6 +1023,7 @@
         <td class="terminTableBody">${item.SonTermin}</td>
         <td class="topTenTableBody">${item.TopTenKg} kg</td>
         <td class="kSayisiTableBody">${item.AktifKalipSayisi + "/" + item.ToplamKalipSayisi || "-"}</td>
+        <input type="hidden" name="Kimlik" id="Kimlik" value="${item.Kimlik}">
         `);
 
         tableBody.append(row);
