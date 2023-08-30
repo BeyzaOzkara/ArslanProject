@@ -183,7 +183,10 @@ class EkSiparis(models.Model):
     EkKg = models.FloatField(null=True, verbose_name="Ek Kg")
     EkKalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
     Ekleyen = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
+    Silindi = models.BooleanField(null=True)
+    Sira = models.IntegerField(null=True)
+    EkDurumu = models.CharField(null=True)
+    
     class Meta:
         verbose_name="EkSiparis"
         verbose_name_plural="EkSiparisler"

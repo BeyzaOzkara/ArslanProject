@@ -20,7 +20,29 @@
 
 <div class="container col-lg-12">
   <h1 class="col-lg-11" style="text-align: center;">Arslan Alüminyum Ek Sipariş Listesi</h1>
+  <h2 class="col-lg-11" style="text-align: center;">YAPIM AŞAMASINDA</h2>
+  <button type="button" id="btnAcilListeKaydet" class="btn btn-info" >Acil Listesi Düzenle</button>
   <div id="ekSiparisTable"></div>
+  <div class="modal fade" id="acilModal" tabindex="-1" aria-labelledby="acilModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Acil Listesi Düzenle</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>YAPIM AŞAMASINDA</h5>
+          <!-- bütün ek siparis listesi movable row tabulator -->
+          <div id="ekSiparisAcilTable"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnAcilDuzenle" class="btn btn-primary">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
@@ -87,12 +109,12 @@
     filterMode:"remote",
     paginationSize:30,
     popupContainer:true,
-    movableRows:true,
     columns:[
+        // sil ve siparistamam ikonu ekle
         {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:30, minWidth:30},
         {title:"Kart No", field:"SipKartNo"},
-        {title:"Ek No", field:"EkNo"},
         {title:"Profil No", field:"ProfilNo"},
+        {title:"Durumu", field:"EkDurumu", visible:false, editor:"select", editorParams:{values:{"okay":"Tamamlandı", "not yet":"Tamamlanmadı", "bloke":"Bloke"}}},
         {title:"Ek Pres Kodu", field:"EkPresKodu"},
         {title:"Ek Termin", field:"EkTermin"},
         {title:"Ek Kg", field:"EkKg"},
@@ -106,6 +128,35 @@
     ],
   });
 
+  btnAcilListe = document.getElementById('btnAcilListeKaydet');
+  btnAcilListe.addEventListener('click', () => {
+    $('#acilModal').modal('show');
+  });
+
+  var ekSiparisAcilTable = new Tabulator("#ekSiparisAcilTable", {
+    height:"700px",
+    layout:"fitDataFill",
+    placeholder:"Ek Sipariş Acil Liste",
+    ajaxURL:"/eksiparis/acil",
+    popupContainer:true,
+    movableRows:true,
+    columns:[
+        {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:30, minWidth:30},
+        {title:"Kart No", field:"SipKartNo"},
+        {title:"Profil No", field:"ProfilNo"},
+        {title:"Durumu", field:"EkDurumu", visible:false},
+        {title:"Ek Pres Kodu", field:"EkPresKodu", visible:false},
+        {title:"Ek Termin", field:"EkTermin"},
+        {title:"Ek Kg", field:"EkKg"},
+        {title:"Firma Adı", field:"FirmaAdi"},
+        {title:"Billet Türü", field:"BilletTuru", visible:false},
+        {title:"Son Termin", field:"SonTermin", visible:false},
+        {title:"Sipariş Kg", field:"GirenKg", visible:false},
+        {title:"Kalan Kg", field:"Kg", visible:false},
+        {title:"Kondüsyon Türü", field:"KondusyonTuru", visible:false},
+        {title:"Toplam Kalan Tenifer", field:"TopTenKg", visible:false},
+    ],
+  });
 
 </script>
 

@@ -711,6 +711,12 @@ def siparis_ekle(request):
         ekSiparis.EkTermin = request.POST['ekTermin']
         ekSiparis.EkKg = request.POST['sipEkleKg']
         ekSiparis.Ekleyen_id = request.user.id
+        ekSiparis.Silindi = False
+        ekSiparis.Sira = list(e).count()+1
+        ekSiparis.EkDurumu = "Tamamlanmadı"
+        if siparis.get(Kimlik = request.POST['sipKimlik']).SiparisTamam == "BLOKE":
+            ekSiparis.EkDurumu = "Bloke"
+
         if not e.filter(SipKartNo = ekSiparis.SipKartNo):
             ekSiparis.EkNo = 1
         else: 
@@ -740,12 +746,13 @@ def eksiparis_list(request):
         },
     )
 
-    ekSiparis = EkSiparis.objects.all().values()
+    ekSiparis = EkSiparis.objects.exclude(Silindi = True).order_by("Sira").values()
     ekSiparisList = list(ekSiparis)
 
     for e in ekSiparisList:
         siparis1 = siparis.get(Kimlik = e['SipKimlik'])
         e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+        e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
         if siparis1:
             e['ProfilNo'] = siparis1.ProfilNo
             e['FirmaAdi'] = siparis1.FirmaAdi
@@ -764,5 +771,41 @@ def eksiparis_list(request):
     ek_count = ekSiparis.count()
     lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
     lastData['data'] = ekSiparisList
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+def eksiparis_acil(request):
+    siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
+        select={
+            "TopTenKg": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
+            "AktifKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
+            "ToplamKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0))"
+        },
+    )
+
+    ekSiparis = EkSiparis.objects.exclude(Silindi = True).order_by("Sira").values()
+    ekSiparisList = list(ekSiparis)
+
+    for e in ekSiparisList:
+        siparis1 = siparis.get(Kimlik = e['SipKimlik'])
+        e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+        e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
+        if siparis1:
+            e['ProfilNo'] = siparis1.ProfilNo
+            e['FirmaAdi'] = siparis1.FirmaAdi
+            e['GirenKg'] = siparis1.GirenKg
+            e['Kg'] = siparis1.Kg
+            e['GirenAdet'] = siparis1.GirenAdet
+            e['Adet'] = siparis1.Adet
+            e['PlanlananMm'] = siparis1.PlanlananMm
+            e['Mm'] = siparis1.Mm
+            e['KondusyonTuru'] = siparis1.KondusyonTuru
+            e['SiparisTamam'] = siparis1.SiparisTamam
+            e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
+            e['BilletTuru'] = siparis1.BilletTuru
+            e['TopTenKg'] = siparis1.TopTenKg
+
+    lastData= []
+    lastData = ekSiparisList
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
