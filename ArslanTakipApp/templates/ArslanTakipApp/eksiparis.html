@@ -114,7 +114,8 @@
         {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:30, minWidth:30},
         {title:"Kart No", field:"SipKartNo"},
         {title:"Profil No", field:"ProfilNo"},
-        {title:"Durumu", field:"EkDurumu", visible:false, editor:"select", editorParams:{values:{"okay":"Tamamlandı", "not yet":"Tamamlanmadı", "bloke":"Bloke"}}},
+        // ek kg ve ek kalan kgye göre progress olabilir tamamlandı tamamlanmadı yeşil renk bloke kırmızı renk
+        {title:"Sipariş Tamam", field:"EkSiparisTamam", visible:false, editor:"select", editorParams:{values:{"Evet":"EVET", "Hayır":"HAYIR", "Bloke":"BLOKE"}}},
         {title:"Ek Pres Kodu", field:"EkPresKodu"},
         {title:"Ek Termin", field:"EkTermin"},
         {title:"Ek Kg", field:"EkKg"},

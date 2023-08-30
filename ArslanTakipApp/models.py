@@ -185,7 +185,8 @@ class EkSiparis(models.Model):
     Ekleyen = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     Silindi = models.BooleanField(null=True)
     Sira = models.IntegerField(null=True)
-    EkDurumu = models.CharField(null=True)
+    EkDurumu = models.FloatField(null=True)
+    EkSiparisTamam = models.CharField(null=True)
     
     class Meta:
         verbose_name="EkSiparis"

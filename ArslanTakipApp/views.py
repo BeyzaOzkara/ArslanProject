@@ -713,9 +713,9 @@ def siparis_ekle(request):
         ekSiparis.Ekleyen_id = request.user.id
         ekSiparis.Silindi = False
         ekSiparis.Sira = list(e).count()+1
-        ekSiparis.EkDurumu = "Tamamlanmadı"
+        ekSiparis.EkSiparisTamam = "HAYIR"
         if siparis.get(Kimlik = request.POST['sipKimlik']).SiparisTamam == "BLOKE":
-            ekSiparis.EkDurumu = "Bloke"
+            ekSiparis.EkSiparisTamam = "BLOKE"
 
         if not e.filter(SipKartNo = ekSiparis.SipKartNo):
             ekSiparis.EkNo = 1
