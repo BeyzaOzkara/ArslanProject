@@ -745,7 +745,8 @@ def eksiparis_list(request):
 
     for e in ekSiparisList:
         siparis1 = siparis.get(Kimlik = e['SipKimlik'])
-        if siparis:
+        e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+        if siparis1:
             e['ProfilNo'] = siparis1.ProfilNo
             e['FirmaAdi'] = siparis1.FirmaAdi
             e['GirenKg'] = siparis1.GirenKg
@@ -756,7 +757,7 @@ def eksiparis_list(request):
             e['Mm'] = siparis1.Mm
             e['KondusyonTuru'] = siparis1.KondusyonTuru
             e['SiparisTamam'] = siparis1.SiparisTamam
-            e['SonTermin'] = siparis1.SonTermin
+            e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
             e['BilletTuru'] = siparis1.BilletTuru
             e['TopTenKg'] = siparis1.TopTenKg
 
