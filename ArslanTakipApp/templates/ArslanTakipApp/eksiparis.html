@@ -20,8 +20,8 @@
 
 <div class="container col-lg-12">
   <h1 class="col-lg-11" style="text-align: center;">Arslan Alüminyum Ek Sipariş Listesi</h1>
-  <h2 class="col-lg-11" style="text-align: center;">YAPIM AŞAMASINDA</h2>
-  <button type="button" id="btnAcilListeKaydet" class="btn btn-info" >Acil Listesi Düzenle</button>
+  <h2 class="col-lg-11" style="text-align: center;">YAPIM AŞAMASINDA (design)</h2>
+  <button type="button" id="btnAcilListeDuzenle" class="btn btn-info" >Acil Listesi Düzenle</button>
   <div id="ekSiparisTable"></div>
   <div class="modal fade" id="acilModal" tabindex="-1" aria-labelledby="acilModalLabel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -33,12 +33,12 @@
           </button>
         </div>
         <div class="modal-body">
-          <h5>YAPIM AŞAMASINDA</h5>
+          {% csrf_token %}
           <!-- bütün ek siparis listesi movable row tabulator -->
           <div id="ekSiparisAcilTable"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="btnAcilDuzenle" class="btn btn-primary">Kaydet</button>
+          <button type="button" id="btnAcilListeKaydet" class="btn btn-primary">Kaydet</button>
         </div>
       </div>
     </div>
@@ -95,6 +95,9 @@
 
     return menu;
   };
+  var handleIcon = function(cell, formatterParams, onRendered){ 
+      return "<i class='fa fa-grip-vertical'></i>";
+  };
 
   var ekSiparisTable = new Tabulator("#ekSiparisTable", {
     height:"700px",
@@ -111,11 +114,13 @@
     popupContainer:true,
     columns:[
         // sil ve siparistamam ikonu ekle
-        {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:30, minWidth:30},
+        {formatter:handleIcon, headerMenu:headerMenu, headerSort:false, frozen:true, width:30, minWidth:30},
         {title:"Kart No", field:"SipKartNo"},
         {title:"Profil No", field:"ProfilNo"},
-        // ek kg ve ek kalan kgye göre progress olabilir tamamlandı tamamlanmadı yeşil renk bloke kırmızı renk
-        {title:"Sipariş Tamam", field:"EkSiparisTamam", visible:false, editor:"select", editorParams:{values:{"Evet":"EVET", "Hayır":"HAYIR", "Bloke":"BLOKE"}}},
+        // ne kadar üretim yapılmış nasıl hesaplanacak?
+        // ek sipariş eklenme gününü tut, pres üretim raporunda o tarihten sonra, o profil noda yapılan üretimler??
+        // data-max = ek kg ve ek kalan kgye göre progress olabilir tamamlandı tamamlanmadı yeşil renk bloke kırmızı renk
+        {title:"Sipariş Tamam", field:"EkSiparisTamam", visible:false, editor:"list", editorParams:{values:{"Evet":"EVET", "Hayır":"HAYIR", "Bloke":"BLOKE"}}},
         {title:"Ek Pres Kodu", field:"EkPresKodu"},
         {title:"Ek Termin", field:"EkTermin"},
         {title:"Ek Kg", field:"EkKg"},
@@ -129,9 +134,11 @@
     ],
   });
 
-  btnAcilListe = document.getElementById('btnAcilListeKaydet');
+  btnAcilListe = document.getElementById('btnAcilListeDuzenle');
   btnAcilListe.addEventListener('click', () => {
     $('#acilModal').modal('show');
+    let data = ekSiparisAcilTable.getData();
+    console.log(data);
   });
 
   var ekSiparisAcilTable = new Tabulator("#ekSiparisAcilTable", {
@@ -158,6 +165,52 @@
         {title:"Toplam Kalan Tenifer", field:"TopTenKg", visible:false},
     ],
   });
+
+  var movedData = {}
+  ekSiparisAcilTable.on("rowMoved", function(row){
+      console.log("row moved");
+      movedData = {};
+      let rows = ekSiparisAcilTable.getRows();
+      rows.forEach(r => {
+        movedData[r._row.data.id] = r.getPosition();
+        console.log(movedData)
+    });
+    movedDataUpdate();
+  });
+
+  let fark = [];
+  const movedDataUpdate = () => {
+    let data = ekSiparisAcilTable.getData();
+    fark = [];
+    data.forEach(d => {
+      if (movedData[d.id] != d.Sira) {
+        ekSiparisAcilTable.updateData([{id:d.id, Sira:movedData[d.id]}]);
+        fark.push({id: d.id , Sira: movedData[d.id]});
+      }
+    });
+  };
+
+  btnAcilKaydet = document.getElementById('btnAcilListeKaydet');
+  btnAcilKaydet.addEventListener('click', () => {
+    $.ajax({
+      url: "/eksiparis/acil",
+      method: "post",
+      data: {
+        'fark': JSON.stringify(fark),
+        'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: function () {
+        console.log("gerceklesti");
+        ekSiparisTable.setData();
+        $('#acilModal').modal('hide');
+        //alert("Acil Liste Kaydedildi!");
+      },
+      error: function (error) {
+      console.error('Error sending moved rows data:', error);
+      }
+    });
+  });
+  
 
 </script>
 

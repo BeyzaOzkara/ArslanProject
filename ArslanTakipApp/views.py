@@ -712,7 +712,7 @@ def siparis_ekle(request):
         ekSiparis.EkKg = request.POST['sipEkleKg']
         ekSiparis.Ekleyen_id = request.user.id
         ekSiparis.Silindi = False
-        ekSiparis.Sira = list(e).count()+1
+        ekSiparis.Sira = e.count()+1
         ekSiparis.EkSiparisTamam = "HAYIR"
         if siparis.get(Kimlik = request.POST['sipKimlik']).SiparisTamam == "BLOKE":
             ekSiparis.EkSiparisTamam = "BLOKE"
@@ -805,7 +805,19 @@ def eksiparis_acil(request):
             e['BilletTuru'] = siparis1.BilletTuru
             e['TopTenKg'] = siparis1.TopTenKg
 
-    lastData= []
-    lastData = ekSiparisList
-    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return HttpResponse(data)
+    if request.method == "GET":
+        lastData= []
+        lastData = ekSiparisList
+        data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+        return HttpResponse(data)
+    elif request.method == "POST":
+        print(request.POST['fark'])
+        fark = request.POST['fark']
+        fark = json.loads(fark)
+        print(fark)
+        for f in fark:
+            print(f['id'])
+            ek = EkSiparis.objects.get(id=f['id'])
+            ek.Sira = f['Sira']
+            ek.save()
+        return HttpResponseRedirect("/eksiparis")

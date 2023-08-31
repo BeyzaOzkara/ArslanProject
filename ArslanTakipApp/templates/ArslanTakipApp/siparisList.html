@@ -929,7 +929,6 @@
     });
 
     const loadPresKodu = (profilNo) => {
-      console.log("LAOD PRES KODU");
       $.ajax({
       url: `/siparis/presKodu/${profilNo}`,
       method: 'GET',
@@ -938,7 +937,6 @@
           //$("#planlananPresKodu").attr('disabled', false);
           console.log(presData);
           $.each(presData, function(key, value) {
-            console.log(key, value);
             $('#planlananPresKodu').append('<option value=' + value + '>' + value + '</option>');
           });
       },
