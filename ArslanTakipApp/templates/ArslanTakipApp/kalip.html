@@ -373,7 +373,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 document.getElementById("infoDurumu").innerText = kal.Silindi;
                 document.getElementById("infoKalipNo").innerText = kal.KalipNo;
                 document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
-                document.getElementById("infoGramaj").innerText = kal.ResimGramaj + " kg/m";
+                document.getElementById("infoGramaj").innerText = kal.ProfilGramaj + " kg/m";
                 document.getElementById("infoSonUretimGramaj").innerText = kal.SonUretimGr + " kg/m";
                 document.getElementById("infoUreticiFirma").innerText = kal.UreticiFirma;
                 document.getElementById("infoSonUretimTarihi").innerText = kal.SonUretimTarih; 
@@ -431,7 +431,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
              topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
             {title:"ÜRETİM TOPLAM", field:"UretimToplamKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
              topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-            {title:"RESİM GRAMAJ", field:"ResimGramaj", headerFilter:"input", visible:false},
+            {title:"PROFİL GRAMAJ", field:"ProfilGramaj", headerFilter:"input", visible:false},
             {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
             {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
             {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},

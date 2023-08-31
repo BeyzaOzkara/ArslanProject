@@ -172,17 +172,18 @@
     <div class="container-fluid col-lg-12">
       <button type="button" id="btnModal" class="btn bg-gradient-info">Arama</button>
       <button type="button" id="btnModalTabulator" class="btn bg-gradient-info">Sırala</button>
-        <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
-        <select id="perPageSelect">
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="40">40</option>
-          <option value="100">100</option>
-          <option value="150">150</option>
-          <option value="200">200</option>
-          <!-- Diğer seçenekleri ekleyebilirsiniz -->
-        </select>
+      <button type="button" id="btnEkSiparisList" class="btn bg-gradient-info">Ek Liste</button>
+      <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
+      <select id="perPageSelect">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="40">40</option>
+        <option value="100">100</option>
+        <option value="150">150</option>
+        <option value="200">200</option>
+        <!-- Diğer seçenekleri ekleyebilirsiniz -->
+      </select>
     </div>
   </div>
   <div class="row">
@@ -454,7 +455,7 @@
                 <td id="ekleKalanKg" data-field="KalanKg"></td>
                 <td id="ekleKalanAdet" data-field="KalanAdet"></td>
                 <td id="eklePlanlananMm" data-field="PlanlananMm"></td>
-                <td id="ekleMm" data-field="Mm"></td>
+                <td id="ekleMm" data-field="Siparismm"></td>
                 <td id="ekleKonusyonTuru" data-field="KondusyonTuru"></td>
                 <td id="ekleTermin" data-field="SonTermin"></td>
                 <td id="ekleTopTen" data-field="TopTenKg"></td>
@@ -482,10 +483,17 @@
                 <input type="date" name="ekTermin" class="date-input" id="planlananTermin" data-field="planlananTermin">
               </div>
             </div>
+
             <div class="row">
               <div class="container-fluid">
                 <label for="siparisEkleKg">Planlanan Miktar(kg): </label>
                 <input type="number" name="sipEkleKg" id="siparisEkleKg">
+              </div>
+            </div>
+            <div class="row">
+              <div class="container-fluid">
+                <label for="planlananAdet">Planlanan Adet: </label>
+                <input type="number" name="planlananAdet" id="planlananAdet">
               </div>
             </div>
           </form>
@@ -522,6 +530,10 @@
             cell.getRow().delete();}
           }
       ],
+  });
+  
+  document.getElementById("btnEkSiparisList").addEventListener('click', function(){
+    location.href = "/eksiparis";
   });
 
   document.getElementById("add-row").addEventListener('click', function(){
@@ -896,6 +908,7 @@
       var topTenTD = terminTD.nextSibling.nextSibling;
       var kSayisiTD = topTenTD.nextSibling.nextSibling;
       var sipKimlik = kSayisiTD.nextSibling.nextSibling;
+      var profilGramaj = sipKimlik.nextSibling.nextSibling;
       if (blokeTD.innerHTML == "✓"){
         document.getElementById("ekleBloke").innerHTML = "Bloke Değil";
       }
@@ -918,7 +931,10 @@
       document.getElementById("ekleTopTen").innerHTML = topTenTD.innerHTML;
       document.getElementById("ekleKSayisi").innerHTML = kSayisiTD.innerHTML;
       document.getElementById('sipKimlik').value = sipKimlik.value;
+      document.getElementById('ProfilGramaj').value = profilGramaj.value;
       console.log(sipKimlik.value);
+      console.log(profilGramaj.value);
+
       loadPresKodu(profilNoTD.innerHTML);
       $('#siparisEkleModal').modal('show'); 
 
@@ -946,6 +962,24 @@
       });
 
     };
+
+    $('#siparisEkleKg').on('change', () => {
+      let boy = (document.getElementById("eklePlanlananMm").innerHTML).slice(0, -3);
+      let gramaj = document.getElementById('ProfilGramaj').value;
+      let kg = document.getElementById('siparisEkleKg').value;
+
+      let adet = Math.ceil((kg*1000)/(boy*gramaj));
+      document.getElementById('planlananAdet').value = adet;
+    });
+
+    $('#planlananAdet').on('change', () => {
+      let boy = (document.getElementById("eklePlanlananMm").innerHTML).slice(0, -3);
+      let gramaj = document.getElementById('ProfilGramaj').value;
+      let adet = document.getElementById('planlananAdet').value;
+
+      let kg = Math.ceil(boy*gramaj*adet/1000);
+      document.getElementById('siparisEkleKg').value = kg;
+    });
 
     document.getElementById("btnSiparisEkle").addEventListener("click", function(){
       let selectedPresKodu =document.getElementById('planlananPresKodu').value;
@@ -1016,12 +1050,13 @@
         <td class="kKgTableBody" style="color: #1F6E8C;font-weight:bold;">${item.Kg} kg</td>
         <td class="kAdetTableBody">${item.Adet} adet</td>
         <td class="planlananMmTableBody">${item.PlanlananMm} mm</td>
-        <td class="mmTableBody">${item.Mm} mm</td>
+        <td class="mmTableBody">${item.Siparismm} mm</td>
         <td class="kondusTableBody">${item.KondusyonTuru}</td>
         <td class="terminTableBody">${item.SonTermin}</td>
         <td class="topTenTableBody">${item.TopTenKg} kg</td>
         <td class="kSayisiTableBody">${item.AktifKalipSayisi + "/" + item.ToplamKalipSayisi || "-"}</td>
         <input type="hidden" name="Kimlik" id="Kimlik" value="${item.Kimlik}">
+        <input type="hidden" name="ProfilGramaj" id="ProfilGramaj" value="${item.Profil_Gramaj}">
         `);
 
         tableBody.append(row);

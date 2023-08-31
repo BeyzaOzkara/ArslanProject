@@ -611,7 +611,7 @@ def siparis_list(request):
         out = [sum(g) for t, g in groupby(TenVList, type)if t is not NoneType]
         e['TopTenSum'] =locale.format_string("%.0f", math.ceil(out[0]), grouping=True)
 
-    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Mm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik')[(page-1)*size:page*size])
+    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[(page-1)*size:page*size])
 
     for a in sip:
         ttk =0
@@ -707,15 +707,13 @@ def siparis_ekle(request):
         ekSiparis = EkSiparis()
         ekSiparis.SipKimlik = request.POST['sipKimlik']
         ekSiparis.SipKartNo = siparis.get(Kimlik = request.POST['sipKimlik']).KartNo
+        ekSiparis.EkAdet = request.POST['planlananAdet']
         ekSiparis.EkPresKodu = request.POST['presKodu']
         ekSiparis.EkTermin = request.POST['ekTermin']
         ekSiparis.EkKg = request.POST['sipEkleKg']
-        ekSiparis.Ekleyen_id = request.user.id
+        ekSiparis.KimTarafindan_id = request.user.id
         ekSiparis.Silindi = False
         ekSiparis.Sira = e.count()+1
-        ekSiparis.EkSiparisTamam = "HAYIR"
-        if siparis.get(Kimlik = request.POST['sipKimlik']).SiparisTamam == "BLOKE":
-            ekSiparis.EkSiparisTamam = "BLOKE"
 
         if not e.filter(SipKartNo = ekSiparis.SipKartNo):
             ekSiparis.EkNo = 1
@@ -737,6 +735,7 @@ def eksiparis_list(request):
         print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
+    users = User.objects.values()
     
     siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
         select={
@@ -753,6 +752,7 @@ def eksiparis_list(request):
         siparis1 = siparis.get(Kimlik = e['SipKimlik'])
         e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
         e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
+        e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
         if siparis1:
             e['ProfilNo'] = siparis1.ProfilNo
             e['FirmaAdi'] = siparis1.FirmaAdi
@@ -761,7 +761,7 @@ def eksiparis_list(request):
             e['GirenAdet'] = siparis1.GirenAdet
             e['Adet'] = siparis1.Adet
             e['PlanlananMm'] = siparis1.PlanlananMm
-            e['Mm'] = siparis1.Mm
+            e['Mm'] = siparis1.Siparismm
             e['KondusyonTuru'] = siparis1.KondusyonTuru
             e['SiparisTamam'] = siparis1.SiparisTamam
             e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
@@ -785,11 +785,13 @@ def eksiparis_acil(request):
 
     ekSiparis = EkSiparis.objects.exclude(Silindi = True).order_by("Sira").values()
     ekSiparisList = list(ekSiparis)
+    users = User.objects.values()
 
     for e in ekSiparisList:
         siparis1 = siparis.get(Kimlik = e['SipKimlik'])
         e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
         e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
+        e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
         if siparis1:
             e['ProfilNo'] = siparis1.ProfilNo
             e['FirmaAdi'] = siparis1.FirmaAdi
@@ -798,7 +800,7 @@ def eksiparis_acil(request):
             e['GirenAdet'] = siparis1.GirenAdet
             e['Adet'] = siparis1.Adet
             e['PlanlananMm'] = siparis1.PlanlananMm
-            e['Mm'] = siparis1.Mm
+            e['Mm'] = siparis1.Siparismm
             e['KondusyonTuru'] = siparis1.KondusyonTuru
             e['SiparisTamam'] = siparis1.SiparisTamam
             e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")

@@ -116,7 +116,7 @@ class KalipMs(models.Model):
     SonUretimGr = models.FloatField(null=True)
     UretimTenSonrasiKg = models.FloatField(null=True)
     UretimToplamKg = models.FloatField(null=True)
-    ResimGramaj = models.FloatField(null=True)
+    ProfilGramaj = models.FloatField(null=True)
     KalipAciklama = models.CharField(null=True)
     SikayetVar = models.IntegerField(null=True)
     KaliteAciklama = models.CharField(null=True)
@@ -162,12 +162,13 @@ class SiparisList(models.Model):
     Kg = models.FloatField(null=True, verbose_name="Kalan Kg")
     Adet = models.FloatField(null=True)
     PlanlananMm = models.FloatField(null=True)
-    Mm = models.FloatField(null=True)
+    Siparismm = models.FloatField(null=True)
     SonTermin = models.DateTimeField(null=True)
     FirmaAdi = models.CharField(null=True)
     KondusyonTuru = models.CharField(null=True)
     BilletTuru = models.CharField(null=True)
     PresKodu = models.CharField(null=True)
+    Profil_Gramaj = models.FloatField(null=True)
 
 
     class Meta:
@@ -182,11 +183,11 @@ class EkSiparis(models.Model):
     EkTermin = models.DateTimeField(null=True)
     EkKg = models.FloatField(null=True, verbose_name="Ek Kg")
     EkKalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
-    Ekleyen = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    KimTarafindan = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     Silindi = models.BooleanField(null=True)
     Sira = models.IntegerField(null=True)
     EkDurumu = models.FloatField(null=True)
-    EkSiparisTamam = models.CharField(null=True)
+    EkAdet = models.IntegerField(null=True)
     
     class Meta:
         verbose_name="EkSiparis"
