@@ -562,6 +562,7 @@ def siparis_list(request):
 
     start3 = time.time()
     if len(filter_list)>0:
+        siTamam = 0
         for i in filter_list:
             if i['field'] == 'TopTenKg':
                 q["ProfilNo"+"__in"] = siparis_TopTenFiltre(i)
@@ -581,10 +582,21 @@ def siparis_list(request):
                 q[i['field'] +"__gte"] = i['type']
                 q[i['field'] +"__lt"] = i['value']
             else:q[i['field']] = i['value']
+            print(q)
 
             if i['field'] != 'SiparisTamam':
-                s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
-            else: s = s.filter(**q).order_by('-SonTermin')
+                siTamam = 1
+                """ print("if1")
+                s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin') """
+            """ else: 
+                print("else1")
+                s = s.filter(**q).order_by('-SonTermin') """
+        if siTamam != 1:
+            print("if1")
+            s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
+        else:
+            print("else1") 
+            s = s.filter(**q).order_by('-SonTermin')
     else:
         s = s.exclude(SiparisTamam = 'BLOKE')
     
@@ -602,8 +614,14 @@ def siparis_list(request):
         s = s.order_by(*sor)
     else: s= s.order_by('-SonTermin')
 
-    e['GirenSum'] =locale.format_string("%.0f",  s.aggregate(Sum('GirenKg'))['GirenKg__sum'], grouping=True)
-    e['KgSum'] = locale.format_string("%.0f", math.ceil(s.aggregate(Sum('Kg'))['Kg__sum']), grouping=True)
+    girenSum = s.aggregate(Sum('GirenKg'))['GirenKg__sum']
+    kgSum = s.aggregate(Sum('Kg'))['Kg__sum']
+    if girenSum == None :
+        girenSum = 0
+    if kgSum == None :
+        kgSum = 0
+    e['GirenSum'] =locale.format_string("%.0f",  girenSum, grouping=True)
+    e['KgSum'] = locale.format_string("%.0f", math.ceil(kgSum), grouping=True)
     e['TopTenSum'] = ""
 
     if hesap == 1:
