@@ -540,7 +540,6 @@
     if (document.getElementById("kriter").value != ""){
         deger = document.getElementById(document.getElementById("kriter").value).getAttribute("data-field");
         modalTable.addData({field:deger,isim:document.getElementById("kriter").value, type:document.getElementById("yon").value, }, false);
-        console.log(document.getElementById("kriter").value);
         document.getElementById(document.getElementById("kriter").value).disabled = true;
         document.getElementById("selected").selected = true;
     }
@@ -552,7 +551,6 @@
         if($(this).val() != ""){
           document.getElementById($(this).val()).disabled = false;
         }
-        //console.log($(this).val());
       });
       sorterList = [];
       $('#tabulatorModal').modal('hide');
@@ -562,13 +560,8 @@
   });
 
   document.getElementById("btnTabSirala").addEventListener("click", function(){
-    console.log(modalTable.getData());
     let modalData = modalTable.getData();
-    for( i in modalData) {
-      console.log(modalData[i])
-    };
     sorterList = modalData;
-    console.log(sorterList);
 
     $('#tabulatorModal').modal('hide');
     loadPage(currentPage);
@@ -932,8 +925,6 @@
       document.getElementById("ekleKSayisi").innerHTML = kSayisiTD.innerHTML;
       document.getElementById('sipKimlik').value = sipKimlik.value;
       document.getElementById('ProfilGramaj').value = profilGramaj.value;
-      console.log(sipKimlik.value);
-      console.log(profilGramaj.value);
 
       loadPresKodu(profilNoTD.innerHTML);
       $('#siparisEkleModal').modal('show'); 
@@ -951,7 +942,6 @@
       dataType: 'json',
       success: function (presData) {
           //$("#planlananPresKodu").attr('disabled', false);
-          console.log(presData);
           $.each(presData, function(key, value) {
             $('#planlananPresKodu').append('<option value=' + value + '>' + value + '</option>');
           });
@@ -1037,8 +1027,14 @@
         // Verileri render et...
         let SiparisTamamSymbol = ""
         if (item.SiparisTamam == 'BLOKE'){ SiparisTamamSymbol = '✗'}else { SiparisTamamSymbol ='✓'} ;
+        if (SiparisTamamSymbol == '✓' ){
+          var ek = `<td class="ekleTableBody" onclick="myFunction(this)">+</td>`
+        }
+        else {
+          var ek = `<td class="ekleTableBody" > </td>`
+        }
         const row = $('<tr class="main-row"></tr>').html(`
-        <td class="ekleTableBody" onclick="myFunction(this)">+</td>}
+        ${ek}
         <td class="blokeTableBody">${SiparisTamamSymbol}</td>
         <td class="kartTableBody">${item.KartNo}</td>
         <td class="firmaTableBody">${item.FirmaAdi}</td>
@@ -1062,13 +1058,6 @@
         tableBody.append(row);
       });
     };
-
-/*     {% if SiparisTamamSymbol == '✓' %} 
-        <td class="ekleTableBody" onclick="myFunction(this)">+</td>
-        {% endif %}
-        {% if SiparisTamamSymbol == '✗' %} 
-          <td class="ekleTableBody"></td>
-        {% endif %} */
 
     let girenMax =0;
     let kgMax =0;
