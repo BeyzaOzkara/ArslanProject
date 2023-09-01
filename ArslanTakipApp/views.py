@@ -755,24 +755,29 @@ def eksiparis_list(request):
     ekSiparisList = list(ekSiparis)
 
     for e in ekSiparisList:
-        siparis1 = siparis.get(Kimlik = e['SipKimlik'])
-        e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
-        e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
-        e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
-        if siparis1:
-            e['ProfilNo'] = siparis1.ProfilNo
-            e['FirmaAdi'] = siparis1.FirmaAdi
-            e['GirenKg'] = siparis1.GirenKg
-            e['Kg'] = siparis1.Kg
-            e['GirenAdet'] = siparis1.GirenAdet
-            e['Adet'] = siparis1.Adet
-            e['PlanlananMm'] = siparis1.PlanlananMm
-            e['Mm'] = siparis1.Siparismm
-            e['KondusyonTuru'] = siparis1.KondusyonTuru
-            e['SiparisTamam'] = siparis1.SiparisTamam
-            e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
-            e['BilletTuru'] = siparis1.BilletTuru
-            e['TopTenKg'] = siparis1.TopTenKg
+        if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
+            ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo']).update(Silindi = True)
+            ekSiparisList.remove(e)
+        else:
+            siparis1 = siparis.get(Kimlik = e['SipKimlik'])
+            e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+            e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
+            e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
+            if siparis1:
+                e['ProfilNo'] = siparis1.ProfilNo
+                e['FirmaAdi'] = siparis1.FirmaAdi
+                e['GirenKg'] = siparis1.GirenKg
+                e['Kg'] = siparis1.Kg
+                e['GirenAdet'] = siparis1.GirenAdet
+                e['Adet'] = siparis1.Adet
+                e['PlanlananMm'] = siparis1.PlanlananMm
+                e['Mm'] = siparis1.Siparismm
+                e['KondusyonTuru'] = siparis1.KondusyonTuru
+                e['SiparisTamam'] = siparis1.SiparisTamam
+                e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
+                e['BilletTuru'] = siparis1.BilletTuru
+                e['TopTenKg'] = siparis1.TopTenKg
+            
 
     ek_count = ekSiparis.count()
     lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
@@ -794,24 +799,28 @@ def eksiparis_acil(request):
     users = User.objects.values()
 
     for e in ekSiparisList:
-        siparis1 = siparis.get(Kimlik = e['SipKimlik'])
-        e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
-        e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
-        e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
-        if siparis1:
-            e['ProfilNo'] = siparis1.ProfilNo
-            e['FirmaAdi'] = siparis1.FirmaAdi
-            e['GirenKg'] = siparis1.GirenKg
-            e['Kg'] = siparis1.Kg
-            e['GirenAdet'] = siparis1.GirenAdet
-            e['Adet'] = siparis1.Adet
-            e['PlanlananMm'] = siparis1.PlanlananMm
-            e['Mm'] = siparis1.Siparismm
-            e['KondusyonTuru'] = siparis1.KondusyonTuru
-            e['SiparisTamam'] = siparis1.SiparisTamam
-            e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
-            e['BilletTuru'] = siparis1.BilletTuru
-            e['TopTenKg'] = siparis1.TopTenKg
+        if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
+            ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo']).update(Silindi = True)
+            ekSiparisList.remove(e)
+        else:
+            siparis1 = siparis.get(Kimlik = e['SipKimlik'])
+            e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+            e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
+            e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
+            if siparis1:
+                e['ProfilNo'] = siparis1.ProfilNo
+                e['FirmaAdi'] = siparis1.FirmaAdi
+                e['GirenKg'] = siparis1.GirenKg
+                e['Kg'] = siparis1.Kg
+                e['GirenAdet'] = siparis1.GirenAdet
+                e['Adet'] = siparis1.Adet
+                e['PlanlananMm'] = siparis1.PlanlananMm
+                e['Mm'] = siparis1.Siparismm
+                e['KondusyonTuru'] = siparis1.KondusyonTuru
+                e['SiparisTamam'] = siparis1.SiparisTamam
+                e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
+                e['BilletTuru'] = siparis1.BilletTuru
+                e['TopTenKg'] = siparis1.TopTenKg
 
     if request.method == "GET":
         lastData= []
@@ -819,12 +828,9 @@ def eksiparis_acil(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
     elif request.method == "POST":
-        print(request.POST['fark'])
         fark = request.POST['fark']
         fark = json.loads(fark)
-        print(fark)
         for f in fark:
-            print(f['id'])
             ek = EkSiparis.objects.get(id=f['id'])
             ek.Sira = f['Sira']
             ek.save()
