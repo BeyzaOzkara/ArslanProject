@@ -582,21 +582,11 @@ def siparis_list(request):
                 q[i['field'] +"__gte"] = i['type']
                 q[i['field'] +"__lt"] = i['value']
             else:q[i['field']] = i['value']
-            print(q)
 
-            if i['field'] != 'SiparisTamam':
-                siTamam = 1
-                """ print("if1")
-                s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin') """
-            """ else: 
-                print("else1")
-                s = s.filter(**q).order_by('-SonTermin') """
-        if siTamam != 1:
-            print("if1")
-            s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
-        else:
-            print("else1") 
+        if any(d['field'] == 'SiparisTamam' for d in filter_list):
             s = s.filter(**q).order_by('-SonTermin')
+        else : s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
+
     else:
         s = s.exclude(SiparisTamam = 'BLOKE')
     

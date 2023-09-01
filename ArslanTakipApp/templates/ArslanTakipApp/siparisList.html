@@ -1038,7 +1038,7 @@
         let SiparisTamamSymbol = ""
         if (item.SiparisTamam == 'BLOKE'){ SiparisTamamSymbol = '✗'}else { SiparisTamamSymbol ='✓'} ;
         const row = $('<tr class="main-row"></tr>').html(`
-        <td class="ekleTableBody" onclick="myFunction(this)">+</td>
+        <td class="ekleTableBody" onclick="myFunction(this)">+</td>}
         <td class="blokeTableBody">${SiparisTamamSymbol}</td>
         <td class="kartTableBody">${item.KartNo}</td>
         <td class="firmaTableBody">${item.FirmaAdi}</td>
@@ -1062,6 +1062,13 @@
         tableBody.append(row);
       });
     };
+
+/*     {% if SiparisTamamSymbol == '✓' %} 
+        <td class="ekleTableBody" onclick="myFunction(this)">+</td>
+        {% endif %}
+        {% if SiparisTamamSymbol == '✗' %} 
+          <td class="ekleTableBody"></td>
+        {% endif %} */
 
     let girenMax =0;
     let kgMax =0;
