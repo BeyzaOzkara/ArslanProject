@@ -34,7 +34,6 @@
         </div>
         <div class="modal-body">
           {% csrf_token %}
-          <!-- bütün ek siparis listesi movable row tabulator -->
           <div id="ekSiparisAcilTable"></div>
         </div>
         <div class="modal-footer">
@@ -116,6 +115,8 @@
         // sil ikonu ekle
         {formatter:handleIcon, headerMenu:headerMenu, hozAlign:"center", title:"", headerSort:false, frozen:true, width:50, minWidth:50},
         {title:"Kart No", field:"SipKartNo"},
+        {title:"Silindi", field:"Silindi"},
+        {title:"MsSilindi", field:"MsSilindi"},
         {title:"Profil No", field:"ProfilNo"},
         // ne kadar üretim yapılmış nasıl hesaplanacak?
         // ek sipariş eklenme gününü tut, pres üretim raporunda o tarihten sonra, o profil noda yapılan üretimler??

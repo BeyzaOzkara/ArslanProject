@@ -185,6 +185,7 @@ class EkSiparis(models.Model):
     EkKalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
     KimTarafindan = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     Silindi = models.BooleanField(null=True)
+    MsSilindi = models.BooleanField(null=True)
     Sira = models.IntegerField(null=True)
     EkDurumu = models.FloatField(null=True)
     EkAdet = models.IntegerField(null=True)

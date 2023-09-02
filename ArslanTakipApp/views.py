@@ -751,12 +751,14 @@ def eksiparis_list(request):
         },
     )
 
-    ekSiparis = EkSiparis.objects.exclude(Silindi = True).order_by("Sira").values()
-    ekSiparisList = list(ekSiparis)
+    ekSiparis = EkSiparis.objects.order_by("Sira").exclude(MsSilindi = True)
+    ekSiparisList = list(ekSiparis.values())
 
     for e in ekSiparisList:
         if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
-            ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo']).update(Silindi = True)
+            a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
+            a.MsSilindi = True
+            a.save()
             ekSiparisList.remove(e)
         else:
             siparis1 = siparis.get(Kimlik = e['SipKimlik'])
@@ -794,13 +796,15 @@ def eksiparis_acil(request):
         },
     )
 
-    ekSiparis = EkSiparis.objects.exclude(Silindi = True).order_by("Sira").values()
-    ekSiparisList = list(ekSiparis)
     users = User.objects.values()
+    ekSiparis = EkSiparis.objects.order_by("Sira").exclude(MsSilindi = True)
+    ekSiparisList = list(ekSiparis.values())
 
     for e in ekSiparisList:
         if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
-            ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo']).update(Silindi = True)
+            a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
+            a.MsSilindi = True
+            a.save()
             ekSiparisList.remove(e)
         else:
             siparis1 = siparis.get(Kimlik = e['SipKimlik'])
@@ -828,9 +832,12 @@ def eksiparis_acil(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
     elif request.method == "POST":
+        print(request.POST['fark'])
         fark = request.POST['fark']
         fark = json.loads(fark)
+        print(fark)
         for f in fark:
+            print(f['id'])
             ek = EkSiparis.objects.get(id=f['id'])
             ek.Sira = f['Sira']
             ek.save()
