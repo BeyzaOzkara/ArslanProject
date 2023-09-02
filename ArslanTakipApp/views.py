@@ -18,7 +18,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
-from django.db.models import Q, Sum, Max, Count, Case, When
+from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -38,15 +38,18 @@ class RegisterView(generic.CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/register.html"
 
+def calculate_pagination(page, size):
+    offset = (page - 1) * size
+    limit = page * size
+    return (offset, limit)
+
 def compare(s, t):
     return sorted(s) == sorted(t)
 
 def guncelle(i, b, u):
     for j in b:
-        print(j[0])
         if i == 'KalipNo':
             k = KalipMs.objects.using('dies').get(KalipNo = j[0])
-            print(k.ProfilNo)
             kalip = Kalip()
             kalip.KalipNo = k.KalipNo
             kalip.ProfilNo = k.ProfilNo
@@ -159,6 +162,7 @@ def kalip_liste(request):
         #print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
+    offset, limit = calculate_pagination(page, size)
     filter_list = params["filter"]
     query = KalipMs.objects.using('dies').all()
     location_list = Location.objects.values()
@@ -180,7 +184,7 @@ def kalip_liste(request):
     
     query = query.filter(**q).order_by('-UretimTarihi') 
 
-    g = list(query.values()[(page-1)*size:page*size])
+    g = list(query.values()[offset:limit])
 
     for c in g:
         if c['UretimTarihi'] != None:
@@ -227,6 +231,7 @@ def kalip_rapor(request):
         print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
+    offset, limit = calculate_pagination(page, size)
     filter_list = params["filter"]
     q = {} 
     kalip_count = 0
@@ -243,7 +248,7 @@ def kalip_rapor(request):
         query = PresUretimRaporu.objects.using('dies').all()
         query = query.filter(**q).order_by('-Tarih') 
 
-        g = list(query.values()[(page-1)*size:page*size])
+        g = list(query.values()[offset:limit])
         for c in g:
             if c['Tarih'] != None:
                 c['Tarih'] = c['Tarih'].strftime("%d-%m-%Y") + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
@@ -276,7 +281,6 @@ def location_hareket(request):
         kalip_l = list(DiesLocation.objects.filter(kalipNo=hareketK).values())
         users = User.objects.values()
         harAr = []
-        print(hareketQuery)
         for h in hareketQuery:
             har ={}
             har['id'] = h['id']
@@ -295,9 +299,6 @@ def location_hareket(request):
             har['kimTarafindan'] = list(users.filter(id=int(h['kimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(h['kimTarafindan_id'])))[0]["last_name"] 
             har['hareketTarihi'] = h['hareketTarihi'].strftime("%d-%m-%Y %H:%M:%S")
             harAr.append(har)
-            print(h)
-            print(har)
-        print(harAr)
         hareket_count = len(harAr)
 
         lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
@@ -541,25 +542,26 @@ def siparis_list(request):
             "ToplamKalipSayisi":"(SELECT COUNT(*) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0))"
         },
     )
-    k = KalipMs.objects.using('dies').all()
     
+    #validation for when params is missing or malformatted
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
         print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
-    page = params["page"]
+    offset, limit = calculate_pagination(params["page"], size)
     filter_list = params["filter"]
     sorter_List = params["sL"]
     hesap = params["h"]
     q={}
     
     e ={}
+
     e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
     e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
+
     e['TopTenMax'] = s.values_list('TopTenKg',flat=True).order_by('-TopTenKg').first()
 
-    start3 = time.time()
     if len(filter_list)>0:
         for i in filter_list:
             if i['field'] == 'TopTenKg':
@@ -602,8 +604,14 @@ def siparis_list(request):
         s = s.order_by(*sor)
     else: s= s.order_by('-SonTermin')
 
-    girenSum = s.aggregate(Sum('GirenKg'))['GirenKg__sum']
-    kgSum = s.aggregate(Sum('Kg'))['Kg__sum']
+    
+    sums = s.aggregate(
+        giren_sum = Sum('GirenKg'),
+        kg_sum = Sum('Kg'),
+        )
+    girenSum = sums['giren_sum']
+    kgSum = sums['kg_sum']
+    
     if girenSum == None :
         girenSum = 0
     if kgSum == None :
@@ -617,7 +625,7 @@ def siparis_list(request):
         out = [sum(g) for t, g in groupby(TenVList, type)if t is not NoneType]
         e['TopTenSum'] =locale.format_string("%.0f", math.ceil(out[0]), grouping=True)
 
-    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[(page-1)*size:page*size])
+    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[offset:limit]) #[(page-1)*size:page*size])
 
     for a in sip:
         ttk =0
@@ -645,8 +653,6 @@ def siparis_TopTenFiltre(i):
     diff = [x for x in sProfil if x not in kPList]
     if len(diff)>0 :
         profilList += diff #azalan sıralarken böyle artan sıralarken diff +=profilList return diff
-        print(diff)
-        print(profilList)
     
     return profilList
 
@@ -719,6 +725,7 @@ def siparis_ekle(request):
         ekSiparis.EkKg = request.POST['sipEkleKg']
         ekSiparis.KimTarafindan_id = request.user.id
         ekSiparis.Silindi = False
+        ekSiparis.MsSilindi = False
         ekSiparis.Sira = e.count()+1
 
         if not e.filter(SipKartNo = ekSiparis.SipKartNo):
@@ -757,8 +764,9 @@ def eksiparis_list(request):
     for e in ekSiparisList:
         if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
             a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
-            a.MsSilindi = True
-            a.save()
+            if a.MsSilindi != True:
+                a.MsSilindi = True
+                a.save()
             ekSiparisList.remove(e)
         else:
             siparis1 = siparis.get(Kimlik = e['SipKimlik'])
@@ -803,8 +811,9 @@ def eksiparis_acil(request):
     for e in ekSiparisList:
         if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
             a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
-            a.MsSilindi = True
-            a.save()
+            if a.MsSilindi != True:
+                a.MsSilindi = True
+                a.save()
             ekSiparisList.remove(e)
         else:
             siparis1 = siparis.get(Kimlik = e['SipKimlik'])

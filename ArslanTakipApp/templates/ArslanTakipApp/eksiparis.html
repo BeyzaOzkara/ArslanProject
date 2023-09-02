@@ -142,6 +142,10 @@
     console.log(data);
   });
 
+  var deleteIcon = function(cell, formatterParams, onRendered){ 
+    return "<i class='fa fa-trash'></i>";
+  };
+
   var ekSiparisAcilTable = new Tabulator("#ekSiparisAcilTable", {
     height:"700px",
     layout:"fitDataFill",
@@ -149,6 +153,17 @@
     ajaxURL:"/eksiparis/acil",
     popupContainer:true,
     movableRows:true,
+    rowFormatter: row => {
+      let data = row.getData();
+        if (data.Silindi == true) {
+          row.getElement().style.color = "#a3050a" 
+          data.Silindi = "Evet";
+          }
+        else if (data.Silindi == false) {
+          data.Silindi = "Hayır";
+          console.log("hayır");
+        }
+    },
     columns:[
         {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:40, minWidth:40},
         {title:"Kart No", field:"SipKartNo"},
@@ -165,17 +180,20 @@
         {title:"Kalan Kg", field:"Kg", visible:false},
         {title:"Kondüsyon Türü", field:"KondusyonTuru", visible:false},
         {title:"Toplam Kalan Tenifer", field:"TopTenKg", visible:false},
+        {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+            //cell.getRow().delete();
+            //var s_id = cell.getData().id;
+            //üstünü çiz kaydete bastıktan sonra silinmesi için post
+        }},
     ],
   });
 
   var movedData = {}
   ekSiparisAcilTable.on("rowMoved", function(row){
-      console.log("row moved");
       movedData = {};
       let rows = ekSiparisAcilTable.getRows();
       rows.forEach(r => {
         movedData[r._row.data.id] = r.getPosition();
-        console.log(movedData)
     });
     movedDataUpdate();
   });
@@ -202,7 +220,6 @@
         'csrfmiddlewaretoken': '{{ csrf_token }}'
       },
       success: function () {
-        console.log("gerceklesti");
         ekSiparisTable.setData();
         $('#acilModal').modal('hide');
         //alert("Acil Liste Kaydedildi!");
