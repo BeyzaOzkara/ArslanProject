@@ -570,8 +570,90 @@
     loadPage(currentPage);
   });
     
-    /* ION SLIDER */
-    $('#range_1').ionRangeSlider({
+  function initSlider(elementId, updateFunc) {
+    $(elementId).ionRangeSlider({
+      min     : 0,
+      max     : 500000,
+      from    : 0,
+      to      : 10000,
+      type    : 'double',
+      step    : 1,
+      postfix  : ' kg',
+      prettify: false,
+      hasGrid : true,
+      onFinish: function(data){
+        var field = $(elementId).data('field');
+        filter = filter.filter(f => f.field !== field);
+        filter.push({ field: field, type: data.from, value: data.to });
+        updateFunc(data);
+      },
+      onChange: updateFunc
+    });
+  }
+
+  initSlider("#range_1", updateInputs1);
+  initSlider("#range_2", updateInputs2);
+  initSlider("#range_3", updateInputs3);
+
+  var from1 =0;
+  var to1=0;
+  var min1 = 0;
+  var from2 =0;
+  var to2=0;
+  var min2 = 0;
+  var from3 =0;
+  var to3=0;
+  var min3 = 0;
+
+  function updateInputs1(data){
+      from1 = data.from;
+      to1 = data.to;
+      $('#sip1').prop("value", from1);
+      $('#sip2').prop("value", to1);
+    };
+
+  function updateInputs2(data){
+    from2 = data.from;
+    to2 = data.to;
+    $('#kalan1').prop("value", from2);
+    $('#kalan2').prop("value", to2);
+  };
+  
+  function updateInputs3(data){
+      from3 = data.from;
+      to3 = data.to;
+      $('#topten1').prop("value", from3);
+      $('#topten2').prop("value", to3);
+
+  };
+
+
+  function addInputChangeHandler(inputElementId, sliderDataKey, fromToKey, minVal) {
+  $(inputElementId).on("change", function() {
+    var val = $(this).prop("value");
+    var slider = $(sliderDataKey).data("ionRangeSlider");
+
+    // validate
+    if (val < minVal) val = minVal;
+    else if (val > slider.result[fromToKey]) val = slider.result[fromToKey];
+
+    var updateObj = {};
+    updateObj[fromToKey] = val;
+    slider.update(updateObj);
+    $(this).prop("value", val);
+  });
+}
+
+addInputChangeHandler('#sip1', '#range_1', 'from', min1);
+addInputChangeHandler('#sip2', '#range_1', 'to', min1);
+addInputChangeHandler('#kalan1', '#range_2', 'to', min2);
+addInputChangeHandler('#kalan2', '#range_2', 'to', min2);
+addInputChangeHandler('#topten1', '#range_3', 'to', min3);
+addInputChangeHandler('#topten2', '#range_3', 'to', min3);
+
+  // Add more calls as needed
+    
+/*     $('#range_1').ionRangeSlider({
       min     : 0,
       max     : 500000,
       from    : 0,
@@ -606,7 +688,6 @@
 
     $('#sip1').on("change", function () {
       var val = $(this).prop("value");
-      // validate
       if (val < min1) {val = min1;
       } else if (val > to1) {val = to1;}
       sliders1.update({
@@ -617,7 +698,7 @@
 
     $('#sip2').on("change", function () {
       var val = $(this).prop("value");
-      // validate
+
       if (val < from1) {val = from1;
       } else if (val > to1) {val = to1;}
       sliders1.update({
@@ -637,8 +718,8 @@
       prettify: false,
       hasGrid : true,
       onFinish: function(data){
-        var from = data.from;   // input data-from attribute
-        var to = data.to;       // input data-to attribute
+        var from = data.from;   
+        var to = data.to;       
         var field = $( "#range_2" ).data('field');
         filter = filter.filter(f => f.field !== field);
         filter.push({ field: field, type: from, value: to});
@@ -661,7 +742,7 @@
 
     $('#kalan1').on("change", function () {
       var val = $(this).prop("value");
-      // validate
+
       if (val < min1) {val = min2;
       } else if (val > to2) {val = to2;}
       sliders2.update({
@@ -672,7 +753,7 @@
 
     $('#kalan2').on("change", function () {
       var val = $(this).prop("value");
-      // validate
+
       if (val < from2) {val = from2;
       } else if (val > to2) {val = to2;}
       sliders2.update({
@@ -691,8 +772,8 @@
       prettify: false,
       hasGrid : true,
       onFinish: function(data){
-        var from = data.from;   // input data-from attribute
-        var to = data.to;       // input data-to attribute
+        var from = data.from;   
+        var to = data.to;       
         var field = $( "#range_3" ).data('field');
         filter = filter.filter(f => f.field !== field);
         filter.push({ field: field, type: from, value: to});
@@ -717,7 +798,7 @@
     $('#topten1').on("change", function () {
       var sliders3 = $("#range_3").data("ionRangeSlider");
       var val = $('#topten1').prop("value");
-      // validate
+
       if (val < min3) {val = min3;
       } else if (val > to3) {val = to3;}
       sliders3.update({
@@ -728,7 +809,7 @@
 
     $('#topten2').on("change", function () {
       var val = $(this).prop("value");
-      // validate
+
       if (val < from3) {val = from3;
       } else if (val > to3) {val = to3;}
       slider3.update({
@@ -736,7 +817,7 @@
       });
       $(this).prop("value", val);
     });
-
+ */
     //Date range picker
     $('#terminDate').daterangepicker({
       "locale": {
@@ -852,6 +933,12 @@
         to:kgMax
       });
       slider2.reset();
+      slider3 = $("#range_3").data("ionRangeSlider");
+      slider3.update({
+        from:0,
+        to:topMax
+      });
+      slider3.reset();
       filter = [];
     });
 
@@ -1055,10 +1142,28 @@
         success: function (paginatedData) {
           renderData(paginatedData.data);
           renderPagination(paginatedData.last_page);
-          girenMax = paginatedData.e.GirenMax;
-          kgMax = paginatedData.e.KgMax;
-          topMax = paginatedData.e.TopTenMax;
           topSum = paginatedData.e.TopTenSum;
+          if (h==1){
+            $('#sipTopTen').html(topSum+" kg");
+            h = 0;
+          }
+          else {$('#sipTopTen').html("hesapla");}
+        },
+        error: function (error) {
+          console.error('Error loading paginated data:', error);
+        }
+      });
+
+      $.ajax({
+        url: `/siparis/max`,
+        method: 'GET',
+        data: { params: JSON.stringify(params)},
+        dataType: 'json',
+        success: function (maxData) {
+          console.log(maxData);
+          girenMax = maxData.GirenMax;
+          kgMax = maxData.KgMax;
+          topMax = maxData.TopTenMax;
           var slider1 = $("#range_1").data("ionRangeSlider");
           slider1.update({
               max: girenMax,
@@ -1086,20 +1191,14 @@
           $('#kalan2').prop("value", to2);
           $('#topten1').prop("value", from3);
           $('#topten2').prop("value", to3);
-          let girenSum = paginatedData.e.GirenSum;
-          let kgSum = paginatedData.e.KgSum;
+          let girenSum = maxData.GirenSum;
+          let kgSum = maxData.KgSum;
           $('#sipTopKg').html(girenSum+" kg");
           $('#sipKalKg').html(kgSum+" kg");
-          if (h==1){
-            $('#sipTopTen').html(topSum+" kg");
-            h = 0;
-          }
-          else {$('#sipTopTen').html("hesapla");}
-        },
-        error: function (error) {
-          console.error('Error loading paginated data:', error);
+
         }
       });
+
       
     };
 

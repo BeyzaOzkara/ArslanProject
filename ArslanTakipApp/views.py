@@ -1,4 +1,6 @@
 import base64, binascii, zlib
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 from types import NoneType
 from itertools import groupby
@@ -18,7 +20,8 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
-from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields
+from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
+
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -573,15 +576,77 @@ def handle_siparis_tamam_filter(s, field, value):
             return None
     else:
         return value
+    
+# Helper function for aggregation and formatting
+def aggregate_and_format(queryset, field):
+    max_val = math.ceil(queryset.aggregate(Max(field))[f'{field}__max'])
+    return locale.format_string("%.0f", max_val, grouping=True)
+
+def aggregate_multiple_and_format(queryset, fields):
+    annotations = {f"{field}__max": Max(field) for field in fields}
+    aggregated = queryset.aggregate(**annotations)
+    
+    formatted = {}
+    for field in fields:
+        max_key = f"{field}__max"
+        max_val = math.ceil(aggregated[max_key])
+        formatted[field] = locale.format_string("%.0f", max_val, grouping=True)
+        
+    return formatted
+# Helper function for annotation and initial query
+def annotate_siparis():
+    return SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')
+                                                 ).annotate(
+    TopTenKg=Subquery(
+        KalipMs.objects.using('dies').filter(
+            ProfilNo=OuterRef('ProfilNo'),
+            AktifPasif='Aktif',
+            Hatali=0,
+            TeniferKalanOmurKg__gte=0
+        ).values('ProfilNo').annotate(
+            total=Sum('TeniferKalanOmurKg')
+        ).values('total')[:1]
+    ),
+    AktifKalipSayisi=Subquery(
+        KalipMs.objects.using('dies').filter(
+            ProfilNo=OuterRef('ProfilNo'),
+            AktifPasif='Aktif',
+            Hatali=0,
+            TeniferKalanOmurKg__gte=0
+        ).values('ProfilNo').annotate(
+            cnt=Count('*')
+        ).values('cnt')[:1]
+    ),
+    ToplamKalipSayisi=Subquery(
+        KalipMs.objects.using('dies').filter(
+            ProfilNo=OuterRef('ProfilNo'),
+            AktifPasif='Aktif',
+            Hatali=0
+        ).values('ProfilNo').annotate(
+            cnt=Count('*')
+        ).values('cnt')[:1]
+    )
+    )
+
+def format_item(a):
+    ttk = 0
+    if a['AktifKalipSayisi']:
+        ttk = math.ceil(a['TopTenKg'])
+    a['SonTermin'] = a['SonTermin'].strftime("%d-%m-%Y")
+    a['GirenKg'] = locale.format_string("%.0f", math.ceil(a["GirenKg"]), grouping=True)
+    a['Kg'] = locale.format_string("%.0f", math.ceil(a["Kg"]), grouping=True)
+    a['TopTenKg'] = locale.format_string("%.0f", ttk, grouping=True)
+    return a
+
+def aggregate_in_parallel(queryset, fields):
+    with ThreadPoolExecutor() as executor:
+        future_to_field = {executor.submit(aggregate_and_format, queryset, field): field for field in fields}
+        return {future_to_field[future]: future.result() for future in concurrent.futures.as_completed(future_to_field)}
+ 
 
 def siparis_list(request):
-    s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
-        select={
-            "TopTenKg": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
-            "AktifKalipSayisi":"(SELECT COUNT(*) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
-            "ToplamKalipSayisi":"(SELECT COUNT(*) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0))"
-        },
-    )
+    # Step 1: Initial Query and Annotation
+    s = annotate_siparis()
     
     #validation for when params is missing or malformatted
     params = json.loads(unquote(request.GET.get('params')))
@@ -594,13 +659,7 @@ def siparis_list(request):
     sorter_List = params["sL"]
     hesap = params["h"]
     q={}
-    
     e ={}
-
-    e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
-    e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
-
-    e['TopTenMax'] = s.values_list('TopTenKg',flat=True).order_by('-TopTenKg').first()
 
     if len(filter_list)>0:
         q = apply_filters(s, filter_list)
@@ -609,33 +668,8 @@ def siparis_list(request):
             s = s.filter(**q).order_by('-SonTermin')
         else:
             s = s.exclude(SiparisTamam='BLOKE').filter(**q).order_by('-SonTermin')
-        """ for i in filter_list:
-            if i['field'] == 'TopTenKg':
-                q["ProfilNo"+"__in"] = siparis_TopTenFiltre(i)
-            elif i["type"] == "like":
-                if i['field'] != 'FirmaAdi':
-                    q[i['field']+"__startswith"] = i['value']
-                else: q[i['field']+"__contains"] = i['value']
-            elif i["type"] == "=":
-                if i['field'] == 'SiparisTamam':
-                    if i['value'] == 'BLOKE':
-                        q[i['field']] = i['value']
-                    elif i['value'] == 'degil':
-                        s = s.exclude(SiparisTamam ='BLOKE')
-                    else: s =s
-                else: q[i['field']] = i['value']
-            elif i['type'] != i['value']:
-                q[i['field'] +"__gte"] = i['type']
-                q[i['field'] +"__lt"] = i['value']
-            else:q[i['field']] = i['value']
-
-        if any(d['field'] == 'SiparisTamam' for d in filter_list):
-            s = s.filter(**q).order_by('-SonTermin')
-        else : s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
-
     else:
-        s = s.exclude(SiparisTamam = 'BLOKE') """
-    
+        s = s.exclude(SiparisTamam='BLOKE')
     sor =[]
     if len(sorter_List)>0:
         for j in sorter_List:
@@ -650,20 +684,6 @@ def siparis_list(request):
         s = s.order_by(*sor)
     else: s= s.order_by('-SonTermin')
 
-    
-    sums = s.aggregate(
-        giren_sum = Sum('GirenKg'),
-        kg_sum = Sum('Kg'),
-        )
-    girenSum = sums['giren_sum']
-    kgSum = sums['kg_sum']
-    
-    if girenSum == None :
-        girenSum = 0
-    if kgSum == None :
-        kgSum = 0
-    e['GirenSum'] =locale.format_string("%.0f",  girenSum, grouping=True)
-    e['KgSum'] = locale.format_string("%.0f", math.ceil(kgSum), grouping=True)
     e['TopTenSum'] = ""
 
     if hesap == 1:
@@ -673,15 +693,9 @@ def siparis_list(request):
 
     sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[offset:limit]) #[(page-1)*size:page*size])
 
-    for a in sip:
-        ttk =0
-        if a['AktifKalipSayisi']:
-            ttk = math.ceil(a['TopTenKg'])
-        a['SonTermin'] =a['SonTermin'].strftime("%d-%m-%Y")
-        a['GirenKg'] = locale.format_string("%.0f", math.ceil(a["GirenKg"]), grouping=True)
-        a['Kg'] = locale.format_string("%.0f", math.ceil(a["Kg"]), grouping=True)
-        a['TopTenKg'] = locale.format_string("%.0f", ttk, grouping=True)
-        #a['TopTenKg'] = f'{ttk:,}'
+    with ThreadPoolExecutor() as executor:
+        sip = list(executor.map(format_item, sip))
+
     sip_count = s.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': [], 'e':e}
     lastData['data'] = sip
@@ -706,11 +720,20 @@ def siparis_max(request):
     s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
     k= KalipMs.objects.using('dies').filter(TeniferKalanOmurKg__gte = 0, AktifPasif="Aktif", Hatali=0)
     e ={}
+
     e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
     e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
-
-    e['GirenSum'] = math.ceil(s.aggregate(Sum('GirenKg'))['GirenKg__sum'])
-    e['KgSum'] = math.ceil(s.aggregate(Sum('Kg'))['Kg__sum'])
+    
+    sums = s.aggregate(
+        giren_sum = Sum('GirenKg'),
+        kg_sum = Sum('Kg'),
+        )
+    if sums['giren_sum'] == None :
+        sums['giren_sum'] = 0
+    if sums['kg_sum'] == None :
+        sums['kg_sum'] = 0
+    e['GirenSum'] = math.ceil(sums['giren_sum'])
+    e['KgSum'] = math.ceil(sums['kg_sum'])
 
     sProfil = list(s.values_list('ProfilNo', flat=True).distinct())
     proTop = k.filter(ProfilNo__in = sProfil).values('ProfilNo').annotate(psum = Sum('TeniferKalanOmurKg'))
