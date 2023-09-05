@@ -789,82 +789,53 @@
     $('#terminDate').on('apply.daterangepicker', function(ev, picker) {
       var start = picker.startDate;
       var end = picker.endDate;
-      var field = $( "#terminDate" ).data('field');
+      let field = $( "#terminDate" ).data('field');
       filter = filter.filter(f => f.field !== field);
       filter.push({ field: field, type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')});
       $( "#terminDate" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
     });
 
+    function applyFilter(filter, fieldId, fieldType, condition = '=') {
+      const fieldValue = $(`#${fieldId}`).val();
+      const field = $(`#${fieldId}`).data('field');
+      filter = filter.filter(f => f.field !== field);
+      if (fieldValue && fieldValue.length > 0) {
+        filter.push({ field, type: condition, value: fieldValue });
+      }
+      if (fieldType === 'select' && fieldValue === 'degil') {
+        // Do nothing or some specific logic if needed.
+      }
+      return filter;
+    }
+
     btnFiltre = document.getElementById('btnFiltre');
     btnFiltre.addEventListener('click', () => {
-      
-      var blokeValue = $("#blokeDurumu").val();
-      if (blokeValue != null) {
-        var field = $( "#blokeDurumu" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (blokeValue != 'degil'){
-          filter.push({ field: field, type: '=', value: blokeValue});
-        }
-      };
-      
-      var kartNoValue = $( "#inKartNo" ).val();
-      if (kartNoValue.length > 0){
-        var field = $( "#inKartNo" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (kartNoValue) {
-            filter.push({ field: field, type: 'like', value: kartNoValue});
-        }
-      };
 
-      var PresValue = $( "#inPresK" ).val();
-      if (PresValue.length > 0){
-        var field = $( "#inPresK" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (PresValue) {
-            filter.push({ field: field, type: 'like', value: PresValue});
-        }
-      };
+      // Bloke Durumu (Select box)
+      filter = applyFilter(filter, 'blokeDurumu', 'select');
 
-      var FirmaAdiValue = $( "#inFirma" ).val();
-      if (FirmaAdiValue.length > 0){
-        var field = $( "#inFirma" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (FirmaAdiValue) {
-            filter.push({ field: field, type: 'like', value: FirmaAdiValue});
-        }
-      };
-      
-      var profilNoValue = $( "#inProfilNo" ).val();
-      if (profilNoValue.length > 0){
-        var field = $( "#inProfilNo" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (profilNoValue) {
-            filter.push({ field: field, type: '=', value: profilNoValue});
-        }
-      };
-      
-      var billetValue = $( "#inBillet" ).val();
-      if (billetValue.length > 0){
-        var field = $( "#inBillet" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (billetValue) {
-            filter.push({ field: field, type: 'like', value: billetValue});
-        }
-      };
-      
-      var kondusValue = $( "#inKondus" ).val();
-      if (kondusValue.length > 0){
-        var field = $( "#inKondus" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        if (kondusValue) {
-            filter.push({ field: field, type: 'like', value: kondusValue});
-        }
-      };
+      // Kart No (Text input)
+      filter = applyFilter(filter, 'inKartNo', 'text', 'like');
+
+      // Pres (Text input)
+      filter = applyFilter(filter, 'inPresK', 'text', 'like');
+
+      // Firma Adi (Text input)
+      filter = applyFilter(filter, 'inFirma', 'text', 'like');
+
+      // Profil No (Text input)
+      filter = applyFilter(filter, 'inProfilNo', 'text');
+
+      // Billet (Text input)
+      filter = applyFilter(filter, 'inBillet', 'text', 'like');
+
+      // Kondus (Text input)
+      filter = applyFilter(filter, 'inKondus', 'text', 'like');
 
       $('#searchModal').modal('hide');
       loadPage(currentPage);
-
     });
+
 
     btnTemiz = document.getElementById('btnTemizle');
     btnTemiz.addEventListener('click', () => {

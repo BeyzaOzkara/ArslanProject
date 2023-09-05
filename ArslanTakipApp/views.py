@@ -534,6 +534,46 @@ def qrDeneme(request):
 class SiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/siparisList.html'
 
+def apply_filters(s, filter_list):
+    q = {}
+    print("apply")
+    for i in filter_list:
+        field = i['field']
+        value = i['value']
+        filter_type = i['type']
+
+        print(field)
+        if field == 'TopTenKg':
+            print("ProfilNo")
+            q["ProfilNo__in"] = siparis_TopTenFiltre(i)
+        elif filter_type == 'like':
+            print("like")
+            q[field + "__startswith" if field != 'FirmaAdi' else field + "__contains"] = value
+            print(q)
+        elif filter_type == '=':
+            print("equal")
+            q[field] = handle_siparis_tamam_filter(s, field, value)
+        elif filter_type != value:
+            print("type")
+            q[field + "__gte"] = filter_type
+            q[field + "__lt"] = value
+        else:
+            q[field] = value
+
+    return q
+
+def handle_siparis_tamam_filter(s, field, value):
+    print("handle")
+    if field == 'SiparisTamam':
+        if value == 'BLOKE':
+            return value
+        elif value == 'degil':
+            s = s.exclude(SiparisTamam='BLOKE')
+        else:
+            return None
+    else:
+        return value
+
 def siparis_list(request):
     s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
         select={
@@ -563,7 +603,13 @@ def siparis_list(request):
     e['TopTenMax'] = s.values_list('TopTenKg',flat=True).order_by('-TopTenKg').first()
 
     if len(filter_list)>0:
-        for i in filter_list:
+        q = apply_filters(s, filter_list)
+
+        if any(d['field'] == 'SiparisTamam' for d in filter_list):
+            s = s.filter(**q).order_by('-SonTermin')
+        else:
+            s = s.exclude(SiparisTamam='BLOKE').filter(**q).order_by('-SonTermin')
+        """ for i in filter_list:
             if i['field'] == 'TopTenKg':
                 q["ProfilNo"+"__in"] = siparis_TopTenFiltre(i)
             elif i["type"] == "like":
@@ -588,7 +634,7 @@ def siparis_list(request):
         else : s = s.exclude(SiparisTamam = 'BLOKE').filter(**q).order_by('-SonTermin')
 
     else:
-        s = s.exclude(SiparisTamam = 'BLOKE')
+        s = s.exclude(SiparisTamam = 'BLOKE') """
     
     sor =[]
     if len(sorter_List)>0:
