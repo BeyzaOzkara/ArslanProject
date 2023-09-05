@@ -670,6 +670,7 @@ def siparis_list(request):
             s = s.exclude(SiparisTamam='BLOKE').filter(**q).order_by('-SonTermin')
     else:
         s = s.exclude(SiparisTamam='BLOKE')
+
     sor =[]
     if len(sorter_List)>0:
         for j in sorter_List:
@@ -717,25 +718,25 @@ def siparis_TopTenFiltre(i):
     return profilList
 
 def siparis_max(request):
-    s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    base_s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
     k= KalipMs.objects.using('dies').filter(TeniferKalanOmurKg__gte = 0, AktifPasif="Aktif", Hatali=0)
-    e ={}
-
-    e['GirenMax'] =math.ceil(s.aggregate(Max('GirenKg'))['GirenKg__max'])
-    e['KgMax'] = math.ceil(s.aggregate(Max('Kg'))['Kg__max'])
     
-    sums = s.aggregate(
+    # Perform aggregation once and access values
+    aggr = base_s.aggregate(
+        giren_max = Max('GirenKg'),
+        kg_max = Max('Kg'),
         giren_sum = Sum('GirenKg'),
-        kg_sum = Sum('Kg'),
-        )
-    if sums['giren_sum'] == None :
-        sums['giren_sum'] = 0
-    if sums['kg_sum'] == None :
-        sums['kg_sum'] = 0
-    e['GirenSum'] = math.ceil(sums['giren_sum'])
-    e['KgSum'] = math.ceil(sums['kg_sum'])
-
-    sProfil = list(s.values_list('ProfilNo', flat=True).distinct())
+        kg_sum = Sum('Kg')
+    )
+    
+    e = {
+        'GirenMax': math.ceil(aggr['giren_max'] or 0),
+        'KgMax': math.ceil(aggr['kg_max'] or 0),
+        'GirenSum': math.ceil(aggr['giren_sum'] or 0),
+        'KgSum': math.ceil(aggr['kg_sum'] or 0),
+    }
+    
+    sProfil = list(base_s.values_list('ProfilNo', flat=True).distinct())
     proTop = k.filter(ProfilNo__in = sProfil).values('ProfilNo').annotate(psum = Sum('TeniferKalanOmurKg'))
     sonuc = proTop.aggregate(Max('psum'))['psum__max']
     e['TopTenMax']  = math.ceil(sonuc)
