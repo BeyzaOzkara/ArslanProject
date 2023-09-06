@@ -1381,20 +1381,23 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     };
 
     tableBody.on('click', '.main-row', function () {
-      document.getElementById('tableBody').style="pointer-events:none;";
-      const profilNo = $(this).find('td:nth-child(5)').text();  // Assuming ProfilNo is in the 3rd column
-      if (profilNo) {
-        const mainTableRow = $(this);
-        const accordionRow = mainTableRow.next('.akordeon');
-        
-        if (accordionRow.length) { 
-          accordionRow.slideToggle();
-          document.getElementById('tableBody').style="";
-        } else {
-          // Load and render accordion table data
-          loadAccordionTable(profilNo, mainTableRow);
+      const str = $(this).find('td:nth-child(17)').text();
+      const tKalipSayisi = str.slice(str.indexOf('/') + 1);
+      if(tKalipSayisi != "-"){
+        document.getElementById('tableBody').style="pointer-events:none;";
+        const profilNo = $(this).find('td:nth-child(5)').text();  // Assuming ProfilNo is in the 3rd column
+        if (profilNo) {
+          const mainTableRow = $(this);
+          const accordionRow = mainTableRow.next('.akordeon');
+          
+          if (accordionRow.length) { 
+            accordionRow.slideToggle();
+            document.getElementById('tableBody').style="";
+          } else {
+            // Load and render accordion table data
+            loadAccordionTable(profilNo, mainTableRow);
+          }
         }
-        
       }
     });
 
