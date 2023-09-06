@@ -20,6 +20,52 @@
   
   <style>
     /* Add your custom styles here */
+    /* Center the loader */
+  #loader {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+  }
+
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Add animation to "page content" */
+  .animate-bottom {
+    position: relative;
+    -webkit-animation-name: animatebottom;
+    -webkit-animation-duration: 1s;
+    animation-name: animatebottom;
+    animation-duration: 1s
+  }
+
+  @-webkit-keyframes animatebottom {
+    from { bottom:-100px; opacity:0 } 
+    to { bottom:0px; opacity:1 }
+  }
+
+  @keyframes animatebottom { 
+    from{ bottom:-100px; opacity:0 } 
+    to{ bottom:0; opacity:1 }
+  }
+
     .table {
       width: 98%;
         border-collapse: collapse;
@@ -172,7 +218,7 @@
   <div class="row">
     <div class="container-fluid col-lg-12">
       <div style="width: 98%;">
-      <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
+        <label for="perPageSelect" id="pageSelectLabel">Sipariş Sayısı:</label>
         <select id="perPageSelect">
           <option value="5">5</option>
           <option value="10">10</option>
@@ -190,7 +236,8 @@
     </div>
   </div>
   <div class="row">
-    <div class="container-fluid col-lg-12">
+    <div id="loader"></div>
+    <div class="container-fluid col-lg-12" id="myDiv">
       <table class="table">
         <thead>
           <tr>
@@ -557,6 +604,7 @@
       });
       sorterList = [];
       $('#tabulatorModal').modal('hide');
+      document.getElementById("loader").style.display = "block";
       loadPage(currentPage);
 
       //document.getElementById(document.getElementById("kriter").value).disabled = false;
@@ -567,6 +615,9 @@
     sorterList = modalData;
 
     $('#tabulatorModal').modal('hide');
+
+    document.getElementById("loader").style.display = "block";
+    console.log("sırala loader display block");
     loadPage(currentPage);
   });
     
@@ -883,6 +934,9 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       if (fieldValue && fieldValue.length > 0) {
         filter.push({ field, type: condition, value: fieldValue });
       }
+      if (fieldType === 'select' && fieldValue === 'degil') {
+        // Do nothing or some specific logic if needed.
+      }
       return filter;
     }
 
@@ -911,6 +965,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       filter = applyFilter(filter, 'inKondus', 'text', 'like');
 
       $('#searchModal').modal('hide');
+      document.getElementById("loader").style.display = "block";
       loadPage(currentPage);
     });
 
@@ -1072,7 +1127,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
           console.error('Error posting data:', error);
         }
     });
-};
+    };
     
     const tableBody = $('#tableBody');
     let itemsPerPage = 5;  // Başlangıçta varsayılan değer
@@ -1115,6 +1170,8 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
 
         tableBody.append(row);
       });
+      document.getElementById("loader").style.display = "none";
+      console.log("renderdata loader none");
     };
 
     let girenMax =0;
@@ -1261,6 +1318,8 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
           currentPage = parseInt($(this).text());
         }
 
+        document.getElementById("loader").style.display = "block";
+        console.log("renderpag loader block");
         loadPage(currentPage);
       });
     };
@@ -1280,51 +1339,6 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       return visiblePages;
     };
 
-    
-    $('.filter-dropdown').on('change', function(){
-        const field = $(this).data('field');
-        const value = $(this).val();
-
-        // Remove existing filter for the field if it exists
-        filter = filter.filter(f => f.field !== field);
-
-        // Add new filter for the field based on the selected value
-        if (value === "degil") {
-            filter.push({ field: field, type: '=', value: 'degil' });
-        } else if (value === "BLOKE") {
-            filter.push({ field: field, type: '=', value: 'BLOKE' });
-        } else if (value === "hepsi") {
-            filter.push({ field: field, type: '=', value: 'hepsi' });
-        }
-
-        // Reload the current page with the updated filter
-        loadPage(currentPage);
-        });
-
-    $('.search-input').on('input', function(){
-        const field = $(this).data('field');
-        const value = $(this).val();
-
-        filter = filter.filter(f => f.field !== field);
-
-        if (value) {
-            filter.push({ field: field, type: 'like', value: value});
-        }
-
-        loadPage(currentPage);
-    });
-    $('.search-date-input').on('input', function(){
-        const field = $(this).data('field');
-        const value = $(this).val();
-
-        filter = filter.filter(f => f.field !== field);
-
-        if (value) {
-            filter.push({ field: field, type: '=', value: value});
-        }
-
-        loadPage(currentPage);
-    });
 
     const renderAccordionTable = (accordionData, mainTableRow) => {
       const accordionRow = $('<tr class="akordeon"><td colspan="17"><div class="container"><div class="row"><div class="col-md-12"><table class="table table-bordered"><thead><tr><th style="width: 6%;">Kalıp No</th><th style="width: 5%;">Üretici Firma</th><th style="width: 8%;">Tenifer Kalan Ömür Kg</th><th style="width: 8%;">Üretim Toplam Kg</th><th style="width: 5%;">Pres Kodu</th><th style="width: 3%;">Çapı</th><th style="width: 5%;">Son Pres Kodu</th><th style="width: 10%;">Konum</th></tr></thead><tbody id="accordionTableBody"></tbody></table></div></div></div></td></tr>');
@@ -1386,6 +1400,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     $('#perPageSelect').on('change', function () {
       itemsPerPage = parseInt($(this).val());
       currentPage = 1;  // Sayfa değiştiğinde ilk sayfaya geç
+      document.getElementById("loader").style.display = "block";
       loadPage(currentPage);
     });
 
