@@ -28,5 +28,7 @@ urlpatterns = [
     path('siparis/presKodu/<str:pNo>', views.siparis_presKodu),
     path('eksiparis/list', views.eksiparis_list),
     path('eksiparis/acil', views.eksiparis_acil),
+    path('kalipfirini/', views.KalipFirinView.as_view()),
+    path('kalipfirini/meydan', views.kalipfirini_meydan),
 
 ]

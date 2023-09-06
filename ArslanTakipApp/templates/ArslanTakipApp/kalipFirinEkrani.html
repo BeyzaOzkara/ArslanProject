@@ -1,0 +1,138 @@
+{% extends 'adminlte/base.html' %}
+
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+
+  <style>
+
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    .content-wrapper {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .row:first-child, .row:nth-child(2) { /* This targets the first and second row */
+      flex-grow: 1;
+      min-height: 50%;  /* This makes each row 50% height of the parent container */
+      display: flex;
+      align-items: stretch;
+    }
+    .card, .table {  /* This makes the card and table take 100% height of their respective row */
+      height: 100%;
+    }
+
+  </style>
+
+{% endblock %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-md-2">
+      <div class="card bg-primary text-white">
+        <div class="card-body">1. GÖZ</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-secondary text-white">
+        <div class="card-body">2. GÖZ</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-success text-white">
+        <div class="card-body">3. GÖZ</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-danger text-white">
+        <div class="card-body">4. GÖZ</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-warning text-white">
+        <div class="card-body">5. GÖZ</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-info text-white">
+        <div class="card-body">6. GÖZ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-md-12">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>KALIP NO</th>
+            <th>KALAN TENİFER</th>
+            <th>KALIP NO</th>
+            <th>KALAN TENİFER</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kalıp 1</td>
+            <td>Ten 1</td>
+            <td>Kalıp 2</td>
+            <td>Ten 2</td>
+          </tr>
+          <tr>
+            <td>Kalıp 3</td>
+            <td>Ten 3</td>
+            <td>Kalıp 4</td>
+            <td>Ten 4</td>
+          </tr>
+          <tr>
+            <td>Kalıp 5</td>
+            <td>Ten 5</td>
+            <td>Kalıp 6</td>
+            <td>Ten 6</td>
+          </tr>
+          <tr>
+            <td>Kalıp 7</td>
+            <td>Ten 7</td>
+            <td>Kalıp 8</td>
+            <td>Ten 8</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+  {% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}

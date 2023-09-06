@@ -1199,7 +1199,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
           renderPagination(paginatedData.last_page);
           topSum = paginatedData.e.TopTenSum;
           if (h==1){
-            $('#sipTopTen').html(topSum+" kg");
+            $('#sipTopTen').html(topSum);
             h = 0;
           }
           else {$('#sipTopTen').html("hesapla");}
@@ -1247,8 +1247,8 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
           $('#topten2').prop("value", to3);
           let girenSum = maxData.GirenSum;
           let kgSum = maxData.KgSum;
-          $('#sipTopKg').html(girenSum+" kg");
-          $('#sipKalKg').html(kgSum+" kg");
+          $('#sipTopKg').html(girenSum);
+          $('#sipKalKg').html(kgSum);
 
         }
       });

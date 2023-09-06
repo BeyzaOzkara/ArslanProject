@@ -728,10 +728,10 @@ def siparis_max(request):
     )
     
     e = {
-        'GirenMax': math.ceil(aggr['giren_max'] or 0),
-        'KgMax': math.ceil(aggr['kg_max'] or 0),
-        'GirenSum': math.ceil(aggr['giren_sum'] or 0),
-        'KgSum': math.ceil(aggr['kg_sum'] or 0),
+        'GirenMax':  locale.format_string("%.0f", math.ceil(aggr['giren_max'] or 0), grouping=True),
+        'KgMax':  locale.format_string("%.0f", math.ceil(aggr['kg_max'] or 0), grouping=True),
+        'GirenSum':  locale.format_string("%.0f", math.ceil(aggr['giren_sum'] or 0), grouping=True),
+        'KgSum':  locale.format_string("%.0f", math.ceil(aggr['kg_sum'] or 0), grouping=True),
     }
     
     sProfil = list(base_s.values_list('ProfilNo', flat=True).distinct())
@@ -919,3 +919,10 @@ def eksiparis_acil(request):
             ek.Sira = f['Sira']
             ek.save()
         return HttpResponseRedirect("/eksiparis")
+
+class KalipFirinView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
+
+def kalipfirini_meydan(request):
+    
+    return
