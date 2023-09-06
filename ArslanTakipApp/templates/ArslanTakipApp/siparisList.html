@@ -990,7 +990,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       });
       slider3.reset();
       filter = [];
-      
+
       $('#searchModal').modal('hide');
       document.getElementById("loader").style.display = "block";
       loadPage(currentPage);
@@ -1137,17 +1137,17 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     let sorterList = [];
     const renderData = (data) => {
       tableBody.empty();  // Önceki verileri temizle
-      data.forEach(item => {
-        //let topten = parseFloat(item.TopTenKg).toFixed(2)
-        // Verileri render et...
-        let SiparisTamamSymbol = ""
-        if (item.SiparisTamam == 'BLOKE'){ SiparisTamamSymbol = '✗'}else { SiparisTamamSymbol ='✓'} ;
-        if (SiparisTamamSymbol == '✓' ){
-          var ek = `<td class="ekleTableBody" onclick="myFunction(this)">+</td>`
-        }
-        else {
-          var ek = `<td class="ekleTableBody" > </td>`
-        }
+      data.forEach(item => { // Verileri render et...
+
+        let SiparisTamamSymbol = (item.SiparisTamam === 'BLOKE') ? '✗' : '✓';
+        // Decide whether to include a '+' symbol based on SiparisTamamSymbol
+        let ek = (SiparisTamamSymbol === '✓') 
+           ? `<td class="ekleTableBody" onclick="myFunction(this)">+</td>` 
+           : `<td class="ekleTableBody"> </td>`;
+
+        const aktifKalipSayisi = item.AktifKalipSayisi !== null ? item.AktifKalipSayisi : '-';
+        const toplamKalipSayisi = item.ToplamKalipSayisi !== null ? item.ToplamKalipSayisi : '-';
+
         const row = $('<tr class="main-row"></tr>').html(`
         ${ek}
         <td class="blokeTableBody">${SiparisTamamSymbol}</td>
@@ -1165,7 +1165,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
         <td class="kondusTableBody">${item.KondusyonTuru}</td>
         <td class="terminTableBody">${item.SonTermin}</td>
         <td class="topTenTableBody">${item.TopTenKg} kg</td>
-        <td class="kSayisiTableBody">${item.AktifKalipSayisi + "/" + item.ToplamKalipSayisi || "-"}</td>
+        <td class="kSayisiTableBody">${aktifKalipSayisi}/${toplamKalipSayisi}</td>
         <input type="hidden" name="Kimlik" id="Kimlik" value="${item.Kimlik}">
         <input type="hidden" name="ProfilGramaj" id="ProfilGramaj" value="${item.Profil_Gramaj}">
         `);
@@ -1173,7 +1173,6 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
         tableBody.append(row);
       });
       document.getElementById("loader").style.display = "none";
-      console.log("renderdata loader none");
     };
 
     let girenMax =0;
