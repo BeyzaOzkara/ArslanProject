@@ -883,9 +883,6 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       if (fieldValue && fieldValue.length > 0) {
         filter.push({ field, type: condition, value: fieldValue });
       }
-      if (fieldType === 'select' && fieldValue === 'degil') {
-        // Do nothing or some specific logic if needed.
-      }
       return filter;
     }
 

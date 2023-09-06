@@ -537,45 +537,7 @@ def qrDeneme(request):
 class SiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/siparisList.html'
 
-def apply_filters(s, filter_list):
-    q = {}
-    print("apply")
-    for i in filter_list:
-        field = i['field']
-        value = i['value']
-        filter_type = i['type']
 
-        print(field)
-        if field == 'TopTenKg':
-            print("ProfilNo")
-            q["ProfilNo__in"] = siparis_TopTenFiltre(i)
-        elif filter_type == 'like':
-            print("like")
-            q[field + "__startswith" if field != 'FirmaAdi' else field + "__contains"] = value
-            print(q)
-        elif filter_type == '=':
-            print("equal")
-            q[field] = handle_siparis_tamam_filter(s, field, value)
-        elif filter_type != value:
-            print("type")
-            q[field + "__gte"] = filter_type
-            q[field + "__lt"] = value
-        else:
-            q[field] = value
-
-    return q
-
-def handle_siparis_tamam_filter(s, field, value):
-    print("handle")
-    if field == 'SiparisTamam':
-        if value == 'BLOKE':
-            return value
-        elif value == 'degil':
-            s = s.exclude(SiparisTamam='BLOKE')
-        else:
-            return None
-    else:
-        return value
     
 # Helper function for aggregation and formatting
 def aggregate_and_format(queryset, field):
@@ -642,32 +604,68 @@ def aggregate_in_parallel(queryset, fields):
     with ThreadPoolExecutor() as executor:
         future_to_field = {executor.submit(aggregate_and_format, queryset, field): field for field in fields}
         return {future_to_field[future]: future.result() for future in concurrent.futures.as_completed(future_to_field)}
- 
+
+def apply_filters(s, filter_list):
+    q = {}
+    exclude_conditions = {}
+
+    for i in filter_list:
+        field = i['field']
+        value = i['value']
+        filter_type = i['type']
+
+        if field == 'TopTenKg':
+            q["ProfilNo__in"] = siparis_TopTenFiltre(i)
+        elif filter_type == 'like':
+            q[field + "__startswith" if field != 'FirmaAdi' else field + "__contains"] = value
+        elif filter_type == '=':
+            condition = handle_siparis_tamam_filter(field, value)
+            if condition:
+                if condition[0] == 'exclude':
+                    exclude_conditions[condition[1]] = condition[2]
+                else:
+                    q[condition[0]] = condition[1]
+        elif filter_type != value:
+            q[field + "__gte"] = filter_type
+            q[field + "__lt"] = value
+        else:
+            q[field] = value
+
+    return (q, exclude_conditions)
+
+def handle_siparis_tamam_filter(field, value):
+    if field == 'SiparisTamam':
+        if value == 'BLOKE':
+            return (field, value)
+        elif value == 'degil':
+            return ('exclude', field, 'BLOKE')
+    else:
+        return (field, value)
 
 def siparis_list(request):
-    # Step 1: Initial Query and Annotation
-    s = annotate_siparis()
-    
     #validation for when params is missing or malformatted
-    params = json.loads(unquote(request.GET.get('params')))
+    params = json.loads(unquote(request.GET.get('params', '{}')))
     for i in params:
         value = params[i]
         print("Key and Value pair are ({}) = ({})".format(i, value))
-    size = params["size"]
-    offset, limit = calculate_pagination(params["page"], size)
-    filter_list = params["filter"]
-    sorter_List = params["sL"]
-    hesap = params["h"]
+    size = params.get("size", 10)  # Default size to 10
+    offset, limit = calculate_pagination(params.get("page", 1), size)
+    filter_list = params.get("filter", [])
+    sorter_List = params.get("sL", [])
+    hesap = params.get("h", {})
+    
+    # Step 1: Initial Query and Annotation
+    s = annotate_siparis()
+    
     q={}
     e ={}
 
     if len(filter_list)>0:
-        q = apply_filters(s, filter_list)
+        q, exclude_cond = apply_filters(s, filter_list)
+        if exclude_cond:
+            s = s.exclude(**exclude_cond)
 
-        if any(d['field'] == 'SiparisTamam' for d in filter_list):
-            s = s.filter(**q).order_by('-SonTermin')
-        else:
-            s = s.exclude(SiparisTamam='BLOKE').filter(**q).order_by('-SonTermin')
+        s = s.filter(**q).order_by('-SonTermin')
     else:
         s = s.exclude(SiparisTamam='BLOKE')
 
