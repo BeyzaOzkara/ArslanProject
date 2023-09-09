@@ -30,5 +30,6 @@ urlpatterns = [
     path('eksiparis/acil', views.eksiparis_acil),
     path('kalipfirini/', views.KalipFirinView.as_view()),
     path('kalipfirini/meydan', views.kalipfirini_meydan),
+    path('kalipfirini/goz', views.kalipfirini_goz),
 
 ]

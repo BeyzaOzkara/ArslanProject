@@ -13,7 +13,7 @@ class Location(models.Model):
         return self.locationName
     
     class Meta:
-        permissions = [("dg_view_location", "Gorme Yetkisi Var"), ("gonder_view_location", "Gonderme Yetkisi Var")]
+        permissions = [("dg_view_location", "Gorme Yetkisi Var"), ("gonder_view_location", "Gonderme Yetkisi Var"), ("meydan_view_location", "Meydan Gorme Yetkisi Var"), ("goz_view_location", "Goz Gorme Yetkisi Var")]
 
     
 #veritabanı isimlerini ingilizce yap
@@ -67,6 +67,7 @@ class Kalip(models.Model):
 class DiesLocation(models.Model):
     kalipNo = models.CharField(primary_key=True, verbose_name="Kalıp Numarası")
     kalipVaris = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
+    hareketTarihi = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         managed = False
@@ -193,3 +194,4 @@ class EkSiparis(models.Model):
     class Meta:
         verbose_name="EkSiparis"
         verbose_name_plural="EkSiparisler"
+

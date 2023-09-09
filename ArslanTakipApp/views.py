@@ -276,7 +276,6 @@ def location_hareket(request):
     lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
 
     if len(filter_list)>0:
-        print(filter_list)
         hareketK = filter_list[0]['value']
         hareketQuery = Hareket.objects.all()
         location_list = Location.objects.values()
@@ -716,8 +715,20 @@ def siparis_TopTenFiltre(i):
     return profilList
 
 def siparis_max(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    filter_list = params.get("filter", [])
+
     base_s = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
     k= KalipMs.objects.using('dies').filter(TeniferKalanOmurKg__gte = 0, AktifPasif="Aktif", Hatali=0)
+    
+    if len(filter_list)>0:
+        q, exclude_cond = apply_filters(base_s, filter_list)
+        if exclude_cond:
+            base_s = base_s.exclude(**exclude_cond)
+
+        base_s = base_s.filter(**q).order_by('-SonTermin')
+    else:
+        base_s = base_s.exclude(SiparisTamam='BLOKE')
     
     # Perform aggregation once and access values
     aggr = base_s.aggregate(
@@ -923,6 +934,47 @@ def eksiparis_acil(request):
 class KalipFirinView(generic.TemplateView):
     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
 
-def kalipfirini_meydan(request):
+def kalipfirini_goz(request):
+    #hangi kalıp fırın giriş yapan kullanıcıya göre belirlenecek
+    #şimdilik gözlerin kalıp sınırı yokmuş gibi ama daha sonra bir sınır verilecek
+    #HTMLe döndürülecek data kalıp no ve fırında geçirdiği süre ya da fırına atılış zamanı
+    #ona bağlı olarak kaç saat olduğu htmlde hesaplanabilir
+    #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati 
+    #Locationa fırınlar için gözler eklenecek
+    if request.method == "GET":
+        loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location) #Location.objects.all() 
+        loc_list = list(loc.values())
+        locs = [l['id'] for l in loc_list]
+        gozKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
+        print(gozKalip.values('kalipNo','hareketTarihi'))
+        gozData = list(gozKalip.values('kalipNo','hareketTarihi'))
+
+        data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+        return HttpResponse(data)
     
-    return
+    elif request.method == "POST":
+        print(request.POST)
+        
+        return
+
+def kalipfirini_meydan(request):
+    #giris yapan usera bagli pres meydanlarındaki kalıplar
+    #her pres kalıp fırını için kullanıcı oluştur, pres meydanlarına yetki ver
+
+    params = json.loads(unquote(request.GET.get('params')))
+    size = params["size"]
+    page = params["page"]
+    offset, limit = calculate_pagination(page, size)
+
+    loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location) #Location.objects.all() 
+    loc_list = list(loc.values())
+    locs = [l['id'] for l in loc_list]
+    meydanKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
+    #print(meydanKalip.values('kalipNo'))
+    meydanData = list(meydanKalip.values('kalipNo')[offset:limit])
+
+    meydan_count = meydanKalip.count()
+    lastData= {'last_page': math.ceil(meydan_count/size), 'data': []}
+    lastData['data'] = meydanData
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)

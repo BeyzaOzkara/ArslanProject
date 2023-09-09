@@ -14,32 +14,28 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
   <style>
 
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
     .content-wrapper {
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
+      overflow: hidden;
     }
-    .content {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
+
+  
+
+    #tableMeydan {
+      max-height: 100%; /* Ensure the card and table take the full height of their container */
+      overflow: auto; /* Add a scrollbar if the content inside overflows */
     }
-    .row:first-child, .row:nth-child(2) { /* This targets the first and second row */
-      flex-grow: 1;
-      min-height: 50%;  /* This makes each row 50% height of the parent container */
-      display: flex;
-      align-items: stretch;
+
+    .info-box {
+      max-height: 100px;
     }
-    .card, .table {  /* This makes the card and table take 100% height of their respective row */
-      height: 100%;
-    }
+
+    
+
+
 
   </style>
 
@@ -47,77 +43,154 @@
 
 {% block content %}
 
-  <div class="row">
+  <div class="row cards-row">
     <div class="col-md-2">
-      <div class="card bg-primary text-white">
-        <div class="card-body">1. GÖZ</div>
-      </div>
+      <div class="card h-100 overflow-auto bg-warning text-white">
+        <div class="card-body">1.GÖZ            <!-- Info Box with Progress Bar -->
+            <div class="info-box border-0" style="width: 100%; color: black;">  <!-- Set width to 100% -->
+                <div class="info-box-content">
+                    <span class="info-box-text">KALIP NO </span>
+                    <span class="info-box-number">16645</span>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 70%; background-color: rgb(121, 41, 21);"></div>
+                    </div>
+                    <span class="progress-description">
+                        70% Tamamlandı
+                    </span>
+                    <!-- tamamlanma yüzdesi geçen süre/24 saat ile hesapla width oa göre değiştir -->
+                </div><!-- /.info-box-content -->
+            </div><!-- /.info-box -->
+            <div class="info-box border-0" style="width: 100%;  color: black;">  <!-- Set width to 100% -->
+              <div class="info-box-content">
+                  <span class="info-box-text">KALIP NO </span>
+                  <span class="info-box-number">16645</span>
+                  <div class="progress">
+                      <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
+                  </div>
+                  <span class="progress-description">
+                      70% Tamamlandı
+                  </span>
+              </div><!-- /.info-box-content -->
+          </div><!-- /.info-box -->
+          <div class="info-box border-0" style="width: 100%; color: black;">  <!-- Set width to 100% -->
+            <div class="info-box-content">
+                <span class="info-box-text">KALIP NO </span>
+                <span class="info-box-number">16645</span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
+                </div>
+                <span class="progress-description">
+                    70% Tamamlandı
+                </span>
+            </div><!-- /.info-box-content -->
+        </div><!-- /.info-box -->
+        <div class="info-box border-0" style="width: 100%; color: black;">  <!-- Set width to 100% -->
+          <div class="info-box-content">
+              <span class="info-box-text">KALIP NO </span>
+              <span class="info-box-number">16645</span>
+              <div class="progress">
+                  <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
+              </div>
+              <span class="progress-description">
+                  70% Tamamlandı
+              </span>
+          </div><!-- /.info-box-content -->
+      </div><!-- /.info-box -->
+          </div>
+        </div>
     </div>
     <div class="col-md-2">
-      <div class="card bg-secondary text-white">
+      <div class="card h-100 overflow-auto bg-primary text-white">
         <div class="card-body">2. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
-      <div class="card bg-success text-white">
+      <div class="card h-100 overflow-auto bg-secondary text-white">
         <div class="card-body">3. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
-      <div class="card bg-danger text-white">
+      <div class="card h-100 overflow-auto bg-success text-white">
         <div class="card-body">4. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
-      <div class="card bg-warning text-white">
+      <div class="card h-100 overflow-auto bg-warning text-white">
         <div class="card-body">5. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
-      <div class="card bg-info text-white">
+      <div class="card h-100 overflow-auto bg-danger text-white">
         <div class="card-body">6. GÖZ</div>
       </div>
     </div>
   </div>
 
-  <div class="row mt-5">
+  <div class="row tabulator-row mt-5">
     <div class="col-md-12">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>KALIP NO</th>
-            <th>KALAN TENİFER</th>
-            <th>KALIP NO</th>
-            <th>KALAN TENİFER</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Kalıp 1</td>
-            <td>Ten 1</td>
-            <td>Kalıp 2</td>
-            <td>Ten 2</td>
-          </tr>
-          <tr>
-            <td>Kalıp 3</td>
-            <td>Ten 3</td>
-            <td>Kalıp 4</td>
-            <td>Ten 4</td>
-          </tr>
-          <tr>
-            <td>Kalıp 5</td>
-            <td>Ten 5</td>
-            <td>Kalıp 6</td>
-            <td>Ten 6</td>
-          </tr>
-          <tr>
-            <td>Kalıp 7</td>
-            <td>Ten 7</td>
-            <td>Kalıp 8</td>
-            <td>Ten 8</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card h-100 overflow-auto" >
+        <div id="tableMeydan"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="kalipModal" tabindex="-1" aria-labelledby="kalipModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="col-lg-10">
+            <h5 class="modal-title">Fırına Ekle</h5>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="" method="post" id="ekleForm">
+            {% csrf_token %}
+
+            <div class="container" style="text-align: center;">
+              <input type="text" class="form-control-lg" disabled name="kalipNo" id="kalipNo" style="margin-bottom: 2%; text-align: center;">
+
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="card bg-primary text-white">
+                    <div class="card-body">GÖZ 1</div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="card bg-secondary text-white">
+                    <div class="card-body">GÖZ 2</div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="card bg-success text-white">
+                    <div class="card-body">GÖZ 3</div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="card bg-danger text-white">
+                    <div class="card-body">GÖZ 4</div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="card bg-warning text-white">
+                    <div class="card-body">GÖZ 5</div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="card bg-info text-white">
+                    <div class="card-body">GÖZ 6</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnFirinaEkle" class="btn btn-primary">Ekle</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -127,12 +200,55 @@
 {% block extra_js %}
 
 <script>
+  
+  let halfHeight = Math.max(0, ($(".content-wrapper").height() - $(".content-header").height()) / 2);
+  
+  var tableMeydan = new Tabulator("#tableMeydan", {
+    height: halfHeight,
+    layout:"fitColumns",
+    placeholder:"Meydan Kalıp Liste",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    paginationSize:10,
+    filterMode: "remote",
+    ajaxURL:"/kalipfirini/meydan",
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns: [
+      {title:"Kalıp No", field:"kalipNo",  headerFilter:"input", cellClick:function(e, cell){
+        let kalip = cell.getData().kalipNo;
+        document.getElementById("kalipNo").value = kalip;
+        $('#kalipModal').modal('show');
 
+      }},
+    ],
+  });
+
+  $(document).ready(function() {
+    function alignModal() {
+      var modalDialog = $(this).find(".modal-dialog");
+      modalDialog.css("margin-top", Math.max(0, 
+      ($(window).height() - modalDialog.height()) / 2));
+    }
+
+    $(".modal").on("shown.bs.modal", alignModal);
+
+    $(window).on("resize", function() {
+      $(".modal:visible").each(alignModal);
+    })
+    console.log($(".content-wrapper").height());
+    console.log($(".content-header").height());
+    var cards = $(this).find(".row.cards-row .card");
+    cards.css("height", halfHeight);
+  });
+  
 </script>
 
 {% endblock %}
 
 {% block javascript %}
   {% include 'adminlte/lib/_scripts.html' %}
+  <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 
 {% endblock %}
