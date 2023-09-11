@@ -1136,38 +1136,39 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     let filter = [];
     let sorterList = [];
     const renderData = (data) => {
+      console.log(data);
       tableBody.empty();  // Önceki verileri temizle
       data.forEach(item => { // Verileri render et...
-
-        let SiparisTamamSymbol = (item.SiparisTamam === 'BLOKE') ? '✗' : '✓';
+        console.log(item[1]);
+        let SiparisTamamSymbol = (item[11] === 'BLOKE') ? '✗' : '✓';
         // Decide whether to include a '+' symbol based on SiparisTamamSymbol
         let ek = (SiparisTamamSymbol === '✓') 
            ? `<td class="ekleTableBody" onclick="myFunction(this)">+</td>` 
            : `<td class="ekleTableBody"> </td>`;
 
-        const aktifKalipSayisi = item.AktifKalipSayisi !== null ? item.AktifKalipSayisi : '-';
-        const toplamKalipSayisi = item.ToplamKalipSayisi !== null ? item.ToplamKalipSayisi : '-';
+        const aktifKalipSayisi = item[15] !== null ? item[15] : '-';
+        const toplamKalipSayisi = item[16] !== null ? item[16] : '-';
 
         const row = $('<tr class="main-row"></tr>').html(`
         ${ek}
         <td class="blokeTableBody">${SiparisTamamSymbol}</td>
-        <td class="kartTableBody">${item.KartNo}</td>
-        <td class="firmaTableBody">${item.FirmaAdi}</td>
-        <td class="profilNoTableBody">${item.ProfilNo}</td>
-        <td class="presTableBody">${item.PresKodu}</td>
-        <td class="billetTableBody">${item.BilletTuru}</td>
-        <td class="girenKgTableBody">${item.GirenKg} kg</td>
-        <td class="girenAdetTableBody">${item.GirenAdet} adet</td>
-        <td class="kKgTableBody" style="color: #1F6E8C;font-weight:bold;">${item.Kg} kg</td>
-        <td class="kAdetTableBody">${item.Adet} adet</td>
-        <td class="planlananMmTableBody">${item.PlanlananMm} mm</td>
-        <td class="mmTableBody">${item.Siparismm} mm</td>
-        <td class="kondusTableBody">${item.KondusyonTuru}</td>
-        <td class="terminTableBody">${item.SonTermin}</td>
-        <td class="topTenTableBody">${item.TopTenKg} kg</td>
+        <td class="kartTableBody">${item[0]}</td>
+        <td class="firmaTableBody">${item[2]}</td>
+        <td class="profilNoTableBody">${item[1]}</td>
+        <td class="presTableBody">${item[10]}</td>
+        <td class="billetTableBody">${item[13]}</td>
+        <td class="girenKgTableBody">${item[19]} kg</td>
+        <td class="girenAdetTableBody">${item[4]} adet</td>
+        <td class="kKgTableBody" style="color: #1F6E8C;font-weight:bold;">${item[20]} kg</td>
+        <td class="kAdetTableBody">${item[6]} adet</td>
+        <td class="planlananMmTableBody">${item[7]} mm</td>
+        <td class="mmTableBody">${item[8]} mm</td>
+        <td class="kondusTableBody">${item[9]}</td>
+        <td class="terminTableBody">${item[21]}</td>
+        <td class="topTenTableBody">${item[22]} kg</td>
         <td class="kSayisiTableBody">${aktifKalipSayisi}/${toplamKalipSayisi}</td>
-        <input type="hidden" name="Kimlik" id="Kimlik" value="${item.Kimlik}">
-        <input type="hidden" name="ProfilGramaj" id="ProfilGramaj" value="${item.Profil_Gramaj}">
+        <input type="hidden" name="Kimlik" id="Kimlik" value="${item[17]}">
+        <input type="hidden" name="ProfilGramaj" id="ProfilGramaj" value="${item[18]}">
         `);
 
         tableBody.append(row);

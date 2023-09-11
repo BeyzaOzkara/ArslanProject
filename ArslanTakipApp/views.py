@@ -590,14 +590,26 @@ def annotate_siparis():
     )
 
 def format_item(a):
+    #append to the end of the tuple
+    #a[20] girenkg, 21 kalankg, 22 sontermin, 23 topten
     ttk = 0
+    if a[15]: #aktifkalipsayısı
+        ttk = math.ceil(a[14])
+    b = (locale.format_string("%.0f", math.ceil(a[3]), grouping=True), 
+            locale.format_string("%.0f", math.ceil(a[5]), grouping=True),
+            a[12].strftime("%d-%m-%Y"),
+            locale.format_string("%.0f", ttk, grouping=True))
+    a += b
+    return a
+    
+    """ ttk = 0
     if a['AktifKalipSayisi']:
         ttk = math.ceil(a['TopTenKg'])
     a['SonTermin'] = a['SonTermin'].strftime("%d-%m-%Y")
     a['GirenKg'] = locale.format_string("%.0f", math.ceil(a["GirenKg"]), grouping=True)
     a['Kg'] = locale.format_string("%.0f", math.ceil(a["Kg"]), grouping=True)
     a['TopTenKg'] = locale.format_string("%.0f", ttk, grouping=True)
-    return a
+    return a """
 
 def aggregate_in_parallel(queryset, fields):
     with ThreadPoolExecutor() as executor:
@@ -688,15 +700,16 @@ def siparis_list(request):
         TenVList = list(s.values_list('TopTenKg',flat=True).order_by('-TopTenKg'))
         out = [sum(g) for t, g in groupby(TenVList, type)if t is not NoneType]
         e['TopTenSum'] =locale.format_string("%.0f", math.ceil(out[0]), grouping=True)
-
-    sip = list(s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[offset:limit]) #[(page-1)*size:page*size])
+    
+    sval = s.values('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[offset:limit]
+    svalueslist = s.values_list('KartNo','ProfilNo','FirmaAdi', 'GirenKg', 'GirenAdet', 'Kg', 'Adet', 'PlanlananMm', 'Siparismm', 'KondusyonTuru', 'PresKodu','SiparisTamam','SonTermin','BilletTuru', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi', 'Kimlik', 'Profil_Gramaj')[offset:limit]
 
     with ThreadPoolExecutor() as executor:
-        sip = list(executor.map(format_item, sip))
+        svalueslist = list(executor.map(format_item, svalueslist))
 
     sip_count = s.count()
     lastData= {'last_page': math.ceil(sip_count/size), 'data': [], 'e':e}
-    lastData['data'] = sip
+    lastData['data'] = svalueslist
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
