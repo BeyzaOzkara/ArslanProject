@@ -30,103 +30,116 @@
                 <p>HOME</p>
             </a>
         </li>
-        <li class="nav-item has-tree-view ">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-object-group"></i> <p>KALIPHANE</p>
-                <p><i class="right fas fa-angle-left"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview menu-open">
-                <li class="nav-item">
-                    <a href="/location" class="nav-link">
-                        <i class="nav-icon fas fa-table"></i> KALIP ARŞİVİ
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/kalip" class="nav-link">
-                        <i class="nav-icon fas fa-database"></i> KALIP LİSTESİ
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/profil" class="nav-link">
-                        <i class="nav-icon fas fa-database"></i> PROFİL LİSTESİ
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="nav-item has-tree-view ">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-wrench"></i> <p>BAKIM</p>
-                <p><i class="right fas fa-angle-left"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview menu-open">
-                <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-wrench"></i> ARIZA LİSTESİ
-                        </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-wrench"></i> YEDEK PARÇA STOK
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-wrench"></i> ARIZA BİLDİRİM
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="nav-item has-tree-view ">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-box-open"></i> <p>STOK</p>
-                <p><i class="right fas fa-angle-left"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview menu-open">
+        {% if not perms.ArslanTakipApp.kalipEkran_view_location or user.is_superuser%}
+            <li class="nav-item has-tree-view ">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-object-group"></i> <p>KALIPHANE</p>
+                    <p><i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview menu-open">
                     <li class="nav-item">
-                            <a href="/stockCard" class="nav-link">
-                                <i class="nav-icon fas fa-table"></i> STOK KARTI EKLE
+                        <a href="/location" class="nav-link">
+                            <i class="nav-icon fas fa-table"></i> KALIP ARŞİVİ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/kalip" class="nav-link">
+                            <i class="nav-icon fas fa-database"></i> KALIP LİSTESİ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/profil" class="nav-link">
+                            <i class="nav-icon fas fa-database"></i> PROFİL LİSTESİ
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-tree-view ">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-wrench"></i> <p>BAKIM</p>
+                    <p><i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview menu-open">
+                    <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-wrench"></i> ARIZA LİSTESİ
                             </a>
                     </li>
-            </ul>
-            <ul class="nav nav-treeview menu-open">
-                <li class="nav-item">
+                    <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-table"></i> STOK LİSTESİ
+                            <i class="nav-icon fas fa-wrench"></i> YEDEK PARÇA STOK
                         </a>
-                </li>
-            </ul>
-            <ul class="nav nav-treeview menu-open">
-                <li class="nav-item">
+                    </li>
+                    <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-table"></i> STOK HAREKETLERİ
+                            <i class="nav-icon fas fa-wrench"></i> ARIZA BİLDİRİM
                         </a>
-                </li>
-            </ul>
-        </li>
-        <li class="nav-item has-tree-view ">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-box-open"></i> <p>PLANLAMA</p>
-                <p><i class="right fas fa-angle-left"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview menu-open">
-                <li class="nav-item">
-                        <a href="/siparis" class="nav-link">
-                            <i class="nav-icon fas fa-table"></i> SİPARİŞ LİSTESİ
-                        </a>
-                </li>
-            </ul>
-            <ul class="nav nav-treeview menu-open">
-                <li class="nav-item">
-                        <a href="/eksiparis" class="nav-link">
-                            <i class="nav-icon fas fa-table"></i> ÜRETİM PLANI LİSTESİ
-                        </a>
-                </li>
-            </ul>
-        </li>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-tree-view ">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-box-open"></i> <p>STOK</p>
+                    <p><i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview menu-open">
+                        <li class="nav-item">
+                                <a href="/stockCard" class="nav-link">
+                                    <i class="nav-icon fas fa-table"></i> STOK KARTI EKLE
+                                </a>
+                        </li>
+                </ul>
+                <ul class="nav nav-treeview menu-open">
+                    <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-table"></i> STOK LİSTESİ
+                            </a>
+                    </li>
+                </ul>
+                <ul class="nav nav-treeview menu-open">
+                    <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-table"></i> STOK HAREKETLERİ
+                            </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-tree-view ">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-box-open"></i> <p>PLANLAMA</p>
+                    <p><i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview menu-open">
+                    <li class="nav-item">
+                            <a href="/siparis" class="nav-link">
+                                <i class="nav-icon fas fa-table"></i> SİPARİŞ LİSTESİ
+                            </a>
+                    </li>
+                </ul>
+                <ul class="nav nav-treeview menu-open">
+                    <li class="nav-item">
+                            <a href="/eksiparis" class="nav-link">
+                                <i class="nav-icon fas fa-table"></i> ÜRETİM PLANI LİSTESİ
+                            </a>
+                    </li>
+                </ul>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a href="/siparis" class="nav-link">
+                    <i class="nav-icon fas fa-table"></i> <p>SİPARİŞ LİSTESİ</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/kalipfirini" class="nav-link">
+                    <i class="nav-icon fas fa-table"></i> <p>FIRIN EKRANI</p>
+                </a>
+            </li>
+        {% endif %}
     {% else %}
     <li class="nav-item">
         <a href="/login" class="nav-link active">

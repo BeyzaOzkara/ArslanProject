@@ -1136,10 +1136,8 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     let filter = [];
     let sorterList = [];
     const renderData = (data) => {
-      console.log(data);
       tableBody.empty();  // Önceki verileri temizle
       data.forEach(item => { // Verileri render et...
-        console.log(item[1]);
         let SiparisTamamSymbol = (item[11] === 'BLOKE') ? '✗' : '✓';
         // Decide whether to include a '+' symbol based on SiparisTamamSymbol
         let ek = (SiparisTamamSymbol === '✓') 
@@ -1183,13 +1181,13 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     let h = 0;
 
     const loadPage = (page) => {
-        const params = {
-            page: page,
-            size: itemsPerPage,
-            filter: filter,
-            sL:sorterList,
-            h:h,
-        };
+      const params = {
+          page: page,
+          size: itemsPerPage,
+          filter: filter,
+          sL:sorterList,
+          h:h,
+      };
       $.ajax({
         url: `/siparis/list`,
         method: 'GET',

@@ -21,7 +21,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -944,7 +944,10 @@ def eksiparis_acil(request):
             ek.save()
         return HttpResponseRedirect("/eksiparis")
 
-class KalipFirinView(generic.TemplateView):
+
+#sayfayı açma yetkisi sadece belli kullanıcıların olsun
+class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
+    permission_required = "ArslanTakipApp.kalipEkran_view_location"
     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
 
 def kalipfirini_goz(request):
@@ -953,23 +956,62 @@ def kalipfirini_goz(request):
     #HTMLe döndürülecek data kalıp no ve fırında geçirdiği süre ya da fırına atılış zamanı
     #ona bağlı olarak kaç saat olduğu htmlde hesaplanabilir
     #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati 
-    #Locationa fırınlar için gözler eklenecek
-    if request.method == "GET":
+    if not request.user.is_superuser:
         loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location) #Location.objects.all() 
-        loc_list = list(loc.values())
-        locs = [l['id'] for l in loc_list]
-        gozKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
-        print(gozKalip.values('kalipNo','hareketTarihi'))
-        gozData = list(gozKalip.values('kalipNo','hareketTarihi'))
 
-        data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-        return HttpResponse(data)
-    
-    elif request.method == "POST":
-        print(request.POST)
+        if request.method == "GET":
+            loc_list = list(loc.values())
+            locs = [l['id'] for l in loc_list]
+            gozKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
+            #print(gozKalip.values('kalipNo','hareketTarihi'))
+            if gozKalip:
+                gozData = list(gozKalip.values('kalipNo','hareketTarihi'))
+
+                data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+                response = JsonResponse(data)
+            else:
+                response = JsonResponse({"error":"Fırınlarda kalıp yok."})
+                response.status_code = 500
+            #return HttpResponse(data)
         
-        return
+        elif request.method == "POST":
+            print(request.POST)
+            kalipNo = request.POST['kalipNo']
+            firinGoz = request.POST['firinNo'][:-5]
+            #firinId = userın yetkisinin olduğu presin kalıp fırını + firingoz
+            #locationName contains firinGoz şeklinde olabilir.
 
+            gonder = loc.get(locationName__contains = firinGoz)
+            gonderId = gonder.id
+
+            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
+            if firinKalipSayisi != 3:
+                k = DiesLocation.objects.get(kalipNo = kalipNo)
+                if k.kalipVaris.id != gonder:
+                    hareket = Hareket()
+                    hareket.kalipKonum_id = k.kalipVaris.id
+                    hareket.kalipVaris_id = gonderId
+                    hareket.kalipNo = kalipNo
+                    hareket.kimTarafindan_id = request.user.id
+                    #hareket.save()
+                    print("Hareket saved")
+                    response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
+                else:
+                    print("Hareket not saved")
+                    response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
+                    response.status_code = 500 #server error
+            else:
+                response = JsonResponse({"error": "Fırın 3 kalıp kapasitesini doldurdu, kalıp eklenemez!"})
+                response.status_code = 500
+
+    else:
+        print("superuser")
+        response = JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."})
+        response.status_code = 403 #forbidden access
+
+    return response
+
+        
 def kalipfirini_meydan(request):
     #giris yapan usera bagli pres meydanlarındaki kalıplar
     #her pres kalıp fırını için kullanıcı oluştur, pres meydanlarına yetki ver
@@ -980,9 +1022,15 @@ def kalipfirini_meydan(request):
     offset, limit = calculate_pagination(page, size)
 
     loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location) #Location.objects.all() 
-    loc_list = list(loc.values())
-    locs = [l['id'] for l in loc_list]
-    meydanKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
+    
+    if not request.user.is_superuser:
+        loc_id = loc.get(locationName__contains = "MEYDAN").id
+        meydanKalip = DiesLocation.objects.filter(kalipVaris_id = loc_id).order_by('kalipNo')
+    else:
+        loc_list = list(loc.values())
+        locs = [l['id'] for l in loc_list]
+        meydanKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
+    
     #print(meydanKalip.values('kalipNo'))
     meydanData = list(meydanKalip.values('kalipNo')[offset:limit])
 

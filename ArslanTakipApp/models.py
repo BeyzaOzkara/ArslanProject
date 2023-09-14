@@ -13,9 +13,13 @@ class Location(models.Model):
         return self.locationName
     
     class Meta:
-        permissions = [("dg_view_location", "Gorme Yetkisi Var"), ("gonder_view_location", "Gonderme Yetkisi Var"), ("meydan_view_location", "Meydan Gorme Yetkisi Var"), ("goz_view_location", "Goz Gorme Yetkisi Var")]
+        permissions = [("dg_view_location", "Gorme Yetkisi Var"), 
+                       ("gonder_view_location", "Gonderme Yetkisi Var"), 
+                       ("meydan_view_location", "Meydan Gorme Yetkisi Var"), 
+                       ("goz_view_location", "Goz Gorme Yetkisi Var"),
+                        ("kalipEkran_view_location", "Kalip Ekrani Gorme Yetkisi Var")]
 
-    
+
 #veritabanı isimlerini ingilizce yap
 #blank true eklenecekleri belirle
 class Kalip(models.Model):
