@@ -963,19 +963,17 @@ def kalipfirini_goz(request):
             loc_list = list(loc.values())
             locs = [l['id'] for l in loc_list]
             gozKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
-            #print(gozKalip.values('kalipNo','hareketTarihi'))
             if gozKalip:
-                gozData = list(gozKalip.values('kalipNo','hareketTarihi'))
-
+                gozData = list(gozKalip.values('kalipNo', 'hareketTarihi', 'kalipVaris__locationName'))
                 data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-                response = JsonResponse(data)
+                #print(data)
             else:
-                response = JsonResponse({"error":"Fırınlarda kalıp yok."})
-                response.status_code = 500
+                data = []
+            response = JsonResponse(data, safe=False) #error döndürmedim çümkü fırınların boş olma durumu bir gerçek bir hal
             #return HttpResponse(data)
         
         elif request.method == "POST":
-            print(request.POST)
+            #print(request.POST)
             kalipNo = request.POST['kalipNo']
             firinGoz = request.POST['firinNo'][:-5]
             #firinId = userın yetkisinin olduğu presin kalıp fırını + firingoz
@@ -993,11 +991,11 @@ def kalipfirini_goz(request):
                     hareket.kalipVaris_id = gonderId
                     hareket.kalipNo = kalipNo
                     hareket.kimTarafindan_id = request.user.id
-                    #hareket.save()
-                    print("Hareket saved")
+                    hareket.save()
+                    #print("Hareket saved")
                     response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
                 else:
-                    print("Hareket not saved")
+                    #print("Hareket not saved")
                     response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
                     response.status_code = 500 #server error
             else:
@@ -1005,7 +1003,7 @@ def kalipfirini_goz(request):
                 response.status_code = 500
 
     else:
-        print("superuser")
+        #print("superuser")
         response = JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."})
         response.status_code = 403 #forbidden access
 

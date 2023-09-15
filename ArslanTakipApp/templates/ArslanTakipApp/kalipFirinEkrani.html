@@ -40,80 +40,35 @@
 
   <div class="row cards-row">
     <div class="col-md-2 ">
-      <div class="card h-100 bg-warning text-white" style="text-align: center;">
-        <div class="card-body 1 align-items-center">1.GÖZ            <!-- Info Box with Progress Bar -->
-            <div class="info-box border-0" style="width: 100%; color: black; ">  <!-- Set width to 100% -->
-                <div class="info-box-content">
-                    <span class="info-box-number">16645-1321432</span>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: 70%; background-color: rgb(121, 41, 21);"></div>
-                    </div>
-                    <span class="progress-description">
-                        70% Tamamlandı
-                    </span>
-                    <!-- tamamlanma yüzdesi geçen süre/24 saat ile hesapla width oa göre değiştir -->
-                </div><!-- /.info-box-content -->
-            </div><!-- /.info-box -->
-            <div class="info-box border-0" style="width: 100%;  color: black;">  <!-- Set width to 100% -->
-              <div class="info-box-content">
-                  <span class="info-box-number">16645</span>
-                  <div class="progress">
-                      <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
-                  </div>
-                  <span class="progress-description">
-                      70% Tamamlandı
-                  </span>
-              </div><!-- /.info-box-content -->
-          </div><!-- /.info-box -->
-          <div class="info-box border-0" style="width: 100%; color: black;">  <!-- Set width to 100% -->
-            <div class="info-box-content">
-                <span class="info-box-number">16645</span>
-                <div class="progress">
-                    <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
-                </div>
-                <span class="progress-description">
-                    70% Tamamlandı
-                </span>
-            </div><!-- /.info-box-content -->
-        </div><!-- /.info-box -->
+      <div class="card h-100 bg-gradient-info text-white" style="text-align: center;">
+        <div class="card-body 1 align-items-center" id="cardBody1">1.GÖZ            <!-- Info Box with Progress Bar -->
           </div>
         </div>
     </div>
     <div class="col-md-2">
       <div class="card h-100 overflow-auto bg-primary text-white" style="text-align: center;">
-        <div class="card-body 2">2. GÖZ</div>
+        <div class="card-body 2" id="cardBody2">2. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
       <div class="card h-100 overflow-auto bg-secondary text-white"  style="text-align: center;">
-        <div class="card-body 3">3. GÖZ</div>
+        <div class="card-body 3" id="cardBody3">3. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
       <div class="card h-100 overflow-auto bg-success text-white" style="text-align: center;">
-        <div class="card-body 4">4. GÖZ
-          <div class="info-box border-0" style="width: 100%; color: black; overflow: hidden;">  <!-- Set width to 100% -->
-            <div class="info-box-content">
-                <span class="info-box-number">16645-234434</span>
-                <div class="progress">
-                    <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
-                </div>
-                <span class="progress-description">
-                    70% Tamamlandı
-                </span>
-            </div><!-- /.info-box-content -->
-        </div><!-- /.info-box -->
+        <div class="card-body 4" id="cardBody4">4. GÖZ
         </div>
       </div>
     </div>
     <div class="col-md-2">
-      <div class="card h-100 overflow-auto bg-warning text-white" style="text-align: center;">
-        <div class="card-body 5">5. GÖZ</div>
+      <div class="card h-100 overflow-auto bg-info text-white" style="text-align: center;">
+        <div class="card-body 5" id="cardBody5">5. GÖZ</div>
       </div>
     </div>
     <div class="col-md-2">
       <div class="card h-100 overflow-auto bg-danger text-white" style="text-align: center;">
-        <div class="card-body 6">6. GÖZ</div>
+        <div class="card-body 6" id="cardBody6">6. GÖZ</div>
       </div>
     </div>
   </div>
@@ -144,7 +99,7 @@
             <div class="container" style="text-align: center;">
             <form action="" method="post" id="ekleForm">
             {% csrf_token %}
-
+            
               <input type="text" class="form-control-lg" name="kalipNo" value="" readonly id="kalipNo" style="margin-bottom: 2%; text-align: center;">
               → →
               <input type="text" class="form-control-lg" name="firinNo" value="" readonly id="firinNo" style="margin-bottom: 2%; text-align: center;">
@@ -153,33 +108,44 @@
               <div class="row goz">
                 <div class="col-md-2">
                   <div class="card bg-primary text-white">
-                    <div class="card-body"><input class="check-input" type="radio" name="foo" id="check1" value="1. GÖZ" aria-label="...">  GÖZ 1</div>
+                    <label for="check1">
+                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check1" value="1. GÖZ" aria-label="...">  GÖZ 1</div>
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="card bg-secondary text-white">
-                    <div class="card-body"><input class="check-input" type="radio" name="foo" id="check2" value="2. GÖZ" aria-label="...">  GÖZ 2</div>
+                    <label for="check2">
+                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check2" value="2. GÖZ" aria-label="...">  GÖZ 2</div>
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="card bg-success text-white">
-                    <div class="card-body"><input class="check-input" type="radio" name="foo" id="check3" value="3. GÖZ" aria-label="...">  GÖZ 3</div>
+                    <label for="check3">
+                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check3" value="3. GÖZ" aria-label="...">  GÖZ 3</div>
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="card bg-danger text-white">
-                    <div class="card-body"><input class="check-input" type="radio" name="foo" id="check4" value="4. GÖZ" aria-label="...">  GÖZ 4</div>
+                    <label for="check4">
+                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check4" value="4. GÖZ" aria-label="...">  GÖZ 4</div>
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="card bg-warning text-white">
-                    <div class="card-body"><input class="check-input" type="radio" name="foo" id="check5" value="5. GÖZ" aria-label="...">  GÖZ 5</div>
+                    <label for="check5">
+                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check5" value="5. GÖZ" aria-label="...">  GÖZ 5</div>
+                    </label>
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="card bg-info text-white">
-                    <div class="card-body">
-                      <input class="check-input" type="radio" name="foo" id="check6" value="6. GÖZ" aria-label="...">  GÖZ 6</div>
+                    <label for="check6">
+                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check6" value="6. GÖZ" aria-label="...">  GÖZ 6</div>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -199,52 +165,64 @@
 
 <script>
 
+    
+  function alignModal() {
+    var modalDialog = $(this).find(".modal-dialog");
+    modalDialog.css("margin-top", Math.max(0, 
+    ($(window).height() - modalDialog.height()) / 2));
+  };
+
+
+  const cardBody1 =  $('#cardBody1');
+  const cardBody2 =  $('#cardBody2');
+  const cardBody3 =  $('#cardBody3');
+  const cardBody4 =  $('#cardBody4');
+  const cardBody5 =  $('#cardBody5');
+  const cardBody6 =  $('#cardBody6');
+  const cardList = [cardBody1, cardBody2, cardBody3, cardBody4, cardBody5, cardBody6]
+  
   const renderData = (data) => { //cardların içine uyacak şekilde info boxlar oluşturulacak
-    cardBody.empty();  // Önceki verileri temizle
+    //gelen datanın konumuna bağlı card doldurulacak
+    cardBody1.empty();  // Önceki verileri temizle
+    cardBody2.empty();
+    cardBody3.empty();
+    cardBody4.empty();
+    cardBody5.empty();
+    cardBody6.empty();
+
+    for(i=1; i<7; i++){
+      const header = $('<h2 class="text-center"></h3>').html(`${i}. GÖZ`);
+      cardBody = cardList[i-1];
+      cardBody.append(header);
+    };
+
     data.forEach(item => { // Verileri render et...
-      let SiparisTamamSymbol = (item[11] === 'BLOKE') ? '✗' : '✓';
-      // Decide whether to include a '+' symbol based on SiparisTamamSymbol
-      let ek = (SiparisTamamSymbol === '✓') 
-          ? `<td class="ekleTableBody" onclick="myFunction(this)">+</td>` 
-          : `<td class="ekleTableBody"> </td>`;
-
-      const aktifKalipSayisi = item[15] !== null ? item[15] : '-';
-      const toplamKalipSayisi = item[16] !== null ? item[16] : '-';
-
-      const row = $('<tr class="main-row"></tr>').html(`
-      ${ek}
-      <td class="blokeTableBody">${SiparisTamamSymbol}</td>
-      <td class="kartTableBody">${item[0]}</td>
-      <input type="hidden" name="Kimlik" id="Kimlik" value="${item[17]}">
-      <input type="hidden" name="ProfilGramaj" id="ProfilGramaj" value="${item[18]}">
-      `);
-
-      cardBody.append(row);
+      //console.log(item.kalipVaris__locationName);
+      let locationName = item.kalipVaris__locationName
+      for (i=1; i<7; i++) {
+        //console.log(cardList[i-1]);
+        if(locationName.indexOf(i) !== -1){
+          cardBody = cardList[i-1];
+          let gozName = i + ". GÖZ"
+          //infobox create
+          //o card için cardBody.append(box)
+          const box = $('<div class="info-box border-0" style="width: 100%; color: black; overflow: hidden;"></div>').html(`
+          <div class="info-box-content">
+                <span class="info-box-number">${item.kalipNo}</span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 70%;  background-color: rgb(121, 41, 21);"></div>
+                </div>
+                <span class="progress-description">
+                    70% Tamamlandı
+                </span>
+            </div><!-- /.info-box-content -->
+          `);
+          cardBody.append(box);
+          break;
+        }
+      };
     });
-  };
 
-  const loadPage = () => {
-    $.ajax({
-      url: `/kalipfirini/goz`,
-      method: 'GET',
-      dataType: 'json',
-      success: function (data) {
-        console.log(data);
-        renderData(data.gozData);
-      },
-      error: function (data) {
-        alert(data.responseJSON.error);
-      }
-    });
-  };
-
-
-  $(document).ready(function() {
-    function alignModal() {
-      var modalDialog = $(this).find(".modal-dialog");
-      modalDialog.css("margin-top", Math.max(0, 
-      ($(window).height() - modalDialog.height()) / 2));
-    }
 
     $(".modal").on("shown.bs.modal", alignModal);
 
@@ -252,16 +230,17 @@
       $(".modal:visible").each(alignModal);
     });
 
+    
     document.getElementsByClassName("content-wrapper")[0].id = "contentw";
     var el = document.getElementById("contentw").style.minHeight.slice(0, -2);
-    console.log(el);
+    //console.log(el);
     
     var header = $(".content-header").height();
     var footer = $(".main-footer").height();
     var eksi = el - header -footer;
-    console.log(eksi);
+    //console.log(eksi);
     let halfHeight = Math.max(0, (eksi) / 2)-5;
-    console.log(halfHeight);
+    //console.log(halfHeight);
 
     var cardsrow = $(this).find(".row.cards-row");
     cardsrow.css("height", halfHeight);
@@ -270,7 +249,7 @@
     var cardcol = $(this).find(".row.cards-row .col-md-2");
     cardcol.css("height", halfHeight);
     var le = $(this).find(".card-body.1 .info-box").length;
-    console.log(le);
+    //console.log(le);
 
     var cards2 = $(this).find(".row.tabulator-row");
     cards2.css("height", halfHeight);
@@ -296,6 +275,27 @@
         }},
       ],
     });
+
+  };
+
+  const loadPage = () => {
+    $.ajax({
+      url: `/kalipfirini/goz`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        data = JSON.parse(data);
+        renderData(data);
+      },
+      error: function (data) {
+        alert(data.responseJSON.error);
+      }
+    });
+  };
+
+
+  $(document).ready(function() {
+
     
   });
   
@@ -318,6 +318,7 @@
         data: $('#ekleForm').serialize(),
         success: function(data){
             alert(data.message);
+            loadPage();
         },
         error: function (data) {
           alert(data.responseJSON.error);
