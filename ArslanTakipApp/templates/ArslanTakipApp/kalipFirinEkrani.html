@@ -34,49 +34,7 @@
     }
 
 
-.base-timer {
-  position: relative;
-  width: 11vh;
-  height: 11vh;
-}
-
-.base-timer__svg {
-  transform: scaleX(-1);
-}
-
-.base-timer__circle {
-  fill: none;
-  stroke: none;
-}
-
-.base-timer__path-elapsed {
-  stroke-width: 7px;
-  stroke: grey;
-}
-
-.base-timer__path-remaining {
-  stroke-width: 7px;
-  stroke-linecap: round;
-  transform: rotate(90deg);
-  transform-origin: center;
-  transition: 1s linear all;
-  fill-rule: nonzero;
-  stroke: currentColor;
-}
-
-.base-timer__path-remaining.green {
-  color: rgb(65, 184, 131);
-}
-
-.base-timer__path-remaining.orange {
-  color: orange;
-}
-
-.base-timer__path-remaining.red {
-  color: red;
-}
-
-.base-timer__label {
+/* .base-timer__label {
   position: absolute;
   width: 11vh;
   height: 11vh;
@@ -85,7 +43,7 @@
   align-items: center;
   justify-content: center;
   font-size: 4vh;
-}
+} */
 
 .timer {
   float: right;
@@ -260,7 +218,6 @@
     };
 
     data.forEach(item => { // Verileri render et...
-      //console.log(item.kalipVaris__locationName);
       let locationName = item.kalipVaris__locationName;
       let hZamani = item.hareketTarihi;
       let count = 1;
@@ -279,9 +236,6 @@
             yanNo = "";
           }
 
-          let timerId = i+"Goz"+ count;
-          //infobox create
-          //o card için cardBody.append(box)
           const box = $('<div class="info-box border-0" style="width: 100%; color: black; overflow: hidden;"></div>').html(`
           <div class="info-box-content">
             <div class="row">
@@ -325,17 +279,86 @@
 
       document.querySelectorAll(".timer").forEach(function(item){
         let hareketZamani = item.getAttribute('data-hareket-zamani');
-        console.log(hareketZamani);
         let hareketDate = new Date(hareketZamani);
         let currentDate = new Date();
         let differenceInMilliseconds = currentDate - hareketDate;
         let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
-        console.log(differenceInSeconds);
         let timePassedForThisTimer = differenceInSeconds;
         let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
         item.innerHTML = `
           <div class="base-timer">
-            <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Tam daire (yeşil) -->
+              <circle cx="50" cy="50" stroke = "#800" stroke-width="4" r="45" fill="grey" />
+              <!-- Yarım daire (gri) -->
+              <path id="halfCircle" class="halfC"
+              d="M 50 5 
+                L 50 50 
+                L 50 50 
+                A 45 45 0 0 0 50 5  
+                Z" fill="green" fill-opacity= "0">
+                <animate
+                  attributeType="XML"
+                  attributeName="fill"
+                  values="#26822a;#1ea624;#26822a;#26822a"
+                  dur="0.8s"
+                  repeatCount="indefinite"/>
+              </path>
+              </circle>
+              <circle id="warn" class="warnC" cx="50" cy="50" r="45" fill= "red" fill-opacity= "0"> 
+              <animate
+                  attributeType="XML"
+                  attributeName="fill"
+                  values="#800;#f00;#800;#800"
+                  dur="0.8s"
+                  repeatCount="indefinite"/>
+              </circle>
+              <text class = "base-timer__label" x="9" y="61" font-size="3.8vh" fill="white">00:00</text>
+          </svg>
+          </div>
+          `;
+          myTimer(item);
+      })
+
+    var timeSet = 24;
+
+    function myTimer(item) {
+      let timerInterval = setInterval(() => {
+        let hareketZamani = item.getAttribute('data-hareket-zamani');
+        let hareketDate = new Date(hareketZamani);
+        let currentDate = new Date();
+        let differenceInMilliseconds = currentDate - hareketDate;
+        let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
+        let timePassedForThisTimer = differenceInSeconds;
+        let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
+
+        let label = item.querySelector('.base-timer__label');
+
+        var now = new Date().getTime();
+        var countDownDate = hareketDate.getTime() + timeSet * 60 * 60 * 1000;
+        var distance = (countDownDate - now) / 1000; // saniyeye dönüştür
+
+        let angle = 360 * (distance / (timeSet*60*60)); // 24 saat (86400 saniye) için 360 derece dönüş yapacak şekilde ayarlandı
+        const endX = 50 + 45 * Math.cos((angle - 90)*Math.PI/180);
+        const endY = 50 + 45 * Math.sin((angle - 90)*Math.PI/180);
+
+        const largeArcFlag = angle > 180 ? 1 : 0;
+        const sweepFlag = 1; // Saat yönünde hareket etmek için       
+        let halfC = item.querySelector('.halfC');
+        let warnC = item.querySelector('.warnC');
+      
+        if (angle>0) {
+          halfC.setAttribute('fill-opacity', '1');
+          halfC.setAttribute('d', `M 50 5 L 50 50 L ${endX} ${endY} A 45 45 0 ${largeArcFlag} 0 50 5 Z`);
+          label.textContent = new Date(now-hareketDate).toISOString().substring(11, 16);
+        } else {
+          warnC.setAttribute('fill-opacity', '1');
+          label.textContent = new Date(Math.abs(distance) * 1000).toISOString().substring(11, 16);
+        }
+      }, 1000);
+    }
+      
+      /* <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <g class="base-timer__circle">
                 <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
                 <path
@@ -343,93 +366,66 @@
                   stroke-dasharray="283"
                   class="base-timer__path-remaining ${remainingPathColor}"
                   d="
-                    M 50, 50
-                    m -45, 0
-                    a 45,45 0 1,0 90,0
-                    a 45,45 0 1,0 -90,0
+                    M 50, 5
+                    a 45,45 0 1,1 0,90
+                    a 45,45 0 1,1 0,-90
                   "
                 ></path>
               </g>
-            </svg>
-            <span id="base-timer-label" class="base-timer__label">${formatTime(
-              timeLeftForThisTimer
-            )}</span>
-          </div>
-          `;
-      })
+            </svg> */
 
-      startTimer();
+      function startTimerForItem(item) {
+        let timerInterval = setInterval(() => {
+          let hareketZamani = item.getAttribute('data-hareket-zamani');
+          let hareketDate = new Date(hareketZamani);
+          let currentDate = new Date();
+          let differenceInMilliseconds = currentDate - hareketDate;
+          let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
+          let timePassedForThisTimer = differenceInSeconds;
+          let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
 
-      function onTimesUp() {
-        clearInterval(timerInterval);
-      }
+          let label = item.querySelector('.base-timer__label');
+          label.innerHTML = formatTime(timePassedForThisTimer);
 
-      function startTimer() {
-        timerInterval = setInterval(() => {
-          document.querySelectorAll(".timer").forEach(function(item){
-            let hareketZamani = item.getAttribute('data-hareket-zamani');
-            let hareketDate = new Date(hareketZamani);
-            let currentDate = new Date();
-            let differenceInMilliseconds = currentDate - hareketDate;
-            let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
-            let timePassedForThisTimer = differenceInSeconds;
-            let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
+          setCircleDasharrayForItem(item, timeLeftForThisTimer);
+          setRemainingPathColorForItem(item, timeLeftForThisTimer);
 
-            let label = item.querySelector('.base-timer__label');
-            label.innerHTML = formatTime(timeLeftForThisTimer);
-
-            setCircleDasharray(timeLeftForThisTimer);
-            setRemainingPathColor(timeLeftForThisTimer);
-
-            if (timeLeftForThisTimer === 0) {
-              onTimesUp();
-            }
-        });
+          if (timeLeftForThisTimer === 0) {
+              clearInterval(timerInterval);
+          }
         }, 1000);
+        item.dataset.timerIntervalId = timerInterval;
       }
 
+      function setCircleDasharrayForItem(item, timeLeftForThisTimer) {
+        const circleLength = 2 * Math.PI * 45; // 2 * PI * radius
+        let percentage = 1 - (timeLeftForThisTimer / TIME_LIMIT);
+        let offset = circleLength * percentage;
+        let path = item.querySelector(".base-timer__path-remaining");
+        path.style.strokeDasharray = `${circleLength} ${circleLength}`;
+        path.style.strokeDashoffset = `${offset}`;
+      }
+
+      function setRemainingPathColorForItem(item, timeLeft) {
+        const { alert, warning, info } = COLOR_CODES;
+        let path = item.querySelector(".base-timer__path-remaining");
+        if (timeLeft <= alert.threshold) {
+            path.classList.remove(warning.color);
+            path.classList.add(alert.color);
+        } else if (timeLeft <= warning.threshold) {
+            path.classList.remove(info.color);
+            path.classList.add(warning.color);
+        }
+      }
       function formatTime(time) {
-        console.log("Time to format:", time);
         const hours = Math.floor(time / 3600);
         let minutes = Math.floor((time % 3600) / 60);
         let seconds = time % 60;
-
         if (minutes < 10) {
             minutes = `0${minutes}`;
         }
-
         return `${hours}:${minutes}`;
       }
-
-      function setRemainingPathColor(timeLeft) {
-        const { alert, warning, info } = COLOR_CODES;
-        if (timeLeft <= alert.threshold) { //classname ile array dönüyor foreache al
-          document.querySelectorAll(".base-timer__path-remaining").forEach(function(item){
-            item.classList.remove(warning.color);
-            item.classList.add(alert.color);
-          });
-        } else if (timeLeft <= warning.threshold) {
-          document.querySelectorAll(".base-timer__path-remaining").forEach(function(item){
-            item.classList.remove(info.color);
-            item.classList.add(warning.color);
-          });
-        }
-      }
-
-      function calculateTimeFraction(timeLeftForThisTimer) {
-        const rawTimeFraction = timeLeftForThisTimer / TIME_LIMIT;
-        return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
-      }
-
-      function setCircleDasharray(timeLeftForThisTimer) {
-        const circleDasharray = `${(
-          calculateTimeFraction(timeLeftForThisTimer) * FULL_DASH_ARRAY
-        ).toFixed(0)} 283`;
-        document.querySelectorAll("base-timer__path-remaining").forEach(function(item){
-          item.setAttribute("stroke-dasharray", circleDasharray);
-        });
-      } 
-
     });
 
 
@@ -497,12 +493,6 @@
       }
     });
   };
-
-
-  $(document).ready(function() {
-
-    
-  });
   
   btnFirinaEkle = document.getElementById('btnFirinaEkle');
   btnFirinaEkle.addEventListener('click', () => {
