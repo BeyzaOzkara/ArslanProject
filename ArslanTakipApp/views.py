@@ -106,7 +106,24 @@ def guncelle(i, b, u):
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
     loc_list = list(loc.values().order_by('id'))
-    loc_list_rev = list(reversed(loc_list))
+
+    # Create a dictionary for O(1) lookups
+    loc_dict = {item['id']: item for item in loc_list}
+    root_nodes = []
+
+    for item in loc_list:
+        parent_id = item['locationRelationID_id']
+        if parent_id:
+            parent = loc_dict.get(parent_id)
+            if parent:
+                parent.setdefault('_children', []).append(item)
+        else:
+            root_nodes.append(item)
+
+    data = json.dumps(root_nodes)
+    gonderData = location_list(request.user)
+
+    """ loc_list_rev = list(reversed(loc_list))
     for item in loc_list_rev:
         for i in loc_list:
             if item['locationRelationID_id'] == i['id']:
@@ -117,7 +134,7 @@ def location(request):
                 loc_list.remove(item)
 
     childData = loc_list
-    gonderData = location_list(request.user)
+    gonderData = location_list(request.user) """
 
     if request.method == "POST":
         dieList = request.POST.get("dieList")
@@ -137,11 +154,30 @@ def location(request):
             else:
                 print("Hareket not saved")
                 
-    data = json.dumps(childData)
+    #data = json.dumps(childData)
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
+    gonderLoc_list = list(gonderLoc.values().order_by('id'))
+
+    gonder_dict = {item['id']: item for item in gonderLoc_list}
+    root_nodes = []
+
+    for item in gonderLoc_list:
+        parent_id = item['locationRelationID_id']
+        if parent_id:
+            parent = gonder_dict.get(parent_id)
+            if parent:
+                parent.setdefault('_children', []).append(item)
+        else:
+            root_nodes.append(item)
+
+    childData = root_nodes
+    data = json.dumps(childData)
+    return data
+
+    """ gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
     gonderLoc_list = list(gonderLoc.values().order_by('id'))
     gonderLoc_list_rev = list(reversed(gonderLoc_list))
     for item in gonderLoc_list_rev:
@@ -155,7 +191,7 @@ def location_list(a):
 
     childData = gonderLoc_list
     data = json.dumps(childData)
-    return data
+    return data """
 
 def kalip_liste(request):
     #Kalıp Listesi Detaylı
@@ -958,15 +994,17 @@ def kalipfirini_goz(request):
     #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati 
     if not request.user.is_superuser:
         loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location) #Location.objects.all() 
-
+        goz_count = loc.filter(locationName__contains = ". GÖZ").count()
+        print(goz_count)
         if request.method == "GET":
             loc_list = list(loc.values())
             locs = [l['id'] for l in loc_list]
             gozKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
             if gozKalip:
                 gozData = list(gozKalip.values('kalipNo', 'hareketTarihi', 'kalipVaris__locationName'))
+                gozData.append({'gozCount': goz_count})
                 data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-                #print(data)
+                print(gozData)
             else:
                 data = []
             response = JsonResponse(data, safe=False) #error döndürmedim çümkü fırınların boş olma durumu bir gerçek bir hal

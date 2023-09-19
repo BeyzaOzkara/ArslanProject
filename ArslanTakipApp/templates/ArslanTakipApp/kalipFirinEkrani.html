@@ -217,7 +217,13 @@
       cardBody.append(header);
     };
 
-    data.forEach(item => { // Verileri render et...
+    let gozCount = data[data.length-1]['gozCount'];
+    console.log(gozCount);
+
+    const data2 = data.slice(0, (data.length-1));
+    console.log(data2);
+
+    data2.forEach(item => { // Verileri render et...
       let locationName = item.kalipVaris__locationName;
       let hZamani = item.hareketTarihi;
       let count = 1;
@@ -358,74 +364,6 @@
       }, 1000);
     }
       
-      /* <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <g class="base-timer__circle">
-                <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
-                <path
-                  id="base-timer-path-remaining"
-                  stroke-dasharray="283"
-                  class="base-timer__path-remaining ${remainingPathColor}"
-                  d="
-                    M 50, 5
-                    a 45,45 0 1,1 0,90
-                    a 45,45 0 1,1 0,-90
-                  "
-                ></path>
-              </g>
-            </svg> */
-
-      function startTimerForItem(item) {
-        let timerInterval = setInterval(() => {
-          let hareketZamani = item.getAttribute('data-hareket-zamani');
-          let hareketDate = new Date(hareketZamani);
-          let currentDate = new Date();
-          let differenceInMilliseconds = currentDate - hareketDate;
-          let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
-          let timePassedForThisTimer = differenceInSeconds;
-          let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
-
-          let label = item.querySelector('.base-timer__label');
-          label.innerHTML = formatTime(timePassedForThisTimer);
-
-          setCircleDasharrayForItem(item, timeLeftForThisTimer);
-          setRemainingPathColorForItem(item, timeLeftForThisTimer);
-
-          if (timeLeftForThisTimer === 0) {
-              clearInterval(timerInterval);
-          }
-        }, 1000);
-        item.dataset.timerIntervalId = timerInterval;
-      }
-
-      function setCircleDasharrayForItem(item, timeLeftForThisTimer) {
-        const circleLength = 2 * Math.PI * 45; // 2 * PI * radius
-        let percentage = 1 - (timeLeftForThisTimer / TIME_LIMIT);
-        let offset = circleLength * percentage;
-        let path = item.querySelector(".base-timer__path-remaining");
-        path.style.strokeDasharray = `${circleLength} ${circleLength}`;
-        path.style.strokeDashoffset = `${offset}`;
-      }
-
-      function setRemainingPathColorForItem(item, timeLeft) {
-        const { alert, warning, info } = COLOR_CODES;
-        let path = item.querySelector(".base-timer__path-remaining");
-        if (timeLeft <= alert.threshold) {
-            path.classList.remove(warning.color);
-            path.classList.add(alert.color);
-        } else if (timeLeft <= warning.threshold) {
-            path.classList.remove(info.color);
-            path.classList.add(warning.color);
-        }
-      }
-      function formatTime(time) {
-        const hours = Math.floor(time / 3600);
-        let minutes = Math.floor((time % 3600) / 60);
-        let seconds = time % 60;
-        if (minutes < 10) {
-            minutes = `0${minutes}`;
-        }
-        return `${hours}:${minutes}`;
-      }
     });
 
 
