@@ -162,15 +162,24 @@
     ($(window).height() - modalDialog.height()) / 2));
   };
 
+
+
   const rowBody = $('#cardsRow');
   const cardList = [];
-  const renderData = (data) => { 
+  const renderData = (data) => {   
+
+    document.getElementsByClassName("content-wrapper")[0].id = "contentw";
+    var el = document.getElementById("contentw").style.minHeight.slice(0, -2);
+    var header = $(".content-header").height();
+    var footer = $(".main-footer").height();
+    var eksi = el - header -footer;
+    let oneThirdHeight = Math.max(0, (eksi) / 3);
+    let halfHeight = Math.max(0, (eksi) / 2)-5;
+
     //kaç fırın gözü var ona göre cardlar oluşturulacak.
     let gozCount = data[data.length-1]['gozCount'];
-    //console.log(gozCount);
 
     const data2 = data.slice(0, (data.length-1));
-    //console.log(data2);
     //gozCount a göre card oluştur içine infoboxları ekle ve rowa appendle
 
     for (j=1; j<=gozCount; j++){
@@ -179,7 +188,7 @@
         colName = "col-md-"+(12/gozCount);
       }
       else {colName = "col-md-"+(10/gozCount);}
-      const card = $('<div class="'+colName+'">').html(`
+      const card = $('<div class="'+colName+'" style="height:'+(oneThirdHeight*2)+'px">').html(`
         <div class="card h-100 bg-gradient-info text-white" style="text-align: center;">
           <div class="card-body ${j} goz align-items-center" id="cardBody${j}">
           </div>
@@ -188,17 +197,12 @@
       rowBody.append(card);
       cardList.push( $('#cardBody'+j));
     }
-    console.log(cardList);
 
-    cardList.forEach(item => {
+    cardList.forEach(function(item, index){
       item.empty();
+      const header = $('<h2 class="text-center"></h3>').html(`${index}. GÖZ`);
+      item.append(header);
     });
-
-    for(i=1; i<=gozCount; i++){
-      const header = $('<h2 class="text-center"></h3>').html(`${i}. GÖZ`);
-      cardBody = cardList[i-1];
-      cardBody.append(header);
-    };
 
     data2.forEach(item => { // Verileri render et...
       let locationName = item.kalipVaris__locationName;
@@ -242,23 +246,8 @@
       const WARNING_THRESHOLD = 3600; // 1 hour
       const ALERT_THRESHOLD = 1800;  // 30 minutes
 
-      const COLOR_CODES = {
-        info: {
-          color: "green"
-        },
-        warning: {
-          color: "orange",
-          threshold: WARNING_THRESHOLD
-        },
-        alert: {
-          color: "red",
-          threshold: ALERT_THRESHOLD
-        }
-      };
-
       const TIME_LIMIT = 86400;
       let timerInterval = null;
-      let remainingPathColor = COLOR_CODES.info.color; 
 
       document.querySelectorAll(".timer").forEach(function(item){
         let hareketZamani = item.getAttribute('data-hareket-zamani');
@@ -342,21 +331,14 @@
     }
       
     });
-
+    //card boyutunu almıyor neden? aşağıda olduğu için olabilir mi 
+    //card height yukarı alınabilir
 
     $(".modal").on("shown.bs.modal", alignModal);
 
     $(window).on("resize", function() {
       $(".modal:visible").each(alignModal);
     });
-
-    document.getElementsByClassName("content-wrapper")[0].id = "contentw";
-    var el = document.getElementById("contentw").style.minHeight.slice(0, -2);
-    
-    var header = $(".content-header").height();
-    var footer = $(".main-footer").height();
-    var eksi = el - header -footer;
-    let halfHeight = Math.max(0, (eksi) / 2)-5;
 
     var cardsrow = $(this).find(".row.cards-row");
     cardsrow.css("height", halfHeight);
@@ -366,10 +348,12 @@
     cardcol.css("height", halfHeight);
 
     var cards2 = $(this).find(".row.tabulator-row");
-    cards2.css("height", halfHeight);
-  
+    cards2.css("height", oneThirdHeight);
+    console.log(oneThirdHeight);
+  //tabulator boyutu doğru gidiyor neden card doğru olmuyor
+
     var tableMeydan = new Tabulator("#tableMeydan", {
-      height: (halfHeight-70),
+      height: (oneThirdHeight-70),
       layout:"fitColumns",
       placeholder:"Meydan Kalıp Liste",
       progressiveLoad:"scroll",
@@ -388,8 +372,6 @@
         }},],});
 
   };
-
-
 
   const loadPage = () => {
     $.ajax({

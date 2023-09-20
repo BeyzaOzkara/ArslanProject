@@ -524,39 +524,6 @@ def qrKalite(request):
             "no" : decrypted_text,
         }
 
-        """ olmayan = []
-        notsaved = []
-        query = KalipMs.objects.using('dies').all() #['SIRA 5','11497'], ['SIRA 6','402-3'], ['SIRA 8','12773-3'],['SIRA 9','4405-31'],['SIRA 9','4471-33'],
-        sira1 = [
-                 ]
-        for i in sira1:
-            try:
-                print(i[1])
-                a = list(KalipMs.objects.using('dies').filter(KalipNo__startswith = i[1]).values())
-                if not a:
-                    olmayan.append(i)
-                for j in a:
-                    kno = j['KalipNo']
-                    if kno.strip()==i[1]:
-                        if DiesLocation.objects.get(kalipNo = kno).kalipVaris_id != Location.objects.get(locationName = i[0]).id:
-                            hareket = Hareket()
-                            print(kno+'if ici')
-                            hareket.kalipKonum_id = DiesLocation.objects.get(kalipNo = kno).kalipVaris_id
-                            #print(DiesLocation.objects.get(kalipNo = kno).kalipVaris_id)
-                            hareket.kalipVaris_id = Location.objects.get(locationName = i[0]).id
-                            #print(hareket.kalipVaris_id)
-                            hareket.kalipNo = query.get(KalipNo = kno).KalipNo
-                            hareket.kimTarafindan_id = request.user.id
-                            hareket.save()
-                            print("Hareket saved")
-                            print()
-            except:
-                print(KalipMs.objects.using('dies').get(KalipNo = i[1]).KalipNo)
-                notsaved.append(i)
-                print("Hareket not saved")
-    
-    print(olmayan)
-    print(notsaved) """
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 class qrKaliteView(generic.TemplateView):
