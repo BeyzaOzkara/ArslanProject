@@ -985,9 +985,11 @@ def kalipfirini_goz(request):
             firinGoz = request.POST['firinNo'][:-5]
             #firinId = userın yetkisinin olduğu presin kalıp fırını + firingoz
             #locationName contains firinGoz şeklinde olabilir.
-
             gonder = loc.get(locationName__contains = firinGoz)
             gonderId = gonder.id
+            #firin capacity location capacity firin kaç kalıp alabilir
+            gozCapacity = Location.objects.get(id = gonderId).capacity
+            print(gozCapacity)
 
             firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
             if firinKalipSayisi != 3:
@@ -1006,9 +1008,8 @@ def kalipfirini_goz(request):
                     response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
                     response.status_code = 500 #server error
             else:
-                response = JsonResponse({"error": "Fırın 3 kalıp kapasitesini doldurdu, kalıp eklenemez!"})
+                response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
                 response.status_code = 500
-
     else:
         #print("superuser")
         response = JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."})

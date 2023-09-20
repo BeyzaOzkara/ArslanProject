@@ -33,24 +33,11 @@
       overflow: auto;
     }
 
-
-/* .base-timer__label {
-  position: absolute;
-  width: 11vh;
-  height: 11vh;
-  top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4vh;
-} */
-
-.timer {
-  float: right;
-  width: 11vh;
-  height: 11vh;
-  
-}
+    .timer {
+      float: right;
+      width: 11vh;
+      height: 11vh;
+    }
 
 
   </style>
@@ -155,19 +142,17 @@
 
 <script>
 
-    
+  //modal gözleri düzenlenecek, yine gelen gozCounta göre göz seçenekleri eklenecek
   function alignModal() {
     var modalDialog = $(this).find(".modal-dialog");
     modalDialog.css("margin-top", Math.max(0, 
     ($(window).height() - modalDialog.height()) / 2));
   };
 
-
-
   const rowBody = $('#cardsRow');
 
   const renderData = (data) => {   
-  const cardList = [];
+    const cardList = [];
     document.getElementsByClassName("content-wrapper")[0].id = "contentw";
     var el = document.getElementById("contentw").style.minHeight.slice(0, -2);
     var header = $(".content-header").height();
