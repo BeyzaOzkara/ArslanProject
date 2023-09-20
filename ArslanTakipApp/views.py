@@ -101,6 +101,20 @@ def guncelle(i, b, u):
             print("updated")
     return True
 
+def hareketSave(dieList, lRec, dieTo, request):
+    for i in dieList:
+        k = DiesLocation.objects.get(kalipNo = i)
+        if k.kalipVaris.id != lRec.id:
+            hareket = Hareket()
+            hareket.kalipKonum_id = k.kalipVaris.id
+            hareket.kalipVaris_id = dieTo
+            hareket.kalipNo = i
+            hareket.kimTarafindan_id = request.user.id
+            hareket.save()
+            print("Hareket saved")
+        else:
+            print("Hareket not saved")
+
 @login_required #user must be logged in
 #@permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 def location(request):
@@ -123,38 +137,20 @@ def location(request):
     data = json.dumps(root_nodes)
     gonderData = location_list(request.user)
 
-    """ loc_list_rev = list(reversed(loc_list))
-    for item in loc_list_rev:
-        for i in loc_list:
-            if item['locationRelationID_id'] == i['id']:
-                try:
-                    i['_children'].append(item)
-                except:
-                    i['_children'] = [item]
-                loc_list.remove(item)
-
-    childData = loc_list
-    gonderData = location_list(request.user) """
-
     if request.method == "POST":
         dieList = request.POST.get("dieList")
         dieList = dieList.split(",")
         dieTo = request.POST.get("dieTo")
         lRec = Location.objects.get(id = dieTo)
-        for i in dieList:
-            k = DiesLocation.objects.get(kalipNo = i)
-            if k.kalipVaris.id != lRec.id:
-                hareket = Hareket()
-                hareket.kalipKonum_id = k.kalipVaris.id
-                hareket.kalipVaris_id = dieTo
-                hareket.kalipNo = i
-                hareket.kimTarafindan_id = request.user.id
-                hareket.save()
-                print("Hareket saved")
-            else:
-                print("Hareket not saved")
-                
-    #data = json.dumps(childData)
+        gozCapacity = Location.objects.get(id = lRec.id).capacity
+
+        if gozCapacity == None:
+            hareketSave(dieList, lRec, dieTo, request)
+        else:
+            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
+            if firinKalipSayisi < gozCapacity:
+                if not (firinKalipSayisi + len(dieList)) > gozCapacity:
+                    hareketSave(dieList, lRec, dieTo, request)
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
 def location_list(a):
@@ -953,6 +949,23 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
     permission_required = "ArslanTakipApp.kalipEkran_view_location"
     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
 
+def infoBoxEkle(kalipNo, gonder, gonderId, request):
+    k = DiesLocation.objects.get(kalipNo = kalipNo)
+    if k.kalipVaris.id != gonder:
+        hareket = Hareket()
+        hareket.kalipKonum_id = k.kalipVaris.id
+        hareket.kalipVaris_id = gonderId
+        hareket.kalipNo = kalipNo
+        hareket.kimTarafindan_id = request.user.id
+        hareket.save()
+        #print("Hareket saved")
+        response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
+    else:
+        #print("Hareket not saved")
+        response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
+        response.status_code = 500 #server error
+    return response
+
 def kalipfirini_goz(request):
     #hangi kalıp fırın giriş yapan kullanıcıya göre belirlenecek
     #şimdilik gözlerin kalıp sınırı yokmuş gibi ama daha sonra bir sınır verilecek
@@ -976,42 +989,27 @@ def kalipfirini_goz(request):
             else:
                 gozData = [{'gozCount': goz_count}]
                 data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-            response = JsonResponse(data, safe=False) #error döndürmedim çümkü fırınların boş olma durumu bir gerçek bir hal
-            #return HttpResponse(data)
+            response = JsonResponse(data, safe=False) #error döndürmedim çünkü fırınların boş olma durumu bir gerçek bir hal
         
         elif request.method == "POST":
-            #print(request.POST)
             kalipNo = request.POST['kalipNo']
             firinGoz = request.POST['firinNo'][:-5]
             #firinId = userın yetkisinin olduğu presin kalıp fırını + firingoz
             #locationName contains firinGoz şeklinde olabilir.
             gonder = loc.get(locationName__contains = firinGoz)
             gonderId = gonder.id
-            #firin capacity location capacity firin kaç kalıp alabilir
             gozCapacity = Location.objects.get(id = gonderId).capacity
-            print(gozCapacity)
 
-            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
-            if firinKalipSayisi != 3:
-                k = DiesLocation.objects.get(kalipNo = kalipNo)
-                if k.kalipVaris.id != gonder:
-                    hareket = Hareket()
-                    hareket.kalipKonum_id = k.kalipVaris.id
-                    hareket.kalipVaris_id = gonderId
-                    hareket.kalipNo = kalipNo
-                    hareket.kimTarafindan_id = request.user.id
-                    hareket.save()
-                    #print("Hareket saved")
-                    response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
-                else:
-                    #print("Hareket not saved")
-                    response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
-                    response.status_code = 500 #server error
+            if gozCapacity == None:
+                response = infoBoxEkle(kalipNo, gonder, gonderId, request)
             else:
-                response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
-                response.status_code = 500
+                firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
+                if firinKalipSayisi < gozCapacity:
+                    response = infoBoxEkle(kalipNo, gonder, gonderId, request)
+                else:
+                    response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
+                    response.status_code = 500         
     else:
-        #print("superuser")
         response = JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."})
         response.status_code = 403 #forbidden access
 

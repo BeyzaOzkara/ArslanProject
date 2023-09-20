@@ -332,14 +332,9 @@
     var cardsrow = $(this).find(".row.cards-row");
     cardsrow.css("height", halfHeight);
 
-    var hel = halfHeight
-    var cardcol = $(this).find(".row.cards-row .col-md-2");
-    cardcol.css("height", halfHeight);
-
     var cards2 = $(this).find(".row.tabulator-row");
     cards2.css("height", oneThirdHeight);
     console.log(oneThirdHeight);
-  //tabulator boyutu doğru gidiyor neden card doğru olmuyor
 
     var tableMeydan = new Tabulator("#tableMeydan", {
       height: (oneThirdHeight-70),
@@ -357,6 +352,7 @@
         {title:"Kalıp No", field:"kalipNo",  headerFilter:"input", cellClick:function(e, cell){
           let kalip = cell.getData().kalipNo;
           document.getElementById("kalipNo").value = kalip;
+          //gözlerin kaç tane olacağını burda yaz
           $('#kalipModal').modal('show');
         }},],});
 
