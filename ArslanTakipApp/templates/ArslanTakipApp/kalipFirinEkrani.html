@@ -165,9 +165,9 @@
 
 
   const rowBody = $('#cardsRow');
-  const cardList = [];
-  const renderData = (data) => {   
 
+  const renderData = (data) => {   
+  const cardList = [];
     document.getElementsByClassName("content-wrapper")[0].id = "contentw";
     var el = document.getElementById("contentw").style.minHeight.slice(0, -2);
     var header = $(".content-header").height();
@@ -178,11 +178,13 @@
 
     //kaç fırın gözü var ona göre cardlar oluşturulacak.
     let gozCount = data[data.length-1]['gozCount'];
-
+    console.log(gozCount);
     const data2 = data.slice(0, (data.length-1));
+    console.log(data2);
     //gozCount a göre card oluştur içine infoboxları ekle ve rowa appendle
-
+    rowBody.empty();
     for (j=1; j<=gozCount; j++){
+      console.log("for col card");
       let colName = ""
       if (gozCount!=5){
         colName = "col-md-"+(12/gozCount);
@@ -195,8 +197,10 @@
         </div>
       `);
       rowBody.append(card);
+      console.log(rowBody);
       cardList.push( $('#cardBody'+j));
-    }
+      console.log(cardList);
+    };
 
     cardList.forEach(function(item, index){
       item.empty();
@@ -379,10 +383,11 @@
       method: 'GET',
       dataType: 'json',
       success: function (data) {
-        //console.log(data);
+        console.log(data);
         if (data.length !=0){
           data = JSON.parse(data);
         }
+        console.log("renderdata ajax");
         renderData(data);
       },
       error: function (data) {
