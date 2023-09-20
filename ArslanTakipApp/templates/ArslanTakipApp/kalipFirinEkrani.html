@@ -59,39 +59,8 @@
 
 {% block content %}
 
-  <div class="row cards-row">
-    <div class="col-md-2 ">
-      <div class="card h-100 bg-gradient-info text-white" style="text-align: center;">
-        <div class="card-body 1 align-items-center" id="cardBody1">1.GÖZ            <!-- Info Box with Progress Bar -->
-          </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-      <div class="card h-100 overflow-auto bg-primary text-white" style="text-align: center;">
-        <div class="card-body 2" id="cardBody2">2. GÖZ</div>
-      </div>
-    </div>
-    <div class="col-md-2">
-      <div class="card h-100 overflow-auto bg-secondary text-white"  style="text-align: center;">
-        <div class="card-body 3" id="cardBody3">3. GÖZ</div>
-      </div>
-    </div>
-    <div class="col-md-2">
-      <div class="card h-100 overflow-auto bg-success text-white" style="text-align: center;">
-        <div class="card-body 4" id="cardBody4">4. GÖZ
-        </div>
-      </div>
-    </div>
-    <div class="col-md-2">
-      <div class="card h-100 overflow-auto bg-info text-white" style="text-align: center;">
-        <div class="card-body 5" id="cardBody5">5. GÖZ</div>
-      </div>
-    </div>
-    <div class="col-md-2">
-      <div class="card h-100 overflow-auto bg-danger text-white" style="text-align: center;">
-        <div class="card-body 6" id="cardBody6">6. GÖZ</div>
-      </div>
-    </div>
+  <div class="row cards-row" id="cardsRow">
+
   </div>
 
   <div class="row tabulator-row">
@@ -193,44 +162,52 @@
     ($(window).height() - modalDialog.height()) / 2));
   };
 
+  const rowBody = $('#cardsRow');
+  const cardList = [];
+  const renderData = (data) => { 
+    //kaç fırın gözü var ona göre cardlar oluşturulacak.
+    let gozCount = data[data.length-1]['gozCount'];
+    //console.log(gozCount);
 
-  const cardBody1 =  $('#cardBody1');
-  const cardBody2 =  $('#cardBody2');
-  const cardBody3 =  $('#cardBody3');
-  const cardBody4 =  $('#cardBody4');
-  const cardBody5 =  $('#cardBody5');
-  const cardBody6 =  $('#cardBody6');
-  const cardList = [cardBody1, cardBody2, cardBody3, cardBody4, cardBody5, cardBody6]
-  
-  const renderData = (data) => { //cardların içine uyacak şekilde info boxlar oluşturulacak
-    //gelen datanın konumuna bağlı card doldurulacak
-    cardBody1.empty();  // Önceki verileri temizle
-    cardBody2.empty();
-    cardBody3.empty();
-    cardBody4.empty();
-    cardBody5.empty();
-    cardBody6.empty();
+    const data2 = data.slice(0, (data.length-1));
+    //console.log(data2);
+    //gozCount a göre card oluştur içine infoboxları ekle ve rowa appendle
 
-    for(i=1; i<7; i++){
+    for (j=1; j<=gozCount; j++){
+      let colName = ""
+      if (gozCount!=5){
+        colName = "col-md-"+(12/gozCount);
+      }
+      else {colName = "col-md-"+(10/gozCount);}
+      const card = $('<div class="'+colName+'">').html(`
+        <div class="card h-100 bg-gradient-info text-white" style="text-align: center;">
+          <div class="card-body ${j} goz align-items-center" id="cardBody${j}">
+          </div>
+        </div>
+      `);
+      rowBody.append(card);
+      cardList.push( $('#cardBody'+j));
+    }
+    console.log(cardList);
+
+    cardList.forEach(item => {
+      item.empty();
+    });
+
+    for(i=1; i<=gozCount; i++){
       const header = $('<h2 class="text-center"></h3>').html(`${i}. GÖZ`);
       cardBody = cardList[i-1];
       cardBody.append(header);
     };
 
-    let gozCount = data[data.length-1]['gozCount'];
-    console.log(gozCount);
-
-    const data2 = data.slice(0, (data.length-1));
-    console.log(data2);
-
     data2.forEach(item => { // Verileri render et...
       let locationName = item.kalipVaris__locationName;
       let hZamani = item.hareketTarihi;
       let count = 1;
-      for (i=1; i<7; i++) {
+      for (i=1; i<=gozCount; i++) {
         if(locationName.indexOf(i) !== -1){
           cardBody = cardList[i-1];
-          let gozName = i + ". GÖZ"
+          let gozName = i + ". GÖZ";
           let profilNo ="";
           let yanNo = "";
           if (item.kalipNo.indexOf("-") != -1){
@@ -420,7 +397,7 @@
       method: 'GET',
       dataType: 'json',
       success: function (data) {
-        console.log(data);
+        //console.log(data);
         if (data.length !=0){
           data = JSON.parse(data);
         }
