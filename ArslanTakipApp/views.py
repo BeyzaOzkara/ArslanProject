@@ -975,7 +975,6 @@ def kalipfirini_goz(request):
     if not request.user.is_superuser:
         loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location) #Location.objects.all() 
         goz_count = loc.filter(locationName__contains = ". GÖZ").count()
-        #print(goz_count)
 
         if request.method == "GET":
             loc_list = list(loc.values())
@@ -985,7 +984,6 @@ def kalipfirini_goz(request):
                 gozData = list(gozKalip.values('kalipNo', 'hareketTarihi', 'kalipVaris__locationName'))
                 gozData.append({'gozCount': goz_count})
                 data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-                #print(gozData)
             else:
                 gozData = [{'gozCount': goz_count}]
                 data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)

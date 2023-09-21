@@ -82,49 +82,7 @@
               <input type="text" class="form-control-lg" name="firinNo" value="" readonly id="firinNo" style="margin-bottom: 2%; text-align: center;">
 
             </form>
-              <div class="row goz">
-                <div class="col-md-2">
-                  <div class="card bg-primary text-white">
-                    <label for="check1">
-                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check1" value="1. GÖZ" aria-label="...">  GÖZ 1</div>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card bg-secondary text-white">
-                    <label for="check2">
-                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check2" value="2. GÖZ" aria-label="...">  GÖZ 2</div>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card bg-success text-white">
-                    <label for="check3">
-                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check3" value="3. GÖZ" aria-label="...">  GÖZ 3</div>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card bg-danger text-white">
-                    <label for="check4">
-                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check4" value="4. GÖZ" aria-label="...">  GÖZ 4</div>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card bg-warning text-white">
-                    <label for="check5">
-                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check5" value="5. GÖZ" aria-label="...">  GÖZ 5</div>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card bg-info text-white">
-                    <label for="check6">
-                      <div class="card-body"><input class="check-input" type="radio" name="foo" id="check6" value="6. GÖZ" aria-label="...">  GÖZ 6</div>
-                    </label>
-                  </div>
-                </div>
+              <div class="row goz" id="rowGoz">
               </div>
             </div>
         </div>
@@ -150,7 +108,8 @@
   };
 
   const rowBody = $('#cardsRow');
-
+  const rowGozBody = $('#rowGoz');
+ 
   const renderData = (data) => {   
     const cardList = [];
     document.getElementsByClassName("content-wrapper")[0].id = "contentw";
@@ -163,13 +122,12 @@
 
     //kaç fırın gözü var ona göre cardlar oluşturulacak.
     let gozCount = data[data.length-1]['gozCount'];
-    console.log(gozCount);
     const data2 = data.slice(0, (data.length-1));
-    console.log(data2);
     //gozCount a göre card oluştur içine infoboxları ekle ve rowa appendle
     rowBody.empty();
+    rowGozBody.empty();
+    
     for (j=1; j<=gozCount; j++){
-      console.log("for col card");
       let colName = ""
       if (gozCount!=5){
         colName = "col-md-"+(12/gozCount);
@@ -182,15 +140,28 @@
         </div>
       `);
       rowBody.append(card);
-      console.log(rowBody);
       cardList.push( $('#cardBody'+j));
-      console.log(cardList);
+
+      const gozCard = $('<div class="'+colName+'">').html(`
+        <div class="card bg-info text-white">
+          <label for="check${j}">
+            <div class="card-body">
+              <input class="check-input" type="radio" name="foo" id="check${j}" value="${j}. GÖZ" aria-label="...">  GÖZ ${j}</div>
+          </label>
+        </div>
+      `);
+      rowGozBody.append(gozCard);
     };
 
     cardList.forEach(function(item, index){
       item.empty();
       const header = $('<h2 class="text-center"></h3>').html(`${index+1}. GÖZ`);
       item.append(header);
+    });
+
+    $('input[type=radio][name=foo]').change(function() {
+      var firin = document.getElementById('firinNo');
+      firin.value = this.value;
     });
 
     data2.forEach(item => { // Verileri render et...
@@ -352,9 +323,12 @@
         {title:"Kalıp No", field:"kalipNo",  headerFilter:"input", cellClick:function(e, cell){
           let kalip = cell.getData().kalipNo;
           document.getElementById("kalipNo").value = kalip;
-          //gözlerin kaç tane olacağını burda yaz
+          
+          //gözlerin kaç tane olacağını burda yaz 
           $('#kalipModal').modal('show');
-        }},],});
+        }},
+      ],
+    });
 
   };
 
@@ -404,10 +378,7 @@
     });
     };
 
-  $('input[type=radio][name=foo]').change(function() {
-    var firin = document.getElementById('firinNo');
-    firin.value = this.value;
-  });
+
 
   loadPage();
 </script>
