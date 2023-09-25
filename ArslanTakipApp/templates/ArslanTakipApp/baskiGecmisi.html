@@ -1,0 +1,66 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container col-lg-12">
+    <h1 class="col-lg-11" style="text-align: center;">4000 Ton Pres Baskı Geçmişi</h1>
+    <h2 class="col-lg-11" style="text-align: center;">YAPIM AŞAMASINDA (design)</h2>
+    <div id="baskiGecmisiTable"></div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    var baskiGecmisiTable = new Tabulator("#baskiGecmisiTable", {
+        height:"700px",
+        layout:"fitDataFill",
+        placeholder:"Baskı Geçmişi",
+        ajaxURL:"/baskigecmisi/list",
+        ajaxURLGenerator:function(url, config, params){
+            return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+        },
+        progressiveLoad:"scroll",
+        paginationMode:"remote",
+        paginationSize:30,
+        columns:[
+            {title:"", field:"BilletCount"},
+            {title:"Kalıp No", field:"dieNumber"},
+            {title:"Baskı Başlangıcı", field:"Start"},
+            {title:"Zaman Kaybı", field:"timeLoss"},
+            {title:"Baskı Süresi", field:"extTime"},
+            {title:"Baskı Boyu mm", field:"stroke"},
+            {title:"Patlama Basıncı bar", field:"peakPreassure"},
+            {title:"Zımba Hızı mm/sn", field:"extTime"},
+            {title:"Billet °C", field:"billetTempOK"},
+            {title:"Billet Bekleme sn", field:"billetRequestTime"},
+            {title:"Billet Boyu", field:"billetLength"},
+        ],
+    });
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+{% endblock %}

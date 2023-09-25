@@ -14,7 +14,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1039,5 +1039,39 @@ def kalipfirini_meydan(request):
     meydan_count = meydanKalip.count()
     lastData= {'last_page': math.ceil(meydan_count/size), 'data': []}
     lastData['data'] = meydanData
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+
+class BaskiGecmisiView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/baskiGecmisi.html'
+
+def baskigecmisi_list(request):
+    params = json.loads(unquote(request.GET.get('params')))
+    for i in params:
+        value = params[i]
+        #print("Key and Value pair are ({}) = ({})".format(i, value))
+    size = params["size"]
+    page = params["page"]
+    offset, limit = calculate_pagination(page, size)
+
+    baskiQS = LivePresFeed.objects.all()
+    baskiList = list(baskiQS.values()[offset:limit])
+
+    for b in baskiList:
+        b['Start'] = b['Start'].strftime("%d-%m-%Y %H:%M:%S")
+        b['Stop'] = b['Stop'].strftime("%d-%m-%Y %H:%M:%S")
+        b['BilletCount'] = b['Parameters']['billetCount']
+        b['dieNumber'] = b['Parameters']['dieNumber']
+        b['extTime'] = b['Parameters']['extTime']
+        b['stroke'] = b['Parameters']['stroke']
+        b['peakPreassure'] = b['Parameters']['peakPreassure']
+        b['extSpeed'] = b['Parameters']['extSpeed']
+        b['billetTempOK'] =b['Parameters']['billetTempOK']
+        b['billetRequestTime'] =b['Parameters']['billetRequestTime']
+        b['billetLength'] = b['Parameters']['billetLength']
+    baski_count = baskiQS.count()
+    lastData= {'last_page': math.ceil(baski_count/size), 'data': []}
+    lastData['data'] = baskiList
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)

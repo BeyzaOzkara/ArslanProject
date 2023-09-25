@@ -31,5 +31,6 @@ urlpatterns = [
     path('kalipfirini/', views.KalipFirinView.as_view()),
     path('kalipfirini/meydan', views.kalipfirini_meydan),
     path('kalipfirini/goz', views.kalipfirini_goz),
-
+    path('baskigecmisi/', views.BaskiGecmisiView.as_view()),
+    path('baskigecmisi/list', views.baskigecmisi_list),
 ]

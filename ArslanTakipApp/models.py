@@ -200,3 +200,11 @@ class EkSiparis(models.Model):
         verbose_name="EkSiparis"
         verbose_name_plural="EkSiparisler"
 
+
+class LivePresFeed(models.Model):
+    MakineKodu = models.CharField(null=True)
+    Start = models.DateTimeField()
+    Stop = models.DateTimeField()
+    Parameters = models.JSONField(null=True) #kalipNo
+    Events = models.CharField(null=True) #ya da ForeignKey yap
+    #node-red-contrib-postgresql  --> npm install node-red-
