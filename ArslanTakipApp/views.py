@@ -491,7 +491,7 @@ def encrypt_aes_ecb(key, plaintext):
     padded_plaintext = pad(plaintext.encode('utf8'), AES.block_size)
     ciphertext = cipher.encrypt(padded_plaintext)
     return ciphertext
-
+#sepet numarası S250 olacak şekilde
 def decrypt_aes_ecb(key, ciphertext):
     cipher = AES.new(key, AES.MODE_ECB)
     decrypted_data = cipher.decrypt(ciphertext)
@@ -504,12 +504,29 @@ def qrKalite(request):
         """ path = request.get_full_path()
         print(path)
         print(path.rsplit('/', 1)[-1]) """
-
+        """ sepetArray = []
+        # Şifre oluşturma
+        for i in range(100,251): #250 if i<10: 
+            sepet = "S" + str(i)
+            encSepet = encrypt_aes_ecb(key, sepet)
+            hexSepet = binascii.hexlify(encSepet)
+            print(hexSepet)
+            #encode mu kullanmıştım??
+            decodedString = hexSepet.decode('utf-8') #??sanırım buydu
+            print(decodedString)
+            s = sepet + ", " + str(decodedString)
+            sepetArray.append(s)
+        print(sepetArray)
+        f = open("QRsepet2.csv", "a")
+        for j in sepetArray:
+            f.write(j+"\n")
+        f.close() """
+        #1 ve 9 arasındaysa başına 2 sıfır 10 ve 99 arasındaysa 1 sıfır
         # Şifre çözme
-        unhexli = binascii.unhexlify('b23d7cad6447841b177fe5610114b374')
+        unhexli = binascii.unhexlify('359b31029c95cf671eb27f7d54f05af0')
         print(unhexli)
         decrypted_text = decrypt_aes_ecb(key, unhexli)
-        print("Çözülmüş Veri:", decrypted_text)        
+        print("Çözülmüş Veri:", decrypted_text)   
 
         ty = request.GET.get('type', '')
         no = request.GET.get('no', '')
@@ -1054,8 +1071,8 @@ def baskigecmisi_list(request):
     size = params["size"]
     page = params["page"]
     offset, limit = calculate_pagination(page, size)
-
-    baskiQS = LivePresFeed.objects.all()
+    #filterlist şeklinde olan filterlar eklenecek
+    baskiQS = LivePresFeed.objects.filter(Events = "extrusion").order_by('-id')
     baskiList = list(baskiQS.values()[offset:limit])
 
     for b in baskiList:
@@ -1070,6 +1087,12 @@ def baskigecmisi_list(request):
         b['billetTempOK'] =b['Parameters']['billetTempOK']
         b['billetRequestTime'] =b['Parameters']['billetRequestTime']
         b['billetLength'] = b['Parameters']['billetLength']
+        try:
+            b['timeLoss'] = b['Parameters']['timeLoss']
+        except:
+            b['timeLoss'] = None
+        
+
     baski_count = baskiQS.count()
     lastData= {'last_page': math.ceil(baski_count/size), 'data': []}
     lastData['data'] = baskiList

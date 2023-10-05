@@ -203,8 +203,19 @@ class EkSiparis(models.Model):
 
 class LivePresFeed(models.Model):
     MakineKodu = models.CharField(null=True)
-    Start = models.DateTimeField()
-    Stop = models.DateTimeField()
+    Start = models.DateTimeField(null=True)
+    Stop = models.DateTimeField(null=True)
     Parameters = models.JSONField(null=True) #kalipNo
     Events = models.CharField(null=True) #ya da ForeignKey yap
     #node-red-contrib-postgresql  --> npm install node-red-
+
+class Termik(models.Model):
+    OvenName = models.CharField(null=True)
+    SampleTime = models.DateTimeField(null=True)
+    Bolge1 = models.FloatField(null=True)
+    OrtaBolge = models.FloatField(null=True)
+    Bolge2 = models.FloatField(null=True)
+    Bolge1TB = models.FloatField(null=True)
+    Bolge2TB = models.FloatField(null=True)
+    ProgramSet = models.CharField(null=True)
+    BatchNo = models.CharField(null=True)
