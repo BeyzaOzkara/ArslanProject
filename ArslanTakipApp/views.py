@@ -144,6 +144,10 @@ def location(request):
         lRec = Location.objects.get(id = dieTo)
         gozCapacity = Location.objects.get(id = lRec.id).capacity
 
+        notPhysical = ["542", "543", "544", "545", "570", "571", "572", "573", "574", "575", "1079"]
+        if dieTo in notPhysical:
+            dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
+
         if gozCapacity == None:
             hareketSave(dieList, lRec, dieTo, request)
         else:
@@ -311,7 +315,7 @@ def location_hareket(request):
         hareketK = filter_list[0]['value']
         hareketQuery = Hareket.objects.all()
         location_list = Location.objects.values()
-        hareketQuery = list(hareketQuery.values().filter(kalipNo=hareketK))
+        hareketQuery = list(hareketQuery.values().filter(kalipNo=hareketK).order_by("-hareketTarihi"))
         kalip_l = list(DiesLocation.objects.filter(kalipNo=hareketK).values())
         users = User.objects.values()
         harAr = []
@@ -552,8 +556,6 @@ def qrDeneme(request):
 class SiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/siparisList.html'
 
-
-    
 # Helper function for aggregation and formatting
 def aggregate_and_format(queryset, field):
     max_val = math.ceil(queryset.aggregate(Max(field))[f'{field}__max'])
@@ -618,14 +620,6 @@ def format_item(a):
     a += b
     return a
     
-    """ ttk = 0
-    if a['AktifKalipSayisi']:
-        ttk = math.ceil(a['TopTenKg'])
-    a['SonTermin'] = a['SonTermin'].strftime("%d-%m-%Y")
-    a['GirenKg'] = locale.format_string("%.0f", math.ceil(a["GirenKg"]), grouping=True)
-    a['Kg'] = locale.format_string("%.0f", math.ceil(a["Kg"]), grouping=True)
-    a['TopTenKg'] = locale.format_string("%.0f", ttk, grouping=True)
-    return a """
 
 def aggregate_in_parallel(queryset, fields):
     with ThreadPoolExecutor() as executor:
@@ -849,6 +843,13 @@ def siparis_ekle(request):
 class EkSiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/eksiparis.html'
 
+def filter_method(i, a):
+    if i["type"] == "like":
+        a[i['field'] + "__startswith"] = i['value']
+    elif i["type"] == "=":
+        a[i['field']] = i['value']
+    return a
+
 def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
@@ -856,6 +857,8 @@ def eksiparis_list(request):
         print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
+    filter_list = params["filter"]
+    offset, limit = calculate_pagination(page, size)
     users = User.objects.values()
     
     siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
@@ -865,19 +868,34 @@ def eksiparis_list(request):
             "ToplamKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0))"
         },
     )
+    
+    q={}
+    w={}
+    sipFields = ["ProfilNo", "FirmaAdi", "GirenKg", "Kg", "GirenAdet", "Adet", "PlanlananMm", "Mm", "KondusyonTuru", "SiparisTamam", "SonTermin", "BilletTuru", "TopTenKg"]
 
-    ekSiparis = EkSiparis.objects.order_by("Sira").exclude(MsSilindi = True)
-    ekSiparisList = list(ekSiparis.values())
-
+    if len(filter_list)>0:
+        for i in filter_list:
+            if i['field'] in sipFields:
+                w = filter_method(i, w)
+            else:
+                q = filter_method(i, q)
+    ekSiparis = EkSiparis.objects.filter(**q).order_by("Sira").exclude(MsSilindi = True)
+    ekSiparisList = list(ekSiparis.values()[offset:limit])
+    siparis2 = siparis.filter(**w)
+    
+    #filterladıklarım aşağıdaki if içinde siliniyor nasıl yapmam lazım?
     for e in ekSiparisList:
         if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
+            print(e)
             a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
             if a.MsSilindi != True:
                 a.MsSilindi = True
                 a.save()
             ekSiparisList.remove(e)
         else:
-            siparis1 = siparis.get(Kimlik = e['SipKimlik'])
+            print(e)
+            print(siparis.get(Kimlik=e['SipKimlik']))
+            siparis1 = siparis2.get(Kimlik = e['SipKimlik'])
             e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
             e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
             e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
