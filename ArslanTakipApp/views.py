@@ -147,7 +147,7 @@ def location(request):
         notPhysical = ["542", "543", "544", "545", "570", "571", "572", "573", "574", "575", "1079"]
         if dieTo in notPhysical:
             dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
-
+            
         if gozCapacity == None:
             hareketSave(dieList, lRec, dieTo, request)
         else:
@@ -1085,13 +1085,25 @@ def baskigecmisi_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
-        #print("Key and Value pair are ({}) = ({})".format(i, value))
+        print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     offset, limit = calculate_pagination(page, size)
+    filter_list = params["filter"]
+    q= {}
+
+    baskiL = ["MakineKodu", "Start", "Stop", "Events"]
+    parameters = [""]
+
     #filterlist şeklinde olan filterlar eklenecek
     baskiQS = LivePresFeed.objects.filter(Events = "extrusion").order_by('-id')
-    baskiList = list(baskiQS.values()[offset:limit])
+    if len(filter_list) > 0:
+        for i in filter_list:
+            if not i["field"] in baskiL:
+                i["field"] = "Parameters__" + i["field"]
+            q = filter_method(i, q)
+
+    baskiList = list(baskiQS.filter(**q).values()[offset:limit])
 
     for b in baskiList:
         b['Start'] = b['Start'].strftime("%d-%m-%Y %H:%M:%S")

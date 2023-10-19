@@ -39,9 +39,9 @@
             return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
         },
         progressiveLoad:"scroll",
+        filterMode:"remote",
         paginationMode:"remote",
         paginationSize:30,
-        filterMode:"remote",
         columns:[
             {title:"", field:"BilletCount", headerFilter:"input"},
             {title:"Kalıp No", field:"dieNumber", headerFilter:"input"},
