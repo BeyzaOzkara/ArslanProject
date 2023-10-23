@@ -504,7 +504,6 @@ def decrypt_aes_ecb(key, ciphertext):
 
 def qrKalite(request):
     if request.method == "GET":
-        print("qr sayfası")
         """ path = request.get_full_path()
         print(path)
         print(path.rsplit('/', 1)[-1]) """
@@ -527,14 +526,13 @@ def qrKalite(request):
         f.close() """
         #1 ve 9 arasındaysa başına 2 sıfır 10 ve 99 arasındaysa 1 sıfır
         # Şifre çözme
-        unhexli = binascii.unhexlify('359b31029c95cf671eb27f7d54f05af0')
-        print(unhexli)
+        unhexli = binascii.unhexlify('819a7b20eed64469c8adaa3ccf01ad06')
+        #print(unhexli)
         decrypted_text = decrypt_aes_ecb(key, unhexli)
-        print("Çözülmüş Veri:", decrypted_text)   
+        #print("Çözülmüş Veri:", decrypted_text)   
 
         ty = request.GET.get('type', '')
         no = request.GET.get('no', '')
-        print(ty + " " + no)
         
         context = {
             "type" : unhexli,
@@ -668,7 +666,7 @@ def siparis_list(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     for i in params:
         value = params[i]
-        print("Key and Value pair are ({}) = ({})".format(i, value))
+        #print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params.get("size", 10)  # Default size to 10
     offset, limit = calculate_pagination(params.get("page", 1), size)
     filter_list = params.get("filter", [])
@@ -854,7 +852,7 @@ def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
-        print("Key and Value pair are ({}) = ({})".format(i, value))
+        #print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
@@ -886,15 +884,12 @@ def eksiparis_list(request):
     #filterladıklarım aşağıdaki if içinde siliniyor nasıl yapmam lazım?
     for e in ekSiparisList:
         if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
-            print(e)
             a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
             if a.MsSilindi != True:
                 a.MsSilindi = True
                 a.save()
             ekSiparisList.remove(e)
         else:
-            print(e)
-            print(siparis.get(Kimlik=e['SipKimlik']))
             siparis1 = siparis2.get(Kimlik = e['SipKimlik'])
             e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
             e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
@@ -1093,7 +1088,6 @@ def baskigecmisi_list(request):
     q= {}
 
     baskiL = ["MakineKodu", "Start", "Stop", "Events"]
-    parameters = [""]
 
     #filterlist şeklinde olan filterlar eklenecek
     baskiQS = LivePresFeed.objects.filter(Events = "extrusion").order_by('-id')
@@ -1102,7 +1096,7 @@ def baskigecmisi_list(request):
             if not i["field"] in baskiL:
                 i["field"] = "Parameters__" + i["field"]
             q = filter_method(i, q)
-
+            
     baskiList = list(baskiQS.filter(**q).values()[offset:limit])
 
     for b in baskiList:
@@ -1128,3 +1122,4 @@ def baskigecmisi_list(request):
     lastData['data'] = baskiList
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
+
