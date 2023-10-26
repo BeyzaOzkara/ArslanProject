@@ -139,12 +139,13 @@
   btnAcilListe.addEventListener('click', () => {
     $('#acilModal').modal('show');
     let data = ekSiparisAcilTable.getData();
-    console.log(data);
   });
 
   var deleteIcon = function(cell, formatterParams, onRendered){ 
     return "<i class='fa fa-trash'></i>";
   };
+
+  var silinenler = [];
 
   var ekSiparisAcilTable = new Tabulator("#ekSiparisAcilTable", {
     height:"700px",
@@ -153,7 +154,7 @@
     ajaxURL:"/eksiparis/acil",
     popupContainer:true,
     movableRows:true,
-    rowFormatter: row => {
+    /* rowFormatter: row => {
       let data = row.getData();
         if (data.Silindi == true) {
           row.getElement().style.color = "#a3050a" 
@@ -161,9 +162,8 @@
           }
         else if (data.Silindi == false) {
           data.Silindi = "Hayır";
-          console.log("hayır");
         }
-    },
+    }, */
     columns:[
         {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:40, minWidth:40},
         {title:"Kart No", field:"SipKartNo"},
@@ -181,13 +181,28 @@
         {title:"Kondüsyon Türü", field:"KondusyonTuru", visible:false},
         {title:"Toplam Kalan Tenifer", field:"TopTenKg", visible:false},
         {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
-            //cell.getRow().delete();
-            //var s_id = cell.getData().id;
-            //üstünü çiz kaydete bastıktan sonra silinmesi için post
+            var row = cell.getRow();
+            var ekNo = cell.getData().id;
+            //if ekle eğer listeyse listeden çıkar de
+            if (!silinenler.includes(ekNo)){
+              silinenler.push(ekNo);
+              row.getElement().style.backgroundColor= '#C08261'
+              //üstünü çiz? silinenlerin rengi değişebilir?
+            }
+            else{
+              var index = silinenler.indexOf(ekNo);
+              if (index > -1){
+                silinenler.splice(index,1);
+                row.getElement().style.backgroundColor= ''
+              }
+              //silinenenler.pop();böyle değil bu son elementi çıkartıyor 
+            }
+            //üstünü çiz kaydete bastıktan sonrra silinmesi için post
         }},
     ],
   });
-
+  
+  //table.deleteRow(silinenler); silinenleri gönder veritabanından da silinsinler
   var movedData = {}
   ekSiparisAcilTable.on("rowMoved", function(row){
       movedData = {};
@@ -217,6 +232,7 @@
       method: "post",
       data: {
         'fark': JSON.stringify(fark),
+        'silinenler': JSON.stringify(silinenler),
         'csrfmiddlewaretoken': '{{ csrf_token }}'
       },
       success: function () {

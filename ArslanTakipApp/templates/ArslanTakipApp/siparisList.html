@@ -232,6 +232,7 @@
         <button style="float: right;" type="button" id="btnEkSiparisList" class="btn bg-gradient-info">Üretim Planı</button>
         <button style="float: right; margin-right: 5px;" type="button" id="btnModal" class="btn bg-gradient-info">Arama</button>
         <button style="float: right; margin-right: 5px;" type="button" id="btnModalTabulator" class="btn bg-gradient-info">Sırala</button>
+        <button style="float: right; margin-right: 5px;" type="button" id="btnTabSiparisEkle" class="btn bg-gradient-info">Ekle</button>
       </div>
     </div>
   </div>
@@ -280,6 +281,21 @@
       </table>
       <div class="pagination-container">
         <ul class="pagination"></ul>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="tabEkleModal" tabindex="-1" aria-labelledby="tabEkleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Siparis EK Kartı</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+        </div>
       </div>
     </div>
   </div>
@@ -580,6 +596,10 @@
             cell.getRow().delete();}
           }
       ],
+  });
+  
+  document.getElementById("btnTabSiparisEkle").addEventListener('click', () => {
+    $('#tabEkleModal').modal('show');
   });
   
   document.getElementById("btnEkSiparisList").addEventListener('click', function(){
@@ -1091,6 +1111,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       
       if (siparisEkleKg != "" && selectedPresKodu != "" && terminDate != "") {
         $('#siparisEkleModal').modal('hide'); 
+        SubForm(); 
       }
       else if (siparisEkleKg == "" && selectedPresKodu == "" && terminDate == ""){
         alert("Lütfen pres ve termin seçip, kilogram değeri giriniz!");
@@ -1113,8 +1134,6 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       else if (terminDate == "") {
         alert("Lütfen planlanan termin seçiniz!");
       }
-      SubForm();
-
     });
 
     function SubForm (){

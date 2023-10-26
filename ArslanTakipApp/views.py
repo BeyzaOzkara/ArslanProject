@@ -877,7 +877,7 @@ def eksiparis_list(request):
                 w = filter_method(i, w)
             else:
                 q = filter_method(i, q)
-    ekSiparis = EkSiparis.objects.filter(**q).order_by("Sira").exclude(MsSilindi = True)
+    ekSiparis = EkSiparis.objects.filter(**q).exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
     ekSiparisList = list(ekSiparis.values()[offset:limit])
     siparis2 = siparis.filter(**w)
     
@@ -926,7 +926,7 @@ def eksiparis_acil(request):
     )
 
     users = User.objects.values()
-    ekSiparis = EkSiparis.objects.order_by("Sira").exclude(MsSilindi = True)
+    ekSiparis = EkSiparis.objects.order_by("Sira").exclude(MsSilindi = True).exclude(Silindi=True)
     ekSiparisList = list(ekSiparis.values())
 
     for e in ekSiparisList:
@@ -962,12 +962,16 @@ def eksiparis_acil(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
     elif request.method == "POST":
-        print(request.POST['fark'])
         fark = request.POST['fark']
         fark = json.loads(fark)
-        print(fark)
+        silinenler = json.loads(request.POST['silinenler'])
+        for s in silinenler:
+            sil = EkSiparis.objects.get(id=s)
+            sil.Silindi = True
+            sil.save()
+            #Silindi true yapSilindi True MsSilindi kontrolü gibi olabilir
+
         for f in fark:
-            print(f['id'])
             ek = EkSiparis.objects.get(id=f['id'])
             ek.Sira = f['Sira']
             ek.save()
