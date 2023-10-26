@@ -243,34 +243,34 @@
         <thead>
           <tr>
             <th scope="col" style="width: 1%;"></th>
-            <th scope="col" style="width: 5%;">Bloke</th>
+            <th scope="col" style="width: 3%;">Bloke</th>
             <th scope="col" style="width: 6%;">Kart No</th>
             <th scope="col" style="width: 10%;">Firma Adı</th>
             <th scope="col" style="width: 7%;">Profil No</th>
             <th scope="col" style="width: 6%;">Pres Kodu</th>
             <th scope="col" style="width: 6%;">Billet Turu</th>
             <th scope="col" colspan="2" style="width: 5%;">Sipariş Kg</th>
-            <th scope="col" colspan="2" style="width: 4%;">Kalan Kg</th>
-            <th scope="col" colspan="2" style="width: 2%;">Boy</th>
+            <th scope="col" colspan="2" style="width: 5%;">Kalan Kg</th>
+            <th scope="col" colspan="2" style="width: 5%;">Boy</th>
             <th scope="col" style="width: 12%;">Kondusyon Türü</th>
-            <th scope="col" style="width: 9%;">Termin</th>
+            <th scope="col" style="width: 7%;">Termin</th>
             <th scope="col" style="width: 8%;">Top Ten Kg </th>
             <th scope="col" style="width: 6%;">Kalıp Sayısı</th>
             
           </tr>
           <tr>
             <th scope="col"  style="width: 1%;"></th>
-            <th scope="col"  style="width: 5%;"></th>
+            <th scope="col"  style="width: 3%;"></th>
             <th scope="col" style="width: 6%;"></th>
             <th scope="col" style="width: 10%;"></th>
             <th scope="col" style="width: 7%;"></th>
             <th scope="col" style="width: 6%;"></th>
             <th scope="col" style="width: 6%;"></th>
             <th scope="col"  colspan="2" style="width: 5%; background-color: #a8ccdd;" id="sipTopKg"></th>
-            <th scope="col" colspan="2" style="width: 4%; background-color: #a8ccdd;" id="sipKalKg"></th>
-            <th scope="col" colspan="2" style="width: 2%;"></th>
+            <th scope="col" colspan="2" style="width: 5%; background-color: #a8ccdd;" id="sipKalKg"></th>
+            <th scope="col" colspan="2" style="width: 5%;"></th>
             <th scope="col" style="width: 12%;"></th>
-            <th scope="col" style="width: 9%;"></th>
+            <th scope="col" style="width: 7%;"></th>
             <th scope="col" style="width: 8%; background-color: #a8ccdd;" id="sipTopTen"></th>
             <th scope="col" style="width: 6%;"></th>
           </tr>
@@ -294,7 +294,7 @@
           </button>
         </div>
         <div class="modal-body">
-          
+
         </div>
       </div>
     </div>
@@ -1157,10 +1157,10 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
     const renderData = (data) => {
       tableBody.empty();  // Önceki verileri temizle
       data.forEach(item => { // Verileri render et...
-        let SiparisTamamSymbol = (item[11] === 'BLOKE') ? '✗' : '✓';
+        let SiparisTamamSymbol = (item[11] === 'BLOKE') ? '<i class="far fa-times-circle"></i>' : '<i class="far fa-check-circle"></i>';
         // Decide whether to include a '+' symbol based on SiparisTamamSymbol
-        let ek = (SiparisTamamSymbol === '✓') 
-           ? `<td class="ekleTableBody" onclick="myFunction(this)">+</td>` 
+        let ek = (SiparisTamamSymbol === '<i class="far fa-check-circle"></i>') 
+           ? `<td class="ekleTableBody" onclick="myFunction(this)"><i class="fa fa-plus"></i></td>` 
            : `<td class="ekleTableBody"> </td>`;
 
         const aktifKalipSayisi = item[15] !== null ? item[15] : '-';
@@ -1168,7 +1168,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
 
         const row = $('<tr class="main-row"></tr>').html(`
         ${ek}
-        <td class="blokeTableBody">${SiparisTamamSymbol}</td>
+        <td class="blokeTableBody" style="text-align: center;">${SiparisTamamSymbol}</td>
         <td class="kartTableBody">${item[0]}</td>
         <td class="firmaTableBody">${item[2]}</td>
         <td class="profilNoTableBody">${item[1]}</td>

@@ -237,6 +237,7 @@
       },
       success: function () {
         ekSiparisTable.setData();
+        ekSiparisAcilTable.deleteRow(silinenler);
         $('#acilModal').modal('hide');
         //alert("Acil Liste Kaydedildi!");
       },
