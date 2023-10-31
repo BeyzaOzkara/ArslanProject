@@ -33,4 +33,5 @@ urlpatterns = [
     path('kalipfirini/goz', views.kalipfirini_goz),
     path('baskigecmisi/', views.BaskiGecmisiView.as_view()),
     path('baskigecmisi/list', views.baskigecmisi_list),
+    path('yuda', views.YudaView.as_view()),
 ]

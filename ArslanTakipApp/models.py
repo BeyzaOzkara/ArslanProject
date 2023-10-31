@@ -219,3 +219,54 @@ class Termik(models.Model):
     Bolge2TB = models.FloatField(null=True)
     ProgramSet = models.CharField(null=True)
     BatchNo = models.CharField(null=True)
+
+class YudaOnay(models.Model):
+    Aciklama = models.CharField(null=True, blank=True)
+    Tarih = models.DateField(null=True, blank=True)
+    Onay = models.BooleanField(null=True, blank=True)
+
+class Yuda(models.Model):
+    YudaNo = models.CharField(null=True, blank=True)
+    ProjeYoneticisi = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null =True)
+    Tarih = models.DateField(null=True, blank=True)
+    RevTarih = models.DateField(null=True, blank=True) #düzenleme yapıldığındaki tarih
+    IstekYapanBolum = models.CharField(null=True, blank=True)
+    IstekYapanKisi = models.CharField(null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor
+    MusteriFirmaAdi = models.CharField(null=True, blank=True)
+    SonKullaniciFirma = models.CharField(null=True, blank=True)
+    OnemliYuzeyler = models.BooleanField(null=True, blank=True)
+    OnemliOlculerVeToleranslar = models.CharField(null=True, blank=True)
+    CizimNo = models.CharField(null=True, blank=True)
+    YillikProfilSiparisi = models.CharField(null=True, blank=True)
+    TalasliImalat = models.CharField(null=True, blank=True)
+    TalasliImalatBoyaYadaEloksaldan = models.CharField(null=True, blank=True)
+    MusteriYuzeyVeyaTalasliIslem = models.CharField(null=True, blank=True)
+    BirlikteCalisanAparati = models.CharField(null=True, blank=True)
+    OzelPaketleme = models.BooleanField(null=True, blank=True)
+    OzelPaketlemeAciklama = models.CharField(null=True, blank=True)
+    KalipDurumu = models.CharField(null=True, blank=True) #Profilin kullanıldığı yer
+    BilletCinsi = models.CharField(null=True, blank=True)
+    Kondusyon = models.CharField(null=True, blank=True)
+    DinToleransi = models.CharField(null=True, blank=True)
+    YuzeyDurumu = models.CharField(null=True, blank=True)
+    MetreAgirlikTalebi = models.BooleanField(null=True, blank=True)
+    MetreAgirlikTalebiMiktar = models.CharField(null=True, blank=True)
+    AskiIzi = models.CharField(null=True, blank=True)
+    IstenilenStandartBoy = models.CharField(null=True, blank=True)
+    MinKullanimBoyu = models.CharField(null=True, blank=True)
+    Folyo = models.BooleanField(null=True, blank=True)
+    Bariyerleme = models.BooleanField(null=True, blank=True)
+    MusteriOdemeVadesi = models.CharField(null=True, blank=True)
+    SatisBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_satis")
+    KaliphaneBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_kaliphane")
+    UretimBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_uretim")
+    KaliteBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_kalite")
+    YuzeyIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_yuzey")
+    MekanikIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_mekanik")
+
+class Comment(models.Model):
+    kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    form = models.ForeignKey(Yuda, on_delete=models.CASCADE, null=True, blank=True)
+    tarih = models.DateTimeField(auto_now=True, null=True, blank=True)
+    aciklama = models.CharField(null=True, blank=True)
+    #yüklenecek dosyalar için ne yazabilirim?

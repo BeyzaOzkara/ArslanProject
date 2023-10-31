@@ -294,7 +294,11 @@
           </button>
         </div>
         <div class="modal-body">
-
+          <div class="container-fluid">
+            <div class="row">
+              <div id="tabulatorEkleModal"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -576,6 +580,22 @@
 
 {% block extra_js %}
 <script>
+
+  const eklenenler = (sipKimlik) => {
+    $.ajax({
+      url: `/siparis/eksorgu/${sipKimlik}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (eklenenData) {
+          $.each(eklenenData, function(key, value) {
+            $('#planlananPresKodu').append('<option value=' + value + '>' + value + '</option>');
+          });
+      },
+      error: function (error) {
+          console.error('Error loading eklenenler:', error);
+      }
+    });
+  };
   
   var deleteIcon = function(cell, formatterParams, onRendered){ 
       return "<i class='fa fa-trash'></i>";
@@ -720,173 +740,6 @@ addInputChangeHandler('#kalan2', '#range_2', 'to', min2);
 addInputChangeHandler('#topten1', '#range_3', 'to', min3);
 addInputChangeHandler('#topten2', '#range_3', 'to', min3);
 
-  // Add more calls as needed
-    
-/*     $('#range_1').ionRangeSlider({
-      min     : 0,
-      max     : 500000,
-      from    : 0,
-      to      : 10000,
-      type    : 'double',
-      step    : 1,
-      postfix  : ' kg',
-      prettify: false,
-      hasGrid : true,
-      onFinish: function(data){
-        var from = data.from;   // input data-from attribute
-        var to = data.to;       // input data-to attribute
-        var field = $( "#range_1" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        filter.push({ field: field, type: from, value: to});
-        updateInputs1;
-      },
-      onChange: updateInputs1
-    });
-    
-    var sliders1 = $("#range_1").data("ionRangeSlider");
-    var from1 =0;
-    var to1=0;
-    var min1 = 0;
-
-    function updateInputs1(data){
-      from1 = data.from;
-      to1 = data.to;
-      $('#sip1').prop("value", from1);
-      $('#sip2').prop("value", to1);
-    };
-
-    $('#sip1').on("change", function () {
-      var val = $(this).prop("value");
-      if (val < min1) {val = min1;
-      } else if (val > to1) {val = to1;}
-      sliders1.update({
-          from: val
-      });
-      $(this).prop("value", val);
-    });
-
-    $('#sip2').on("change", function () {
-      var val = $(this).prop("value");
-
-      if (val < from1) {val = from1;
-      } else if (val > to1) {val = to1;}
-      sliders1.update({
-          to: val
-      });
-      $(this).prop("value", val);
-    });
-
-    $('#range_2').ionRangeSlider({
-      min     : 0,
-      max     : 500000,
-      from    : 0,
-      to      : 10000,
-      type    : 'double',
-      step    : 1,
-      postfix  : ' kg',
-      prettify: false,
-      hasGrid : true,
-      onFinish: function(data){
-        var from = data.from;   
-        var to = data.to;       
-        var field = $( "#range_2" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        filter.push({ field: field, type: from, value: to});
-        updateInputs2;
-      },
-      onChange: updateInputs2
-    });
-        
-    var sliders2 = $("#range_2").data("ionRangeSlider");
-    var from2 =0;
-    var to2=0;
-    var min2 = 0;
-
-    function updateInputs2(data){
-      from2 = data.from;
-      to2 = data.to;
-      $('#kalan1').prop("value", from2);
-      $('#kalan2').prop("value", to2);
-    };
-
-    $('#kalan1').on("change", function () {
-      var val = $(this).prop("value");
-
-      if (val < min1) {val = min2;
-      } else if (val > to2) {val = to2;}
-      sliders2.update({
-          from: val
-      });
-      $(this).prop("value", val);
-    });
-
-    $('#kalan2').on("change", function () {
-      var val = $(this).prop("value");
-
-      if (val < from2) {val = from2;
-      } else if (val > to2) {val = to2;}
-      sliders2.update({
-          to: val
-      });
-      $(this).prop("value", val);
-    });
-
-    
-    $('#range_3').ionRangeSlider({
-      min     : 0,
-      max     : 500000,
-      type    : 'double',
-      step    : 1,
-      postfix  : ' kg',
-      prettify: false,
-      hasGrid : true,
-      onFinish: function(data){
-        var from = data.from;   
-        var to = data.to;       
-        var field = $( "#range_3" ).data('field');
-        filter = filter.filter(f => f.field !== field);
-        filter.push({ field: field, type: from, value: to});
-        updateInputs3;
-      },
-      onChange: updateInputs3,
-    });
-    
-    var slider3 = $("#range_3").data("ionRangeSlider");
-    var from3 =0;
-    var to3=0;
-    var min3 = 0;
-
-    function updateInputs3(data){
-      from3 = data.from;
-      to3 = data.to;
-      $('#topten1').prop("value", from3);
-      $('#topten2').prop("value", to3);
-
-    };
-
-    $('#topten1').on("change", function () {
-      var sliders3 = $("#range_3").data("ionRangeSlider");
-      var val = $('#topten1').prop("value");
-
-      if (val < min3) {val = min3;
-      } else if (val > to3) {val = to3;}
-      sliders3.update({
-          from: val
-      });
-      $(this).prop("value", val);
-    });
-
-    $('#topten2').on("change", function () {
-      var val = $(this).prop("value");
-
-      if (val < from3) {val = from3;
-      } else if (val > to3) {val = to3;}
-      slider3.update({
-          to: val
-      });
-      $(this).prop("value", val);
-    });
- */
     //Date range picker
     $('#terminDate').daterangepicker({
       "locale": {

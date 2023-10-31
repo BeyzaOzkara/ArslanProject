@@ -837,6 +837,15 @@ def siparis_ekle(request):
         ekSiparis.save()
 
     return HttpResponseRedirect("/siparis")
+ 
+def siparis_eksorgu(request, sipKimlik):
+    print(sipKimlik)
+    ekSiparis = EkSiparis.objects.all().values()
+    ekList = list(ekSiparis)
+    ekSiparis.filter(sipKimlik__in=sipKimlik)
+    #ekSiparisdeki kimlikleri göndermek daha mantıklı yukarıdaki gibi yapmak yerine
+    return
+
 
 class EkSiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/eksiparis.html'
@@ -850,9 +859,8 @@ def filter_method(i, a):
 
 def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
-    for i in params:
-        value = params[i]
-        #print("Key and Value pair are ({}) = ({})".format(i, value))
+    #for i in params:
+        #print("Key and Value pair are ({}) = ({})".format(i, params[i]))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
@@ -969,7 +977,7 @@ def eksiparis_acil(request):
             sil = EkSiparis.objects.get(id=s)
             sil.Silindi = True
             sil.save()
-            #Silindi true yapSilindi True MsSilindi kontrolü gibi olabilir
+            #Silindi True olsun MsSilindi exclude yapılırken bunu da excludela 
 
         for f in fark:
             ek = EkSiparis.objects.get(id=f['id'])
@@ -1126,4 +1134,7 @@ def baskigecmisi_list(request):
     lastData['data'] = baskiList
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
+
+class YudaView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/yuda.html'
 

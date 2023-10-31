@@ -1,0 +1,256 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">YENİ ÜRÜN DEVREYE ALMA FORMU</h5>
+    </div>
+    <div class="card-body" style="display: block;">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="form-group">
+            <label for="istekYapanBolum">İSTEK YAPAN BÖLÜM</label>
+            <input type="text" id="istekYapanBolum" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="istekYapanKisi">İSTEK YAPAN KİŞİ</label>
+            <input type="text" id="istekYapanKisi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="onemliYuzeyler">ÖNEMLİ YÜZEYLER (GÖRÜNEN YÜZEYLER)</label>
+            <div class="ml-auto">
+              <label class="radio-inline">
+                <input type="radio" name="onemliYuzeyler1">VAR
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="onemliYuzeyler2">YOK
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="onemliOlculerVeToleranslar">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</label>
+            <input type="text" id="onemliOlculerVeToleranslar" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="cizimNo">ÇİZİM NO</label>
+            <input type="text" id="cizimNo" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="yillikProfilSiparisi">YILLIK PROFİL SİPARİŞİ</label>
+            <input type="text" id="yillikProfilSiparisi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="istenilenStandartBoy">İSTENİLEN STANDART BOY</label>
+            <input type="text" id="istenilenStandartBoy" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="minKullanimBoyu">MİN. KULLANIM BOYU</label>
+            <input type="text" id="minKullanimBoyu" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="musteriOdemeVadesi">MÜŞTERİ ÖDEME VADESİ</label>
+            <input type="text" id="musteriOdemeVadesi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="talasliImalat">TALAŞLI İMALAT</label>
+            <div class="ml-auto">
+              <label class="radio-inline">
+                <input type="radio" name="talasliImalat">VAR
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="talasliImalat">YOK
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="talasliImalat">BELİRTİLMEDİ
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="talasliImalatBoyaYadaEloksaldan">TALAŞLI İMALAT BOYA YA DA ELOKSALDAN</label>
+            <div class="ml-auto">
+              <label class="radio-inline">
+                <input type="radio" name="talasliImalatBoyaYadaEloksaldan">ÖNCE
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="talasliImalatBoyaYadaEloksaldan">SONRA
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="talasliImalatBoyaYadaEloksaldan">BELİRTİLMEDİ
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="musteriYuzeyVeyaTalasliIslem">MÜŞTERİ YÜZEY VEYA TALAŞLI İŞLEM YAPIYOR MU?</label>
+            <div class="ml-auto">
+              <label class="checkbox-inline">
+                <input type="checkbox" name="musteriYuzeyVeyaTalasliIslem">ELOKSAL
+              </label>
+              <label class="radio-inline">
+                <input type="checkbox" name="musteriYuzeyVeyaTalasliIslem">BOYA
+              </label>
+              <label class="radio-inline">
+                <input type="checkbox" name="musteriYuzeyVeyaTalasliIslem">MEKANİK İŞLEM
+              </label>
+              <label class="radio-inline">
+                <input type="checkbox" name="musteriYuzeyVeyaTalasliIslem">YAPMIYOR
+              </label>
+              <label class="radio-inline">
+                <input type="checkbox" name="musteriYuzeyVeyaTalasliIslem">BELİRTİLMEDİ
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="birlikteCalisanAparati">BİRLİKTE ÇALŞAN APARATI</label>
+            <div class="ml-auto">
+              <label class="radio-inline">
+                <input type="radio" name="birlikteCalisanAparati">KENDİSİ İLE ÇALIŞIR
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="birlikteCalisanAparati">VAR
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="birlikteCalisanAparati">YOK
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="ozelPaketleme">ÖZEL PAKETLEME</label>
+            <div class="ml-auto">
+              <label class="radio-inline">
+                <input type="radio" name="ozelPaketleme">VAR
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="ozelPaketleme">YOK
+              </label>
+            </div>
+          </div>
+
+
+        </div>
+
+
+        <div class="col-lg-6">
+          <div class="form-group">
+            <label for="musteriFirmaAdi">MÜŞTERİ FİRMA ADI</label>
+            <input type="text" id="musteriFirmaAdi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="sonKullaniciFirma">SON KULLANICI FİRMA</label>
+            <input type="text" id="sonKullaniciFirma" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="kalipDurumu">PROFİLİN KULLANILDIĞI YER (KALIP DURUMU)</label>
+            <input type="text" id="kalipDurumu" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="billetCinsi">BİLLET CİNSİ</label>
+            <select id="billetCinsi" class="form-control custom-select">
+              <option value="6060">6060</option>
+              <option value="6063">6063</option>
+              <option value="6060-90">6060-90</option>
+              <option value="6463">6463</option>
+              <option value="6082">6082</option>
+              <option value="6005">6005</option>
+              <option value="6013">6013</option>
+              <option value="6061">6061</option>
+              <option value="6060-B">6060-B</option>
+              <option value="6060-90B">6060-90B</option>
+              <option value="6005-B">6005-B</option>
+              <option value="6082-B">6082-B</option>
+              <option value="DIGER">DİĞER</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="kondusyon">KONDÜSYON</label>
+            <select id="kondusyon" class="form-control custom-select">
+              <option value="T5">T5</option>
+              <option value="T6">T6</option>
+              <option value="T66">T66</option>
+              <option value="F18">F18</option>
+              <option value="F22">F22</option>
+              <option value="F25">F25</option>
+              <option value="F31">F31</option>
+              <option value="DIGER">DİĞER</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dinToleransi">DIN TOLERANSI</label>
+            <input type="text" id="dinToleransi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="yuzeyDurumu">YÜZEY DURUMU</label>
+            <input type="text" id="yuzeyDurumu" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="metreAgirlikTalebi">METRE AĞIRLIK TALEBİ</label>
+            <input type="text" id="metreAgirlikTalebi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="askiIzi">ASKI İZİ</label>
+            <input type="text" id="askiIzi" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="folyo">FOLYO</label>
+            <input type="text" id="folyo" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="bariyerleme">BARİYERLEME</label>
+            <input type="text" id="bariyerleme" class="form-control">
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">YENİ ÜRÜN DEVREYE ALMA FORMU</h5>
+        </div>
+        <div class="card-body p-0" style="display: block;">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+{% endblock %}
