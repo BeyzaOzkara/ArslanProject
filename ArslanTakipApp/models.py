@@ -227,11 +227,11 @@ class YudaOnay(models.Model):
 
 class Yuda(models.Model):
     YudaNo = models.CharField(null=True, blank=True)
-    ProjeYoneticisi = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null =True)
+    ProjeYoneticisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_projeyoneticisi", blank=True, null =True)
     Tarih = models.DateField(null=True, blank=True)
     RevTarih = models.DateField(null=True, blank=True) #düzenleme yapıldığındaki tarih
     IstekYapanBolum = models.CharField(null=True, blank=True)
-    IstekYapanKisi = models.CharField(null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor
+    IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor
     MusteriFirmaAdi = models.CharField(null=True, blank=True)
     SonKullaniciFirma = models.CharField(null=True, blank=True)
     OnemliYuzeyler = models.BooleanField(null=True, blank=True)
