@@ -1,0 +1,332 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %} ">
+
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1>Yeni Ürün Devreye Alma Formu</h1>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Detaylar</h3>
+      <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+          <i class="fas fa-minus"></i></button>
+        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+          <i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Önemli Yüzeyler (Görünen Yüzeyler)</span>
+                  <span class="info-box-number text-center text-muted mb-0">var-yok</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Önemli Ölçüler ve Toleranslar</span>
+                  <span class="info-box-number text-center text-muted mb-0">Et kalınlığı 1 mm</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Yıllık Profil Siparişi</span>
+                  <span class="info-box-number text-center text-muted mb-0">3 ton / ay<span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Talaşlı İmalat</span>
+                  <span class="info-box-number text-center text-muted mb-0">var-yok-belirtilmedi</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Talaşlı İmalat Boya Ya Da Eloksaldan</span>
+                  <span class="info-box-number text-center text-muted mb-0">önce-sonra-belirtilmedi<span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Müşteri Yüzey Veya Talaşlı İşlem Yapıyor mu?</span>
+                  <span class="info-box-number text-center text-muted mb-0">eloksal-boya-mek.işlem-yapmıyor-belirtilmedi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Billet Cinsi</span>
+                  <span class="info-box-number text-center text-muted mb-0">6063</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Kondüsyon</span>
+                  <span class="info-box-number text-center text-muted mb-0">T6<span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Dın Toleransı</span>
+                  <span class="info-box-number text-center text-muted mb-0">tsen755-tsen12020-diğer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Yüzey Durumu</span>
+                  <span class="info-box-number text-center text-muted mb-0">sadecepres-eloksallı-boyalı</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Askı İzi</span>
+                  <span class="info-box-number text-center text-muted mb-0">kesilecek-kesilmeyecek-belirtilmedi</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Birlikte Çalışan Aparatı</span>
+                  <span class="info-box-number text-center text-muted mb-0">kendisiileçalışır-var-yok</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Folyo</span>
+                  <span class="info-box-number text-center text-muted mb-0">var-yok</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Bariyerleme</span>
+                  <span class="info-box-number text-center text-muted mb-0">var-yok</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Özel Paketleme</span>
+                  <span class="info-box-number text-center text-muted mb-0">var-yok<span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">İstenilen Standart Boy</span>
+                  <span class="info-box-number text-center text-muted mb-0">6080 mm</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Min. Kullanım Boyu</span>
+                  <span class="info-box-number text-center text-muted mb-0">-<span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">Metre Ağırlık Talebi</span>
+                  <span class="info-box-number text-center text-muted mb-0">var-yok<span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-12">
+              <h4>Paylaşılanlar</h4>
+                <div class="post">
+                  <div class="user-block">
+                    <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                    <span class="username">
+                      <a href="#">Jonathan Burke Jr.</a>
+                    </span>
+                    <span class="description">tarih ve saat</span>
+                  </div>
+                  <!-- /.user-block -->
+                  <p>
+                    Lorem ipsum represents a long-held tradition for designers,
+                    typographers and the like. Some people hate it and argue for
+                    its demise, but others ignore.
+                  </p>
+
+                  <p>
+                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v2</a>
+                  </p>
+                </div>
+
+                <div class="post clearfix">
+                  <div class="user-block">
+                    <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
+                    <span class="username">
+                      <a href="#">Sarah Ross</a>
+                    </span>
+                    <span class="description">tarih ve saat</span>
+                  </div>
+                  <!-- /.user-block -->
+                  <p>
+                    Lorem ipsum represents a long-held tradition for designers,
+                    typographers and the like. Some people hate it and argue for
+                    its demise, but others ignore.
+                  </p>
+                  <p>
+                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 2</a>
+                  </p>
+                </div>
+
+                <div class="post">
+                  <div class="user-block">
+                    <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                    <span class="username">
+                      <a href="#">Jonathan Burke Jr.</a>
+                    </span>
+                    <span class="description">tarih ve saat</span>
+                  </div>
+                  <!-- /.user-block -->
+                  <p>
+                    Lorem ipsum represents a long-held tradition for designers,
+                    typographers and the like. Some people hate it and argue for
+                    its demise, but others ignore.
+                  </p>
+
+                  <p>
+                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
+                  </p>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+          <h3 class="text-primary"><i class="fas fa-paint-brush"></i> Çizim No: [10 001 3147]</h3>
+          <p class="text-muted">Müşteri [Otomotiv Kasa] için kullanılmak üzere Billet Cinsi [6063], Kondüsyon [T6], Din Toleransı [TS EN 12020] olarak []</p>
+          <br>
+          <div class="text-muted">
+            <p class="text-sm">Müşteri Firma Adı
+              <b class="d-block">Mikron SMS Eloksal Boya Alüminyum San ve Tic A.Ş.</b>
+            </p>
+            <p class="text-sm">Müşteri Ödeme Vadesi
+              <b class="d-block">Peşin</b>
+            </p>
+            <p class="text-sm">Profilin Kullanıldığı Yer (Kalıp Durumu)
+              <b class="d-block">Otomotiv Kasa</b>
+            </p>
+            <p class="text-sm">Proje Yöneticisi
+              <b class="d-block">Harun</b>
+            </p>
+          </div>
+          <h5 class="mt-5 text-muted">Proje dosyaları</h5>
+          <ul class="list-unstyled">
+            <li>
+              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-image "></i> Logo.png</a>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
+            </li>
+          </ul>
+          
+          <div class="col-12">
+            <div class="row">
+                <div class="col-lg-12">
+                  <form action="" method="post" id="commentForm">
+                  <!-- textarea -->
+                  <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea class="form-control" rows="3" placeholder="..."></textarea>
+                  </div>
+                  <!-- dosya eklemeyi unutma -->
+                  <button type="button" class="btn btn-primary" id="btnPaylas">PAYLAŞ</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<!-- Select2 -->
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+{% endblock %}

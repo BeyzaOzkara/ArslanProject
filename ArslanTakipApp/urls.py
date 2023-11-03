@@ -34,4 +34,6 @@ urlpatterns = [
     path('baskigecmisi/', views.BaskiGecmisiView.as_view()),
     path('baskigecmisi/list', views.baskigecmisi_list),
     path('yuda', views.YudaView.as_view()),
+    path('yuda/ekle', views.yuda_ekle),
+    path('yudaDetail', views.YudaDetailView.as_view()),
 ]

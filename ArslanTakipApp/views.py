@@ -14,7 +14,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1137,4 +1137,49 @@ def baskigecmisi_list(request):
 
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda.html'
+    """ def post(self, request):
+    if request.method == "POST":
+        print(request.POST)
+        return   """
 
+def yuda_ekle(request):
+    if request.method == "POST":
+        print(request.POST)
+        posted = request.POST
+        y = Yuda()
+        y.YudaNo = 1 #yuda no nasıldı
+        #y.ProjeYoneticisi_id = 1harun beye hesap aç default yönetici şimdilik o
+        y.IstekYapanBolum = posted['istekYapanBolum'] or None
+        y.IstekYapanKisi_id = request.user.id
+        y.MusteriFirmaAdi = posted['musteriFirmaAdi']
+        y.SonKullaniciFirma = posted['sonKullaniciFirma']
+        y.OnemliYuzeyler = posted['onemliYuzeyler'] or None
+        y.OnemliOlculerVeToleranslar = posted['onemliOlculerVeToleranslar']
+        y.CizimNo = posted['cizimNo']
+        y.YillikProfilSiparisi = posted['yillikProfilSiparisi']
+        y.TalasliImalat = posted['talasliImalat']
+        y.TalasliImalatBoyaYadaEloksaldan = posted['talasliImalatBoyaYadaEloksaldan']
+        y.MusteriYuzeyVeyaTalasliIslem = posted['musteriYuzeyVeyaTalasliIslem']
+        y.BirlikteCalisanAparati = posted['birlikteCalisanAparati']
+        y.OzelPaketleme = posted['ozelPaketleme']
+        y.OzelPaketlemeAciklama = posted['ozelPaketlemeAciklama']
+        y.KalipDurumu = posted['kalipDurumu']
+        y.BilletCinsi = posted['billetCinsi']
+        y.Kondusyon = posted['kondusyon']
+        y.DinToleransi = posted['dinToleransi']
+        y.YuzeyDurumu = posted['yuzeyDurumu']
+        y.MetreAgirlikTalebi = posted['metreAgirlikTalebi']
+        y.MetreAgirlikTalebiMiktar = posted['minMATDeger'] + "minimum, " + posted['maxMATDeger'] + "maximum"
+        y.AskiIzi = posted['askiIzi']
+        y.IstenilenStandartBoy = posted['istenilenStandartBoy']
+        y.MinKullanimBoyu = posted['minKullanimBoyu']
+        y.Folyo = posted['folyo']
+        y.Bariyerleme = posted['bariyerleme']
+        y.MusteriOdemeVadesi = posted['musteriOdemeVadesi']
+        #y.YuklenenDosyalar = 
+        print(y)
+
+    return
+
+class YudaDetailView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/yudaDetail.html'
