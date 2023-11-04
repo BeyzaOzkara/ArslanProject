@@ -1136,7 +1136,7 @@ def baskigecmisi_list(request):
     return HttpResponse(data)
 
 class YudaView(generic.TemplateView):
-    template_name = 'ArslanTakipApp/yuda.html'
+    template_name = 'ArslanTakipApp/yuda2.html'
     """ def post(self, request):
     if request.method == "POST":
         print(request.POST)

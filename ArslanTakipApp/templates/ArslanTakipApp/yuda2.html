@@ -1,0 +1,322 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %} ">
+
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex p-0">
+            <h3 class="card-title p-3">YENİ ÜRÜN DEVREYE ALMA FORMU</h3>
+            <ul class="nav nav-pills ml-auto p-2">
+              <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Tolerans</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Profil</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Yüzey</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Talaşlı İmalat</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_7" data-toggle="tab">Paketleme</a></li>
+            </ul>
+        </div><!-- /.card-header -->
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1">
+                    <div class="card">
+                        <div class="card-header">Sipariş Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI</span>
+                                      <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2">
+                                      <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">SON KULLANICI FİRMA</span>
+                                      <input type="text" name="sonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2">
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">PROFİLİN KULLANILDIĞI YER (KALIP DURUMU)</span>
+                                      <input type="text" name="KalipDurumu" id="KalipDurumu" class="form-control mt-2">
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ ÇİZİM NO</span>
+                                      <input type="text" name="CizimNo" id="CizimNo" class="form-control mt-2">
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">YILLIK PROFİL SİPARİŞİ</span>
+                                      <input type="text" name="YillikProfilSiparisi" id="YillikProfilSiparisi" class="form-control mt-2">
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ ÖDEME VADESİ</span>
+                                      <input type="text" name="MusteriOdemeVadesi" id="MusteriOdemeVadesi" class="form-control mt-2">
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_2">
+                    <div class="card">
+                        <div class="card-header">Alaşım ve Kondüsyon Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">BİLLET CİNSİ</span>
+                                        <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2">
+                                        <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">KONDÜSYON</span>
+                                        <input type="text" name="sonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_3">
+                    <div class="card">
+                        <div class="card-header">Tolerans Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">DIN TOLERANS</span>
+                                        <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2">
+                                        <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI</span>
+                                        <input type="text" name="sonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2">
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</span>
+                                        <input type="text" name="sonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_4">
+                    <div class="card">
+                        <div class="card-header">Profil Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="mat1" value="Var">
+                                            <label class="form-check-label" for="inlineRadio1">VAR</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="mat2" value="Yok">
+                                            <label class="form-check-label" for="inlineRadio2">YOK</label>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-8">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content">
+                                           <div id="profilTabulator"></div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_5">
+                    <div class="card">
+                        <div class="card-header">Yüzey Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_6">
+                    <div class="card">
+                        <div class="card-header">Talaşlı İmalat Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">VAR</span>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">YOK</span>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">MÜŞTERİ YAPACAK</span>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
+                                        <input type="text" name="talasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_7">
+                    <div class="card">
+                        <div class="card-header">Paketleme Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">STANDART PALET</span>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">İHRACAT PALET</span>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">ÖZEL PAKETLEME</span>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
+                                        <input type="text" name="talasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+    var deleteIcon = function(cell, formatterParams, onRendered){ 
+        return "<i class='fa fa-trash'></i>";
+    };
+
+    var profilTab = new Tabulator("#profilTabulator", {
+        layout:"fitDataFill",
+        placeholder:"Profil Detayları",
+        popupContainer:true,
+        movableRows:true,
+        columns:[
+            {rowHandle:true, formatter:"handle", title:"", headerSort:false, frozen:true, width:40, minWidth:40},
+            {title:"İstenilen Standart Boy", field:"IstenilenStandartBoy"},
+            {title:"Minimum Kullanım Boyu", field:"MinKullanimBoyu"},
+            {title:"Min-Max Metre Ağırlık Talebi", field:"MetreAgirlikTalebiMiktar", visible:false},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                cell.getRow().delete();
+            }},
+        ],
+    });
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<!-- Select2 -->
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+{% endblock %}
