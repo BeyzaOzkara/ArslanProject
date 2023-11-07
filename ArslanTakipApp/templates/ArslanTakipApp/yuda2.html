@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', '')">
+                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer')">
                                         <option value="Kondüsyon" id="kondusyonSelected" selected disabled>Kondüsyon </option>
                                         
                                     </select>
@@ -125,6 +125,16 @@
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                     <button type="button" id="add-row" class="btn btn-outline-info" >Ekle</button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2" id="AlaşımDiv" style="display: none;">
+                                    <div class="form-group">
+                                        <input type="text" name="AlaşımDiger" placeholder="Alaşım" id="AlaşımDiger" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2" id="KondüsyonDiv" style="display: none;">
+                                    <div class="form-group">
+                                        <input type="text" name="KondüsyonDiger" placeholder="Kondüsyon" id="KondüsyonDiger" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -366,28 +376,30 @@
             if(target != ""){
                 selectFunction(target, target, title, "Diğer");
             }
-            if(!$('#'+title+'Diger').length){
-                $('#alasimKondusyonRow').append('<div class="col-lg-2"><div class="form-group"><input type="text" placeholder="'+ title +'" name="'+ title +'Diger" id="'+ title +'Diger" class="form-control"></div></div>');
-            }
+                $('#'+ title+'Div').show();
         }else{
-        $.ajax({
-            url: `/yuda/${objId}`,
-            method: 'GET',
-            dataType: 'json',
-            success: function (Data) {
-                $('#'+target+'ed').nextAll().remove();
-                
-                $.each(Data, function(key, value) {
-                    $('#'+target+'').append('<option value=' + value.id + '>' + value.Isim + '</option>');
+            $('#'+ title+'Div').hide();
+            if(target != "") {
+                    $.ajax({
+                    url: `/yuda/${objId}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (Data) {
+                        $('#'+target+'ed').nextAll().remove();
+                        
+                        $.each(Data, function(key, value) {
+                            $('#'+target+'').append('<option value=' + value.id + '>' + value.Isim + '</option>');
+                        });
+                        if(diger){
+                            $('#'+target+'').append('<option value="0">'+ diger +'</option>')
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error loading select data:', error);
+                    }
                 });
-                if(diger){
-                    $('#'+target+'').append('<option value="0">'+ diger +'</option>')
-                }
-            },
-            error: function (error) {
-                console.error('Error loading select data:', error);
             }
-        });
+        
         }
     };
 
