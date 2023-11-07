@@ -265,6 +265,14 @@ class Yuda(models.Model):
     MekanikIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_mekanik")
     YuklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
 
+class Parameter(models.Model):
+    ParentId = models.ManyToManyField("self", symmetrical=False, null=True, blank=True)
+    Isim = models.CharField(null=True, blank=True)
+    Tag = models.CharField(null=True, blank=True) #appname-yuda gibi
+
+    def __str__(self):
+        return self.Isim
+
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     Form = models.ForeignKey(Yuda, on_delete=models.CASCADE, null=True, blank=True)

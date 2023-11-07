@@ -37,3 +37,5 @@ admin.site.register(Location, LocationAdmin)
 #admin.site.register(Kalip)
 admin.site.register(Hareket)
 #@admin.register(Hareket)
+
+admin.site.register(Parameter)

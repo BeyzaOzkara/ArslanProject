@@ -104,24 +104,31 @@
                         <div class="card-header">Alaşım ve Kondüsyon Detayları</div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
-                                    <div class="info-box-content">
-                                        <span class="info-box-text text-center text-bold">BİLLET CİNSİ</span>
-                                        <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2">
-                                        <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
-                                    </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                    <select name="alasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Diğer')">
+                                        <option value="Alaşım" id="alasimSelected" selected disabled>Alaşım </option>
+                                        <!-- {% for al in alasim_json %}
+                                            <option value='{{al.id}}'>{{ al.Isim }}</option>
+                                        {% endfor %} -->
+                                    </select>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
-                                    <div class="info-box-content">
-                                        <span class="info-box-text text-center text-bold">KONDÜSYON</span>
-                                        <input type="text" name="sonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2">
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect">
+                                        <option value="Kondüsyon" id="kondusyonSelected" selected disabled>Kondüsyon </option>
+                                        
+                                    </select>
                                     </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                    <button type="button" id="add-row" class="btn btn-outline-info" >Ekle</button>
                                     </div>
                                 </div>
                             </div>
+                            <div id="alasimTabulator"></div>
                         </div>
                     </div>
                 </div>
@@ -192,10 +199,37 @@
                 </div>
                 <div class="tab-pane" id="tab_5">
                     <div class="card">
-                        <div class="card-header">Yüzey Detayları</div>
+                        <div class="card-header d-flex p-0">
+                            <h3 class="card-title p-3">Yüzey Detayları</h3>
+                            <ul class="nav nav-pills ml-auto p-2">
+                                <li class="nav-item"><a class="nav-link active" href="#ytab_1" data-toggle="tab">Eloksal</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#ytab_2" data-toggle="tab">Boya</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#ytab_3" data-toggle="tab">Ahşap Kaplama</a></li>
+                            </ul>
+                        </div>
                         <div class="card-body">
                             <div class="row">
-                                
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="ytab_1">
+                                        <div id="eloksalTab">
+                                            <div class="row">
+                                                <div class="container-fluid">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="ytab_2">
+                                        <div id="boyaTab">
+
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="ytab_3">
+                                        <div id="ahsapTab">
+
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -309,6 +343,53 @@
             }},
         ],
     });
+
+    var alasimTab = new Tabulator("#alasimTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Alaşım", field:"BilletCinsi"},
+            {title:"Kondüsyon", field:"Kondusyon"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                var data = cell.getData();
+                document.getElementById(data.isim).disabled = false;
+                cell.getRow().delete();}
+            }
+        ],
+    });
+
+
+    function selectFunction(objId, target, diger) {
+        if (objId == 0){
+            selectFunction(target, target, "Diğer")
+        }else{
+        $.ajax({
+            url: `/yuda/${objId}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (Data) {
+
+                $('#'+target+'ed').nextAll().remove();
+                
+                $.each(Data, function(key, value) {
+                    $('#'+target+'').append('<option value=' + value.id + '>' + value.Isim + '</option>');
+                });
+                if(diger){
+                    $('#'+target+'').append('<option value="0">'+ diger +'</option>')
+                }
+            },
+            error: function (error) {
+                console.error('Error loading select data:', error);
+            }
+        });
+        
+        }
+    }; 
+
+    selectFunction(1, "alasimSelect", "Diğer");
+    
 </script>
 {% endblock %}
 

@@ -14,7 +14,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay, Parameter
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1141,6 +1141,25 @@ class YudaView(generic.TemplateView):
     if request.method == "POST":
         print(request.POST)
         return   """
+    
+def yuda(request):
+    parameters = Parameter.objects.all()
+    alasims = parameters.filter(ParentId = 1).values()
+    alasim = list(alasims)
+    print(alasim)
+    return render(request, 'ArslanTakipApp/yuda2.html', {'alasim_json':alasim})
+
+def yuda(request, objId):
+    try: 
+        int(objId)
+        allParams = Parameter.objects.all()
+        parameters = list(allParams.filter(ParentId = objId).values())
+    except:
+        allParams = Parameter.objects.all()
+        parameters = list(allParams.filter(Tag = objId).values())
+
+    data = json.dumps(parameters, indent=1)
+    return HttpResponse(data)
 
 def yuda_ekle(request):
     if request.method == "POST":
@@ -1149,7 +1168,7 @@ def yuda_ekle(request):
         y = Yuda()
         y.YudaNo = 1 #yuda no nasıldı
         #y.ProjeYoneticisi_id = 1harun beye hesap aç default yönetici şimdilik o
-        y.IstekYapanBolum = posted['istekYapanBolum'] or None
+        y.IstekYapanBolum = posted.get(['istekYapanBolum']) or None
         y.IstekYapanKisi_id = request.user.id
         y.MusteriFirmaAdi = posted['musteriFirmaAdi']
         y.SonKullaniciFirma = posted['sonKullaniciFirma']
