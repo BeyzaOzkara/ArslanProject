@@ -103,10 +103,10 @@
                     <div class="card">
                         <div class="card-header">Alaşım ve Kondüsyon Detayları</div>
                         <div class="card-body">
-                            <div class="row">
+                            <div class="row" id="alasimKondusyonRow">
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="alasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Diğer')">
+                                    <select name="alasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer')">
                                         <option value="Alaşım" id="alasimSelected" selected disabled>Alaşım </option>
                                         <!-- {% for al in alasim_json %}
                                             <option value='{{al.id}}'>{{ al.Isim }}</option>
@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect">
+                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', '')">
                                         <option value="Kondüsyon" id="kondusyonSelected" selected disabled>Kondüsyon </option>
                                         
                                     </select>
@@ -361,16 +361,20 @@
     });
 
 
-    function selectFunction(objId, target, diger) {
+    function selectFunction(objId, target, title, diger) {
         if (objId == 0){
-            selectFunction(target, target, "Diğer")
+            if(target != ""){
+                selectFunction(target, target, title, "Diğer");
+            }
+            if(!$('#'+title+'Diger').length){
+                $('#alasimKondusyonRow').append('<div class="col-lg-2"><div class="form-group"><input type="text" placeholder="'+ title +'" name="'+ title +'Diger" id="'+ title +'Diger" class="form-control"></div></div>');
+            }
         }else{
         $.ajax({
             url: `/yuda/${objId}`,
             method: 'GET',
             dataType: 'json',
             success: function (Data) {
-
                 $('#'+target+'ed').nextAll().remove();
                 
                 $.each(Data, function(key, value) {
@@ -384,12 +388,13 @@
                 console.error('Error loading select data:', error);
             }
         });
-        
         }
-    }; 
+    };
 
-    selectFunction(1, "alasimSelect", "Diğer");
-    
+    selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
+    /* açıldığında yüklenmesini istediğimiz selectleri yazmayı unutma */
+    /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
+
 </script>
 {% endblock %}
 
