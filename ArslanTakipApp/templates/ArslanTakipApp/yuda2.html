@@ -138,10 +138,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="alasimTabulator"></div>
-                            
                             <div class="row">
-                                <p>NOT: 1.Tercih üstte olacak şekilde sıralayın</p>
+                                <div class="col-12">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content">
+                                            <div id="alasimTabulator"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -204,17 +208,28 @@
                                 <div class="col-12 col-sm-4">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
-                                        <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="mat1" value="Var">
-                                            <label class="form-check-label" for="inlineRadio1">VAR</label>
+                                        <div class="row">
+                                            <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="mat1" value="Var">
+                                                <label class="form-check-label" for="inlineRadio1">VAR</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="mat2" value="Yok">
+                                                <label class="form-check-label" for="inlineRadio2">YOK</label>
+                                            </div>
                                         </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="mat2" value="Yok">
-                                            <label class="form-check-label" for="inlineRadio2">YOK</label>
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6">
+                                                <input type="text" name="minMAT" id="MAT" class="form-control">
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <input type="text" name="maxMAT" id="maxMAT" class="form-control">
+                                            </div>
                                         </div>
                                     </div>
                                     </div>
+                                    
                                 </div>
                                 
                             </div>
@@ -247,7 +262,33 @@
                                         <div id="eloksalTab">
                                             <div class="row">
                                                 <div class="container-fluid">
+                                                    <div class="row" id="eloksal">
+                                                        <div class="col-lg-2">
+                                                            <div class="form-group">
+                                                            <select name="matlastirmaSelect" class="form-control" id="matlastirmaSelect" onchange="selectFunction(this.value, 'eloksalRenkSelect', 'Matlaştırma', 'Diğer')">
+                                                                <option value="Matlaştırma" id="matlastirmaSelected" selected disabled>Matlaştırma </option>
+                                                                
+                                                            </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-2">
+                                                            <div class="form-group">
+                                                            <select name="eloksalRenkSelect" class="form-control" id="eloksalRenkSelect" onchange="selectFunction(this.value, '', 'Renk', 'Diğer')">
+                                                                <option value="Renk" id="renkSelected" selected disabled>Renk </option>
+                                                                
+                                                            </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-2">
+                                                            <div class="form-group">
+                                                            <select name="kaplamaKalinlikSelect" class="form-control" id="kaplamaKalinlikSelect" onchange="selectFunction(this.value, '', 'Kaplama Kalınlığı', 'Diğer')">
+                                                                <option value="Kaplama Kalınlığı" id="kaplamaKalinlikSelected" selected disabled>Kaplama Kalınlığı </option>
+                                                                 
 
+                                                            </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -381,6 +422,7 @@
         layout:"fitColumns",
         data:[],
         movableRows:true,
+        placeholder:"1.Tercih üstte olacak şekilde sıralayın",
         columns:[
             {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
             {title:"Alaşım", field:"Alasim"},
@@ -403,8 +445,8 @@
                 $('#'+ title+'Div').show();
         }else{
             if ($('#'+ title+'Div').is(':visible')){
+                $('#'+ title+'Diger').val("");
                 $('#'+ title+'Div').hide();
-                $('#'+ title+'Div').val()="";
             }
             if(target != "") {
                     $.ajax({
@@ -430,6 +472,8 @@
     };
 
     selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
+    selectFunction(20, "matlastirmaSelect", "Matlaştırma", "");
+    /* selectFunction(,"", "Kaplama Kalınlığı", "Diğer"); */
     /* açıldığında yüklenmesini istediğimiz selectleri yazmayı unutma */
     /* bütün selectler için arraya alıp for yap */
     /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
