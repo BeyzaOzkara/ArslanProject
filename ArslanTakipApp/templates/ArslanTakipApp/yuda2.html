@@ -124,7 +124,7 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <button type="button" id="add-row" class="btn btn-outline-info" >Ekle</button>
+                                    <button type="button" id="AlasimKondusyonEkle" class="btn btn-outline-info" >Ekle</button>
                                     </div>
                                 </div>
                                 <div class="col-lg-2" id="AlaşımDiv" style="display: none;">
@@ -360,11 +360,12 @@
         movableRows:true,
         columns:[
             {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
-            {title:"Alaşım", field:"BilletCinsi"},
+            {title:"Alaşım", field:"Alasim"},
             {title:"Kondüsyon", field:"Kondusyon"},
+            {title:"AlaşımID", field:"AlasimID", visible:false},
+            {title:"KondüsyonID", field:"KondusyonID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
                 var data = cell.getData();
-                document.getElementById(data.isim).disabled = false;
                 cell.getRow().delete();}
             }
         ],
@@ -378,7 +379,10 @@
             }
                 $('#'+ title+'Div').show();
         }else{
-            $('#'+ title+'Div').hide();
+            if ($('#'+ title+'Div').is(':visible')){
+                $('#'+ title+'Div').hide();
+                $('#'+ title+'Div').val()="";
+            }
             if(target != "") {
                     $.ajax({
                     url: `/yuda/${objId}`,
@@ -399,13 +403,35 @@
                     }
                 });
             }
-        
         }
     };
 
     selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
     /* açıldığında yüklenmesini istediğimiz selectleri yazmayı unutma */
     /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
+
+    document.getElementById("AlasimKondusyonEkle").addEventListener("click", function(){
+        let alasimID = "";
+        let kondusyonID = "";
+        let alasim = "";
+        let kondusyon = "";
+        if (document.getElementById("AlaşımDiger").value == "") {
+            alasimID = $('#alasimSelect').val();
+            alasim = $('#alasimSelect option:selected').text();
+        }
+        else {
+            alasim = document.getElementById("AlaşımDiger").innerText;
+        }
+        if(document.getElementById("KondüsyonDiger").value == ""){
+            kondusyonID = $('#kondusyonSelect').val();
+            kondusyon = $('#kondusyonSelect option:selected').text();
+        }
+        else {
+            kondusyon = $('#KondüsyonDiger').text();
+        }
+        alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+        
+    });
 
 </script>
 {% endblock %}
