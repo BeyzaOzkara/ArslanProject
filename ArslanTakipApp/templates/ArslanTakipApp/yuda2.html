@@ -139,6 +139,10 @@
                                 </div>
                             </div>
                             <div id="alasimTabulator"></div>
+                            
+                            <div class="row">
+                                <p>NOT: 1.Tercih üstte olacak şekilde sıralayın</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -183,6 +187,22 @@
                             <div class="row">
                                 <div class="col-12 col-sm-4">
                                     <div class="info-box bg-light">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-center text-bold">İstenilen Boy</span>
+                                            <input type="text" name="istenilenBoy" class="form-control" id="istenilenBoy">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-center text-bold">Minimum Kullanım Boyu</span>
+                                            <input type="text" name="MinKullanimBoyu" class="form-control" id="MinKullanimBoyu">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
                                         <div class="form-check form-check-inline">
@@ -196,7 +216,10 @@
                                     </div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-8">
+                                
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
                                     <div class="info-box bg-light">
                                         <div class="info-box-content">
                                            <div id="profilTabulator"></div> 
@@ -408,29 +431,28 @@
 
     selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
     /* açıldığında yüklenmesini istediğimiz selectleri yazmayı unutma */
+    /* bütün selectler için arraya alıp for yap */
     /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
 
     document.getElementById("AlasimKondusyonEkle").addEventListener("click", function(){
-        let alasimID = "";
-        let kondusyonID = "";
-        let alasim = "";
-        let kondusyon = "";
+        /* AlaşımDiger ve KondüsyonDigeri arraye alıp for döndürüp tek if else ile yapılabilir */
+        let alasimID, kondusyonID, alasim, kondusyon = "";
         if (document.getElementById("AlaşımDiger").value == "") {
             alasimID = $('#alasimSelect').val();
             alasim = $('#alasimSelect option:selected').text();
         }
         else {
-            alasim = document.getElementById("AlaşımDiger").innerText;
+            alasim =$('#AlaşımDiger').val();
         }
         if(document.getElementById("KondüsyonDiger").value == ""){
             kondusyonID = $('#kondusyonSelect').val();
             kondusyon = $('#kondusyonSelect option:selected').text();
         }
         else {
-            kondusyon = $('#KondüsyonDiger').text();
+            console.log("diğer");
+            kondusyon = $('#KondüsyonDiger').val();
         }
         alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
-        
     });
 
 </script>
