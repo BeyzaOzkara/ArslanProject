@@ -20,6 +20,23 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %} ">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %} ">
 
+  <style>
+    .input-color {
+        position: relative;
+    }
+    .input-color input {
+        padding-left: 20px;
+    }
+    .input-color .color-box {
+        width: 30px;
+        height: 30px;
+        display: inline-block;
+        background-color: #ccc;
+        position: absolute;
+        left: 5px;
+        top: 5px;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -256,37 +273,46 @@
                             </ul>
                         </div>
                         <div class="card-body">
-                            <div class="row">
                                 <div class="tab-content">
                                     <div class="tab-pane" id="ytab_1">
                                         <div id="eloksalTab">
                                             <div class="row">
-                                                <div class="container-fluid">
-                                                    <div class="row" id="eloksal">
-                                                        <div class="col-lg-2">
-                                                            <div class="form-group">
-                                                            <select name="matlastirmaSelect" class="form-control" id="matlastirmaSelect" onchange="selectFunction(this.value, 'eloksalRenkSelect', 'Matlaştırma', 'Diğer')">
-                                                                <option value="Matlaştırma" id="matlastirmaSelected" selected disabled>Matlaştırma </option>
-                                                                
-                                                            </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-2">
-                                                            <div class="form-group">
-                                                            <select name="eloksalRenkSelect" class="form-control" id="eloksalRenkSelect" onchange="selectFunction(this.value, '', 'Renk', 'Diğer')">
-                                                                <option value="Renk" id="renkSelected" selected disabled>Renk </option>
-                                                                
-                                                            </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-2">
-                                                            <div class="form-group">
-                                                            <select name="kaplamaKalinlikSelect" class="form-control" id="kaplamaKalinlikSelect" onchange="selectFunction(this.value, '', 'Kaplama Kalınlığı', 'Diğer')">
-                                                                <option value="Kaplama Kalınlığı" id="kaplamaKalinlikSelected" selected disabled>Kaplama Kalınlığı </option>
-                                                                 
+                                                <div class="col-lg-2">
+                                                    <div class="form-group">
+                                                    <select name="matlastirmaSelect" class="form-control" id="matlastirmaSelect" onchange="selectFunction(this.value, 'eloksalRenkSelect', 'Matlaştırma', '')">
+                                                        <option value="Matlaştırma" id="matlastirmaSelected" selected disabled>Matlaştırma </option>
+                                                        
+                                                    </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <div class="form-group">
+                                                    <select name="eloksalRenkSelect" class="form-control" id="eloksalRenkSelect">
+                                                        <option value="Renk" id="eloksalRenkSelected" selected disabled>Renk </option>
+                                                        
+                                                    </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <div class="form-group">
+                                                    <select name="kaplamaKalinlikSelect" class="form-control" id="eloksalKaplamaKalinligiSelect" onchange="selectFunction(this.value, '', 'Kaplama Kalınlığı', 'Diğer')">
+                                                        <option value="Kaplama Kalınlığı" id="kaplamaKalinlikSelected" selected disabled>Kaplama Kalınlığı </option>
+                                                            
 
-                                                            </select>
-                                                            </div>
+                                                    </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <div class="form-group">
+                                                    <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-info" >Ekle</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="info-box">
+                                                        <div class="info-box-content">
+                                                            <div id="eloksalTabulator"></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -294,17 +320,33 @@
                                         </div>
                                     </div>
                                     <div class="tab-pane" id="ytab_2">
-                                        <div id="boyaTab">
-
+                                        <div class="row" id="boyaTab">
+                                            <div class="form-group">
+                                                <div class="input-color">
+                                                    <input type="text" id="colorinput" class="form-control">
+                                                    <div class="row">
+                                                        <div class="color-box" id="ralColorBox"></div>
+                                                    </div>
+                                                    <label for="ral">RAL</label>
+                                                </div>
+<!--                                                 <label  style="white-space: nowrap;">RAL :<input type="text" name="RAL" id="RAL" class="form-control"></label>
+ -->                                                
+                                            </div>
+                                            <div class="form-group">
+                                                <select name="turSelect" id="turSelect" class="form-control">
+                                                    <option value="Tür" id="turSelected" selected disabled>Tür </option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="tab-pane" id="ytab_3">
                                         <div id="ahsapTab">
-
+                                            <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control">
+                                                <option value="Ahşap Kaplama" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -336,7 +378,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-12 col-sm-4">
+                                <div class="col-12">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
@@ -376,7 +418,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-12 col-sm-4">
+                                <div class="col-12">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
@@ -403,7 +445,7 @@
     };
 
     var profilTab = new Tabulator("#profilTabulator", {
-        layout:"fitDataFill",
+        layout:"fitColumns",
         placeholder:"Profil Detayları",
         popupContainer:true,
         movableRows:true,
@@ -422,7 +464,7 @@
         layout:"fitColumns",
         data:[],
         movableRows:true,
-        placeholder:"1.Tercih üstte olacak şekilde sıralayın",
+        placeholder:"1. Tercih üstte olacak şekilde sıralayınız",
         columns:[
             {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
             {title:"Alaşım", field:"Alasim"},
@@ -430,10 +472,27 @@
             {title:"AlaşımID", field:"AlasimID", visible:false},
             {title:"KondüsyonID", field:"KondusyonID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
-                var data = cell.getData();
+                let data = cell.getData();
                 cell.getRow().delete();}
             }
         ],
+    });
+
+    var eloksalTab = new Tabulator("#eloksalTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1. Tercih üstte olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Matlaştırma", field:"Matlastirma"},
+            {title:"Renk", field:"Renk"},
+            {title:"Kaplama Kalınlığı", field:"KaplamaKalinligi"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                let data = cell.getData();
+                cell.getRow().delete();
+            }}
+        ]
     });
 
 
@@ -473,7 +532,9 @@
 
     selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
     selectFunction(20, "matlastirmaSelect", "Matlaştırma", "");
-    /* selectFunction(,"", "Kaplama Kalınlığı", "Diğer"); */
+    selectFunction(59,"eloksalKaplamaKalinligiSelect", "Kaplama Kalınlığı", "");
+    selectFunction(67, "turSelect", "Tür", "");
+    selectFunction(73, "ahsapKaplamaSelect", "Ahşap Kaplama", "Diğer");
     /* açıldığında yüklenmesini istediğimiz selectleri yazmayı unutma */
     /* bütün selectler için arraya alıp for yap */
     /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
