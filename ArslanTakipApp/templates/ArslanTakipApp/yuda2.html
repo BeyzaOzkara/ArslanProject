@@ -297,8 +297,7 @@
                                                     <div class="form-group">
                                                     <select name="kaplamaKalinlikSelect" class="form-control" id="eloksalKaplamaKalinligiSelect" onchange="selectFunction(this.value, '', 'Kaplama Kalınlığı', 'Diğer')">
                                                         <option value="Kaplama Kalınlığı" id="kaplamaKalinlikSelected" selected disabled>Kaplama Kalınlığı </option>
-                                                            
-
+                                                        
                                                     </select>
                                                     </div>
                                                 </div>
@@ -341,9 +340,23 @@
                                     </div>
                                     <div class="tab-pane" id="ytab_3">
                                         <div id="ahsapTab">
-                                            <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control">
-                                                <option value="Ahşap Kaplama" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
-                                            </select>
+                                            <div class="row">
+                                                <div class="col-lg-6 form-group">
+                                                    <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control">
+                                                        <option value="Ahşap Kaplama" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2 form-group">
+                                                    <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-info">Ekle</button>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 info-box">
+                                                    <div class="info-box-content">
+                                                        <div id="ahsapKaplamaTabulator"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -478,7 +491,7 @@
         ],
     });
 
-    var eloksalTab = new Tabulator("#eloksalTabulator", {
+    var eloksalTabulator = new Tabulator("#eloksalTabulator", {
         layout:"fitColumns",
         data:[],
         movableRows:true,
@@ -488,6 +501,21 @@
             {title:"Matlaştırma", field:"Matlastirma"},
             {title:"Renk", field:"Renk"},
             {title:"Kaplama Kalınlığı", field:"KaplamaKalinligi"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                let data = cell.getData();
+                cell.getRow().delete();
+            }}
+        ]
+    });
+
+    var ahsapKaplamaTabulator = new Tabulator("#ahsapKaplamaTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1. Tercih üste olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Ahşap Kaplama", field:"ahsapKaplama"},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
@@ -553,11 +581,16 @@
             kondusyonID = $('#kondusyonSelect').val();
             kondusyon = $('#kondusyonSelect option:selected').text();
         }
-        else {
+        else if(document.getElementById("kondusyonSelect") == ""){
             console.log("diğer");
             kondusyon = $('#KondüsyonDiger').val();
         }
         alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+    });
+
+    document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
+        let matlastirma, renk, kalinlik = "";
+
     });
 
 </script>
