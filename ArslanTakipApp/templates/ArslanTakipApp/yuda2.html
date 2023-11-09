@@ -501,6 +501,9 @@
             {title:"Matlaştırma", field:"Matlastirma"},
             {title:"Renk", field:"Renk"},
             {title:"Kaplama Kalınlığı", field:"KaplamaKalinligi"},
+            {title:"Matlaştırma ID", field:"MatlastirmaID", visible:false},
+            {title:"Renk ID", field:"RenkID", visible:false},
+            {title:"Kaplama Kalınlığı ID", field:"KaplamaKalinligiID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
@@ -515,7 +518,8 @@
         placeholder:"1. Tercih üste olacak şekilde sıralayınız",
         columns:[
             {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
-            {title:"Ahşap Kaplama", field:"ahsapKaplama"},
+            {title:"Ahşap Kaplama", field:"AhsapKaplama"},
+            {title:"Ahşap Kaplama ID", field:"AhsapKaplamaID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
@@ -589,8 +593,25 @@
     });
 
     document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
-        let matlastirma, renk, kalinlik = "";
+        let matlastirma, renk, kalinlik, matlastirmaId, renkId, kalinlikId = "";
+        if($('#matlastirmaSelect').val() != null && $('#eloksalRenkSelect').val() != null && $('#eloksalKaplamaKalinligiSelect').val() != null){
+            matlastirma = $('#matlastirmaSelect option:selected').text();
+            renk =  $('#eloksalRenkSelect option:selected').text();
+            kalinlik =  $('#eloksalKaplamaKalinligiSelect option:selected').text();
+            matlastirmaId = $('#matlastirmaSelect').val();
+            renkId =  $('#eloksalRenkSelect').val();
+            kalinlikId =  $('#eloksalKaplamaKalinligiSelect').val();
+            eloksalTabulator.addData({Matlastirma:matlastirma, Renk:renk, KaplamaKalinligi:kalinlik, MatlastirmaID:matlastirmaId, RenkID: renkId, KaplamaKalinligiID:kalinlikId}, false);
+        }
+    });
 
+    document.getElementById("ahsapKaplamaEkle").addEventListener('click', function(){
+        let ahsapKaplama, ahsapKaplamaId = "";
+        if($('#ahsapKaplamaSelect').val() != null){
+            ahsapKaplamaId = $('#ahsapKaplamaSelect').val();
+            ahsapKaplama = $('#ahsapKaplamaSelect option:selected').text();
+            ahsapKaplamaTabulator.addData({AhsapKaplama:ahsapKaplama, AhsapKaplamaID:ahsapKaplamaId}, false);
+        }
     });
 
 </script>
