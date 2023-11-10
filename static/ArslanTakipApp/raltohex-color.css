@@ -1,0 +1,857 @@
+/**
+ *  Ral-to-Hex CSS
+ *  Author: Marcel Bursch [ http://mabudev.com ]
+ *  Licensed under MIT
+ */
+
+.ral1000 {
+  color: #CCC58F !important;
+}
+
+.ral1001 {
+  color: #D1BC8A !important;
+}
+
+.ral1002 {
+  color: #D2B773 !important;
+}
+
+.ral1003 {
+  color: #F7BA0B !important;
+}
+
+.ral1004 {
+  color: #E2B007 !important;
+}
+
+.ral1005 {
+  color: #C89F04 !important;
+}
+
+.ral1006 {
+  color: #E1A100 !important;
+}
+
+.ral1007 {
+  color: #E79C00 !important;
+}
+
+.ral1011 {
+  color: #AF8A54 !important;
+}
+
+.ral1012 {
+  color: #D9C022 !important;
+}
+
+.ral1013 {
+  color: #E9E5CE !important;
+}
+
+.ral1014 {
+  color: #DFCEA1 !important;
+}
+
+.ral1015 {
+  color: #EADEBD !important;
+}
+
+.ral1016 {
+  color: #EAF044 !important;
+}
+
+.ral1017 {
+  color: #F4B752 !important;
+}
+
+.ral1018 {
+  color: #F3E03B !important;
+}
+
+.ral1019 {
+  color: #A4957D !important;
+}
+
+.ral1020 {
+  color: #9A9464 !important;
+}
+
+.ral1021 {
+  color: #EEC900 !important;
+}
+
+.ral1023 {
+  color: #F0CA00 !important;
+}
+
+.ral1024 {
+  color: #B89C50 !important;
+}
+
+.ral1026 {
+  color: #F5FF00 !important;
+}
+
+.ral1027 {
+  color: #A38C15 !important;
+}
+
+.ral1028 {
+  color: #FFAB00 !important;
+}
+
+.ral1032 {
+  color: #DDB20F !important;
+}
+
+.ral1033 {
+  color: #FAAB21 !important;
+}
+
+.ral1034 {
+  color: #EDAB56 !important;
+}
+
+.ral1035 {
+  color: #A29985 !important;
+}
+
+.ral1036 {
+  color: #927549 !important;
+}
+
+.ral1037 {
+  color: #EEA205 !important;
+}
+
+.ral2000 {
+  color: #DD7907 !important;
+}
+
+.ral2001 {
+  color: #BE4E20 !important;
+}
+
+.ral2002 {
+  color: #C63927 !important;
+}
+
+.ral2003 {
+  color: #FA842B !important;
+}
+
+.ral2004 {
+  color: #E75B12 !important;
+}
+
+.ral2005 {
+  color: #FF2300 !important;
+}
+
+.ral2007 {
+  color: #FFA421 !important;
+}
+
+.ral2008 {
+  color: #F3752C !important;
+}
+
+.ral2009 {
+  color: #E15501 !important;
+}
+
+.ral2010 {
+  color: #D4652F !important;
+}
+
+.ral2011 {
+  color: #EC7C25 !important;
+}
+
+.ral2012 {
+  color: #DB6A50 !important;
+}
+
+.ral2013 {
+  color: #954527 !important;
+}
+
+.ral3000 {
+  color: #AB2524 !important;
+}
+
+.ral3001 {
+  color: #A02128 !important;
+}
+
+.ral3002 {
+  color: #A1232B !important;
+}
+
+.ral3003 {
+  color: #8D1D2C !important;
+}
+
+.ral3004 {
+  color: #701F29 !important;
+}
+
+.ral3005 {
+  color: #5E2028 !important;
+}
+
+.ral3007 {
+  color: #402225 !important;
+}
+
+.ral3009 {
+  color: #703731 !important;
+}
+
+.ral3011 {
+  color: #7E292C !important;
+}
+
+.ral3012 {
+  color: #CB8D73 !important;
+}
+
+.ral3013 {
+  color: #9C322E !important;
+}
+
+.ral3014 {
+  color: #D47479 !important;
+}
+
+.ral3015 {
+  color: #E1A6AD !important;
+}
+
+.ral3016 {
+  color: #AC4034 !important;
+}
+
+.ral3017 {
+  color: #D3545F !important;
+}
+
+.ral3018 {
+  color: #D14152 !important;
+}
+
+.ral3020 {
+  color: #C1121C !important;
+}
+
+.ral3022 {
+  color: #D56D56 !important;
+}
+
+.ral3024 {
+  color: #F70000 !important;
+}
+
+.ral3026 {
+  color: #FF0000 !important;
+}
+
+.ral3027 {
+  color: #B42041 !important;
+}
+
+.ral3028 {
+  color: #E72512 !important;
+}
+
+.ral3031 {
+  color: #AC323B !important;
+}
+
+.ral3032 {
+  color: #711521 !important;
+}
+
+.ral3033 {
+  color: #B24C43 !important;
+}
+
+.ral4001 {
+  color: #8A5A83 !important;
+}
+
+.ral4002 {
+  color: #933D50 !important;
+}
+
+.ral4003 {
+  color: #D15B8F !important;
+}
+
+.ral4004 {
+  color: #691639 !important;
+}
+
+.ral4005 {
+  color: #83639D !important;
+}
+
+.ral4006 {
+  color: #992572 !important;
+}
+
+.ral4007 {
+  color: #4A203B !important;
+}
+
+.ral4008 {
+  color: #904684 !important;
+}
+
+.ral4009 {
+  color: #A38995 !important;
+}
+
+.ral4010 {
+  color: #C63678 !important;
+}
+
+.ral4011 {
+  color: #8773A1 !important;
+}
+
+.ral4012 {
+  color: #6B6880 !important;
+}
+
+.ral5000 {
+  color: #384C70 !important;
+}
+
+.ral5001 {
+  color: #1F4764 !important;
+}
+
+.ral5002 {
+  color: #2B2C7C !important;
+}
+
+.ral5003 {
+  color: #2A3756 !important;
+}
+
+.ral5004 {
+  color: #1D1F2A !important;
+}
+
+.ral5005 {
+  color: #154889 !important;
+}
+
+.ral5007 {
+  color: #41678D !important;
+}
+
+.ral5008 {
+  color: #313C48 !important;
+}
+
+.ral5009 {
+  color: #2E5978 !important;
+}
+
+.ral5010 {
+  color: #13447C !important;
+}
+
+.ral5011 {
+  color: #232C3F !important;
+}
+
+.ral5012 {
+  color: #3481B8 !important;
+}
+
+.ral5013 {
+  color: #232D53 !important;
+}
+
+.ral5014 {
+  color: #6C7C98 !important;
+}
+
+.ral5015 {
+  color: #2874B2 !important;
+}
+
+.ral5017 {
+  color: #0E518D !important;
+}
+
+.ral5018 {
+  color: #21888F !important;
+}
+
+.ral5019 {
+  color: #1A5784 !important;
+}
+
+.ral5020 {
+  color: #0B4151 !important;
+}
+
+.ral5021 {
+  color: #07737A !important;
+}
+
+.ral5022 {
+  color: #2F2A5A !important;
+}
+
+.ral5023 {
+  color: #4D668E !important;
+}
+
+.ral5024 {
+  color: #6A93B0 !important;
+}
+
+.ral5025 {
+  color: #296478 !important;
+}
+
+.ral5026 {
+  color: #102C54 !important;
+}
+
+.ral6000 {
+  color: #327662 !important;
+}
+
+.ral6001 {
+  color: #28713E !important;
+}
+
+.ral6002 {
+  color: #276235 !important;
+}
+
+.ral6003 {
+  color: #4B573E !important;
+}
+
+.ral6004 {
+  color: #0E4243 !important;
+}
+
+.ral6005 {
+  color: #0F4336 !important;
+}
+
+.ral6006 {
+  color: #40433B !important;
+}
+
+.ral6007 {
+  color: #283424 !important;
+}
+
+.ral6008 {
+  color: #35382E !important;
+}
+
+.ral6009 {
+  color: #26392F !important;
+}
+
+.ral6010 {
+  color: #3E753B !important;
+}
+
+.ral6011 {
+  color: #68825B !important;
+}
+
+.ral6012 {
+  color: #31403D !important;
+}
+
+.ral6013 {
+  color: #797C5A !important;
+}
+
+.ral6014 {
+  color: #444337 !important;
+}
+
+.ral6015 {
+  color: #3D403A !important;
+}
+
+.ral6016 {
+  color: #026A52 !important;
+}
+
+.ral6017 {
+  color: #468641 !important;
+}
+
+.ral6018 {
+  color: #48A43F !important;
+}
+
+.ral6019 {
+  color: #B7D9B1 !important;
+}
+
+.ral6020 {
+  color: #354733 !important;
+}
+
+.ral6021 {
+  color: #86A47C !important;
+}
+
+.ral6022 {
+  color: #3E3C32 !important;
+}
+
+.ral6024 {
+  color: #008754 !important;
+}
+
+.ral6025 {
+  color: #53753C !important;
+}
+
+.ral6026 {
+  color: #005D52 !important;
+}
+
+.ral6027 {
+  color: #81C0BB !important;
+}
+
+.ral6028 {
+  color: #2D5546 !important;
+}
+
+.ral6029 {
+  color: #007243 !important;
+}
+
+.ral6032 {
+  color: #0F8558 !important;
+}
+
+.ral6033 {
+  color: #478A84 !important;
+}
+
+.ral6034 {
+  color: #7FB0B2 !important;
+}
+
+.ral6035 {
+  color: #1B542C !important;
+}
+
+.ral6036 {
+  color: #005D4C !important;
+}
+
+.ral6037 {
+  color: #25E712 !important;
+}
+
+.ral6038 {
+  color: #00F700 !important;
+}
+
+.ral7000 {
+  color: #7E8B92 !important;
+}
+
+.ral7001 {
+  color: #8F999F !important;
+}
+
+.ral7002 {
+  color: #817F68 !important;
+}
+
+.ral7003 {
+  color: #7A7B6D !important;
+}
+
+.ral7004 {
+  color: #9EA0A1 !important;
+}
+
+.ral7005 {
+  color: #6B716F !important;
+}
+
+.ral7006 {
+  color: #756F61 !important;
+}
+
+.ral7008 {
+  color: #746643 !important;
+}
+
+.ral7009 {
+  color: #5B6259 !important;
+}
+
+.ral7010 {
+  color: #575D57 !important;
+}
+
+.ral7011 {
+  color: #555D61 !important;
+}
+
+.ral7012 {
+  color: #596163 !important;
+}
+
+.ral7013 {
+  color: #555548 !important;
+}
+
+.ral7015 {
+  color: #51565C !important;
+}
+
+.ral7016 {
+  color: #373F43 !important;
+}
+
+.ral7021 {
+  color: #2E3234 !important;
+}
+
+.ral7022 {
+  color: #4B4D46 !important;
+}
+
+.ral7023 {
+  color: #818479 !important;
+}
+
+.ral7024 {
+  color: #474A50 !important;
+}
+
+.ral7026 {
+  color: #374447 !important;
+}
+
+.ral7030 {
+  color: #939388 !important;
+}
+
+.ral7031 {
+  color: #5D6970 !important;
+}
+
+.ral7032 {
+  color: #B9B9A8 !important;
+}
+
+.ral7033 {
+  color: #818979 !important;
+}
+
+.ral7034 {
+  color: #939176 !important;
+}
+
+.ral7035 {
+  color: #CBD0CC !important;
+}
+
+.ral7036 {
+  color: #9A9697 !important;
+}
+
+.ral7037 {
+  color: #7C7F7E !important;
+}
+
+.ral7038 {
+  color: #B4B8B0 !important;
+}
+
+.ral7039 {
+  color: #6B695F !important;
+}
+
+.ral7040 {
+  color: #9DA3A6 !important;
+}
+
+.ral7042 {
+  color: #8F9695 !important;
+}
+
+.ral7043 {
+  color: #4E5451 !important;
+}
+
+.ral7044 {
+  color: #BDBDB2 !important;
+}
+
+.ral7045 {
+  color: #91969A !important;
+}
+
+.ral7046 {
+  color: #82898E !important;
+}
+
+.ral7047 {
+  color: #CFD0CF !important;
+}
+
+.ral7048 {
+  color: #888175 !important;
+}
+
+.ral8000 {
+  color: #887142 !important;
+}
+
+.ral8001 {
+  color: #9C6B30 !important;
+}
+
+.ral8002 {
+  color: #7B5141 !important;
+}
+
+.ral8003 {
+  color: #80542F !important;
+}
+
+.ral8004 {
+  color: #8F4E35 !important;
+}
+
+.ral8007 {
+  color: #6F4A2F !important;
+}
+
+.ral8008 {
+  color: #6F4F28 !important;
+}
+
+.ral8011 {
+  color: #5A3A29 !important;
+}
+
+.ral8012 {
+  color: #673831 !important;
+}
+
+.ral8014 {
+  color: #49392D !important;
+}
+
+.ral8015 {
+  color: #633A34 !important;
+}
+
+.ral8016 {
+  color: #4C2F26 !important;
+}
+
+.ral8017 {
+  color: #44322D !important;
+}
+
+.ral8019 {
+  color: #3F3A3A !important;
+}
+
+.ral8022 {
+  color: #211F20 !important;
+}
+
+.ral8023 {
+  color: #A65E2F !important;
+}
+
+.ral8024 {
+  color: #79553C !important;
+}
+
+.ral8025 {
+  color: #755C49 !important;
+}
+
+.ral8028 {
+  color: #4E3B31 !important;
+}
+
+.ral8029 {
+  color: #763C28 !important;
+}
+
+.ral9001 {
+  color: #FDF4E3 !important;
+}
+
+.ral9002 {
+  color: #E7EBDA !important;
+}
+
+.ral9003 {
+  color: #F4F4F4 !important;
+}
+
+.ral9004 {
+  color: #282828 !important;
+}
+
+.ral9005 {
+  color: #0A0A0A !important;
+}
+
+.ral9006 {
+  color: #A5A5A5 !important;
+}
+
+.ral9007 {
+  color: #8F8F8F !important;
+}
+
+.ral9010 {
+  color: #FFFFFF !important;
+}
+
+.ral9011 {
+  color: #1C1C1C !important;
+}
+
+.ral9016 {
+  color: #F6F6F6 !important;
+}
+
+.ral9017 {
+  color: #1E1E1E !important;
+}
+
+.ral9018 {
+  color: #D7D7D7 !important;
+}
+
+.ral9022 {
+  color: #9C9C9C !important;
+}
+
+.ral9023 {
+  color: #828282 !important;
+}
