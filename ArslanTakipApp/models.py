@@ -263,7 +263,7 @@ class Yuda(models.Model):
     KaliteBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_kalite")
     YuzeyIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_yuzey")
     MekanikIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_mekanik")
-    YuklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
+    #YuklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
 
 class Parameter(models.Model):
     ParentId = models.ManyToManyField("self", symmetrical=False, null=True, blank=True)
@@ -272,6 +272,16 @@ class Parameter(models.Model):
 
     def __str__(self):
         return self.Isim
+
+class FileType(models.Model):
+    file_type = models.CharField()
+
+class MyFile(models.Model):
+    my_yuda = models.ForeignKey(Yuda, related_name="files", on_delete=models.DO_NOTHING, null=True, blank=True)
+    my_type = models.ForeignKey(FileType, related_name="my_type", on_delete=models.DO_NOTHING, null=True, blank=True)
+    file = models.FileField(upload_to='media/')
+    
+
 
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

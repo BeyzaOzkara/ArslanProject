@@ -1161,6 +1161,7 @@ def yuda(request, objId):
     data = json.dumps(parameters, indent=1)
     return HttpResponse(data)
 
+
 def yuda_ekle(request):
     if request.method == "POST":
         print(request.POST)
@@ -1195,6 +1196,8 @@ def yuda_ekle(request):
         y.Folyo = posted['folyo']
         y.Bariyerleme = posted['bariyerleme']
         y.MusteriOdemeVadesi = posted['musteriOdemeVadesi']
+
+        
         #y.YuklenenDosyalar = 
         print(y)
 
