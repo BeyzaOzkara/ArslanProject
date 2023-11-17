@@ -260,8 +260,10 @@
                                 <div class="tab-pane active" id="ytab_1">
                                     <div class="row">
                                         <div class="form-group col-lg-4">
-                                            <select name="presYuzeyDetay" id="presYuzeyDetay" class="form-control" onchange="if (this.value !='Pres Yüzey'){toastClick('info',''+this.value+' Ufuk Beye Sor','')}">
-                                                <option value="presYuzeyDetay" id="presYuzeyDetaySelected" selected disabled>Yüzey Detay</option>
+                                            <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal')
+                                                                                                                    {toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','oc')}
+                                                                                                                    else if(this.value == 'Boya Kalite'){toastClick('info', 'Boya işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın. ','oc')}">
+                                                <option value="yuzeyPresDetay" id="yuzeyPresSelected" selected disabled>Yüzey Detay</option>
                                                 <option value="Pres Yüzey">Pres Yüzey</option>
                                                 <option value="Eloksal Kalite">Eloksal Kalite</option>
                                                 <option value="Boya Kalite">Boya Kalite</option>
@@ -359,16 +361,20 @@
                                                 <option value="Tür" id="turSelected" selected disabled>Tür </option>
                                             </select>
                                         </div>
-                                        <div class="form-group input-group col-lg-3">
-                                            <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control">
-                                                <option value="boyaMarka" selected disabled>Marka</option>
-                                            </select>
-                                            <select name="boyaClassSelect" id="boyaClassSelect" class="form-control" onclick="toastClick('info','Belirtilmediyse Class 1','')">
-                                                <option value="boyaClass" selected>Class 1</option>
-                                                <option value="boyaClass2">Class 2</option>
-                                                <option value="boyaClass3">Class 3</option>
-                                            </select>
-                                            <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
+                                        <div class="form-group col-lg-3">
+                                            <div class="input-group">
+                                                <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
+                                                    <option value="boyaMarka" selected disabled>Marka</option>
+                                                </select>
+                                                <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
+                                                <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                                <select name="boyaClassSelect" id="boyaClassSelect" class="form-control" onclick="toastClick('info','Belirtilmediyse Class 1','')">
+                                                    <option value="boyaClass" selected>Class 1</option>
+                                                    <option value="boyaClass2">Class 2</option>
+                                                    <option value="boyaClass3">Class 3</option>
+                                                </select>
+                                                <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
+                                            </div>
                                         </div>
                                         <div class="form-group input-group col-lg-1">
                                             <select name="boyaKalinlikSelect" id="boyaKalinlikSelect" class="form-control">
@@ -563,22 +569,6 @@
         return "<i class='fa fa-trash'></i>";
     };
 
-    var profilTab = new Tabulator("#profilTabulator", {
-        layout:"fitColumns",
-        placeholder:"Profil Detayları",
-        popupContainer:true,
-        movableRows:true,
-        columns:[
-            {rowHandle:true, formatter:"handle", title:"", headerSort:false, frozen:true, width:40, minWidth:40},
-            {title:"İstenilen Standart Boy", field:"IstenilenStandartBoy"},
-            {title:"Minimum Kullanım Boyu", field:"MinKullanimBoyu"},
-            {title:"Min-Max Metre Ağırlık Talebi", field:"MetreAgirlikTalebiMiktar", visible:false},
-            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
-                cell.getRow().delete();
-            }},
-        ],
-    });
-
     var alasimTab = new Tabulator("#alasimTabulator", {
         layout:"fitColumns",
         data:[],
@@ -707,6 +697,11 @@
       };
     };
 
+    function digerFunction(selectId, digerId){
+        $('#'+selectId).hide();
+        $('#'+digerId).show();
+    }; /* texti kapatmak için de bunu çağır */
+
     function selectFunction(objId, target, title, diger) {
         if (objId == 0){
             if(target != ""){
@@ -771,6 +766,12 @@
             kondusyon = $('#KondüsyonDiger').val();
         }
         alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+    });
+
+    document.getElementById("YuzeyPresEkle").addEventListener("click", function(){
+        if($('#yuzeyPresSelect').val() != null){
+            console.log("if")
+        }
     });
 
     document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
