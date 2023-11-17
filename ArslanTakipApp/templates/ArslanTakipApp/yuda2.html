@@ -27,7 +27,8 @@
         margin: 0 auto;  
         left: 50%;   
         margin-left: -150px;
-    }
+    };
+
   </style>
 
 {% endblock %}
@@ -41,11 +42,10 @@
               <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Tolerans</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Profil</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Yüzey</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Talaşlı İmalat</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_7" data-toggle="tab">Paketleme</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_8" data-toggle="tab">Dosya</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Talaşlı İmalat</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Paketleme</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_7" data-toggle="tab">Dosya</a></li>
             </ul>
         </div><!-- /.card-header -->
         <div class="card-body">
@@ -94,7 +94,20 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ</span>
-                                      <input type="text" name="YillikProfilSiparisi" id="YillikProfilSiparisi" class="form-control mt-2">
+                                      <div class="input-group">
+                                        <input type="text" placeholder="kg" name="YillikProfilSiparisi" id="YillikProfilSiparisi" class="form-control">
+                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-outline-info active">
+                                              <input type="radio" name="profilSip" id="sipHafta" autocomplete="off" checked> HAFTA
+                                            </label>
+                                            <label class="btn btn-outline-info">
+                                              <input type="radio" name="profilSip" id="sipAy" autocomplete="off"> AY
+                                            </label>
+                                            <label class="btn btn-outline-info">
+                                              <input type="radio" name="profilSip" id="sipYil" autocomplete="off"> YIL
+                                            </label>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -166,7 +179,7 @@
                         <div class="card-header">Tolerans Detayları</div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-12 col-sm-6">
+                                <div class="col-12 col-sm-4">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">DIN TOLERANS</span>
@@ -186,7 +199,7 @@
                                     </div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6">
+                                <div class="col-12 col-sm-4">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI</span>
@@ -207,7 +220,16 @@
                                     </div>
                                     </div>
                                 </div>
-                                
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
+                                            <a class="btn btn-app">
+                                                <input type="checkbox" class="form-check-input" name="" id="metre"> Var
+                                            </a>
+                                    </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-12 ">
@@ -224,60 +246,6 @@
                 </div>
                 <div class="tab-pane" id="tab_4">
                     <div class="card">
-                        <div class="card-header">Profil Detayları</div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
-                                        <div class="info-box-content">
-                                            <span class="info-box-text text-center text-bold">İstenilen Boy</span>
-                                            <input type="text" name="istenilenBoy" class="form-control" id="istenilenBoy">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
-                                        <div class="info-box-content">
-                                            <span class="info-box-text text-center text-bold">Minimum Kullanım Boyu</span>
-                                            <input type="text" placeholder="Müşteri kısa kesim yapıyor ise" name="MinKullanimBoyu" class="form-control" id="MinKullanimBoyu">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
-                                    <div class="info-box-content">
-                                        <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
-                                        <div class="row">
-                                            <div class="col-12 col-sm-2">
-                                                <input type="checkbox" name="metreCheck" id="metreCheck" checked data-bootstrap-switch data-size="large" data-off-color="danger" data-on-color="success" data-on-text="VAR" data-off-text="YOK">
-                                            </div>
-                                            <div class="col-12 col-sm-5" >
-                                                <input type="text" name="minMAT" id="minMAT" class="form-control">
-                                            </div>
-                                            <div class="col-12 col-sm-5">
-                                                <input type="text" name="maxMAT" id="maxMAT" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    </div>
-                                    
-                                </div>
-                                
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="info-box bg-light">
-                                        <div class="info-box-content">
-                                           <div id="profilTabulator"></div> 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane" id="tab_5">
-                    <div class="card">
                         <div class="card-header d-flex p-0">
                             <h3 class="card-title p-3">Yüzey Detayları</h3>
                             <ul class="nav nav-pills ml-auto p-2">
@@ -289,7 +257,34 @@
                         </div>
                         <div class="card-body">
                             <div class="tab-content">
-                                <div class="tab-pane active" id="ytab_1"></div>
+                                <div class="tab-pane active" id="ytab_1">
+                                    <div class="row">
+                                        <div class="form-group col-lg-4">
+                                            <select name="presYuzeyDetay" id="presYuzeyDetay" class="form-control" onchange="if (this.value !='Pres Yüzey'){toastClick('info',''+this.value+' Ufuk Beye Sor','')}">
+                                                <option value="presYuzeyDetay" id="presYuzeyDetaySelected" selected disabled>Yüzey Detay</option>
+                                                <option value="Pres Yüzey">Pres Yüzey</option>
+                                                <option value="Eloksal Kalite">Eloksal Kalite</option>
+                                                <option value="Boya Kalite">Boya Kalite</option>
+                                                <option value="Parlak Eloksal">Parlak Eloksal</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-1">
+                                            <input type="number" class="form-control" placeholder="Boy (mm)" max="15000" name="yPresBoy" id="yuzeyPresBoy">
+                                        </div>
+                                        <div class="form-group col-lg-1">
+                                            <button type="button" id="YuzeyPresEkle" class="btn btn-outline-info" >Ekle</button>
+                                        </div> 
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="info-box">
+                                                <div class="info-box-content">
+                                                    <div id="yuzeyPresTabulator"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="tab-pane" id="ytab_2">
                                         <div class="row">
                                             <div class="col-lg-2">
@@ -318,6 +313,21 @@
                                             </div>
                                             <div class="col-lg-2">
                                                 <div class="form-group">
+                                                    <input type="text" class="form-control" placeholder="Boy" name="eloksalBoy" id="eloksalBoy">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                      <span class="input-group-text">
+                                                        <input type="checkbox" id="eloksalTemiz">
+                                                      </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" value="Temiz Kesim" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
                                                 <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-info" >Ekle</button>
                                                 </div>
                                             </div>
@@ -334,7 +344,7 @@
                                         
                                 </div>
                                 <div class="tab-pane" id="ytab_3">
-                                    <div class="row col-lg-12">
+                                    <div class="row">
                                         <div class="form-group col-lg-2">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
@@ -353,7 +363,7 @@
                                             <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control">
                                                 <option value="boyaMarka" selected disabled>Marka</option>
                                             </select>
-                                            <select name="boyaClassSelect" id="boyaClassSelect" class="form-control">
+                                            <select name="boyaClassSelect" id="boyaClassSelect" class="form-control" onclick="toastClick('info','Belirtilmediyse Class 1','')">
                                                 <option value="boyaClass" selected>Class 1</option>
                                                 <option value="boyaClass2">Class 2</option>
                                                 <option value="boyaClass3">Class 3</option>
@@ -365,9 +375,18 @@
                                                 <option value="boyaKalınlık" selected disabled>Kalınlık</option>
                                             </select>
                                         </div>
-                                        <div class="form-group input-group col-lg-2">
-                                            <input type="text" class="form-control" placeholder="Gloss Min" name="boyaGlossMin" id="boyaGlossMin">
-                                            <input type="text" class="form-control" placeholder="Max" name="boyaGlossMax" id="boyaGlossMax">
+                                        <div class="form-group col-lg-1">
+                                            <input type="text" class="form-control" placeholder="Boy" name="boyaBoy" id="boyaBoy">
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text">
+                                                    <input type="checkbox" id="boyaTemiz">
+                                                  </span>
+                                                </div>
+                                                <input type="text" class="form-control" value="Temiz Kesim" readonly>
+                                            </div>
                                         </div>
                                         <div class="form-group col-lg-2">
                                             <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
@@ -392,6 +411,19 @@
                                                     <option value="Ahşap Kaplama" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
                                                 </select>
                                             </div>
+                                            <div class="col-lg-2">
+                                                <input type="text" class="form-control" placeholder="Boy" name="ahsapBoy" id="ahsapBoy">
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                      <span class="input-group-text">
+                                                        <input type="checkbox" id="eloksalTemiz">
+                                                      </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" value="Temiz Kesim" readonly>
+                                                </div>
+                                            </div>
                                             <div class="col-lg-2 form-group">
                                                 <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-info">Ekle</button>
                                             </div>
@@ -409,7 +441,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane" id="tab_6">
+                <div class="tab-pane" id="tab_5">
                     <div class="card">
                         <div class="card-header">Talaşlı İmalat Detayları</div>
                         <div class="card-body">
@@ -439,7 +471,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane" id="tab_7">
+                <div class="tab-pane" id="tab_6">
                     <div class="card">
                         <div class="card-header">Paketleme Detayları</div>
                         <div class="card-body">
@@ -469,7 +501,7 @@
                             </div>
                         </div>
                 </div>
-                <div class="tab-pane" id="tab_8">
+                <div class="tab-pane" id="tab_7">
                     <div class="card">
                         <div class="card-header">Yüklenecek Dosyalar</div>
                         <div class="card-body" id="dosyaBody">
@@ -563,6 +595,22 @@
                 cell.getRow().delete();}
             }
         ],
+    });
+
+    var yuzeyPresTabulator = new Tabulator('#yuzeyPresTabulator', {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1.Tercih üstte olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Yüzey Detay", field:"YuzeyDetay"},
+            {title:"Boy", field:"YuzeyPresBoy"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                let data = cell.getData();
+                cell.getRow().delete();
+            }}
+        ]
     });
 
     var eloksalTabulator = new Tabulator("#eloksalTabulator", {
