@@ -130,35 +130,36 @@
                             <div class="row" id="alasimKondusyonRow">
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="alasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer')">
-                                        <option value="Alaşım" id="alasimSelected" selected disabled>Alaşım </option>
-                                        <!-- {% for al in alasim_json %}
-                                            <option value='{{al.id}}'>{{ al.Isim }}</option>
-                                        {% endfor %} -->
+                                    <select name="alasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer'); if(this.value==0){digerFunction('alasimSelect', 'alasimDigerDiv')}">
+                                        <option value="alasimSelected" id="alasimSelected" selected disabled>Alaşım </option>
+                                        
                                     </select>
+                                    <div class="input-group" id="alasimDigerDiv" style="display: none;">
+                                        <input type="text" class="form-control" placeholder="Alaşım" id="alasimDiger">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="alasimDigerSpan" onclick="digerFunction('alasimDigerDiv', 'alasimSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                        </div>
+                                    </div>
+                                    
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer')">
-                                        <option value="Kondüsyon" id="kondusyonSelected" selected disabled>Kondüsyon </option>
+                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer'); if(this.value==0){digerFunction('kondusyonSelect', 'kondusyonDigerDiv')}">
+                                        <option value="kondusyonSelected" id="kondusyonSelected" selected disabled>Kondüsyon </option>
                                         
                                     </select>
+                                    <div class="input-group" id="kondusyonDigerDiv" style="display: none;">
+                                        <input type="text" class="form-control" placeholder="Kondüsyon" id="kondusyonDiger">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="kondusyonDigerSpan" onclick="digerFunction('kondusyonDigerDiv', 'kondusyonSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                        </div>
+                                    </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                     <button type="button" id="AlasimKondusyonEkle" class="btn btn-outline-info" >Ekle</button>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2" id="AlaşımDiv" style="display: none;">
-                                    <div class="form-group">
-                                        <input type="text" name="AlaşımDiger" placeholder="Alaşım" id="AlaşımDiger" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-lg-2" id="KondüsyonDiv" style="display: none;">
-                                    <div class="form-group">
-                                        <input type="text" name="KondüsyonDiger" placeholder="Kondüsyon" id="KondüsyonDiger" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -364,7 +365,7 @@
                                         <div class="form-group col-lg-3">
                                             <div class="input-group">
                                                 <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
-                                                    <option value="boyaMarka" selected disabled>Marka</option>
+                                                    <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
                                                 </select>
                                                 <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
                                                 <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
@@ -413,9 +414,15 @@
                                     <div id="ahsapTab">
                                         <div class="row">
                                             <div class="col-lg-6 form-group">
-                                                <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control">
-                                                    <option value="Ahşap Kaplama" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
+                                                <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')">
+                                                    <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
                                                 </select>
+                                                <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
+                                                    <input type="text" class="form-control" id="ahsapKaplamaDiger">
+                                                    <div class="input-group-append">
+                                                        <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col-lg-2">
                                                 <input type="text" class="form-control" placeholder="Boy" name="ahsapBoy" id="ahsapBoy">
@@ -699,6 +706,9 @@
 
     function digerFunction(selectId, digerId){
         $('#'+selectId).hide();
+        if(selectId.includes('Select')){
+            $('#'+selectId).val(selectId+'ed');
+        };
         $('#'+digerId).show();
     }; /* texti kapatmak için de bunu çağır */
 
