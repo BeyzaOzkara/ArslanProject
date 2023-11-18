@@ -314,24 +314,24 @@
                                                 </select>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
+                                            <div class="col-lg-1">
                                                 <div class="form-group">
-                                                    <input type="text" class="form-control" placeholder="Boy" name="eloksalBoy" id="eloksalBoy">
+                                                    <input type="number" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" id="eloksalBoy">
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <div class="input-group">
+                                            <div class="col-lg-2 form-group">
+                                                <div class="row">
+                                                <div class="input-group col-lg-8">
                                                     <div class="input-group-prepend">
                                                       <span class="input-group-text temizSpan">
                                                         <input type="checkbox" class="temizCheckbox" id="eloksalTemiz">
                                                       </span>
                                                     </div>
-                                                    <input type="text" class="form-control temizInput col-lg-6" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                    <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <div class="form-group">
-                                                <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-info" >Ekle</button>
+                                                <div class="col-lg-4" >
+                                                    <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-info">Ekle</button>
+                                                </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -348,34 +348,37 @@
                                 </div>
                                 <div class="tab-pane" id="ytab_3">
                                     <div class="row">
-                                        <div class="form-group col-lg-2">
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text ral" id="RALspan" style="color: rgb(231, 231, 231);">...</span>
-                                                    <span class="input-group-text" id="">RAL </span>
-                                                </div>
-                                                <input type="text" class="form-control" id="RALinput" maxlength="4" size="4">
-                                            </div>
-                                        </div>
                                         <div class="form-group col-lg-1">
                                             <select name="turSelect" id="turSelect" class="form-control">
                                                 <option value="Tür" id="turSelected" selected disabled>Tür </option>
                                             </select>
                                         </div>
-                                        <div class="form-group col-lg-3">
-                                            <div class="input-group">
-                                                <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
+                                        <div class="col-lg-5">
+                                        <div class="row">
+                                            <div class="input-group col-lg-9">
+                                                <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control col-lg-4" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
                                                     <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
                                                 </select>
                                                 <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
                                                 <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
-                                                <select name="boyaClassSelect" id="boyaClassSelect" class="form-control" onclick="toastClick('info','Belirtilmediyse Class 1','')">
+                                                <select name="boyaClassSelect" id="boyaClassSelect" class="form-control col-lg-3" onclick="toastClick('info','Belirtilmediyse Class 1','')">
                                                     <option value="boyaClass" selected>Class 1</option>
                                                     <option value="boyaClass2">Class 2</option>
                                                     <option value="boyaClass3">Class 3</option>
                                                 </select>
                                                 <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
                                             </div>
+                                            
+                                            <div class="col-lg-3">
+                                                <div class="input-group ">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text ral" id="RALspan" style="color: rgb(231, 231, 231);">...</span>
+                                                        <span class="input-group-text" id="">RAL </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" id="RALinput" maxlength="4" size="4">
+                                                </div>
+                                            </div>
+                                        </div>
                                         </div>
                                         <div class="form-group input-group col-lg-1">
                                             <select name="boyaKalinlikSelect" id="boyaKalinlikSelect" class="form-control">
@@ -383,21 +386,24 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-lg-1">
-                                            <input type="text" class="form-control" placeholder="Boy" name="boyaBoy" id="boyaBoy">
+                                            <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" id="boyaBoy">
                                         </div>
-                                        <div class="form-group">
-                                            <div class="input-group">
+                                        <div class="form-group col-lg-3">
+                                        <div class="row">
+                                            <div class="input-group col-lg-5">
                                                 <div class="input-group-prepend">
                                                   <span class="input-group-text temizSpan">
                                                     <input type="checkbox" class="temizCheckbox" id="boyaTemiz">
                                                   </span>
                                                 </div>
-                                                <input type="text" class="form-control temizInput col-lg-6" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
                                             </div>
+                                            <div class="col-lg-7">
+                                                <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
+                                            </div>
+                                        </div>    
                                         </div>
-                                        <div class="form-group col-lg-2">
-                                            <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
-                                        </div>
+                                        
                                         <div class="form-group col-lg-1">
                                             <button type="button" id="YuzeyBoyaEkle" class="btn btn-outline-info" >Ekle</button>
                                         </div> 
@@ -414,7 +420,7 @@
                                     <div id="ahsapTab">
                                         <div class="row">
                                             <div class="col-lg-6 form-group">
-                                                <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')">
+                                                <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="if(this.value==0){ digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')}">
                                                     <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
                                                 </select>
                                                 <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
@@ -424,8 +430,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <input type="text" class="form-control" placeholder="Boy" name="ahsapBoy" id="ahsapBoy">
+                                            <div class="col-lg-1">
+                                                <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" id="ahsapBoy">
                                             </div>
                                             <div class="col-lg-2 form-group">
                                                 <div class="row">
@@ -638,6 +644,8 @@
             {title:"Matlaştırma", field:"Matlastirma"},
             {title:"Renk", field:"Renk"},
             {title:"Kaplama Kalınlığı", field:"KaplamaKalinligi"},
+            {title:"Boy", field:"EloksalBoy"},
+            {title:"Temiz Kesim", field:"EloksalTemizKesim"},
             {title:"Matlaştırma ID", field:"MatlastirmaID", visible:false},
             {title:"Renk ID", field:"RenkID", visible:false},
             {title:"Kaplama Kalınlığı ID", field:"KaplamaKalinligiID", visible:false},
@@ -778,40 +786,52 @@
     document.getElementById("AlasimKondusyonEkle").addEventListener("click", function(){
         /* AlaşımDiger ve KondüsyonDigeri arraye alıp for döndürüp tek if else ile yapılabilir */
         let alasimID, kondusyonID, alasim, kondusyon = "";
-        if (document.getElementById("AlaşımDiger").value == "") {
+        if (document.getElementById("alasimDigerDiv").style.display == "none") {
             alasimID = $('#alasimSelect').val();
             alasim = $('#alasimSelect option:selected').text();
         }
         else {
-            alasim =$('#AlaşımDiger').val();
+            alasim =$('#alasimDiger').val();
         }
-        if(document.getElementById("KondüsyonDiger").value == ""){
+        if(document.getElementById("kondusyonDigerDiv").style.display == "none"){
             kondusyonID = $('#kondusyonSelect').val();
             kondusyon = $('#kondusyonSelect option:selected').text();
         }
-        else if(document.getElementById("kondusyonSelect") == ""){
-            console.log("diğer");
-            kondusyon = $('#KondüsyonDiger').val();
+        else {
+            kondusyon = $('#kondusyonDiger').val();
         }
-        alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+        if(alasim!="Alaşım " && kondusyon!="Kondüsyon "){
+            alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+        }
     });
 
     document.getElementById("YuzeyPresEkle").addEventListener("click", function(){
+        let yPresSelect, yPresBoy = "";
         if($('#yuzeyPresSelect').val() != null){
-            console.log("if")
+            yPresSelect = $('#yuzeyPresSelect').val();
+            yPresBoy = $('#yuzeyPresBoy').val();
+
+            yuzeyPresTabulator.addData({YuzeyDetay:yPresSelect, YuzeyPresBoy:yPresBoy}, false);
         }
     });
 
     document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
-        let matlastirma, renk, kalinlik, matlastirmaId, renkId, kalinlikId = "";
+        let matlastirma, renk, kalinlik, eBoy, eTemiz, matlastirmaId, renkId, kalinlikId = "";
         if($('#matlastirmaSelect').val() != null && $('#eloksalRenkSelect').val() != null && $('#eloksalKaplamaKalinligiSelect').val() != null){
             matlastirma = $('#matlastirmaSelect option:selected').text();
             renk =  $('#eloksalRenkSelect option:selected').text();
             kalinlik =  $('#eloksalKaplamaKalinligiSelect option:selected').text();
+            eBoy = $('#eloksalBoy').val();
+            if($('#eloksalTemiz').is(':checked')){
+                eTemiz = "Temiz Kesim";
+            }
+            else{
+                eTemiz = "Temiz Kesim Değil";
+            }
             matlastirmaId = $('#matlastirmaSelect').val();
             renkId =  $('#eloksalRenkSelect').val();
             kalinlikId =  $('#eloksalKaplamaKalinligiSelect').val();
-            eloksalTabulator.addData({Matlastirma:matlastirma, Renk:renk, KaplamaKalinligi:kalinlik, MatlastirmaID:matlastirmaId, RenkID: renkId, KaplamaKalinligiID:kalinlikId}, false);
+            eloksalTabulator.addData({Matlastirma:matlastirma, Renk:renk, KaplamaKalinligi:kalinlik, EloksalBoy:eBoy, EloksalTemizKesim:eTemiz, MatlastirmaID:matlastirmaId, RenkID: renkId, KaplamaKalinligiID:kalinlikId}, false);
         }
     });
 
