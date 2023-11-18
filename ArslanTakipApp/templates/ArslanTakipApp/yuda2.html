@@ -322,11 +322,11 @@
                                             <div class="form-group">
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
-                                                      <span class="input-group-text">
-                                                        <input type="checkbox" id="eloksalTemiz">
+                                                      <span class="input-group-text temizSpan">
+                                                        <input type="checkbox" class="temizCheckbox" id="eloksalTemiz">
                                                       </span>
                                                     </div>
-                                                    <input type="text" class="form-control" value="Temiz Kesim" readonly>
+                                                    <input type="text" class="form-control temizInput col-lg-6" value="Temiz Kesim" style="background-color: transparent;" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-lg-2">
@@ -388,11 +388,11 @@
                                         <div class="form-group">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                  <span class="input-group-text">
-                                                    <input type="checkbox" id="boyaTemiz">
+                                                  <span class="input-group-text temizSpan">
+                                                    <input type="checkbox" class="temizCheckbox" id="boyaTemiz">
                                                   </span>
                                                 </div>
-                                                <input type="text" class="form-control" value="Temiz Kesim" readonly>
+                                                <input type="text" class="form-control temizInput col-lg-6" value="Temiz Kesim" style="background-color: transparent;" readonly>
                                             </div>
                                         </div>
                                         <div class="form-group col-lg-2">
@@ -418,7 +418,7 @@
                                                     <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
                                                 </select>
                                                 <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
-                                                    <input type="text" class="form-control" id="ahsapKaplamaDiger">
+                                                    <input type="text" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
                                                     <div class="input-group-append">
                                                         <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                                     </div>
@@ -427,19 +427,24 @@
                                             <div class="col-lg-2">
                                                 <input type="text" class="form-control" placeholder="Boy" name="ahsapBoy" id="ahsapBoy">
                                             </div>
-                                            <div class="form-group">
-                                                <div class="input-group">
+                                            <div class="col-lg-2 form-group">
+                                                <div class="row">
+                                                <div class="input-group col-lg-8">
                                                     <div class="input-group-prepend">
-                                                      <span class="input-group-text">
-                                                        <input type="checkbox" id="eloksalTemiz">
+                                                      <span class="input-group-text temizSpan">
+                                                        <input type="checkbox" class="temizCheckbox" id="ahsapTemiz">
                                                       </span>
                                                     </div>
-                                                    <input type="text" class="form-control" value="Temiz Kesim" readonly>
+                                                    <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                </div>
+                                                <div class="col-lg-4" >
+                                                    <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-info">Ekle</button>
+                                                </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2 form-group">
-                                                <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-info">Ekle</button>
-                                            </div>
+                                            <!-- <div class="col-lg-2 form-group">
+                                                
+                                            </div> -->
                                         </div>
                                         <div class="row">
                                             <div class="col-12 info-box">
@@ -547,16 +552,29 @@
 
 {% block extra_js %}
 <script>
+    $('.temizSpan').click(
+        function() {
+            console.log(this);
+            console.log($(this).find(":checkbox"));
+            var cb = $(this).find(":checkbox")[0];
+
+            if (!$(cb).attr("checked")) {
+                $(cb).attr("checked", "checked");
+            } else {
+                $(cb).removeAttr("checked");
+            }
+        }
+    );
+
+    $('.temizSpan .temizCheckbox').click(
+        function(event){
+            event.stopPropagation();
+    });
     
     function toastClick(iconInput, titleInput, position){
         toastr.remove();
         var pos = {"":"toast-top-right", "oc":"toast-orta-center", "br":"toast-bottom-right", "tc":"toast-top-center"};
         let posi = pos[position];
-        console.log(posi)
-        /* toastr.options = { 
-            "positionClass": posi,
-            "progressBar": true,
-        } */
 
         if(iconInput=="success"){
             toastr.success(titleInput,"",{"positionClass": posi})

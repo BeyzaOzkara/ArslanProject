@@ -282,7 +282,6 @@ class MyFile(models.Model):
     file = models.FileField(upload_to='media/')
     
 
-
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     Form = models.ForeignKey(Yuda, on_delete=models.CASCADE, null=True, blank=True)
