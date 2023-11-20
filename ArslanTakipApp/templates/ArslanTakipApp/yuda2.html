@@ -368,7 +368,6 @@
                                                 </select>
                                                 <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
                                             </div>
-                                            
                                             <div class="col-lg-3">
                                                 <div class="input-group ">
                                                     <div class="input-group-prepend">
@@ -663,15 +662,17 @@
         placeholder:"1. Tercih üste olacak şekilde sıralayınız",
         columns:[
             {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
-            {title:"RAL", field:"Ral"},
             {title:"Tür", field:"Tur"},
-            {title:"Tür ID", field:"TurID", visible:false},
             {title:"Marka", field:"Marka"},
-            {title:"Marka Renk Kodu", field:"MarkaRenkKodu", visible:false},
-            {title:"Kalınlık Min", field:"KalinlikMin"},
-            {title:"Kalınlık Max", field:"KalinlikMax"},
-            {title:"Gloss Min", field:"GlossMin"},
-            {title:"Gloss Max", field:"GlossMax"},
+            {title:"Class", field:"BoyaClass"},
+            {title:"Marka Renk Kodu", field:"MarkaRenkKodu"},
+            {title:"RAL", field:"Ral"},
+            {title:"Tür ID", field:"TurID", visible:false},
+            {title:"Marka ID", field:"BoyaMarkaID", visible:false},
+            {title:"Kalınlık", field:"BoyaKalinlik"},
+            {title:"Kalınlık ID", field:"BoyaKalinlikID", visible:false},
+            {title:"Boy", field:"BoyaBoy"},
+            {title:"Temiz Kesim", field:"BoyaTemizKesim"},
             {title:"Açıklama", field:"BoyaAciklama"},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
@@ -689,6 +690,8 @@
             {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
             {title:"Ahşap Kaplama", field:"AhsapKaplama"},
             {title:"Ahşap Kaplama ID", field:"AhsapKaplamaID", visible:false},
+            {title:"Boy", field:"AhsapBoy"},
+            {title:"Temiz Kesim", field:"AhsapTemizKesim"},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
@@ -836,25 +839,48 @@
     });
 
     document.getElementById("YuzeyBoyaEkle").addEventListener("click", function(){
-        let RALinput, turSelect, boyaMarka, markaRenkKodu, boyaKalinlikMin, boyaKalinlikMax, boyaGlossMin, boyaGlossMax, boyaAciklama = "";
-        let boyaList = ["Ral", "turSelect", "boyaMarka", "markaRenkKodu", "boyaKalinlikMin", "boyaKalinlikMax", "boyaGlossMin", "boyaGlossMax", "boyaAciklama"];
-        var t = yuzeyBoyaTabulator.getColumns();
-        var inputList = {"Ral" : "RALInput", "Tur" : "TurSelect"}
-        console.log("#" + inputList[t[1]._column.definition.field])
-        boyaList.forEach(element => {
-            
-        });
-        if($('#RALinput, #boyaMarka, #markaRenkKodu, #boyaKalinlikMin, #boyaKalinlikMax, #boyaGlossMin, #boyaGlossMax, #boyaAciklama').val() != "" && $('#turSelect').val() != null){
-            yuzeyBoyaTabulator.addData({Ral:$('#RALinput').val(), Tur: $('#turSelect option:selected').text(), TurID: $('#turSelect').val(), Marka: $('#'), MarkaRenkKodu: $('#'), Kalinlik: $('#'),  GlossMin: $('#'), GlossMax: $('#'), BoyaAciklama: $('#')})
+        let boyaMarka, boyaMarkaID, bTemiz, boyaKalinlik, boyaKalinlikID = "";
+        if(document.getElementById("boyaMarkaDiger").style.display == "none"){
+            boyaMarka = $('#boyaMarkaSelect option:selected').text();
+            boyaMarkaID = $('#boyaMarkaSelect').val();
+        }
+        else{
+            boyaMarka = $('#boyaMarkaDiger').val();
+        }
+        if($('#boyaTemiz').is(':checked')){
+            bTemiz = "Temiz Kesim";
+        }
+        else{
+            bTemiz = "Temiz Kesim Değil";
+        }
+        if($('#boyaKalinlikSelect').val() != null){
+            boyaKalinlik = $('#boyaKalinlikSelect option:selected').text();
+            boyaKalinlikID = $('#boyaKalinlikSelect').val();
+        }
+        if($('#markaRenkKodu').val() != "" && boyaMarka != "" && $('#turSelect').val() != null){
+            yuzeyBoyaTabulator.addData({Tur: $('#turSelect option:selected').text(), TurID: $('#turSelect').val(), Marka: boyaMarka, MarkaID: boyaMarkaID, BoyaClass:$('#boyaClassSelect option:selected').text(), 
+            MarkaRenkKodu: $('#markaRenkKodu').val(), Ral:$('#RALinput').val(), BoyaKalinlik: boyaKalinlik, BoyaKalinlikID: boyaKalinlikID, 
+            BoyaBoy:$('#boyaBoy').val(), BoyaTemizKesim:bTemiz, BoyaAciklama: $('#boyaAciklama').val()}, false);
         }
     });
 
     document.getElementById("ahsapKaplamaEkle").addEventListener('click', function(){
-        let ahsapKaplama, ahsapKaplamaId = "";
-        if($('#ahsapKaplamaSelect').val() != null){
-            ahsapKaplamaId = $('#ahsapKaplamaSelect').val();
+        let ahsapKaplama, ahsapKaplamaId, aTemiz = "";
+        if($('#ahsapTemiz').is(':checked')){
+            aTemiz = "Temiz Kesim";
+        }
+        else{
+            aTemiz = "Temiz Kesim Değil";
+        };
+        if(document.getElementById("ahsapKaplamaDigerDiv").style.display == "none"){
             ahsapKaplama = $('#ahsapKaplamaSelect option:selected').text();
-            ahsapKaplamaTabulator.addData({AhsapKaplama:ahsapKaplama, AhsapKaplamaID:ahsapKaplamaId}, false);
+            ahsapKaplamaID = $('#ahsapKaplamaSelect').val();
+        }
+        else{
+            ahsapKaplama = $('#ahsapKaplamaDiger').val();
+        }
+        if(ahsapKaplama != "" && ahsapKaplama != "Ahşap Kaplama"){
+            ahsapKaplamaTabulator.addData({AhsapKaplama:ahsapKaplama, AhsapKaplamaID:ahsapKaplamaId, AhsapBoy:$('#ahsapBoy').val(), AhsapTemizKesim:aTemiz}, false);
         }
     });
 
