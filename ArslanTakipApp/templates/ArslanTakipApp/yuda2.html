@@ -41,7 +41,7 @@
             <ul class="nav nav-pills ml-auto p-2">
               <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Tolerans</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', 'oc')">Tolerans</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Talaşlı İmalat</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Paketleme</a></li>
@@ -49,6 +49,7 @@
             </ul>
         </div><!-- /.card-header -->
         <div class="card-body">
+        <form action="" method="post" id="yudaForm">
             <div class="tab-content">
                 <div class="tab-pane active" id="tab_1">
                     <div class="card">
@@ -59,7 +60,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI</span>
-                                      <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2">
+                                      <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2" required>
                                       <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
                                     </div>
                                   </div>
@@ -94,14 +95,14 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ</span>
-                                      <div class="input-group">
-                                        <input type="text" placeholder="kg" name="YillikProfilSiparisi" id="YillikProfilSiparisi" class="form-control">
+                                      <div class="input-group mt-2">
+                                        <input type="text" placeholder="kg" name="YillikProfilSiparisi" id="YillikProfilSiparisi" class="form-control" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn btn-outline-info active">
-                                              <input type="radio" name="profilSip" id="sipHafta" autocomplete="off" checked> HAFTA
+                                              <input type="radio" name="profilSip" id="sipHafta" autocomplete="off"> HAFTA
                                             </label>
                                             <label class="btn btn-outline-info">
-                                              <input type="radio" name="profilSip" id="sipAy" autocomplete="off"> AY
+                                              <input type="radio" name="profilSip" id="sipAy" autocomplete="off" checked> AY
                                             </label>
                                             <label class="btn btn-outline-info">
                                               <input type="radio" name="profilSip" id="sipYil" autocomplete="off"> YIL
@@ -140,7 +141,6 @@
                                             <span class="input-group-text" id="alasimDigerSpan" onclick="digerFunction('alasimDigerDiv', 'alasimSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                         </div>
                                     </div>
-                                    
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -172,6 +172,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <input type="text" name="alasimTabData" id="alasimTabData" style="display: none;" required>
                         </div>
                     </div>
                 </div>
@@ -184,7 +185,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">DIN TOLERANS</span>
-                                        <select name="dinTolerans" id="dinTolerans" class="form-control mb-3" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','br')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}">
+                                        <select name="dinTolerans" id="dinTolerans" class="form-control mb-3 mt-3" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
                                             <option value="" selected disabled>Tolerans seçiniz</option>
                                             <option value="EN 755-3">EN 755-3   Yuvarlak Dolu</option>
                                             <option value="EN 755-4">EN 755-4   Kare Dolu</option>
@@ -204,8 +205,8 @@
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI</span>
                                         <!-- multiselect ile seçilsin select2 -->
-                                        <div class="form-group">
-                                            <select class="select2bs4" multiple="multiple" id="birlikteCalisan" data-placeholder="Select a State" style="width: 100%;">
+                                        <div class="form-group mt-3">
+                                            <select class="select2bs4" multiple="multiple" id="birlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
                                                 <option value="Aparatı Var">Aparatı Var</option>
                                                 <option value="Kendisiyle Çalışır">Kendisiyle Çalışır</option>
                                                 <option value="Yok">Yok</option>
@@ -218,7 +219,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
-                                        <div class="row mb-3">
+                                        <div class="row mb-3 mt-3">
                                         <div class="input-group col-lg-3">
                                             <div class="input-group-prepend">
                                               <span class="input-group-text checkSpan" id="metreSpan">
@@ -241,7 +242,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</span>
-                                        <textarea name="onemliOlculer" class="form-control" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi"></textarea>
+                                        <textarea name="onemliOlculer" class="form-control mt-3" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi"></textarea>
                                     </div>
                                     </div>
                                 </div>
@@ -276,7 +277,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-lg-1">
-                                            <input type="number" class="form-control" placeholder="Boy (mm)" max="15000" name="yPresBoy" id="yuzeyPresBoy">
+                                            <input type="number" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
                                         </div>
                                         <div class="form-group col-lg-1">
                                             <button type="button" id="YuzeyPresEkle" class="btn btn-outline-info" >Ekle</button>
@@ -291,6 +292,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <input type="text" name="yPresTabData" id="yPresTabData" style="display: none;">
                                 </div>
                                 <div class="tab-pane" id="ytab_2">
                                         <div class="row">
@@ -320,7 +322,7 @@
                                             </div>
                                             <div class="col-lg-1">
                                                 <div class="form-group">
-                                                    <input type="number" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" id="eloksalBoy">
+                                                    <input type="number" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" min="0" id="eloksalBoy">
                                                 </div>
                                             </div>
                                             <div class="col-lg-2 form-group">
@@ -348,7 +350,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+                                    <input type="text" name="yEloksalTabData" id="yEloksalTabData" style="display: none;">
                                 </div>
                                 <div class="tab-pane" id="ytab_3">
                                     <div class="row">
@@ -389,7 +391,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-lg-1">
-                                            <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" id="boyaBoy">
+                                            <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
                                         </div>
                                         <div class="form-group col-lg-3">
                                         <div class="row">
@@ -418,6 +420,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <input type="text" name="yBoyaTabData" id="yBoyaTabData" style="display: none;">
                                 </div>
                                 <div class="tab-pane" id="ytab_4">
                                     <div id="ahsapTab">
@@ -434,7 +437,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-1">
-                                                <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" id="ahsapBoy">
+                                                <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
                                             </div>
                                             <div class="col-lg-2 form-group">
                                                 <div class="row">
@@ -462,6 +465,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <input type="text" name="yAhsapTabData" id="yAhsapTabData" style="display: none;">
                                     </div>
                                 </div>
                             </div>
@@ -520,7 +524,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                        <input type="text" name="talasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2">
+                                        <input type="text" name="talasliImalatAciklama" id="paketlemeAciklama" class="form-control mt-2">
                                     </div>
                                     </div>
                                 </div>
@@ -554,6 +558,17 @@
                     </div>
                 </div>
             </div>
+        </form>
+        </div>
+        <div class="card-footer">
+            <!--  -->
+            <div class="progress" style="height: 60px;">
+                <div class="progress-bar bg-warning" role="progressbar"
+                     aria-valuenow="0" aria-valuemin="1" aria-valuemax="100" style="width: 1%;" id="kaydetProgress">
+                     <button type="button" id="yudaKaydet" class="btn btn-block bg-gradient-primary btn-lg" style="height: 100%; display: none;">KAYDET</button>
+                </div>
+                     <!-- <span style="">KAYDET</span> -->
+              </div>
         </div>
     </div>
 </div>
@@ -561,6 +576,33 @@
 
 {% block extra_js %}
 <script>
+    function changeFunction () {
+        /* progress bar requiredlara göre dolsun */
+        let requiredElements = document.getElementById("yudaForm").querySelectorAll("[required]");
+        let req = 0;
+        for(var i = 0; i < requiredElements.length; i++) {
+            if (requiredElements[i].validity.valid){
+                req++;
+            }
+        }
+        let yuzde = req*100/requiredElements.length
+        document.getElementById('kaydetProgress').style.width = yuzde +'%';
+        if(yuzde >= 100){
+            setTimeout(function(){
+                document.getElementById('kaydetProgress').style.width = '0%';
+                setTimeout(function(){$('#yudaKaydet').show();
+                    document.getElementById('kaydetProgress').style.width = '100%';
+                    }, 600);
+                }, 600);
+        }
+        else {
+            $('#yudaKaydet').hide();
+        }
+    };
+
+    $(':input, .select').on('edit change', function(){changeFunction()});
+
+
     $('.checkSpan').click(
         function() {
             var cb = $(this).find(":checkbox")[0];
@@ -568,12 +610,14 @@
             if (!$(cb).attr("checked")) {
                 $(cb).attr("checked", "checked");
                 if(this.id=="metreSpan"){
-                    $('#matInputDiv').show()
+                    $('#matInputDiv').show();
+                    $('#minMAT, #maxMAT').prop('required', true);
                 }
             } else {
                 $(cb).removeAttr("checked");
                 if(this.id=="metreSpan"){
-                    $('#matInputDiv').hide()
+                    $('#matInputDiv').hide();
+                    $('#minMAT, #maxMAT').prop('required', false);
                 }
             }
             
@@ -587,6 +631,11 @@
     
     function toastClick(iconInput, titleInput, position){
         toastr.remove();
+        toastr.options ={
+            "timeOut" : 2000,
+            "extendedTimeOut" : 0,
+            "progressBar" : true
+        }
         var pos = {"":"toast-top-right", "oc":"toast-orta-center", "br":"toast-bottom-right", "tc":"toast-top-center"};
         let posi = pos[position];
 
@@ -621,7 +670,13 @@
             {title:"KondüsyonID", field:"KondusyonID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
                 let data = cell.getData();
-                cell.getRow().delete();}
+                cell.getRow().delete();
+                $('#alasimTabData').val(alasimTab.getData());
+                if(alasimTab.getData().length == 0){
+                    $('#alasimTabData').prop('required', true);
+                }
+                changeFunction();
+            }
             }
         ],
     });
@@ -638,6 +693,7 @@
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
+                $('#yPresTabData').val(yuzeyPresTabulator.getData());
             }}
         ]
     });
@@ -660,6 +716,7 @@
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
+                $('#yEloksalTabData').val(eloksalTabulator.getData());
             }}
         ]
     });
@@ -686,6 +743,7 @@
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
+                $('#yBoyaTabData').val(yuzeyBoyaTabulator.getData());
             }}
         ]
     });
@@ -704,6 +762,7 @@
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 let data = cell.getData();
                 cell.getRow().delete();
+                $('#yAhsapTabData').val(ahsapKaplamaTabulator.getData());
             }}
         ]
     });
@@ -814,22 +873,26 @@
         }
         if(alasim!="Alaşım " && kondusyon!="Kondüsyon "){
             alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+            $('#alasimTabData').val(alasimTab.getData());
+            $('#alasimTabData').removeAttr('required');
+            changeFunction();
         }
     });
 
     document.getElementById("YuzeyPresEkle").addEventListener("click", function(){
         let yPresSelect, yPresBoy = "";
-        if($('#yuzeyPresSelect').val() != null){
+        if($('#yuzeyPresSelect').val() != null && $('#yuzeyPresBoy').val()!=""){
             yPresSelect = $('#yuzeyPresSelect').val();
             yPresBoy = $('#yuzeyPresBoy').val();
 
             yuzeyPresTabulator.addData({YuzeyDetay:yPresSelect, YuzeyPresBoy:yPresBoy}, false);
+            $('#yPresTabData').val(yuzeyPresTabulator.getData());
         }
     });
 
     document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
         let matlastirma, renk, kalinlik, eBoy, eTemiz, matlastirmaId, renkId, kalinlikId = "";
-        if($('#matlastirmaSelect').val() != null && $('#eloksalRenkSelect').val() != null && $('#eloksalKaplamaKalinligiSelect').val() != null){
+        if($('#matlastirmaSelect').val() != null && $('#eloksalRenkSelect').val() != null && $('#eloksalKaplamaKalinligiSelect').val() != null && $('#eloksalBoy').val()!=""){
             matlastirma = $('#matlastirmaSelect option:selected').text();
             renk =  $('#eloksalRenkSelect option:selected').text();
             kalinlik =  $('#eloksalKaplamaKalinligiSelect option:selected').text();
@@ -844,6 +907,7 @@
             renkId =  $('#eloksalRenkSelect').val();
             kalinlikId =  $('#eloksalKaplamaKalinligiSelect').val();
             eloksalTabulator.addData({Matlastirma:matlastirma, Renk:renk, KaplamaKalinligi:kalinlik, EloksalBoy:eBoy, EloksalTemizKesim:eTemiz, MatlastirmaID:matlastirmaId, RenkID: renkId, KaplamaKalinligiID:kalinlikId}, false);
+            $('#yEloksalTabData').val(eloksalTabulator.getData());
         }
     });
 
@@ -866,10 +930,11 @@
             boyaKalinlik = $('#boyaKalinlikSelect option:selected').text();
             boyaKalinlikID = $('#boyaKalinlikSelect').val();
         }
-        if($('#markaRenkKodu').val() != "" && boyaMarka != "" && $('#turSelect').val() != null){
+        if($('#RALinput').val() != "" && $('#boyaBoy').val() != "" && $('#turSelect').val() != null){
             yuzeyBoyaTabulator.addData({Tur: $('#turSelect option:selected').text(), TurID: $('#turSelect').val(), Marka: boyaMarka, MarkaID: boyaMarkaID, BoyaClass:$('#boyaClassSelect option:selected').text(), 
             MarkaRenkKodu: $('#markaRenkKodu').val(), Ral:$('#RALinput').val(), BoyaKalinlik: boyaKalinlik, BoyaKalinlikID: boyaKalinlikID, 
             BoyaBoy:$('#boyaBoy').val(), BoyaTemizKesim:bTemiz, BoyaAciklama: $('#boyaAciklama').val()}, false);
+            $('#yBoyaTabData').val(yuzeyBoyaTabulator.getData());
         }
     });
 
@@ -888,10 +953,23 @@
         else{
             ahsapKaplama = $('#ahsapKaplamaDiger').val();
         }
-        if(ahsapKaplama != "" && ahsapKaplama != "Ahşap Kaplama"){
+        if(ahsapKaplama != "" && ahsapKaplama != "Ahşap Kaplama" && $('#ahsapBoy').val() != ""){
             ahsapKaplamaTabulator.addData({AhsapKaplama:ahsapKaplama, AhsapKaplamaID:ahsapKaplamaId, AhsapBoy:$('#ahsapBoy').val(), AhsapTemizKesim:aTemiz}, false);
+            $('#yAhsapTabData').val(ahsapKaplamaTabulator.getData());
         }
     });
+
+    document.getElementById("yudaKaydet").addEventListener('click', function(){
+        /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
+        console.log(document.getElementById('birlikteCalisan').validity.valid)
+        /* musteriFirmaAdi, sonKullaniciFirma, KullanimAlani, CizimNo, YillikProfilSiparisi, sipHafta, sipAy, sipYıl, profilSip, MusteriOdemeVadesi
+        alasimTabulator
+        dinTolerans, birlikteCalisan, metreCheckbox, matInputDiv, minMAT, maxMAT, onemliOlculer
+        yuzeyPresTabulator, eloksalTabulator, yuzeyBoyaTabulator, ahsapKaplamaTabulator
+        talasliImalat, talasliImalatAciklama
+        paketleme, paketlemeAciklama
+        fileInput, fileTabulator */
+    })
 
     $('#RALinput').keyup(function() {
         let defaultClass = "input-group-text ral"
@@ -929,5 +1007,5 @@
 <script src="{% static 'admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/toastr/toastr.min.js' %}"></script>
-<script src="{% static 'static/admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
 {% endblock %}
