@@ -19,9 +19,8 @@
  <link rel="stylesheet" href="{% static 'ArslanTakipApp/raltohex-background.min.css' %}">
   <link rel="stylesheet" href="{% static 'ArslanTakipApp/raltohex-color.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
-  <link rel="stylesheet" href="{% static 'admin-lte/plugins/toastr/toastr.min.css ' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/toastr/toastr.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
-  <style>
     .toast-orta-center { 
         top: 30%;   
         margin: 0 auto;  
@@ -46,7 +45,7 @@
             <ul class="nav nav-pills ml-auto p-2">
               <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', 'br')">Tolerans</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', '')">Tolerans</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Talaşlı İmalat</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Paketleme</a></li>
@@ -629,7 +628,7 @@
         let talasliImalat, talasliImalatAciklama = "";
         let paketleme, paketlemeAciklama = "";
 
-        
+
 
         /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
         /* musteriFirmaAdi, sonKullaniciFirma, KullanimAlani, CizimNo, YillikProfilSiparisi, sipHafta, sipAy, sipYıl, profilSip, MusteriOdemeVadesi
