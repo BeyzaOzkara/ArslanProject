@@ -46,7 +46,7 @@
             <ul class="nav nav-pills ml-auto p-2">
               <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
-              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', '')">Tolerans</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', 'br')">Tolerans</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Talaşlı İmalat</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Paketleme</a></li>
@@ -65,7 +65,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI</span>
-                                      <input type="text" name="musteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2" required>
+                                      <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" required>
                                       <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
                                     </div>
                                   </div>
@@ -74,7 +74,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">SON KULLANICI FİRMA</span>
-                                      <input type="text" name="sonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2" placeholder="Paylaşıldıysa lütfen girin">
+                                      <input type="text" name="SonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2 kaydet" placeholder="Paylaşıldıysa lütfen girin">
                                     </div>
                                   </div>
                                 </div>
@@ -82,7 +82,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİLİN KULLANILDIĞI YER</span>
-                                      <input type="text" name="KullanimAlani" id="KullanimAlani" class="form-control mt-2" placeholder="ÖRN: Solar Otomotiv..">
+                                      <input type="text" name="KullanimAlani" id="kullanimAlani" class="form-control mt-2 kaydet" placeholder="ÖRN: Solar Otomotiv..">
                                     </div>
                                   </div>
                                 </div>
@@ -92,7 +92,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ RESİM/PARÇA NO</span>
-                                      <input type="text" name="CizimNo" id="CizimNo" class="form-control mt-2">
+                                      <input type="text" name="CizimNo" id="cizimNo" class="form-control mt-2 kaydet">
                                     </div>
                                   </div>
                                 </div>
@@ -101,16 +101,16 @@
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ</span>
                                       <div class="input-group mt-2">
-                                        <input type="text" placeholder="kg" name="YillikProfilSiparisi" id="YillikProfilSiparisi" class="form-control" required>
+                                        <input type="text" placeholder="kg" name="YillikProfilSiparisi" id="yillikProfilSiparisi" class="form-control kaydet" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn btn-outline-primary active">
-                                              <input type="radio" name="profilSip" id="sipHafta" autocomplete="off"> HAFTA
+                                              <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off"> HAFTA
                                             </label>
                                             <label class="btn btn-outline-primary">
-                                              <input type="radio" name="profilSip" id="sipAy" autocomplete="off" checked> AY
+                                              <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off" checked> AY
                                             </label>
                                             <label class="btn btn-outline-primary">
-                                              <input type="radio" name="profilSip" id="sipYil" autocomplete="off"> YIL
+                                              <input type="radio" name="ProfilSip" id="sipYil" class="kaydet" value="YIL" autocomplete="off"> YIL
                                             </label>
                                         </div>
                                       </div>
@@ -121,7 +121,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ ÖDEME VADESİ</span>
-                                      <input type="text" name="MusteriOdemeVadesi" id="MusteriOdemeVadesi" class="form-control mt-2">
+                                      <input type="text" name="MusteriOdemeVadesi" id="musteriOdemeVadesi" class="form-control mt-2 kaydet">
                                     </div>
                                   </div>
                                 </div>
@@ -136,12 +136,12 @@
                             <div class="row" id="alasimKondusyonRow">
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="alasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer'); if(this.value==0){digerFunction('alasimSelect', 'alasimDigerDiv')}">
+                                    <select name="AlasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer'); if(this.value==0){digerFunction('alasimSelect', 'alasimDigerDiv')}">
                                         <option value="alasimSelected" id="alasimSelected" selected disabled>Alaşım </option>
                                         
                                     </select>
                                     <div class="input-group" id="alasimDigerDiv" style="display: none;">
-                                        <input type="text" class="form-control" placeholder="Alaşım" id="alasimDiger">
+                                        <input type="text" class="form-control" name="AlasimDiger" placeholder="Alaşım" id="alasimDiger">
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="alasimDigerSpan" onclick="digerFunction('alasimDigerDiv', 'alasimSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                         </div>
@@ -150,7 +150,7 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <select name="kondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer'); if(this.value==0){digerFunction('kondusyonSelect', 'kondusyonDigerDiv')}">
+                                    <select name="KondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer'); if(this.value==0){digerFunction('kondusyonSelect', 'kondusyonDigerDiv')}">
                                         <option value="kondusyonSelected" id="kondusyonSelected" selected disabled>Kondüsyon </option>
                                         
                                     </select>
@@ -177,7 +177,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <input type="text" name="alasimTabData" id="alasimTabData" style="display: none;" required>
+                            <input type="text" name="AlasimKondusyon" id="alasimTabData" style="display: none;" class="kaydet" required>
                         </div>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">DIN TOLERANS</span>
-                                        <select name="dinTolerans" id="dinTolerans" class="form-control mb-3 mt-3" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
+                                        <select name="DinTolerans" id="dinTolerans" class="form-control mb-3 mt-3 kaydet" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
                                             <option value="" selected disabled>Tolerans seçiniz</option>
                                             <option value="EN 755-3">EN 755-3   Yuvarlak Dolu</option>
                                             <option value="EN 755-4">EN 755-4   Kare Dolu</option>
@@ -211,7 +211,7 @@
                                         <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI</span>
                                         <!-- multiselect ile seçilsin select2 -->
                                         <div class="form-group mt-3">
-                                            <select class="select2bs4" multiple="multiple" id="birlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
+                                            <select class="select2bs4 kaydet" multiple="multiple" id="birlikteCalisan" name="BirlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
                                                 <option value="Aparatı Var">Aparatı Var</option>
                                                 <option value="Kendisiyle Çalışır">Kendisiyle Çalışır</option>
                                                 <option value="Yok">Yok</option>
@@ -228,17 +228,13 @@
                                             <div class="input-group col-lg-12">
                                                 <div class="input-group-prepend">
                                                 <span class="input-group-text checkSpan" id="metreSpan">
-                                                    <input type="checkbox" class="metreCheckbox" id="metreCheckbox">
+                                                    <input type="checkbox" class="metreCheckbox kaydet" name="MetreAgirlikTalebi" id="metreCheckbox">
                                                 </span>
                                                 </div>
                                                 <input type="text" class="form-control metreInput" value="VAR" style="background-color: transparent;" readonly>
-                                                <input type="text" class="form-control col-lg-4" placeholder="minimum" name="minMAT" id="minMAT" style="display: none;">
-                                                <input type="text" class="form-control col-lg-4" placeholder="maximum" name="maxMAT" id="maxMAT" style="display: none;">
+                                                <input type="text" class="form-control col-lg-4 kaydet" placeholder="minimum" name="MATmin" id="minMAT" style="display: none;">
+                                                <input type="text" class="form-control col-lg-4 kaydet" placeholder="maximum" name="MATmax" id="maxMAT" style="display: none;">
                                             </div>
-                                            <!-- <div class="row col-lg-8" id="matInputDiv" style="display: none;">
-                                                <input type="text" class="form-control col-lg-6" placeholder="minimum" name="minMAT" id="minMAT">
-                                                <input type="text" class="form-control col-lg-6" placeholder="maximum" name="maxMAT" id="maxMAT">
-                                            </div> -->
                                         </div>
                                     </div>
                                     </div>
@@ -249,7 +245,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</span>
-                                        <textarea name="onemliOlculer" class="form-control mt-3" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi"></textarea>
+                                        <textarea name="OnemliOlculer" class="form-control mt-3 kaydet" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi"></textarea>
                                     </div>
                                     </div>
                                 </div>
@@ -299,7 +295,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="text" name="yPresTabData" id="yPresTabData" style="display: none;" required>
+                                    <input type="text" name="YuzeyPres" id="yPresTabData" class="kaydet" style="display: none;" required>
                                 </div>
                                 <div class="tab-pane" id="ytab_2">
                                         <div class="row">
@@ -357,7 +353,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    <input type="text" name="yEloksalTabData" id="yEloksalTabData" style="display: none;" required>
+                                    <input type="text" name="YuzeyEloksal" class="kaydet" id="yEloksalTabData" style="display: none;" required>
                                 </div>
                                 <div class="tab-pane" id="ytab_3">
                                     <div class="row">
@@ -427,7 +423,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="text" name="yBoyaTabData" id="yBoyaTabData" style="display: none;" required>
+                                    <input type="text" name="YuzeyBoya" class="kaydet" id="yBoyaTabData" style="display: none;" required>
                                 </div>
                                 <div class="tab-pane" id="ytab_4">
                                     <div id="ahsapTab">
@@ -472,7 +468,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="text" name="yAhsapTabData" id="yAhsapTabData" style="display: none;" required>
+                                        <input type="text" name="YuzeyAhsap" class="kaydet" id="yAhsapTabData" style="display: none;" required>
                                     </div>
                                 </div>
                             </div>
@@ -486,13 +482,13 @@
                             <div class="row">
                                 <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
                                     <label class="btn btn-outline-primary active">
-                                      <input type="radio" name="talasliImalat" id="tVar" autocomplete="off" checked> VAR
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off" checked> VAR
                                     </label>
                                     <label class="btn btn-outline-primary">
-                                      <input type="radio" name="talasliImalat" id="tYok" autocomplete="off"> YOK
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off"> YOK
                                     </label>
                                     <label class="btn btn-outline-primary">
-                                      <input type="radio" name="talasliImalat" id="tMusteri" autocomplete="off"> MÜŞTERİ YAPACAK
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tMusteri" value="Müşteri Yapacak" autocomplete="off"> MÜŞTERİ YAPACAK
                                     </label>
                                 </div>
                             </div>
@@ -501,7 +497,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                        <input type="text" name="talasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2">
+                                        <input type="text" name="TalasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2 kaydet">
                                     </div>
                                     </div>
                                 </div>
@@ -516,13 +512,13 @@
                             <div class="row">
                                 <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
                                     <label class="btn btn-outline-primary active">
-                                      <input type="radio" name="paketleme" id="pStandart" autocomplete="off" checked> STANDART PALET
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pStandart" value="Standart Palet" autocomplete="off" checked> STANDART PALET
                                     </label>
                                     <label class="btn btn-outline-primary">
-                                      <input type="radio" name="paketleme" id="pIhracat" autocomplete="off"> İHRACAT PALET
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pIhracat" value="Ihracat Palet" autocomplete="off"> İHRACAT PALET
                                     </label>
                                     <label class="btn btn-outline-primary">
-                                      <input type="radio" name="paketleme" id="pOzel" autocomplete="off"> ÖZEL PAKETLEME
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pOzel" value="Ozel Paketleme" autocomplete="off"> ÖZEL PAKETLEME
                                     </label>
                                 </div>
                             </div>
@@ -531,7 +527,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                        <input type="text" name="talasliImalatAciklama" id="paketlemeAciklama" class="form-control mt-2">
+                                        <input type="text" name="PaketlemeAciklama" id="paketlemeAciklama" class="form-control mt-2 kaydet">
                                     </div>
                                     </div>
                                 </div>
@@ -592,8 +588,8 @@
                 }
             }
             let yuzde = req*100/requiredElements.length;
-            if (yuzde <= 1){
-                yuzde = 1;
+            if (yuzde <= 100){
+                yuzde = 100;
             }
             document.getElementById('kaydetProgress').style.width = yuzde +'%';
             if(yuzde >= 100 ){
@@ -617,29 +613,6 @@
     };
 
     $(':input, .select').on('edit change', function(){changeFunction()});
-
-    document.getElementById("yudaKaydet").addEventListener('click', function(){
-        let musteriFirmaAdi, sonKullaniciFirma, kullanimAlani, cizimNo, yillikProfilSiparisi, musteriOdemeVadesi = "";
-        let alasimList = "";
-        let dinTolerans, birlikteCalisan, metreCheckbox, minMAT, maxMAT, onemliOlculer = "";
-        let yuzeyPresList = "";
-        let yuzeyEloksalList = "";
-        let yuzeyBoyaList = "";
-        let yuzeyAhsapKaplamaList ="";
-        let talasliImalat, talasliImalatAciklama = "";
-        let paketleme, paketlemeAciklama = "";
-
-
-
-        /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
-        /* musteriFirmaAdi, sonKullaniciFirma, KullanimAlani, CizimNo, YillikProfilSiparisi, sipHafta, sipAy, sipYıl, profilSip, MusteriOdemeVadesi
-        alasimTabulator
-        dinTolerans, birlikteCalisan, metreCheckbox, matInputDiv, minMAT, maxMAT, onemliOlculer
-        yuzeyPresTabulator, eloksalTabulator, yuzeyBoyaTabulator, ahsapKaplamaTabulator
-        talasliImalat, talasliImalatAciklama
-        paketleme, paketlemeAciklama
-        fileInput, fileTabulator */
-    });
 
     $('.checkSpan').click(
         function() {
@@ -714,7 +687,7 @@
             {title:"KondüsyonID", field:"KondusyonID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
                 cell.getRow().delete();
-                $('#alasimTabData').val(alasimTab.getData());
+                $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
                 if(alasimTab.getData().length == 0){
                     $('#alasimTabData').prop('required', true);
                 }
@@ -926,7 +899,7 @@
         }
         if(alasim!="Alaşım " && kondusyon!="Kondüsyon "){
             alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
-            $('#alasimTabData').val(alasimTab.getData());
+            $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
             $('#alasimTabData').removeAttr('required');
             changeFunction();
         }
@@ -1039,7 +1012,81 @@
     //Initialize Select2 Elements
     $('.select2bs4').select2({
       theme: 'bootstrap4'
-    })
+    });
+
+    
+    document.getElementById("yudaKaydet").addEventListener('click', function(){
+        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
+        for(let i = 0; i < formElements.length; i++) {
+            if (formElements[i].type == "radio" && $('#'+formElements[i].id).is(':checked')) {
+                console.log(formElements[i].name + " " +formElements[i].value);
+            }
+            else if (formElements[i].type == "checkbox" && $('#'+formElements[i].id).is(':checked')) {
+                console.log(formElements[i].name + " " +formElements[i].value);
+            }
+            else if (formElements[i].type == "select-multiple"){
+                let results = [];
+                let opt;
+                for (let j=0; j< formElements[i].options.length; j++){
+                    opt = formElements[i].options[j]
+                    if(opt.selected){results.push(opt.value);}
+                }
+                console.log(formElements[i].name + " " + results);
+            }
+            else{
+                console.log(formElements[i].name + " " +formElements[i].value);
+            }
+        }
+
+       /*  let musteriFirmaAdi = $('#musteriFirmaAdi').val() || "";
+        let sonKullaniciFirma = $('#sonKullaniciFirma').val() || "";
+        let kullanimAlani = $('#kullanimAlani').val() || "";
+        let cizimNo = $('#cizimNo').val() || "";
+        let yillikProfilSiparisi = $('#yillikProfilSiparisi').val() + " KG/" +  $("input[name='profilSip']:checked").val() || ""; hafta ay yıl nasıl alınmalı 
+        let musteriOdemeVadesi = $('#musteriOdemeVadesi').val() || "";
+         console.log(musteriFirmaAdi +" + " + sonKullaniciFirma +" + " + kullanimAlani +" + " + cizimNo +" + " + yillikProfilSiparisi +" + " + musteriOdemeVadesi); 
+
+        let alasimList = alasimTabData || "";
+         console.log(alasimList); 
+
+        let dinTolerans = $('#dinTolerans').val() || "";
+        let birlikteCalisan = $('#birlikteCalisan').val() || "";
+        let metreCheckbox = $("input[name='metreCheckbox']:checked").val() || "";
+        let minMAT = $('#minMAT').val() || "";
+        let maxMAT = $('#maxMAT').val() || "";
+        let onemliOlculer = $('#onemliOlculer').val() || "";
+        console.log(dinTolerans + " " + birlikteCalisan + " " + metreCheckbox + " " + minMAT + " " + maxMAT + " " + onemliOlculer);
+
+        let yuzeyPresList = yuzeyPresTabData || "";
+        console.log(yuzeyPresList);
+
+        let yuzeyEloksalList = eloksalTabulator.getData() || "";
+        console.log(yuzeyEloksalList);
+
+        let yuzeyBoyaList = yuzeyBoyaTabulator.getData() || "";
+        console.log(yuzeyBoyaList);
+
+        let yuzeyAhsapKaplamaList = ahsapKaplamaTabulator.getData() || "";
+        console.log(yuzeyAhsapKaplamaList);
+
+        let talasliImalat = $("input[name='talasliImalat']:checked").val()  || "";  
+        let talasliImalatAciklama = $('#talasliImalatAciklama').val() || "";
+        console.log(talasliImalat + " " + talasliImalatAciklama);
+
+        let paketleme = $("input[name='paketleme']:checked").val() || "";
+        let paketlemeAciklama = $('#paketlemeAciklama').val() || "";
+        console.log(paketleme + " " + paketlemeAciklama); */
+
+        /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
+        /* musteriFirmaAdi, sonKullaniciFirma, KullanimAlani, CizimNo, YillikProfilSiparisi, sipHafta, sipAy, sipYıl, profilSip, MusteriOdemeVadesi
+        alasimTabulator
+        dinTolerans, birlikteCalisan, metreCheckbox, matInputDiv, minMAT, maxMAT, onemliOlculer
+        yuzeyPresTabulator, eloksalTabulator, yuzeyBoyaTabulator, ahsapKaplamaTabulator
+        talasliImalat, talasliImalatAciklama
+        paketleme, paketlemeAciklama
+        fileInput, fileTabulator */
+    });
+
 
 </script>
 {% endblock %}
