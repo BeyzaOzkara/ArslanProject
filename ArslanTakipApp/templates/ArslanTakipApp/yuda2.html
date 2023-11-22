@@ -582,30 +582,38 @@
 
 {% block extra_js %}
 <script>
-    var yuzeyReq = 0;
-
+    var full = false;
     function changeFunction () {
-        /* progress bar requiredlara göre dolsun */
         let requiredElements = document.getElementById("yudaForm").querySelectorAll("[required]");
-        let req = 0;
-        for(var i = 0; i < requiredElements.length; i++) {
-            if (requiredElements[i].validity.valid){
-                req++;
+            let req = 0;
+            for(var i = 0; i < requiredElements.length; i++) {
+                if (requiredElements[i].validity.valid){
+                    req++;
+                }
             }
-        }
-        let yuzde = req*100/requiredElements.length;
-        document.getElementById('kaydetProgress').style.width = yuzde +'%';
-        if(yuzde >= 100){
-            setTimeout(function(){
-                document.getElementById('kaydetProgress').style.width = '0%';
-                setTimeout(function(){$('#yudaKaydet').show();
-                    document.getElementById('kaydetProgress').style.width = '100%';
+            let yuzde = req*100/requiredElements.length;
+            if (yuzde <= 1){
+                yuzde = 1;
+            }
+            document.getElementById('kaydetProgress').style.width = yuzde +'%';
+            if(yuzde >= 100 ){
+                if(full == false){
+                    setTimeout(function(){
+                    document.getElementById('kaydetProgress').style.width = '0%';
+                    setTimeout(function(){$('#yudaKaydet').show();
+                        document.getElementById('kaydetProgress').style.width = '100%';
                     }, 600);
+
                 }, 600);
+                full = true;
+                };
+                
+            }
+            else {
+                $('#yudaKaydet').hide();
+                full = false;
         }
-        else {
-            $('#yudaKaydet').hide();
-        }
+        
     };
 
     $(':input, .select').on('edit change', function(){changeFunction()});
@@ -620,6 +628,8 @@
         let yuzeyAhsapKaplamaList ="";
         let talasliImalat, talasliImalatAciklama = "";
         let paketleme, paketlemeAciklama = "";
+
+        
 
         /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
         /* musteriFirmaAdi, sonKullaniciFirma, KullanimAlani, CizimNo, YillikProfilSiparisi, sipHafta, sipAy, sipYıl, profilSip, MusteriOdemeVadesi
