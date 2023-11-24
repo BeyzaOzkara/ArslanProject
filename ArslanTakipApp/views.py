@@ -1160,38 +1160,43 @@ def yuda(request, objId):
 
 def yuda_kaydet(request):
     if request.method == "POST":
-        print("post kaydet")
-        print(request.POST)
-        print(request.FILES) 
-        y = YudaForm()
-        y.YudaNo = "YUDA-YY-GGG-NN"
-        y.ProjeYoneticisi_id = 1
+        try:
+            print("post kaydet")
+            print(request.POST)
+            print(request.FILES) 
+            y = YudaForm()
+            y.YudaNo = "YUDA-YY-GGG-NN"
+            y.ProjeYoneticisi_id = 1
 
-        for key, value in request.POST.items():
-            
-            if hasattr(y, key):
-                if key == "BirlikteCalisan":
-                    value_list = value.split(',')
-                    setattr(y, key, value_list)
-                else:
-                    setattr(y, key, value)
+            for key, value in request.POST.items():
+                
+                if hasattr(y, key):
+                    if key == "BirlikteCalisan":
+                        value_list = value.split(',')
+                        setattr(y, key, value_list)
+                    else:
+                        setattr(y, key, value)
 
-        # Her bir özelliği kontrol etmek için yazdırın
-        for field in y._meta.fields:
-            print(f"{field.name}: {getattr(y, field.name)}")
+            # Her bir özelliği kontrol etmek için yazdırın
+            for field in y._meta.fields:
+                print(f"{field.name}: {getattr(y, field.name)}")
 
-        y.save()
+            y.save()
 
-        # Dosyaları ve başlıkları işleyin
-        file_titles = request.POST.getlist('fileTitles[]')
-        for file, title in zip(request.FILES.getlist('files[]'), file_titles):
-            MyFile.objects.create(
-                my_yuda=y,
-                file_type=title,
-                file=file
-            )
+            # Dosyaları ve başlıkları işleyin
+            file_titles = request.POST.getlist('fileTitles[]')
+            for file, title in zip(request.FILES.getlist('files[]'), file_titles):
+                MyFile.objects.create(
+                    my_yuda=y,
+                    file_type=title,
+                    file=file
+                )
+            return JsonResponse({'success': True, 'message': 'Kayıt başarılı'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Geçersiz JSON formatı'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
         
-        return JsonResponse({'success': True, 'message': 'Kayıt başarılı'})
     return JsonResponse({'success': False, 'message': 'Geçersiz istek'})
     
     """ 
