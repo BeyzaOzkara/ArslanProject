@@ -34,6 +34,9 @@
     .toast-message {
         font-size: x-large;
     }
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
   </style>
 
 {% endblock %}
@@ -53,8 +56,8 @@
               <li class="nav-item"><a class="nav-link" href="#tab_7" data-toggle="tab">Dosya</a></li>
             </ul>
         </div><!-- /.card-header -->
-        <div class="card-body">
-        <form action="" method="post" id="yudaForm">
+        <div class="card-body" id="formBody">
+        <form enctype="multipart/form-data" action="" method="post" id="yudaForm">
             <div class="tab-content">
                 <div class="tab-pane active" id="tab_1">
                     <div class="card">
@@ -541,19 +544,14 @@
                         <div class="card-body" id="dosyaBody">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="fileInput" multiple onchange="showname()">
-                                        <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="info-box">
-                                        <div class="info-box-content">
-                                            <div id="fileTabulator"></div>
+                                    <!-- <form enctype="multipart/form-data" action="" method="post" id="fileUploadForm">
+                                        {% csrf_token %} -->
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
                                         </div>
-                                    </div>
+                                        <div id="fileTitles" class="form-group"></div>
+                                    <!-- </form> -->
                                 </div>
                             </div>
 
@@ -568,7 +566,7 @@
             <div class="progress" style="height: 60px;">
                 <div class="progress-bar bg-warning" role="progressbar"
                      aria-valuenow="0" aria-valuemin="1" aria-valuemax="100" style="width: 1%;" id="kaydetProgress">
-                     <button type="button" id="yudaKaydet" class="btn btn-block bg-gradient-primary btn-lg" style="height: 100%; display: none;">KAYDET</button>
+                     <button type="button" id="yudaKaydet" class="btn btn-block bg-gradient-primary btn-lg" style="height: 100%; ">KAYDET</button>
                 </div>
             </div>
         </div>
@@ -578,6 +576,7 @@
 
 {% block extra_js %}
 <script>
+    var formData = new FormData();
     var full = false;
     function changeFunction () {
         let requiredElements = document.getElementById("yudaForm").querySelectorAll("[required]");
@@ -793,22 +792,6 @@
         changeFunction();
     }
 
-    var fileTabulator = new Tabulator("#fileTabulator", {
-        layout:"fitColumns",
-        data:[],
-        movableRows:true,
-        placeholder:"Lütfen Dosya Türlerini Seçiniz",
-        columns:[
-            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
-            {title:"Dosya Adı", field:"fileName"},
-            {title:"Dosya Türü (Zorunlu)", field:"fileTur", validator:"required", editor:"list", editorParams:{values:{"Profil Resmi":"Profil Resmi", "Mekanik İşlem Resmi":"Mekanik İşlem Resmi", "Paketleme Talimatı":"Paketleme Talimatı", "Boya Şartnamesi":"Boya Şartnamesi", "Şartname":"Şartname","3D Data":"3D Data", "Diğer":"Diğer"}}},
-            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
-                let data = cell.getData();
-                cell.getRow().delete();
-            }}
-        ]
-    });
-
     $('#metreCheck').on('change.bootstrapSwitch', function(e) {
         let metreC = e.target.checked;
         if (!metreC){
@@ -819,13 +802,13 @@
         }
     });
 
-    function showname () {
+    /* function showname () {
       var fileList = document.getElementById('fileInput').files;
       for ( var i = 0; i < fileList.length; i++) {
         let name = fileList.item(i).name;
         fileTabulator.addData({fileName:name}, false);
       };
-    };
+    }; */
 
     function digerFunction(selectId, digerId){
         $('#'+selectId).hide();
@@ -876,7 +859,6 @@
     selectFunction(73, "ahsapKaplamaSelect", "Ahşap Kaplama", "Diğer");
     selectFunction(106, "boyaKalinlikSelect", "Boya Kalınlık", "");
     selectFunction(112, "boyaMarkaSelect", "Marka", "Diğer");
-    /* açıldığında yüklenmesini istediğimiz selectleri yazmayı unutma */
     /* bütün selectler için arraya alıp for yap */
     /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
 
@@ -912,7 +894,7 @@
             yPresBoy = $('#yuzeyPresBoy').val();
 
             yuzeyPresTabulator.addData({YuzeyDetay:yPresSelect, YuzeyPresBoy:yPresBoy}, false);
-            $('#yPresTabData').val(yuzeyPresTabulator.getData());
+            $('#yPresTabData').val(JSON.stringify(yuzeyPresTabulator.getData()));
             checkNull();
         }
     });
@@ -934,7 +916,7 @@
             renkId =  $('#eloksalRenkSelect').val();
             kalinlikId =  $('#eloksalKaplamaKalinligiSelect').val();
             eloksalTabulator.addData({Matlastirma:matlastirma, Renk:renk, KaplamaKalinligi:kalinlik, EloksalBoy:eBoy, EloksalTemizKesim:eTemiz, MatlastirmaID:matlastirmaId, RenkID: renkId, KaplamaKalinligiID:kalinlikId}, false);
-            $('#yEloksalTabData').val(eloksalTabulator.getData());
+            $('#yEloksalTabData').val(JSON.stringify(eloksalTabulator.getData()));
             checkNull();
         }
     });
@@ -962,7 +944,7 @@
             yuzeyBoyaTabulator.addData({Tur: $('#turSelect option:selected').text(), TurID: $('#turSelect').val(), Marka: boyaMarka, MarkaID: boyaMarkaID, BoyaClass:$('#boyaClassSelect option:selected').text(), 
             MarkaRenkKodu: $('#markaRenkKodu').val(), Ral:$('#RALinput').val(), BoyaKalinlik: boyaKalinlik, BoyaKalinlikID: boyaKalinlikID, 
             BoyaBoy:$('#boyaBoy').val(), BoyaTemizKesim:bTemiz, BoyaAciklama: $('#boyaAciklama').val()}, false);
-            $('#yBoyaTabData').val(yuzeyBoyaTabulator.getData());
+            $('#yBoyaTabData').val(JSON.stringify(yuzeyBoyaTabulator.getData()));
             checkNull();
         }
     });
@@ -984,7 +966,7 @@
         }
         if(ahsapKaplama != "" && ahsapKaplama != "Ahşap Kaplama" && $('#ahsapBoy').val() != ""){
             ahsapKaplamaTabulator.addData({AhsapKaplama:ahsapKaplama, AhsapKaplamaID:ahsapKaplamaId, AhsapBoy:$('#ahsapBoy').val(), AhsapTemizKesim:aTemiz}, false);
-            $('#yAhsapTabData').val(ahsapKaplamaTabulator.getData());
+            $('#yAhsapTabData').val(JSON.stringify(ahsapKaplamaTabulator.getData()));
             checkNull();
         }
     });
@@ -1014,15 +996,88 @@
       theme: 'bootstrap4'
     });
 
-    
-    document.getElementById("yudaKaydet").addEventListener('click', function(){
-        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-        for(let i = 0; i < formElements.length; i++) {
-            if (formElements[i].type == "radio" && $('#'+formElements[i].id).is(':checked')) {
-                console.log(formElements[i].name + " " +formElements[i].value);
+    var selectedFiles = [];
+    $('#fileInput').on('change', function(e) {
+        Array.from(e.target.files).forEach(function(newFile) {
+            if (!fileAlreadySelected(newFile)) {
+                selectedFiles.push(newFile);
             }
-            else if (formElements[i].type == "checkbox" && $('#'+formElements[i].id).is(':checked')) {
-                console.log(formElements[i].name + " " +formElements[i].value);
+        });
+        updateFileList();
+    });
+
+    function fileAlreadySelected(newFile) {
+        return selectedFiles.some(function(existingFile) {
+            return newFile.name === existingFile.name && newFile.size === existingFile.size;
+        });
+    }
+
+    function updateFileList() {
+        var fileTitles = $('#fileTitles');
+        fileTitles.empty(); // Önceki başlık alanlarını temizle
+
+        selectedFiles.forEach(function(file, index) {
+            fileTitles.append(
+                `<div class="mb-3" id="fileDiv-${index}">
+                    <label>${file.name}</label>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFile(${index})">Sil</button>
+                    <select class="form-control kaydet" name="fileTitles[]">
+                        <option value="Teknik Resim">Teknik Resim</option>
+                        <option value="Şartname">Şartname</option>
+                        <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                    </select>
+                </div>`
+            );
+        });
+    };
+
+    window.removeFile = function(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+    };
+
+    
+
+    document.querySelector("#yudaKaydet").addEventListener('click', function(){
+        /* var formData = new FormData(document.getElementById('fileUploadForm')); */
+        var formData = new FormData();
+        formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+
+        selectedFiles.forEach(function(file) {
+            formData.append('files[]', file);
+        });
+
+        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
+        var values = {};
+        
+        for(let i = 0; i < formElements.length; i++) {
+            if (formElements[i].type == "radio") {
+                if($('#'+formElements[i].id).is(':checked')){
+                    values[formElements[i].name] = formElements[i].value;
+                    formData.append([formElements[i].name], formElements[i].value);
+                }
+            }
+            else if (formElements[i].type == "checkbox" ) {
+                if ($('#'+formElements[i].id).is(':checked')){
+                    if (formElements[i].name == "MetreAgirlikTalebi"){
+                        values[formElements[i].name] = "Var";
+                        formData.append([formElements[i].name], "Var");
+                    }
+                    else {
+                        values[formElements[i].name] = "Temiz Kesim";
+                        formData.append([formElements[i].name], "Temiz Kesim");
+                    };
+                }
+                else {
+                    if (formElements[i].name == "MetreAgirlikTalebi"){
+                        values[formElements[i].name] = "Yok";
+                        formData.append([formElements[i].name], "Yok");
+                    }
+                    else {
+                        values[formElements[i].name] = "Temiz Kesim Değil";
+                        formData.append([formElements[i].name], "Temiz Kesim Değil");
+                    };
+                }
             }
             else if (formElements[i].type == "select-multiple"){
                 let results = [];
@@ -1030,13 +1085,63 @@
                 for (let j=0; j< formElements[i].options.length; j++){
                     opt = formElements[i].options[j]
                     if(opt.selected){results.push(opt.value);}
-                }
-                console.log(formElements[i].name + " " + results);
+                };
+                values[formElements[i].name] = results;
+                formData.append([formElements[i].name], results);
             }
             else{
-                console.log(formElements[i].name + " " +formElements[i].value);
+                values[formElements[i].name] = formElements[i].value;
+                formData.append([formElements[i].name], formElements[i].value);
             }
-        }
+        };
+
+
+        $.ajax({
+            url: '/yudakaydet', // Sunucu tarafı işlem URL'si
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                // Başarılı yükleme sonrası işlemler
+                alert('Dosyalar başarıyla yüklendi!');
+            },
+            error: function() {
+                // Hata durumunda işlemler
+                alert('Dosya yüklemesi başarısız oldu.');
+            }
+        });
+        
+        /* var formData = new FormData(document.getElementById("fileForm")); */
+        
+        /* var filesList = document.getElementById('fileInput').files;
+        for ( var i = 0; i < filesList.length; i++) {
+            let name = filesList.item(i).name;
+            
+        };
+        
+        console.log("Created FormData, " + [...formData.keys()] + " keys in data");
+        console.log(values); */
+        
+        /* fileData = $('#fileInput').prop('files')[0];
+        formData = new FormData();
+        formData.append('file', fileData);
+        console.log("Created FormData, " + [...formData.keys()] + " keys in data"); */
+
+        /* $.ajax({
+            url: '/yudakaydet',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(){
+                alert("Kaydedildi!");
+            },
+            error: function (error) {
+            console.error('Error posting data:', error);
+            }
+        }); */
+
 
        /*  let musteriFirmaAdi = $('#musteriFirmaAdi').val() || "";
         let sonKullaniciFirma = $('#sonKullaniciFirma').val() || "";
@@ -1078,13 +1183,6 @@
         console.log(paketleme + " " + paketlemeAciklama); */
 
         /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
-        /* musteriFirmaAdi, sonKullaniciFirma, KullanimAlani, CizimNo, YillikProfilSiparisi, sipHafta, sipAy, sipYıl, profilSip, MusteriOdemeVadesi
-        alasimTabulator
-        dinTolerans, birlikteCalisan, metreCheckbox, matInputDiv, minMAT, maxMAT, onemliOlculer
-        yuzeyPresTabulator, eloksalTabulator, yuzeyBoyaTabulator, ahsapKaplamaTabulator
-        talasliImalat, talasliImalatAciklama
-        paketleme, paketlemeAciklama
-        fileInput, fileTabulator */
     });
 
 

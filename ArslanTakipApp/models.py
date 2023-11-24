@@ -225,15 +225,36 @@ class YudaOnay(models.Model):
     Tarih = models.DateField(null=True, blank=True)
     Onay = models.BooleanField(null=True, blank=True)
 
-class Yuda(models.Model):
+class YudaForm(models.Model):
     YudaNo = models.CharField(null=True, blank=True)
     ProjeYoneticisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_projeyoneticisi", blank=True, null =True)
     Tarih = models.DateField(auto_now=True, null=True, blank=True)
     RevTarih = models.DateField(null=True, blank=True) #düzenleme yapıldığındaki tarih
-    IstekYapanBolum = models.CharField(null=True, blank=True)
-    IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor
     MusteriFirmaAdi = models.CharField(null=True, blank=True)
     SonKullaniciFirma = models.CharField(null=True, blank=True)
+    KullanımAlani = models.CharField(null=True, blank=True)
+    CizimNo = models.CharField(null=True, blank=True)
+    ProfilSiparisi = models.CharField(null=True, blank=True)
+    MusteriOdemeVadesi = models.CharField(null=True, blank=True)
+    AlasimKondusyon = models.JSONField(null=True, blank=True)
+    DinTolerans = models.CharField(null=True, blank=True)
+    BirlikteCalisan = ArrayField(models.CharField(max_length=200), blank=True, size=3, default=list)
+    MetreAgirlikTalebi = models.CharField(null=True, blank=True)
+    MATmin = models.CharField(null=True, blank=True)
+    MATmax = models.CharField(null=True, blank=True)
+    OnemliOlculer = models.CharField(null=True, blank=True)
+    YuzeyPres = models.JSONField(null=True, blank=True)
+    YuzeyEloksal = models.JSONField(null=True, blank=True)
+    YuzeyBoya = models.JSONField(null=True, blank=True)
+    YuzeyAhsap = models.JSONField(null=True, blank=True)
+    TalasliImalat = models.CharField(null=True, blank=True)
+    TalasliImalatAciklama = models.CharField(null=True, blank=True)
+    Paketleme = models.CharField(null=True, blank=True)
+    PaketlemeAciklama = models.CharField(null=True, blank=True)
+
+class Yuda(models.Model):
+    """ IstekYapanBolum = models.CharField(null=True, blank=True)
+    IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor
     OnemliYuzeyler = models.CharField(null=True, blank=True)
     OnemliOlculerVeToleranslar = models.CharField(null=True, blank=True)
     CizimNo = models.CharField(null=True, blank=True)
@@ -262,7 +283,7 @@ class Yuda(models.Model):
     UretimBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_uretim")
     KaliteBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_kalite")
     YuzeyIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_yuzey")
-    MekanikIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_mekanik")
+    MekanikIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_mekanik") """
     #YuklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
 
 class Parameter(models.Model):
@@ -273,18 +294,15 @@ class Parameter(models.Model):
     def __str__(self):
         return self.Isim
 
-class FileType(models.Model):
-    file_type = models.CharField()
-
 class MyFile(models.Model):
-    my_yuda = models.ForeignKey(Yuda, related_name="files", on_delete=models.DO_NOTHING, null=True, blank=True)
-    my_type = models.ForeignKey(FileType, related_name="my_type", on_delete=models.DO_NOTHING, null=True, blank=True)
+    my_yuda = models.ForeignKey(YudaForm, related_name="files", on_delete=models.DO_NOTHING, null=True, blank=True)
+    file_type = models.CharField(null=True, blank=True)
     file = models.FileField(upload_to='media/')
     
 
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    Form = models.ForeignKey(Yuda, on_delete=models.CASCADE, null=True, blank=True)
+    Form = models.ForeignKey(YudaForm, on_delete=models.CASCADE, null=True, blank=True)
     Tarih = models.DateTimeField(auto_now=True, null=True, blank=True)
     Aciklama = models.CharField(null=True, blank=True)
     EklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)

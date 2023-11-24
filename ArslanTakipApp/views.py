@@ -14,7 +14,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay, Parameter
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay, Parameter, MyFile, YudaForm
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1137,10 +1137,6 @@ def baskigecmisi_list(request):
 
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
-    """ def post(self, request):
-    if request.method == "POST":
-        print(request.POST)
-        return   """
     
 def yuda(request):
     parameters = Parameter.objects.all()
@@ -1162,46 +1158,101 @@ def yuda(request, objId):
     return HttpResponse(data)
 
 
-def yuda_ekle(request):
+def yuda_kaydet(request):
     if request.method == "POST":
+        print("post kaydet")
         print(request.POST)
-        posted = request.POST
-        y = Yuda()
-        y.YudaNo = 1 #yuda no nasıldı
-        #y.ProjeYoneticisi_id = 1harun beye hesap aç default yönetici şimdilik o
-        y.IstekYapanBolum = posted.get(['istekYapanBolum']) or None
-        y.IstekYapanKisi_id = request.user.id
-        y.MusteriFirmaAdi = posted['musteriFirmaAdi']
-        y.SonKullaniciFirma = posted['sonKullaniciFirma']
-        y.OnemliYuzeyler = posted['onemliYuzeyler'] or None
-        y.OnemliOlculerVeToleranslar = posted['onemliOlculerVeToleranslar']
-        y.CizimNo = posted['cizimNo']
-        y.YillikProfilSiparisi = posted['yillikProfilSiparisi']
-        y.TalasliImalat = posted['talasliImalat']
-        y.TalasliImalatBoyaYadaEloksaldan = posted['talasliImalatBoyaYadaEloksaldan']
-        y.MusteriYuzeyVeyaTalasliIslem = posted['musteriYuzeyVeyaTalasliIslem']
-        y.BirlikteCalisanAparati = posted['birlikteCalisanAparati']
-        y.OzelPaketleme = posted['ozelPaketleme']
-        y.OzelPaketlemeAciklama = posted['ozelPaketlemeAciklama']
-        y.KalipDurumu = posted['kalipDurumu']
-        y.BilletCinsi = posted['billetCinsi']
-        y.Kondusyon = posted['kondusyon']
-        y.DinToleransi = posted['dinToleransi']
-        y.YuzeyDurumu = posted['yuzeyDurumu']
-        y.MetreAgirlikTalebi = posted['metreAgirlikTalebi']
-        y.MetreAgirlikTalebiMiktar = posted['minMATDeger'] + "minimum, " + posted['maxMATDeger'] + "maximum"
-        y.AskiIzi = posted['askiIzi']
-        y.IstenilenStandartBoy = posted['istenilenStandartBoy']
-        y.MinKullanimBoyu = posted['minKullanimBoyu']
-        y.Folyo = posted['folyo']
-        y.Bariyerleme = posted['bariyerleme']
-        y.MusteriOdemeVadesi = posted['musteriOdemeVadesi']
+        print(request.FILES) 
+        y = YudaForm()
+        y.YudaNo = "YUDA-YY-GGG-NN"
+        y.ProjeYoneticisi_id = 1
 
+        for key, value in request.POST.items():
+            
+            if hasattr(y, key):
+                if key == "BirlikteCalisan":
+                    value_list = value.split(',')
+                    setattr(y, key, value_list)
+                else:
+                    setattr(y, key, value)
+
+        # Her bir özelliği kontrol etmek için yazdırın
+        for field in y._meta.fields:
+            print(f"{field.name}: {getattr(y, field.name)}")
+
+        y.save()
+
+        # Dosyaları ve başlıkları işleyin
+        file_titles = request.POST.getlist('fileTitles[]')
+        for file, title in zip(request.FILES.getlist('files[]'), file_titles):
+            MyFile.objects.create(
+                my_yuda=y,
+                file_type=title,
+                file=file
+            )
         
-        #y.YuklenenDosyalar = 
-        print(y)
+        return JsonResponse({'success': True, 'message': 'Kayıt başarılı'})
+    return JsonResponse({'success': False, 'message': 'Geçersiz istek'})
+    
+    """ 
+        MusteriFirmaAdi
+        SonKullaniciFirma
+        KullanımAlani
+        CizimNo
 
-    return
+        ProfilSiparisi #YillikProfilSiparisi +" kg/"+ ProfilSip
+
+        MusteriOdemeVadesi
+        AlasimKondusyon
+        DinTolerans
+        BirlikteCalisan
+        MetreAgirlikTalebi
+        MATmin
+        MATmax
+        OnemliOlculer
+
+        YuzeyPres
+        YuzeyEloksal
+        YuzeyBoya
+        YuzeyAhsap
+        
+        TalasliImalat
+        TalasliImalatAciklama
+        Paketleme
+        PaketlemeAciklama """
+        
 
 class YudaDetailView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yudaDetail.html'
+
+""" posted = request.POST
+    y = Yuda()
+    y.YudaNo = 1 #yuda no nasıldı
+    #y.ProjeYoneticisi_id = 1harun beye hesap aç default yönetici şimdilik o
+    y.IstekYapanBolum = posted.get(['istekYapanBolum']) or None
+    y.IstekYapanKisi_id = request.user.id
+    y.MusteriFirmaAdi = posted['musteriFirmaAdi']
+    y.SonKullaniciFirma = posted['sonKullaniciFirma']
+    y.OnemliYuzeyler = posted['onemliYuzeyler'] or None
+    y.OnemliOlculerVeToleranslar = posted['onemliOlculerVeToleranslar']
+    y.CizimNo = posted['cizimNo']
+    y.YillikProfilSiparisi = posted['yillikProfilSiparisi']
+    y.TalasliImalat = posted['talasliImalat']
+    y.TalasliImalatBoyaYadaEloksaldan = posted['talasliImalatBoyaYadaEloksaldan']
+    y.MusteriYuzeyVeyaTalasliIslem = posted['musteriYuzeyVeyaTalasliIslem']
+    y.BirlikteCalisanAparati = posted['birlikteCalisanAparati']
+    y.OzelPaketleme = posted['ozelPaketleme']
+    y.OzelPaketlemeAciklama = posted['ozelPaketlemeAciklama']
+    y.KalipDurumu = posted['kalipDurumu']
+    y.BilletCinsi = posted['billetCinsi']
+    y.Kondusyon = posted['kondusyon']
+    y.DinToleransi = posted['dinToleransi']
+    y.YuzeyDurumu = posted['yuzeyDurumu']
+    y.MetreAgirlikTalebi = posted['metreAgirlikTalebi']
+    y.MetreAgirlikTalebiMiktar = posted['minMATDeger'] + "minimum, " + posted['maxMATDeger'] + "maximum"
+    y.AskiIzi = posted['askiIzi']
+    y.IstenilenStandartBoy = posted['istenilenStandartBoy']
+    y.MinKullanimBoyu = posted['minKullanimBoyu']
+    y.Folyo = posted['folyo']
+    y.Bariyerleme = posted['bariyerleme']
+    y.MusteriOdemeVadesi = posted['musteriOdemeVadesi'] """
