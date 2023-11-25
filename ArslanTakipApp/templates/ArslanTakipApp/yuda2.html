@@ -1124,7 +1124,7 @@
             },
             error: function() {
                 // Hata durumunda işlemler
-                alert('Dosya yüklemesi başarısız oldu.'+response.message);
+                alert('Dosya yüklemesi başarısız oldu.'+response.responseJSON.error);
             }
         });
         

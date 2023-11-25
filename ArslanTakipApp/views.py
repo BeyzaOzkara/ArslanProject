@@ -1191,13 +1191,16 @@ def yuda_kaydet(request):
                     file_type=title,
                     file=file
                 )
-            return JsonResponse({'success': True, 'message': 'Kayıt başarılı'})
+            response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'message': 'Geçersiz JSON formatı'})
+            response = JsonResponse({'error': 'Geçersiz JSON formatı'})
         except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)})
-        
-    return JsonResponse({'success': False, 'message': 'Geçersiz istek'})
+            response = JsonResponse({'error': str(e)})
+            
+    response =  JsonResponse({'error': 'Geçersiz istek'})
+    response.status_code = 500 #server error
+
+    return response
     
     """ 
         MusteriFirmaAdi
@@ -1230,34 +1233,3 @@ def yuda_kaydet(request):
 class YudaDetailView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yudaDetail.html'
 
-""" posted = request.POST
-    y = Yuda()
-    y.YudaNo = 1 #yuda no nasıldı
-    #y.ProjeYoneticisi_id = 1harun beye hesap aç default yönetici şimdilik o
-    y.IstekYapanBolum = posted.get(['istekYapanBolum']) or None
-    y.IstekYapanKisi_id = request.user.id
-    y.MusteriFirmaAdi = posted['musteriFirmaAdi']
-    y.SonKullaniciFirma = posted['sonKullaniciFirma']
-    y.OnemliYuzeyler = posted['onemliYuzeyler'] or None
-    y.OnemliOlculerVeToleranslar = posted['onemliOlculerVeToleranslar']
-    y.CizimNo = posted['cizimNo']
-    y.YillikProfilSiparisi = posted['yillikProfilSiparisi']
-    y.TalasliImalat = posted['talasliImalat']
-    y.TalasliImalatBoyaYadaEloksaldan = posted['talasliImalatBoyaYadaEloksaldan']
-    y.MusteriYuzeyVeyaTalasliIslem = posted['musteriYuzeyVeyaTalasliIslem']
-    y.BirlikteCalisanAparati = posted['birlikteCalisanAparati']
-    y.OzelPaketleme = posted['ozelPaketleme']
-    y.OzelPaketlemeAciklama = posted['ozelPaketlemeAciklama']
-    y.KalipDurumu = posted['kalipDurumu']
-    y.BilletCinsi = posted['billetCinsi']
-    y.Kondusyon = posted['kondusyon']
-    y.DinToleransi = posted['dinToleransi']
-    y.YuzeyDurumu = posted['yuzeyDurumu']
-    y.MetreAgirlikTalebi = posted['metreAgirlikTalebi']
-    y.MetreAgirlikTalebiMiktar = posted['minMATDeger'] + "minimum, " + posted['maxMATDeger'] + "maximum"
-    y.AskiIzi = posted['askiIzi']
-    y.IstenilenStandartBoy = posted['istenilenStandartBoy']
-    y.MinKullanimBoyu = posted['minKullanimBoyu']
-    y.Folyo = posted['folyo']
-    y.Bariyerleme = posted['bariyerleme']
-    y.MusteriOdemeVadesi = posted['musteriOdemeVadesi'] """
