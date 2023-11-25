@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/toastr/toastr.min.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
   <style>
     .toast-orta-center { 
         top: 30%;   
@@ -37,6 +38,7 @@
     .custom-file-input ~ .custom-file-label::after {
         content: "Gözat";
     }
+    .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
   </style>
 
 {% endblock %}
@@ -544,14 +546,11 @@
                         <div class="card-body" id="dosyaBody">
                             <div class="row">
                                 <div class="col-12">
-                                    <!-- <form enctype="multipart/form-data" action="" method="post" id="fileUploadForm">
-                                        {% csrf_token %} -->
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
-                                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
-                                        </div>
-                                        <div id="fileTitles" class="form-group"></div>
-                                    <!-- </form> -->
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                                        <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                                    </div>
+                                    <div id="fileTitles" class="form-group"></div>
                                 </div>
                             </div>
 
@@ -1016,19 +1015,38 @@
         var fileTitles = $('#fileTitles');
         fileTitles.empty(); // Önceki başlık alanlarını temizle
 
-        selectedFiles.forEach(function(file, index) {
-            fileTitles.append(
-                `<div class="mb-3" id="fileDiv-${index}">
-                    <label>${file.name}</label>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFile(${index})">Sil</button>
-                    <select class="form-control kaydet" name="fileTitles[]">
-                        <option value="Teknik Resim">Teknik Resim</option>
-                        <option value="Şartname">Şartname</option>
-                        <option value="Paketleme Talimatı">Paketleme Talimatı</option>
-                    </select>
+        var row = $('<div class="row"></div>');
+		fileTitles.append(row);
+
+        selectedFiles.forEach(function(file, index){
+            let fileType = file.name.split(".").pop().toLowerCase();
+            var column = $(
+                `<div class="col-md-6 mt-3">
+                    <div class="mp-3 d-flex justify-content-between border rounded">
+                        <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                        <div class="p-1 flex-grow-1">
+                            <label class="overflow">${file.name}</label>
+                            <select class="form-control kaydet" name="fileTitles[]">
+                                <option value="Teknik Resim">Teknik Resim</option>
+                                <option value="Şartname">Şartname</option>
+                                <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index})">
+                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                        </button>
+                    </div>
                 </div>`
             );
+
+            row.append(column);
+
+            if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+                row = $('<div class="row"></div>');
+                fileTitles.append(row);
+            }
         });
+
     };
 
     window.removeFile = function(index) {
@@ -1037,9 +1055,7 @@
     };
 
     
-
     document.querySelector("#yudaKaydet").addEventListener('click', function(){
-        /* var formData = new FormData(document.getElementById('fileUploadForm')); */
         var formData = new FormData();
         formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
 
@@ -1097,14 +1113,14 @@
 
 
         $.ajax({
-            url: '/yudakaydet', // Sunucu tarafı işlem URL'si
+            url: '/yudakaydet',
             type: 'POST',
             data: formData,
             contentType: false,
             processData: false,
             success: function(response) {
                 // Başarılı yükleme sonrası işlemler
-                alert('Dosyalar başarıyla yüklendi!');
+                alert('Dosyalar başarıyla yüklendi!'+response.message);
             },
             error: function() {
                 // Hata durumunda işlemler
@@ -1142,47 +1158,6 @@
             }
         }); */
 
-
-       /*  let musteriFirmaAdi = $('#musteriFirmaAdi').val() || "";
-        let sonKullaniciFirma = $('#sonKullaniciFirma').val() || "";
-        let kullanimAlani = $('#kullanimAlani').val() || "";
-        let cizimNo = $('#cizimNo').val() || "";
-        let yillikProfilSiparisi = $('#yillikProfilSiparisi').val() + " KG/" +  $("input[name='profilSip']:checked").val() || ""; hafta ay yıl nasıl alınmalı 
-        let musteriOdemeVadesi = $('#musteriOdemeVadesi').val() || "";
-         console.log(musteriFirmaAdi +" + " + sonKullaniciFirma +" + " + kullanimAlani +" + " + cizimNo +" + " + yillikProfilSiparisi +" + " + musteriOdemeVadesi); 
-
-        let alasimList = alasimTabData || "";
-         console.log(alasimList); 
-
-        let dinTolerans = $('#dinTolerans').val() || "";
-        let birlikteCalisan = $('#birlikteCalisan').val() || "";
-        let metreCheckbox = $("input[name='metreCheckbox']:checked").val() || "";
-        let minMAT = $('#minMAT').val() || "";
-        let maxMAT = $('#maxMAT').val() || "";
-        let onemliOlculer = $('#onemliOlculer').val() || "";
-        console.log(dinTolerans + " " + birlikteCalisan + " " + metreCheckbox + " " + minMAT + " " + maxMAT + " " + onemliOlculer);
-
-        let yuzeyPresList = yuzeyPresTabData || "";
-        console.log(yuzeyPresList);
-
-        let yuzeyEloksalList = eloksalTabulator.getData() || "";
-        console.log(yuzeyEloksalList);
-
-        let yuzeyBoyaList = yuzeyBoyaTabulator.getData() || "";
-        console.log(yuzeyBoyaList);
-
-        let yuzeyAhsapKaplamaList = ahsapKaplamaTabulator.getData() || "";
-        console.log(yuzeyAhsapKaplamaList);
-
-        let talasliImalat = $("input[name='talasliImalat']:checked").val()  || "";  
-        let talasliImalatAciklama = $('#talasliImalatAciklama').val() || "";
-        console.log(talasliImalat + " " + talasliImalatAciklama);
-
-        let paketleme = $("input[name='paketleme']:checked").val() || "";
-        let paketlemeAciklama = $('#paketlemeAciklama').val() || "";
-        console.log(paketleme + " " + paketlemeAciklama); */
-
-        /* console.log(document.getElementById('musteriFirmaAdi').validity.valid) */
     });
 
 
