@@ -1194,11 +1194,10 @@ def yuda_kaydet(request):
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
+            response.status_code = 500 #server error
         except Exception as e:
             response = JsonResponse({'error': str(e)})
-            
-    response =  JsonResponse({'error': 'Geçersiz istek'})
-    response.status_code = 500 #server error
+            response.status_code = 500 #server error
 
     return response
     
