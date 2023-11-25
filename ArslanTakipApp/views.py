@@ -1,4 +1,5 @@
 import base64, binascii, zlib
+import datetime
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
@@ -14,7 +15,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay, Parameter, MyFile, YudaForm
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay, Parameter, UploadFile, YudaForm
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -177,21 +178,6 @@ def location_list(a):
     data = json.dumps(childData)
     return data
 
-    """ gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
-    gonderLoc_list = list(gonderLoc.values().order_by('id'))
-    gonderLoc_list_rev = list(reversed(gonderLoc_list))
-    for item in gonderLoc_list_rev:
-        for i in gonderLoc_list:
-            if item['locationRelationID_id'] == i['id']:
-                try:
-                    i['_children'].append(item)
-                except:
-                    i['_children'] = [item]
-                gonderLoc_list.remove(item)
-
-    childData = gonderLoc_list
-    data = json.dumps(childData)
-    return data """
 
 def kalip_liste(request):
     #Kalıp Listesi Detaylı
@@ -1161,12 +1147,10 @@ def yuda(request, objId):
 def yuda_kaydet(request):
     if request.method == "POST":
         try:
-            print("post kaydet")
-            print(request.POST)
-            print(request.FILES) 
+            today = datetime.datetime.now().strftime('%j')
             y = YudaForm()
-            y.YudaNo = "YUDA-YY-GGG-NN"
-            y.ProjeYoneticisi_id = 1
+            y.YudaNo = "YUDA-YY-"+today+"-NN"
+            y.ProjeYoneticisi = request.user
 
             for key, value in request.POST.items():
                 
@@ -1177,19 +1161,18 @@ def yuda_kaydet(request):
                     else:
                         setattr(y, key, value)
 
-            # Her bir özelliği kontrol etmek için yazdırın
-            for field in y._meta.fields:
-                print(f"{field.name}: {getattr(y, field.name)}")
-
             y.save()
 
             # Dosyaları ve başlıkları işleyin
             file_titles = request.POST.getlist('fileTitles[]')
             for file, title in zip(request.FILES.getlist('files[]'), file_titles):
-                MyFile.objects.create(
-                    my_yuda=y,
-                    file_type=title,
-                    file=file
+                UploadFile.objects.create(
+                    File = file,
+                    FileTitle = title,
+                    FileModel = "YudaForm",
+                    FileModelId = y.id,
+                    UploadedBy = y.ProjeYoneticisi,
+                    Note = "",
                 )
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:

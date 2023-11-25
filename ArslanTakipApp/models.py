@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -295,10 +296,22 @@ class Parameter(models.Model):
         return self.Isim
 
 class MyFile(models.Model):
-    my_yuda = models.ForeignKey(YudaForm, related_name="files", on_delete=models.DO_NOTHING, null=True, blank=True)
+    """ my_yuda = models.ForeignKey(YudaForm, related_name="files", on_delete=models.DO_NOTHING, null=True, blank=True)
     file_type = models.CharField(null=True, blank=True)
-    file = models.FileField(upload_to='media/')
+    file = models.FileField(upload_to='media/') """
     
+class UploadFile(models.Model):
+    File = models.FileField(upload_to='media/')
+    FileTitle = models.CharField(null=True, blank=True)
+    FileModel = models.CharField(null=True, blank=True)
+    FileModelId = models.CharField(null=True, blank=True)
+    UploadDate = models.DateField(auto_now=True, null=True, blank=True)
+    UploadedBy = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="file_uploaded_by", blank=True, null =True)
+    OriginFile = models.ForeignKey("self", on_delete=models.DO_NOTHING, blank =True, null=True)
+    Note = models.CharField(null=True, blank=True)
+
+    def __str__(self):
+        return self.File
 
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

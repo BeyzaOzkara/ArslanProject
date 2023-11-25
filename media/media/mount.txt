@@ -1,0 +1,2 @@
+//192.168.180.200/MAS  /home/arslanplc01/ArslanProject/media/    cifs   username=Mas,password=W0rKx2du9KaodUfk
+//192.168.180.200/ProfilDesign  /home/arslanplc01/ArslanProject/static/ProfilDesign/  
