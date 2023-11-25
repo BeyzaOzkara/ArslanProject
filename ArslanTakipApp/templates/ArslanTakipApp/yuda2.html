@@ -1122,7 +1122,7 @@
                 // Başarılı yükleme sonrası işlemler
                 alert('Dosyalar başarıyla yüklendi!'+response.message);
             },
-            error: function() {
+            error: function(response) {
                 // Hata durumunda işlemler
                 alert('Dosya yüklemesi başarısız oldu.'+response.responseJSON.error);
             }
