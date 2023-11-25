@@ -271,9 +271,9 @@
                             <h3 class="card-title p-3">Yüzey Detayları</h3>
                             <ul class="nav nav-pills ml-auto p-2">
                                 <li class="nav-item"><a class="nav-link active" href="#ytab_1" data-toggle="tab">Pres</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#ytab_2" data-toggle="tab" onclick="toastClick('info','Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#ytab_3" data-toggle="tab" onclick="toastClick('info','Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#ytab_4" data-toggle="tab" onclick="toastClick('info','Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#ytab_2" data-toggle="tab" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#ytab_3" data-toggle="tab" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#ytab_4" data-toggle="tab" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a></li>
                             </ul>
                         </div>
                         <div class="card-body">
@@ -281,8 +281,8 @@
                                 <div class="tab-pane active" id="ytab_1">
                                     <div class="row">
                                         <div class="form-group col-lg-4">
-                                            <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal')
-                                                                                                                    {toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','br')}
+                                            <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if(this.value == 'Pres Yüzey'){toastClick('info', 'Müşteriye Pres olarak sevk edilecekse doldurunuz', 'br')}
+                                                                                                                    else if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal'){toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','br')}
                                                                                                                     else if(this.value == 'Boya Kalite'){toastClick('info', 'Boya işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın. ','br')}">
                                                 <option value="yuzeyPresDetay" id="yuzeyPresSelected" selected disabled>Yüzey Detay</option>
                                                 <option value="Pres Yüzey">Pres Yüzey</option>
@@ -553,9 +553,14 @@
                         <div class="card-body" id="dosyaBody">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
-                                        <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                                        </div>
                                     </div>
                                     <div id="fileTitles" class="form-group"></div>
                                 </div>
@@ -808,13 +813,6 @@
         }
     });
 
-    /* function showname () {
-      var fileList = document.getElementById('fileInput').files;
-      for ( var i = 0; i < fileList.length; i++) {
-        let name = fileList.item(i).name;
-        fileTabulator.addData({fileName:name}, false);
-      };
-    }; */
 
     function digerFunction(selectId, digerId){
         $('#'+selectId).hide();
@@ -1061,7 +1059,11 @@
         updateFileList();
     };
 
-    
+    function DosyaTemizle(){
+        selectedFiles = [];
+        updateFileList();
+    };
+
     document.querySelector("#yudaKaydet").addEventListener('click', function(){
         var formData = new FormData();
         formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
@@ -1134,8 +1136,6 @@
                 alert('Dosya yüklemesi başarısız oldu. '+response.responseJSON.error);
             }
         });
-        
-        /* var formData = new FormData(document.getElementById("fileForm")); */
         
         /* var filesList = document.getElementById('fileInput').files;
         for ( var i = 0; i < filesList.length; i++) {
