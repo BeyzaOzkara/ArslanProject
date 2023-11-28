@@ -26,7 +26,7 @@
   <h1>Yeni Ürün Devreye Alma Formu</h1>
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">YUDA NO</h3>
+      <h3 class="card-title">YUDA NO {{YudaNo}}</h3>
       <!-- tarih ekle -->
       <div class="card-tools">
         <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -42,16 +42,15 @@
           <div class="row">
             <div class="col-12 col-sm-4">
               <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Önemli Yüzeyler (Görünen Yüzeyler)</span>
-                  <span class="info-box-number text-center text-muted mb-0">var-yok</span>
+                <div class="info-box-content" id="siparisDiv">
+                  <span class="info-box-text text-center text-muted">SİPARİŞ</span>
                 </div>
               </div>
             </div>
             <div class="col-12 col-sm-4">
               <div class="info-box bg-light">
                 <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Önemli Ölçüler ve Toleranslar</span>
+                  <span class="info-box-text text-center text-muted">ALAŞIM VE KONDÜSYON</span>
                   <span class="info-box-number text-center text-muted mb-0">Et kalınlığı 1 mm</span>
                 </div>
               </div>
@@ -59,138 +58,36 @@
             <div class="col-12 col-sm-4">
               <div class="info-box bg-light">
                 <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Yıllık Profil Siparişi</span>
+                  <span class="info-box-text text-center text-muted">TOLERANSLAR</span>
                   <span class="info-box-number text-center text-muted mb-0">3 ton / ay<span>
                 </div>
               </div>
             </div>
           </div>
           <div class="row">
-            <div class="col-12 col-sm-4">
+            <div class="col-12 col-sm-12">
               <div class="info-box bg-light">
                 <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Talaşlı İmalat</span>
+                  <span class="info-box-text text-center text-muted">YÜZEY</span>
                   <span class="info-box-number text-center text-muted mb-0">var-yok-belirtilmedi</span>
                 </div>
               </div>
             </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Talaşlı İmalat Boya Ya Da Eloksaldan</span>
-                  <span class="info-box-number text-center text-muted mb-0">önce-sonra-belirtilmedi<span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Müşteri Yüzey Veya Talaşlı İşlem Yapıyor mu?</span>
-                  <span class="info-box-number text-center text-muted mb-0">eloksal-boya-mek.işlem-yapmıyor-belirtilmedi</span>
-                </div>
-              </div>
-            </div>
           </div>
           <div class="row">
-            <div class="col-12 col-sm-4">
+            <div class="col-12 col-sm-6">
               <div class="info-box bg-light">
                 <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Billet Cinsi</span>
+                  <span class="info-box-text text-center text-muted">TALAŞLI İMALAT</span>
                   <span class="info-box-number text-center text-muted mb-0">6063</span>
                 </div>
               </div>
             </div>
-            <div class="col-12 col-sm-4">
+            <div class="col-12 col-sm-6">
               <div class="info-box bg-light">
                 <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Kondüsyon</span>
+                  <span class="info-box-text text-center text-muted">PAKETLEME</span>
                   <span class="info-box-number text-center text-muted mb-0">T6<span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Dın Toleransı</span>
-                  <span class="info-box-number text-center text-muted mb-0">tsen755-tsen12020-diğer</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Yüzey Durumu</span>
-                  <span class="info-box-number text-center text-muted mb-0">sadecepres-eloksallı-boyalı</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Askı İzi</span>
-                  <span class="info-box-number text-center text-muted mb-0">kesilecek-kesilmeyecek-belirtilmedi</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Birlikte Çalışan Aparatı</span>
-                  <span class="info-box-number text-center text-muted mb-0">kendisiileçalışır-var-yok</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Folyo</span>
-                  <span class="info-box-number text-center text-muted mb-0">var-yok</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Bariyerleme</span>
-                  <span class="info-box-number text-center text-muted mb-0">var-yok</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Özel Paketleme</span>
-                  <span class="info-box-number text-center text-muted mb-0">var-yok<span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">İstenilen Standart Boy</span>
-                  <span class="info-box-number text-center text-muted mb-0">6080 mm</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Min. Kullanım Boyu</span>
-                  <span class="info-box-number text-center text-muted mb-0">-<span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="info-box bg-light">
-                <div class="info-box-content">
-                  <span class="info-box-text text-center text-muted">Metre Ağırlık Talebi</span>
-                  <span class="info-box-number text-center text-muted mb-0">var-yok<span>
                 </div>
               </div>
             </div>
@@ -334,7 +231,11 @@
   console.log(data);
 
   function LoadDetail() {
-    $.ajax({
+    const sip = $('#siparisDiv');
+    const sipVal = $('<span class="info-box-number text-center text-muted mb-0">'+data[0].YudaNo +'</span>');
+    sip.append(sipVal);
+    
+    /* $.ajax({
       url: `/yudaDetail/${yId}`,
       method: 'GET',
       dataType: 'json',
@@ -346,9 +247,11 @@
           // Hata durumunda işlemler
           alert('Başarısız oldu. '+response.responseJSON.error);
       }
-    });
+    }); */
 
   };
+
+  LoadDetail();
 
 </script>
 {% endblock %}
