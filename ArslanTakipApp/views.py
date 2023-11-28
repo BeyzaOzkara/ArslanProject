@@ -15,7 +15,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, Yuda, YudaOnay, Parameter, UploadFile, YudaForm
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -333,72 +333,7 @@ def location_hareket(request):
     return HttpResponse(data)
 
 def kalip(request):
-    """ with transaction.atomic():
-        listFields = {'AktifPasif', 'Silindi',  'Hatali', 'KalipNo', 'SilinmeSebebi', 'TeniferKalanOmurKg', 'KaliteOkey', 'TeniferOmruMt', 'TeniferOmruKg', 'TeniferNo', 'SonTeniferTarih', 
-                        'SonTeniferKg', 'SonTeniferSebebi', 'SonUretimTarih', 'SonUretimGr', 'UretimTenSonrasiKg', 'UretimToplamKg', 'KalipAciklama', 'SikayetVar', 'KaliteAciklama', 
-                        'PresKodu', 'PaketBoyu'}
-        for i in listFields:
-            print(i)
-            u = {}
-            rows1 = list(KalipMs.objects.using('dies').order_by('-KalipNo').values_list('KalipNo', i))
-            rows2 = list(Kalip.objects.order_by('-KalipNo').values_list('KalipNo', i))
-            a = compare(rows1,rows2)
-            if a == False:
-                print (a)
-                b= set(rows1) - set(rows2)
-                #print (b)
-                #guncelle(i,b,u)
-                for j in b:
-                    print(j[0])
-                    if i == 'KalipNo':
-                        k = KalipMs.objects.using('dies').get(KalipNo = j[0])
-                        print(k.ProfilNo)
-                        kalip = Kalip()
-                        kalip.KalipNo = k.KalipNo
-                        kalip.ProfilNo = k.ProfilNo
-                        kalip.Kimlik = k.Kimlik
-                        kalip.FirmaKodu = k.FirmaKodu
-                        kalip.FirmaAdi = k.FirmaAdi
-                        kalip.Cinsi = k.Cinsi
-                        kalip.Miktar = k.Miktar
-                        kalip.Capi = k.Capi
-                        kalip.UretimTarihi = k.UretimTarihi
-                        kalip.GozAdedi = k.GozAdedi
-                        kalip.Silindi = k.Silindi
-                        kalip.SilinmeSebebi =k.SilinmeSebebi
-                        kalip.Bolster = k.Bolster
-                        kalip.KalipCevresi = k.KalipCevresi
-                        kalip.KaliteOkey = k.KaliteOkey
-                        kalip.UreticiFirma = k.UreticiFirma
-                        kalip.TeniferOmruMt = k.TeniferOmruMt
-                        kalip.TeniferOmruKg = k.TeniferOmruKg
-                        kalip.TeniferKalanOmurKg = k.TeniferKalanOmurKg
-                        kalip.TeniferNo = k.TeniferNo
-                        kalip.SonTeniferTarih = k.SonTeniferTarih
-                        kalip.SonTeniferKg = k.SonTeniferKg
-                        kalip.SonTeniferSebebi = k.SonTeniferSebebi
-                        kalip.SonUretimTarih = k.SonUretimTarih
-                        kalip.SonUretimGr = k.SonUretimGr
-                        kalip.UretimTenSonrasiKg = k.UretimTenSonrasiKg
-                        kalip.UretimToplamKg = k.UretimToplamKg
-                        kalip.ResimGramaj = k.ResimGramaj
-                        kalip.KalipAciklama = k.KalipAciklama
-                        kalip.SikayetVar = k.SikayetVar
-                        kalip.KaliteAciklama = k.KaliteAciklama
-                        kalip.AktifPasif = k.AktifPasif
-                        kalip.Hatali = k.Hatali
-                        kalip.PresKodu  = k.PresKodu
-                        kalip.PaketBoyu = k.PaketBoyu
-                        kalip.ResimDizini = k.ResimDizini
-                        kalip.kalipLocation_id = 48
-                        
-                        kalip.save()
-                        print("kalip saved")
-                    else:
-                        print(i)
-                        u[i] = j[1]
-                        Kalip.objects.filter(KalipNo = j[0]).update(**u) """
-                        #print("updated")
+    
     return render(request, 'ArslanTakipApp/kalip.html')
 
 class KalipView(generic.TemplateView):
@@ -1124,13 +1059,6 @@ def baskigecmisi_list(request):
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
     
-def yuda(request):
-    parameters = Parameter.objects.all()
-    alasims = parameters.filter(ParentId = 1).values()
-    alasim = list(alasims)
-    print(alasim)
-    return render(request, 'ArslanTakipApp/yuda2.html', {'alasim_json':alasim})
-
 def yuda(request, objId):
     try: 
         int(objId)
@@ -1212,6 +1140,55 @@ def yuda_kaydet(request):
         PaketlemeAciklama """
         
 
-class YudaDetailView(generic.TemplateView):
-    template_name = 'ArslanTakipApp/yudaDetail.html'
+class YudasView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/yudaList.html'
+
+def yudas_list(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    for i in params:
+        value = params[i]
+        print("Key and Value pair are ({}) = ({})".format(i, value))
+    size = params.get("size", 10)  # Default size to 10
+    offset, limit = calculate_pagination(params.get("page", 1), size)
+    filter_list = params.get("filter", [])
+    q = {}
+
+    y = YudaForm.objects.all()
+
+    if len(filter_list) > 0:
+        for i in filter_list:
+            q = filter_method(i, q)
+    
+    yudas = y.filter(**q).order_by("-Tarih")
+    yudaList = list(yudas.values()[offset:limit])
+
+    y_count = yudas.count()
+    lastData= {'last_page': math.ceil(y_count/size), 'data': []}
+    lastData['data'] = yudaList
+    print(lastData)
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+
+def yudaDetail(request, yId):
+    #veritabanından yuda no ile ilişkili dosyaların isimlerini al
+    yudaFiles = getFiles("YudaForm", yId)
+    yudaComments = getComments("YudaForm", yId)
+
+    yudaDetails = YudaForm.objects.filter(id = yId).values()
+    
+    data = json.dumps(list(yudaDetails), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data})#, 'file_json':fileData})
+
+def getFiles(ref, mId):
+    allFiles = UploadFile.objects.all()
+    filteredFiles = allFiles.filter(Q(FileModel = ref) & Q(FileModelId = mId)).values()
+    print(filteredFiles)
+    return
+
+def getComments(ref, mId):
+    allComments = Comment.objects.all()
+    filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId)).values()
+
+    return
 

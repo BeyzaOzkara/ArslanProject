@@ -1,0 +1,264 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+<h1>Yeni Ürün Devreye Alma Formları</h1>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+              <i class="fas fa-minus"></i></button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+              <i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped projects">
+            <thead>
+                <tr>
+                    <th style="width: 1%">
+                        #
+                    </th>
+                    <th style="width: 20%">
+                        YUDA NO
+                    </th>
+                    <th style="width: 30%">
+                        İlgili Bölümler
+                    </th>
+                    <th>
+                        Onay
+                    </th>
+                    <th style="width: 8%" class="text-center">
+                        Durum
+                    </th>
+                    <th style="width: 20%">
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="yudaTBody">
+
+            </tbody>
+        </table>
+        <br>
+        <div class="pagination-container">
+            <div class="row ml-1">
+            <select id="perPageSelect" class="form-control col-lg-1">
+              <option value="5" selected>5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+              <option value="150">150</option>
+              <option value="200">200</option>
+              <!-- Diğer seçenekleri ekleyebilirsiniz -->
+            </select>
+            <ul class="pagination col-lg-11"></ul>
+            </div>
+          </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let itemsPerPage = 5;  // Başlangıçta varsayılan değer
+    let filterList = [];
+    const tableBody = $('#yudaTBody');
+    function getProjects(data){
+        tableBody.empty();  // Önceki verileri temizle
+        data.forEach(item => {
+            console.log(item);
+            const row = $('<tr></tr>').html(`
+            <td>
+                #
+            </td>
+            <td>
+                <a>
+                    ${item.YudaNo}
+                </a>
+                <br/>
+                <small>
+                    ${item.Tarih} tarihinde oluşturuldu
+                </small>
+            </td>
+            <td>
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <img alt="Avatar" class="table-avatar" src="{% static 'admin-lte/dist/img/avatar.png' %}">
+                    </li>
+                    <li class="list-inline-item">
+                        <img alt="Avatar" class="table-avatar" src="{% static 'admin-lte/dist/img/avatar2.png' %}">
+                    </li>
+                    <li class="list-inline-item">
+                        <img alt="Avatar" class="table-avatar" src="{% static 'admin-lte/dist/img/avatar3.png' %}">
+                    </li>
+                    <li class="list-inline-item">
+                        <img alt="Avatar" class="table-avatar" src="{% static 'admin-lte/dist/img/avatar04.png' %}">
+                    </li>
+                </ul>
+            </td>
+            <td class="project_progress">
+                <div class="progress progress-sm">
+                    <div class="progress-bar bg-green" role="progressbar" aria-volumenow="57" aria-volumemin="0" aria-volumemax="100" style="width: 57%">
+                    </div>
+                </div>
+                <small>
+                    57% Complete
+                </small>
+            </td>
+            <td class="project-state">
+                <span class="badge badge-success">Success</span>
+            </td>
+            <td class="project-actions text-right">
+                <a class="btn btn-primary btn-sm" href="yudaDetail/${item.id}">
+                    <i class="fas fa-folder">
+                    </i>
+                    View
+                </a>
+                <a class="btn btn-info btn-sm" href="#">
+                    <i class="fas fa-pencil-alt">
+                    </i>
+                    Edit
+                </a>
+                <a class="btn btn-danger btn-sm" href="#">
+                    <i class="fas fa-trash">
+                    </i>
+                    Delete
+                </a>
+            </td>
+            `);
+            tableBody.append(row);
+        });
+    };
+
+    const renderPagination = (totalPages) => {
+      const paginationUl = $('.pagination');
+      paginationUl.empty();  // Önceki pagination'ı temizle
+
+      const prevButton = `
+      <li class="page-item prev ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" aria-label="Previous" style="color: #96B6C5;">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+      `;
+      
+      const nextButton = `
+      <li class="page-item next ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" aria-label="Next" style="color: #96B6C5;">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+      `;
+
+      paginationUl.append(prevButton);
+
+      const visiblePages = calculateVisiblePages(totalPages);
+
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || visiblePages.includes(i)) {
+          const liClass = i === currentPage ? 'page-item active' : 'page-item';
+          const li = `<li class="${liClass}"><a class="page-link" href="#" style="color: #96B6C5;">${i}</a></li>`;
+          paginationUl.append(li);
+        } else if (i === visiblePages[0] - 1 || i === visiblePages[visiblePages.length - 1] + 1) {
+          paginationUl.append(`
+            <li class="page-item disabled">
+              <span class="page-link" style="color: #96B6C5;">...</span>
+            </li>
+          `);
+        }
+      }
+
+      paginationUl.append(nextButton);
+
+      paginationUl.find('.page-link').on('click', function (e) {
+        const parentLi = $(this).closest('.page-item');
+
+        if (parentLi.hasClass('disabled')) {
+          return;
+        }
+
+        if (parentLi.hasClass('prev')) {
+          currentPage = Math.max(1, currentPage - 1);
+        } else if (parentLi.hasClass('next')) {
+          currentPage = Math.min(totalPages, currentPage + 1);
+        } else {
+          currentPage = parseInt($(this).text());
+        }
+
+        console.log("renderpag loader block");
+        loadPage(currentPage);
+      });
+    };
+
+    const calculateVisiblePages = (totalPages) => {
+      const visiblePages = [];
+      const maxVisiblePages = 20; // You can adjust this value
+
+      const middlePage = Math.floor(maxVisiblePages / 2);
+      const lowerBound = Math.max(1, currentPage - middlePage);
+      const upperBound = Math.min(totalPages, lowerBound + maxVisiblePages - 1);
+
+      for (let i = lowerBound; i <= upperBound; i++) {
+        visiblePages.push(i);
+      }
+
+      return visiblePages;
+    };
+
+    const loadPage = (page) => {
+        const params = {
+          page: page,
+          size: itemsPerPage,
+          filter: filterList,
+        };
+        $.ajax({
+            url: `yudas/list`,
+            method: 'GET',
+            data: { params: JSON.stringify(params)},
+            dataType: 'json',
+            success: function (paginatedData) {
+                console.log(paginatedData.data);
+                getProjects(paginatedData.data);
+                renderPagination(paginatedData.last_page);
+            },
+            error: function (error) {
+                console.error('Error loading paginated data:', error);
+            }
+        });
+    };
+
+    $('#perPageSelect').on('change', function () {
+      itemsPerPage = parseInt($(this).val());
+      currentPage = 1;  // Sayfa değiştiğinde ilk sayfaya geç
+      loadPage(currentPage);
+    });
+
+    let currentPage = 1;
+    loadPage(currentPage);  // İlk sayfa yüklendiğinde verileri ve pagination'ı getir
+  
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}

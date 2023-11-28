@@ -315,8 +315,8 @@ class UploadFile(models.Model):
 
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    Form = models.ForeignKey(YudaForm, on_delete=models.CASCADE, null=True, blank=True)
+    FormModel = models.CharField(null=True, blank=True)
+    FormModelId = models.CharField(null=True, blank=True)
     Tarih = models.DateTimeField(auto_now=True, null=True, blank=True)
     Aciklama = models.CharField(null=True, blank=True)
-    EklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
     #yüklenecek dosyalar için ne yazabilirim?

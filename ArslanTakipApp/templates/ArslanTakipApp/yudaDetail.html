@@ -26,7 +26,8 @@
   <h1>Yeni Ürün Devreye Alma Formu</h1>
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">Detaylar</h3>
+      <h3 class="card-title">YUDA NO</h3>
+      <!-- tarih ekle -->
       <div class="card-tools">
         <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
           <i class="fas fa-minus"></i></button>
@@ -36,6 +37,7 @@
     </div>
     <div class="card-body">
       <div class="row">
+        <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme -->
         <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
           <div class="row">
             <div class="col-12 col-sm-4">
@@ -194,122 +196,36 @@
             </div>
           </div>
           
-          <div class="row">
-            <div class="col-12">
-              <h4>Paylaşılanlar</h4>
-                <div class="post">
-                  <div class="user-block">
-                    <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                    <span class="username">
-                      <a href="#">Jonathan Burke Jr.</a>
-                    </span>
-                    <span class="description">tarih ve saat</span>
-                  </div>
-                  <!-- /.user-block -->
-                  <p>
-                    Lorem ipsum represents a long-held tradition for designers,
-                    typographers and the like. Some people hate it and argue for
-                    its demise, but others ignore.
-                  </p>
-
-                  <p>
-                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v2</a>
-                  </p>
-                </div>
-
-                <div class="post clearfix">
-                  <div class="user-block">
-                    <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
-                    <span class="username">
-                      <a href="#">Sarah Ross</a>
-                    </span>
-                    <span class="description">tarih ve saat</span>
-                  </div>
-                  <!-- /.user-block -->
-                  <p>
-                    Lorem ipsum represents a long-held tradition for designers,
-                    typographers and the like. Some people hate it and argue for
-                    its demise, but others ignore.
-                  </p>
-                  <p>
-                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 2</a>
-                  </p>
-                </div>
-
-                <div class="post">
-                  <div class="user-block">
-                    <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                    <span class="username">
-                      <a href="#">Jonathan Burke Jr.</a>
-                    </span>
-                    <span class="description">tarih ve saat</span>
-                  </div>
-                  <!-- /.user-block -->
-                  <p>
-                    Lorem ipsum represents a long-held tradition for designers,
-                    typographers and the like. Some people hate it and argue for
-                    its demise, but others ignore.
-                  </p>
-
-                  <p>
-                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
-                  </p>
-                </div>
-            </div>
-          </div>
         </div>
+        <!-- dosyalar -->
         <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
-          <h3 class="text-primary"><i class="fas fa-paint-brush"></i> Çizim No: [10 001 3147]</h3>
-          <p class="text-muted">Müşteri [Otomotiv Kasa] için kullanılmak üzere Billet Cinsi [6063], Kondüsyon [T6], Din Toleransı [TS EN 12020] olarak []</p>
+          <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
+          <p class="text-muted">Yuda No ..-...-.. ile ilişkili dosyalar</p>
           <br>
-          <div class="text-muted">
-            <p class="text-sm">Müşteri Firma Adı
-              <b class="d-block">Mikron SMS Eloksal Boya Alüminyum San ve Tic A.Ş.</b>
-            </p>
-            <p class="text-sm">Müşteri Ödeme Vadesi
-              <b class="d-block">Peşin</b>
-            </p>
-            <p class="text-sm">Profilin Kullanıldığı Yer (Kalıp Durumu)
-              <b class="d-block">Otomotiv Kasa</b>
-            </p>
-            <p class="text-sm">Proje Yöneticisi
-              <b class="d-block">Harun</b>
-            </p>
-          </div>
-          <h5 class="mt-5 text-muted">Proje dosyaları</h5>
+          <h5 class="text-muted">Proje dosyaları</h5>
           <ul class="list-unstyled">
             <li>
-              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a>
+              <a href="" class="btn-link text-secondary mr-1"><!-- <span class="fiv-cla fiv-icon-${fileType} border-right-0 rounded-left"></span> --><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a> <!-- dosya uzantılarına göre icon getir -->
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
             <li>
-              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
             <li>
-              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
             <li>
-              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-image "></i> Logo.png</a>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-image "></i> Logo.png</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
             <li>
-              <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
           </ul>
           
-          <div class="col-12">
-            <div class="row">
-                <div class="col-lg-12">
-                  <form action="" method="post" id="commentForm">
-                  <!-- textarea -->
-                  <div class="form-group">
-                    <label>Açıklama</label>
-                    <textarea class="form-control" rows="3" placeholder="..."></textarea>
-                  </div>
-                  <!-- dosya eklemeyi unutma -->
-                  <button type="button" class="btn btn-primary" id="btnPaylas">PAYLAŞ</button>
-                </form>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -317,10 +233,124 @@
     </div>
 
   </div>
+  <!-- yorumlar -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Yorumlar</h3>
+      <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+          <i class="fas fa-minus"></i></button>
+        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+          <i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12">
+          <h4>Paylaşılanlar</h4>
+            <div class="post">
+              <div class="user-block">
+                <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                <span class="username">
+                  <a href="#">Jonathan Burke Jr.</a>
+                </span>
+                <span class="description">tarih ve saat</span>
+              </div>
+              <!-- /.user-block -->
+              <p>
+                Lorem ipsum represents a long-held tradition for designers,
+                typographers and the like. Some people hate it and argue for
+                its demise, but others ignore.
+              </p>
+
+              <p>
+                <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v2</a>
+              </p>
+            </div>
+
+            <div class="post clearfix">
+              <div class="user-block">
+                <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
+                <span class="username">
+                  <a href="#">Sarah Ross</a>
+                </span>
+                <span class="description">tarih ve saat</span>
+              </div>
+              <!-- /.user-block -->
+              <p>
+                Lorem ipsum represents a long-held tradition for designers,
+                typographers and the like. Some people hate it and argue for
+                its demise, but others ignore.
+              </p>
+              <p>
+                <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 2</a>
+              </p>
+            </div>
+
+            <div class="post">
+              <div class="user-block">
+                <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                <span class="username">
+                  <a href="#">Jonathan Burke Jr.</a>
+                </span>
+                <span class="description">tarih ve saat</span>
+              </div>
+              <!-- /.user-block -->
+              <p>
+                Lorem ipsum represents a long-held tradition for designers,
+                typographers and the like. Some people hate it and argue for
+                its demise, but others ignore.
+              </p>
+
+              <p>
+                <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
+              </p>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- yorum yazma (richtext) -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Yorum Yap</h3>
+      <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+          <i class="fas fa-minus"></i></button>
+        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+          <i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script>
+  var data = JSON.parse('{{ yuda_json|escapejs }}');
+  console.log(data);
+
+  function LoadDetail() {
+    $.ajax({
+      url: `/yudaDetail/${yId}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          // alınan dataya göre info box ve dosyaları doldur
+          alert('Bilgiler başarıyla yüklendi! ');
+      },
+      error: function(response) {
+          // Hata durumunda işlemler
+          alert('Başarısız oldu. '+response.responseJSON.error);
+      }
+    });
+
+  };
+
+</script>
 {% endblock %}
 
 {% block javascript %}
