@@ -1076,8 +1076,9 @@ def yuda_kaydet(request):
     if request.method == "POST":
         try:
             today = datetime.datetime.now().strftime('%j')
+            year = datetime.datetime.now().strftime('%y')
             y = YudaForm()
-            y.YudaNo = "YUDA-YY-"+today+"-NN"
+            y.YudaNo = "YUDA-"+year+"-"+today+"-NN"
             y.ProjeYoneticisi = request.user
 
             for key, value in request.POST.items():
@@ -1169,7 +1170,6 @@ def yudas_list(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
@@ -1178,8 +1178,18 @@ def yudaDetail(request, yId):
     comments = json.dumps(list(yudaComments), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
-    
-    data = json.dumps(list(yudaDetails), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    yList = list(yudaDetails)
+    for i in yList:
+        i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
+        print(i)
+        print(i['YuzeyPres'])
+        a = i['YuzeyPres']
+        for b in a:
+            print(b)
+    #liste şeklinde gidecek verileri düzelt
+
+    data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
 def getFiles(ref, mId):
