@@ -24,7 +24,7 @@
 {% block content %}
 <div class="container-fluid">
   <h1>Yeni Ürün Devreye Alma Formu</h1>
-  <div class="card">
+  <div class="card" id="yudaCard">
     <div class="card-header">
       <h3 class="card-title">YUDA NO {{YudaNo}}</h3>
       <!-- tarih ekle -->
@@ -219,7 +219,8 @@
       </div>
     </div>
     <div class="card-body">
-
+      <!-- textarea -->
+      <textarea name="yorumText" id="yorumText" placeholder=" . . . " cols="30" rows="10"></textarea>
     </div>
   </div>
 </div>
@@ -228,12 +229,136 @@
 {% block extra_js %}
 <script>
   var data = JSON.parse('{{ yuda_json|escapejs }}');
+  var files = JSON.parse('{{ files_json|escapejs }}');
+  var comments = JSON.parse('{{ comment_json|escapejs }}');
   console.log(data);
+  console.log(files); 553984
+  console.log(comments);
 
+  const cardYuda = $('#yudaCard');
   function LoadDetail() {
-    const sip = $('#siparisDiv');
+    /* const sip = $('#siparisDiv');
     const sipVal = $('<span class="info-box-number text-center text-muted mb-0">'+data[0].YudaNo +'</span>');
-    sip.append(sipVal);
+    sip.append(sipVal); */
+
+    cardYuda.empty();  // Önceki verileri temizle
+    data.forEach(i => {
+      console.log(i);
+      const yudaHeader = $('<div class="card-header"></div>').html(`
+        <h3 class="card-title"> ${i.YudaNo}</h3>
+        <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+          <i class="fas fa-minus"></i></button>
+        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Kaldır">
+          <i class="fas fa-times"></i></button>
+        </div>
+      `);
+      cardYuda.append(yudaHeader);
+
+      let yuzeyPres = (i.YuzeyPres === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Pres: ${i.YuzeyPres}</span>`;
+      let yuzeyEloksal = (i.YuzeyEloksal === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Eloksal: ${i.YuzeyEloksal}</span>`;
+      let yuzeyBoya = (i.YuzeyBoya === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Boya: ${i.YuzeyBoya}</span>`;
+      let yuzeyAhsap = (i.YuzeyAhsap === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Ahşap Kaplama: ${i.YuzeyAhsap}</span>`;
+
+      const yudaBody = $('<div class="card-body"></div>').html(`
+      <div class="row">
+        <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme -->
+        <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content" id="siparisDiv">
+                  <span class="info-box-text text-center text-muted">SİPARİŞ</span>
+                  <span class="info-box-number text-center text-muted mb-0">${i.MusteriFirmaAdi}</span>
+                  <span class="info-box-number text-center text-muted mb-0">${i.ProfilSiparisi}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">ALAŞIM VE KONDÜSYON</span>
+                  <span class="info-box-number text-center text-muted mb-0">${i.AlasimKondusyon}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">TOLERANSLAR</span>
+                  <span class="info-box-number text-center text-muted mb-0">${i.DinTolerans}<span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-12">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">YÜZEY</span>
+                  ${yuzeyPres}
+                  ${yuzeyEloksal}
+                  ${yuzeyBoya}
+                  ${yuzeyAhsap}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-6">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">TALAŞLI İMALAT</span>
+                  <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat} <br> Açıklama: ${i.TalasliImalatAciklama}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <div class="info-box bg-light">
+                <div class="info-box-content">
+                  <span class="info-box-text text-center text-muted">PAKETLEME</span>
+                  <span class="info-box-number text-center text-muted mb-0">${i.Paketleme} <br> Açıklama: ${i.PaketlemeAciklama}<span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <!-- dosyalar -->
+        <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+          <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
+          <p class="text-muted">Yuda No ..-...-.. ile ilişkili dosyalar</p>
+          <br>
+          <h5 class="text-muted">Proje dosyaları</h5>
+          <ul class="list-unstyled">
+            <li>
+              <a href="/${files[0].File}" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a> <!-- dosya uzantılarına göre icon getir -->
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-image "></i> Logo.png</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+            </li>
+            <li>
+              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+            </li>
+          </ul>
+          
+        </div>
+      </div>
+
+      `);
+      cardYuda.append(yudaBody);
+    });
     
     /* $.ajax({
       url: `/yudaDetail/${yId}`,

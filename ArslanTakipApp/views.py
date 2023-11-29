@@ -1173,22 +1173,24 @@ def yudas_list(request):
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
+    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     yudaComments = getComments("YudaForm", yId)
+    comments = json.dumps(list(yudaComments), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
     
     data = json.dumps(list(yudaDetails), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data})#, 'file_json':fileData})
+    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
 def getFiles(ref, mId):
     allFiles = UploadFile.objects.all()
     filteredFiles = allFiles.filter(Q(FileModel = ref) & Q(FileModelId = mId)).values()
-    print(filteredFiles)
-    return
+
+    return filteredFiles
 
 def getComments(ref, mId):
     allComments = Comment.objects.all()
     filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId)).values()
-
-    return
+    
+    return filteredComments
 
