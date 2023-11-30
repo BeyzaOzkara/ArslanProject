@@ -128,9 +128,9 @@
     <div class="card-header">
       <h3 class="card-title">Yorumlar</h3>
       <div class="card-tools">
-        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
           <i class="fas fa-minus"></i></button>
-        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Kaldır">
           <i class="fas fa-times"></i></button>
       </div>
     </div>
@@ -248,7 +248,6 @@
     let yuzeyEloksal = (i.YuzeyEloksal === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Eloksal: ${i.YuzeyEloksal}</span>`;
     let yuzeyBoya = (i.YuzeyBoya === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Boya: ${i.YuzeyBoya}</span>`;
     let yuzeyAhsap = (i.YuzeyAhsap === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Ahşap Kaplama: ${i.YuzeyAhsap}</span>`;
-
     const yudaBody = $('<div class="card-body"></div>').html(`
     <div class="row" id="yudaRow">
       <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme -->
@@ -330,7 +329,7 @@
     const dosyaList = $('#dosyaList');
     files.forEach(f => {
       const yudaDosya = $('<li></li>').html(`
-            <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a> <!-- dosya uzantılarına göre icon getir -->
+            <a href="/media/${f.File}" download class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a> <!-- dosya uzantılarına göre icon getir -->
             <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>  
       `);
       dosyaList.append(yudaDosya);

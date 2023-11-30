@@ -1166,7 +1166,6 @@ def yudas_list(request):
     y_count = yudas.count()
     lastData= {'last_page': math.ceil(y_count/size), 'data': []}
     lastData['data'] = yudaList
-    print(lastData)
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
@@ -1183,13 +1182,19 @@ def yudaDetail(request, yId):
     for i in yList:
         i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
         print(i)
-        print(i['YuzeyPres'])
-        a = i['YuzeyPres']
-        for b in a:
-            print(b)
-    #liste şeklinde gidecek verileri düzelt
+        alasimJson = json.loads(i['AlasimKondusyon'])
+        alasim = ""
+        aSayac = 0
+        for a in alasimJson:
+            alasim += "Alaşım: "+ a['Alasim'] + "  Kondüsyon: "+ a['Kondusyon']
+            aSayac += 1
+            if aSayac != len(alasimJson):
+                alasim += ","
+        i['AlasimKondusyon'] = alasim
 
+    #liste şeklinde gidecek verileri düzelt
     data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    print()
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
 def getFiles(ref, mId):
