@@ -340,7 +340,7 @@
     const dosyaList = $('#dosyaList');
     files.forEach(f => {
       const yudaDosya = $('<li style="font-size:1.5em"></li>').html(`
-            <a href="/media/${f.File}" target="__blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a> <!-- dosya uzantılarına göre icon getir -->
+            <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a> <!-- dosya uzantılarına göre icon getir -->
             <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>  
       `);
       dosyaList.append(yudaDosya);
