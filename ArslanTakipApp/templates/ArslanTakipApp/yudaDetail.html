@@ -136,7 +136,7 @@
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-12">
+        <div class="col-12" id="yorumCol">
           <h4>Paylaşılanlar</h4>
             <div class="post">
               <div class="user-block">
@@ -180,8 +180,8 @@
             <div class="post">
               <div class="user-block">
                 <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                <span class="username">
-                  <a href="#">Deneme 3</a>
+                <span class="username" style="color: blue;">
+                  Deneme 3
                 </span>
                 <span class="description">tarih ve saat</span>
               </div>
@@ -244,68 +244,78 @@
       `);
     cardYuda.append(yudaHeader);
 
-    let yuzeyPres = (i.YuzeyPres === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Pres: ${i.YuzeyPres}</span>`;
-    let yuzeyEloksal = (i.YuzeyEloksal === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Eloksal: ${i.YuzeyEloksal}</span>`;
-    let yuzeyBoya = (i.YuzeyBoya === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Boya: ${i.YuzeyBoya}</span>`;
-    let yuzeyAhsap = (i.YuzeyAhsap === "") ? `` : `<span class="info-box-number text-center text-muted mb-0">Ahşap Kaplama: ${i.YuzeyAhsap}</span>`;
     const yudaBody = $('<div class="card-body"></div>').html(`
     <div class="row" id="yudaRow">
       <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme -->
       <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
         <div class="row">
           <div class="col-12 col-sm-4">
-            <div class="info-box bg-light">
+            <div class="info-box bg-light h-100">
               <div class="info-box-content" id="siparisDiv">
                 <span class="info-box-text text-center text-muted">SİPARİŞ</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.MusteriFirmaAdi}</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.ProfilSiparisi}</span>
+                <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi}</span>
+                <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">Ödeme Vadesi: ${i.MusteriOdemeVadesi || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">Çizim No: ${i.CizimNo || " - - "}</span>
               </div>
             </div>
           </div>
           <div class="col-12 col-sm-4">
-            <div class="info-box bg-light">
+            <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">ALAŞIM VE KONDÜSYON</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.AlasimKondusyon}</span>
+                <span class="info-box-number text-center text-muted mb-0" style="overflow: auto">${i.AlasimKondusyon}</span>
               </div>
             </div>
           </div>
           <div class="col-12 col-sm-4">
-            <div class="info-box bg-light">
+            <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">TOLERANSLAR</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.DinTolerans}<span>
+                <span class="info-box-number text-center text-muted mb-0">${i.BirlikteCalisan}<span>
+                <span class="info-box-number text-center text-muted mb-0">Metre Ağırlık Talebi ${i.MetreAgirlikTalebi}<span>
+                <span class="info-box-number text-center text-muted mb-0">Önemli Ölçüler: ${i.OnemliOlculer || " - - "}<span>
               </div>
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
           <div class="col-12 col-sm-12">
             <div class="info-box bg-light">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">YÜZEY</span>
-                ${yuzeyPres}
-                ${yuzeyEloksal}
-                ${yuzeyBoya}
-                ${yuzeyAhsap}
+                <span class="info-box-text text-center text-muted">Pres:</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.YuzeyPres || " - - "}</span>
+                <hr>
+                <span class="info-box-text text-center text-muted">Eloksal:</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.YuzeyEloksal || " - - "}
+                <hr>
+                <span class="info-box-text text-center text-muted">Boya:</span>
+                </span><span class="info-box-number text-center text-muted mb-0">${i.YuzeyBoya || " - - "}</span>
+                <hr>
+                <span class="info-box-text text-center text-muted">Ahşap Kaplama:</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.YuzeyAhsap || " - - "}</span>
               </div>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-12 col-sm-6">
-            <div class="info-box bg-light">
+            <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">TALAŞLI İMALAT</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat} <br> Açıklama: ${i.TalasliImalatAciklama}</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat} <br> Açıklama: ${i.TalasliImalatAciklama || " - - "}</span>
               </div>
             </div>
           </div>
           <div class="col-12 col-sm-6">
-            <div class="info-box bg-light">
+            <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">PAKETLEME</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.Paketleme} <br> Açıklama: ${i.PaketlemeAciklama}<span>
+                <span class="info-box-number text-center text-muted mb-0">${i.Paketleme} <br> Açıklama: ${i.PaketlemeAciklama || " - - "}<span>
               </div>
             </div>
           </div>
@@ -328,7 +338,7 @@
 
     const dosyaList = $('#dosyaList');
     files.forEach(f => {
-      const yudaDosya = $('<li></li>').html(`
+      const yudaDosya = $('<li style="font-size:1.5em"></li>').html(`
             <a href="/media/${f.File}" download class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a> <!-- dosya uzantılarına göre icon getir -->
             <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>  
       `);
@@ -337,6 +347,38 @@
     
 
   };
+
+  const yorumCol = $('#yorumCol');
+  function loadComments() {
+    yorumCol.empty();
+    comments.forEach(c => {
+      const yorumlar = $('<div class="post"></div>').html(`
+          <div class="post">
+            <div class="user-block">
+              <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+              <span class="username" style="color: blue;">
+                Deneme 3
+              </span>
+              <span class="description">tarih ve saat</span>
+            </div>
+            <!-- /.user-block -->
+            <p>
+              Lorem ipsum represents a long-held tradition for designers,
+              typographers and the like. Some people hate it and argue for
+              its demise, but others ignore.
+            </p>
+
+            <p>
+              <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
+            </p>
+          </div>
+      `); /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
+      yorumCol.append(yorumlar);
+      
+    });
+    
+  }
+
 
   LoadDetail();
 

@@ -1175,6 +1175,7 @@ def yudaDetail(request, yId):
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     yudaComments = getComments("YudaForm", yId)
     comments = json.dumps(list(yudaComments), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    #yorum dosyalarını yorumlara nasıl bağlamalıyım? dosyalarını ayrı mı bağlamalıyım
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
 
@@ -1182,15 +1183,60 @@ def yudaDetail(request, yId):
     for i in yList:
         i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
         print(i)
-        alasimJson = json.loads(i['AlasimKondusyon'])
-        alasim = ""
-        aSayac = 0
-        for a in alasimJson:
-            alasim += "Alaşım: "+ a['Alasim'] + "  Kondüsyon: "+ a['Kondusyon']
-            aSayac += 1
-            if aSayac != len(alasimJson):
-                alasim += ","
-        i['AlasimKondusyon'] = alasim
+        if i['AlasimKondusyon'] != '': 
+            alasimJson = json.loads(i['AlasimKondusyon'])
+            alasim = ""
+            Sayac = 0
+            for a in alasimJson:
+                alasim += "Alaşım: "+ a['Alasim'] + "  Kondüsyon: "+ a['Kondusyon']
+                Sayac += 1
+                if Sayac != len(alasimJson):
+                    alasim += "; "
+            i['AlasimKondusyon'] = alasim
+
+        if i['YuzeyPres'] != '': 
+            presJson = json.loads(i['YuzeyPres'])
+            Sayac = 0
+            pres = ""
+            for a in presJson:
+                pres += "Yuzey Detay: "+ a['YuzeyDetay'] +",  Boy: "+ a['YuzeyPresBoy']
+                Sayac += 1
+                if Sayac != len(presJson):
+                    pres += "; "
+            i['YuzeyPres'] = pres
+
+        if i['YuzeyEloksal'] != '': 
+            eloksalJson = json.loads(i['YuzeyEloksal'])
+            Sayac = 0
+            eloksal = ""
+            for a in eloksalJson:
+                eloksal += "Matlaştırma: "+ a['Matlastirma'] + ",  Renk: "+ a['Renk'] + ",  Kaplama Kalınlığı: "+ a['KaplamaKalinligi'] +",  Boy: "+ a['EloksalBoy']+ ",  "+ a['EloksalTemizKesim']
+                Sayac += 1
+                if Sayac != len(eloksalJson):
+                    eloksal += "; "
+            i['YuzeyEloksal'] = eloksal
+
+        if i['YuzeyBoya'] != '': 
+            boyaJson = json.loads(i['YuzeyBoya'])
+            Sayac = 0
+            boya = ""
+            for a in boyaJson:
+                boya += "Tür: "+ a['Tur']+ ",  Marka: "+ a['Marka']+ ",  Renk Kodu: "+ a['MarkaRenkKodu']+ ",  Class: "+ a['BoyaClass']+ ",  RAL: "+ a['Ral']+ ",  Kalınlık: "+ a['BoyaKalinlik']+ ",  Boy: "+ a['BoyaBoy']+ ",  "+ a['BoyaTemizKesim']
+                Sayac += 1
+                if Sayac != len(boyaJson):
+                    boya += "; "
+            i['YuzeyBoya'] = boya
+
+        if i['YuzeyAhsap'] != '': 
+            ahsapJson = json.loads(i['YuzeyAhsap'])
+            Sayac = 0
+            ahsap = ""
+            for a in ahsapJson:
+                ahsap += "Ahşap Kaplama: "+ a['AhsapKaplama']+ ",  Boy: "+ a['AhsapBoy']+ ",  "+ a['AhsapTemizKesim']
+                Sayac += 1
+                if Sayac != len(ahsapJson):
+                    ahsap += ";  "
+            i['YuzeyAhsap'] = ahsap
 
     #liste şeklinde gidecek verileri düzelt
     data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
