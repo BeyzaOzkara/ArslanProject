@@ -1176,13 +1176,12 @@ def yudaDetail(request, yId):
     yudaComments = getComments("YudaForm", yId)
     comments = json.dumps(list(yudaComments), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     #yorum dosyalarını yorumlara nasıl bağlamalıyım? dosyalarını ayrı mı bağlamalıyım
-
+    print(comments)
     yudaDetails = YudaForm.objects.filter(id = yId).values()
 
     yList = list(yudaDetails)
     for i in yList:
         i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
-        print(i)
         if i['AlasimKondusyon'] != '': 
             alasimJson = json.loads(i['AlasimKondusyon'])
             alasim = ""
