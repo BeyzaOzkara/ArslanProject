@@ -1078,7 +1078,7 @@ def yuda_kaydet(request):
             today = datetime.datetime.now().strftime('%j')
             year = datetime.datetime.now().strftime('%y')
             y = YudaForm()
-            y.YudaNo = "YUDA-"+year+"-"+today+"-NN"
+            y.YudaNo = year+"-"+today+"-NN" #aynı günün kaçıncı numarası
             y.ProjeYoneticisi = request.user
 
             for key, value in request.POST.items():
@@ -1112,33 +1112,6 @@ def yuda_kaydet(request):
             response.status_code = 500 #server error
 
     return response
-    
-    """ 
-        MusteriFirmaAdi
-        SonKullaniciFirma
-        KullanımAlani
-        CizimNo
-
-        ProfilSiparisi #YillikProfilSiparisi +" kg/"+ ProfilSip
-
-        MusteriOdemeVadesi
-        AlasimKondusyon
-        DinTolerans
-        BirlikteCalisan
-        MetreAgirlikTalebi
-        MATmin
-        MATmax
-        OnemliOlculer
-
-        YuzeyPres
-        YuzeyEloksal
-        YuzeyBoya
-        YuzeyAhsap
-        
-        TalasliImalat
-        TalasliImalatAciklama
-        Paketleme
-        PaketlemeAciklama """
         
 
 class YudasView(generic.TemplateView):
@@ -1149,7 +1122,7 @@ def yudas_list(request):
     for i in params:
         value = params[i]
         print("Key and Value pair are ({}) = ({})".format(i, value))
-    size = params.get("size", 10)  # Default size to 10
+    size = params.get("size", 7)  # Default size to 10
     offset, limit = calculate_pagination(params.get("page", 1), size)
     filter_list = params.get("filter", [])
     q = {}
@@ -1171,12 +1144,18 @@ def yudas_list(request):
 
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
+    users = User.objects.values()
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     yudaComments = getComments("YudaForm", yId)
-    comments = json.dumps(list(yudaComments), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     #yorum dosyalarını yorumlara nasıl bağlamalıyım? dosyalarını ayrı mı bağlamalıyım
-    print(comments)
+    yudaCList = list(yudaComments)
+    for c in yudaCList:
+        c['KullaniciAdi'] = list(users.filter(id=int(c['Kullanici_id'])))[0]["first_name"] + " " + list(users.filter(id=int(c['Kullanici_id'])))[0]["last_name"]
+        c['Tarih'] = c['Tarih'].strftime("%d-%m-%Y %H:%M:%S")
+        c['cfiles'] = list(getFiles("Comment", c['id']))
+        
+    comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     yudaDetails = YudaForm.objects.filter(id = yId).values()
 
     yList = list(yudaDetails)
@@ -1239,8 +1218,37 @@ def yudaDetail(request, yId):
 
     #liste şeklinde gidecek verileri düzelt
     data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    print()
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
+
+def yudaDetailComment(request):
+    if request.method == 'POST':
+        try:
+            req = request.POST
+            c = Comment()
+            c.Kullanici = request.user
+            c.FormModel = "YudaForm"
+            c.FormModelId = (req['formID'])
+            c.Aciklama = req['yorum']
+
+            c.save()
+
+            for file in request.FILES.getlist('yfiles'):
+                UploadFile.objects.create(
+                    File = file,
+                    FileModel = "Comment",
+                    FileModelId = c.id,
+                    UploadedBy = c.Kullanici,
+                    Note = "",
+                )
+            response = JsonResponse({'message': 'Kayıt başarılı'})
+        except json.JSONDecodeError:
+            response = JsonResponse({'error': 'Geçersiz JSON formatı'})
+            response.status_code = 500 #server error
+        except Exception as e:
+            response = JsonResponse({'error': str(e)})
+            response.status_code = 500 #server error
+
+    return response
 
 def getFiles(ref, mId):
     allFiles = UploadFile.objects.all()

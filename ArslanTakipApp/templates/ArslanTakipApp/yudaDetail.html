@@ -126,76 +126,16 @@
   <!-- yorumlar -->
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">Yorumlar</h3>
+      <h3 class="card-title">Paylaşılanlar</h3>
       <div class="card-tools">
         <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
           <i class="fas fa-minus"></i></button>
-        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Kaldır">
-          <i class="fas fa-times"></i></button>
       </div>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-12" id="yorumCol">
-          <h4>Paylaşılanlar</h4>
-            <div class="post">
-              <div class="user-block">
-                <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                <span class="username">
-                  <a href="#">Deneme Kişi</a>
-                </span>
-                <span class="description">tarih ve saat</span>
-              </div>
-              <!-- /.user-block -->
-              <p>
-                Lorem ipsum represents a long-held tradition for designers,
-                typographers and the like. Some people hate it and argue for
-                its demise, but others ignore.
-              </p>
-
-              <p>
-                <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v2</a>
-              </p>
-            </div>
-
-            <div class="post clearfix">
-              <div class="user-block">
-                <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
-                <span class="username">
-                  <a href="#">Deneme 2</a>
-                </span>
-                <span class="description">tarih ve saat</span>
-              </div>
-              <!-- /.user-block -->
-              <p>
-                Lorem ipsum represents a long-held tradition for designers,
-                typographers and the like. Some people hate it and argue for
-                its demise, but others ignore.
-              </p>
-              <p>
-                <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 2</a>
-              </p>
-            </div>
-
-            <div class="post">
-              <div class="user-block">
-                <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                <span class="username" style="color: blue;">
-                  Deneme 3
-                </span>
-                <span class="description">tarih ve saat</span>
-              </div>
-              <!-- /.user-block -->
-              <p>
-                Lorem ipsum represents a long-held tradition for designers,
-                typographers and the like. Some people hate it and argue for
-                its demise, but others ignore.
-              </p>
-
-              <p>
-                <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
-              </p>
-            </div>
+            
         </div>
       </div>
     </div>
@@ -205,16 +145,21 @@
     <div class="card-header">
       <h3 class="card-title">Yorum Yap</h3>
       <div class="card-tools">
-        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
           <i class="fas fa-minus"></i></button>
-        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
-          <i class="fas fa-times"></i></button>
       </div>
     </div>
-    <div class="card-body">
+    <div class="card-body" id="yorumCard">
       <!-- textarea -->
       <textarea name="yorumText" class="form-control" id="yorumText" placeholder=" . . . " cols="30" rows="10"></textarea>
-      <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylaş()">Paylaş</button>
+      <!-- <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+      <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label> -->
+      <label for="yorumFile" style="cursor: pointer;">
+        <i class="fas fa-link ml-1 mr-2"></i>
+        <input type="file" id="yorumFile" style="display: none" name="image" multiple data-original-title="upload files">
+      </label>
+      <label class="overflow" id="yorumLabel"></label>
+      <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
     </div>
   </div>
 </div>
@@ -225,7 +170,7 @@
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
-  console.log(data);
+  console.log(comments);
 
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
@@ -239,8 +184,6 @@
           <h5 class="card-title mr-2 ml-2"> | </h5>
           <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
             <i class="fas fa-minus"></i></button>
-          <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Kaldır">
-            <i class="fas fa-times"></i></button>
         </div>
       `);
     cardYuda.append(yudaHeader);
@@ -267,7 +210,7 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">ALAŞIM VE KONDÜSYON</span>
-                <span class="info-box-number text-center text-muted mb-0" style="overflow: auto">${i.AlasimKondusyon}</span>
+                <span class="info-box-number text-center text-muted mb-0" style="overflow: auto">${i.AlasimKondusyon || " - - "}</span>
               </div>
             </div>
           </div>
@@ -341,49 +284,101 @@
     files.forEach(f => {
       const yudaDosya = $('<li style="font-size:1.5em"></li>').html(`
             <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a> <!-- dosya uzantılarına göre icon getir -->
-            <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>  
+            <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
       `);
       dosyaList.append(yudaDosya);
     });
-    
-
 
 
   };
 
   const yorumCol = $('#yorumCol');
-  function loadComments() {
+  function LoadComments() {
     yorumCol.empty();
     comments.forEach(c => {
       const yorumlar = $('<div class="post"></div>').html(`
-          <div class="post">
             <div class="user-block">
               <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
               <span class="username" style="color: blue;">
-                Deneme 3
+                ${c.KullaniciAdi}
               </span>
-              <span class="description">tarih ve saat</span>
+              <span class="description">${c.Tarih}</span>
             </div>
             <!-- /.user-block -->
             <p>
-              Lorem ipsum represents a long-held tradition for designers,
-              typographers and the like. Some people hate it and argue for
-              its demise, but others ignore.
+              ${c.Aciklama}
             </p>
-
-            <p>
-              <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
-            </p>
-          </div>
-      `); /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
+      `);
+      c.cfiles.forEach(cf => {
+        const cfiles = $('<p></p>').html(`
+              <a href="/media/${cf.File}" target="_blank" class="link-black text-sm"><i class="fas fa-link mr-1"></i>  ${cf.File.substring(6)}</a>
+        `);
+        yorumlar.append(cfiles);
+      });
+      
+      /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
       yorumCol.append(yorumlar);
       
     });
     
   }
+  
+  var selectedFiles = [];
+  $('#yorumFile').on('change', function(e) {
+      Array.from(e.target.files).forEach(function(newFile) {
+          if (!fileAlreadySelected(newFile)) {
+              selectedFiles.push(newFile);
+          }
+      });
+      console.log(selectedFiles);
+      updateFileList();
+  });
 
+  function fileAlreadySelected(newFile) {
+      return selectedFiles.some(function(existingFile) {
+          return newFile.name === existingFile.name && newFile.size === existingFile.size;
+      });
+  };
+
+  function updateFileList() {
+    /* file isimlerini al ve labele yazdır */ 
+    var yorumFileList = "";
+    selectedFiles.forEach(function(elm, index, array) {
+      index != array.length - 1 ? yorumFileList += elm.name + "  |  " : yorumFileList += elm.name;
+    });
+    $('#yorumLabel').text(yorumFileList);
+  };
+
+  function yorumPaylas(){
+    
+    var yorumData = new FormData();
+    yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    yorumData.append("formID", data[0].id);
+    yorumData.append("yorum", $('#yorumText').val());
+    selectedFiles.forEach(function(file) {
+      yorumData.append('yfiles', file);
+    });
+    
+    $.ajax({
+            url: '/yudaDetailComment',
+            type: 'POST',
+            data: yorumData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                // Başarılı yükleme sonrası işlemler
+                window.location.reload();
+            },
+            error: function(response) {
+                // Hata durumunda işlemler
+                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+            }
+    });
+
+  };
 
   LoadDetail();
+  LoadComments();
 
 </script>
 {% endblock %}
