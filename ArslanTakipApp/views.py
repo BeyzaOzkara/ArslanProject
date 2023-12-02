@@ -1216,7 +1216,6 @@ def yudaDetail(request, yId):
                     ahsap += ";  "
             i['YuzeyAhsap'] = ahsap
 
-    #liste şeklinde gidecek verileri düzelt
     data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
@@ -1229,7 +1228,6 @@ def yudaDetailComment(request):
             c.FormModel = "YudaForm"
             c.FormModelId = (req['formID'])
             c.Aciklama = req['yorum']
-
             c.save()
 
             for file in request.FILES.getlist('yfiles'):
@@ -1240,6 +1238,7 @@ def yudaDetailComment(request):
                     UploadedBy = c.Kullanici,
                     Note = "",
                 )
+            
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
