@@ -19,6 +19,11 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %} ">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %} ">
 
+  <style>
+    .hide {
+      display: none;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -170,7 +175,7 @@
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
-  console.log(files);
+  
 
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
@@ -271,7 +276,15 @@
         <p class="text-muted">${i.YudaNo} ile ilişkili dosyalar</p>
         <br>
         <h5 class="text-muted">Proje dosyaları</h5>
-        <ul class="list-unstyled" id="dosyaList">
+        <ul class="list-unstyled" id="dosyaList"">
+          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Teknik Resim</li>
+          <ul class="list-unstyled dosyalar hide" id="teknik"></ul>
+          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Şartname</li>
+          <ul class="list-unstyled dosyalar hide" id="sart"></ul>
+          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Paketleme Talimatı</li>
+          <ul class="list-unstyled dosyalar hide" id="paket"></ul>
+          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
+          <ul class="list-unstyled dosyalar hide" id="digerDos"></ul>
         </ul>
       </div>
       
@@ -281,17 +294,54 @@
     cardYuda.append(yudaBody);
 
     const dosyaList = $('#dosyaList');
+    const teknikList = $('#teknik');
+    const sartList = $('#sart');
+    const paketList = $('#paket');
+    const digerDosList = $('#digerDos');
+    
     files.forEach(f => {
-      const yudaDosya = $('<li style="font-size:1.5em"></li>').html(`
+      if (f.FileTitle == "Teknik Resim") {
+        const teknikDos = $('<li style="font-size:1.5em"></li>').html(`
+              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
+            <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+        `);
+        teknikList.append(teknikDos);
+      }
+      else if(f.FileTitle == "Şartname") {
+        const sartDos = $('<li style="font-size:1.5em"></li>').html(`
+              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+        `);
+        sartList.append(sartDos);
+      }
+      else if (f.FileTitle == "Paketleme Talimatı") {
+        const paketDos = $('<li style="font-size:1.5em"></li>').html(`
+              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+        `);
+        paketList.append(paketDos);
+      }
+      else {
+        const digerDos = $('<li style="font-size:1.5em"></li>').html(`
+              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
+              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+        `);
+        digerDosList.append(digerDos);
+      }
+      /* const yudaDosya = $('<li style="font-size:1.5em"></li>').html(`
             <label>${f.FileTitle}</label>
+            <br>
             <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
             <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
       `);
-      dosyaList.append(yudaDosya);
+      dosyaList.append(yudaDosya); */
     });
 
-
   };
+
+  function dosyaFunc(e) {
+    $(e).next('ul').toggle();
+  }
 
   const yorumCol = $('#yorumCol');
   function LoadComments() {
@@ -322,7 +372,9 @@
       
     });
     
-  }
+  };
+
+  
   
   var selectedFiles = [];
   $('#yorumFile').on('change', function(e) {
