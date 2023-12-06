@@ -1142,6 +1142,10 @@ def yudas_list(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+def yuda_edit(request, yId):
+    
+    return
+
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     users = User.objects.values()

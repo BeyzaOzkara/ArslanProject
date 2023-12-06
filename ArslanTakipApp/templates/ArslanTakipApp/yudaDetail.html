@@ -18,10 +18,22 @@
   <!-- Select2 -->
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %} ">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %} ">
-
+  <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
   <style>
     .hide {
       display: none;
+    }
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
+    .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
+    .overflow {
+        display: block;
+        white-space: nowrap;
+        width: 120px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
   </style>
 {% endblock %}
@@ -103,22 +115,6 @@
               <a href="" class="btn-link text-secondary mr-1"><!-- <span class="fiv-cla fiv-icon-${fileType} border-right-0 rounded-left"></span> --><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a> <!-- dosya uzantılarına göre icon getir -->
               <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
-            <li>
-              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-            </li>
-            <li>
-              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-            </li>
-            <li>
-              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-image "></i> Logo.png</a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-            </li>
-            <li>
-              <a href="" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-            </li>
           </ul>
           
         </div>
@@ -155,15 +151,29 @@
       </div>
     </div>
     <div class="card-body" id="yorumCard">
-      <!-- textarea -->
-      <textarea name="yorumText" class="form-control" id="yorumText" placeholder=" . . . " cols="30" rows="10"></textarea>
-      <!-- <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
-      <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label> -->
-      <label for="yorumFile" style="cursor: pointer;">
-        <i class="fas fa-link ml-1 mr-2"></i>
+      <div class="row">
+        <div class="col-12" id="yorumTextCol">
+          <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
+                          style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+        </div>
+        <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="display: none;">
+          <div class="input-group">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+            </div>
+            <div class="input-group-append">
+                <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+            </div>
+        </div>
+        <div id="fileTitles" class="form-group"></div>
+        </div>
+      </div>
+      <!-- <label for="yorumFile" style="cursor: pointer;">
         <input type="file" id="yorumFile" style="display: none" name="image" multiple data-original-title="upload files">
-      </label>
-      <label class="overflow" id="yorumLabel"></label>
+      </label> -->
+      <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
+      <label class="overflow" id="yorumLabel"></label> <!-- yuda eklerkenki gibi birr dosya ekleme yap -->
       <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
     </div>
   </div>
@@ -175,7 +185,6 @@
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
-  
 
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
@@ -202,7 +211,7 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content" id="siparisDiv">
                 <span class="info-box-text text-center text-muted">SİPARİŞ</span>
-                <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi}</span>
+                <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi || " - - "}</span>
                 <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
                 <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
                 <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
@@ -223,9 +232,9 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">TOLERANSLAR</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.DinTolerans}<span>
-                <span class="info-box-number text-center text-muted mb-0">${i.BirlikteCalisan}<span>
-                <span class="info-box-number text-center text-muted mb-0">Metre Ağırlık Talebi ${i.MetreAgirlikTalebi}<span>
+                <span class="info-box-number text-center text-muted mb-0">${i.DinTolerans || " - - "}<span>
+                <span class="info-box-number text-center text-muted mb-0">${i.BirlikteCalisan || " - - "}<span>
+                <span class="info-box-number text-center text-muted mb-0">Metre Ağırlık Talebi ${i.MetreAgirlikTalebi || " - - "}<span>
                 <span class="info-box-number text-center text-muted mb-0">Önemli Ölçüler: ${i.OnemliOlculer || " - - "}<span>
               </div>
             </div>
@@ -256,7 +265,7 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">TALAŞLI İMALAT</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat} <br> Açıklama: ${i.TalasliImalatAciklama || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat || " - - "} <br> Açıklama: ${i.TalasliImalatAciklama || " - - "}</span>
               </div>
             </div>
           </div>
@@ -264,7 +273,7 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">PAKETLEME</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.Paketleme} <br> Açıklama: ${i.PaketlemeAciklama || " - - "}<span>
+                <span class="info-box-number text-center text-muted mb-0">${i.Paketleme || " - - "} <br> Açıklama: ${i.PaketlemeAciklama || " - - "}<span>
               </div>
             </div>
           </div>
@@ -293,7 +302,6 @@
     `);
     cardYuda.append(yudaBody);
 
-    const dosyaList = $('#dosyaList');
     const teknikList = $('#teknik');
     const sartList = $('#sart');
     const paketList = $('#paket');
@@ -341,7 +349,7 @@
 
   function dosyaFunc(e) {
     $(e).next('ul').toggle();
-  }
+  };
 
   const yorumCol = $('#yorumCol');
   function LoadComments() {
@@ -374,25 +382,6 @@
     
   };
 
-  
-  
-  var selectedFiles = [];
-  $('#yorumFile').on('change', function(e) {
-      Array.from(e.target.files).forEach(function(newFile) {
-          if (!fileAlreadySelected(newFile)) {
-              selectedFiles.push(newFile);
-          }
-      });
-      console.log(selectedFiles);
-      updateFileList();
-  });
-
-  function fileAlreadySelected(newFile) {
-      return selectedFiles.some(function(existingFile) {
-          return newFile.name === existingFile.name && newFile.size === existingFile.size;
-      });
-  };
-
   function updateFileList() {
     /* file isimlerini al ve labele yazdır */ 
     var yorumFileList = "";
@@ -401,16 +390,88 @@
     });
     $('#yorumLabel').text(yorumFileList);
   };
+ 
+  function DosyaEkle() {
+    let changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";
+    document.getElementById('yorumTextCol').setAttribute("class", changedClass);
+    $('#dosyaEkleCol').show();
+  };
+  
+  var selectedFiles = [];
+  $('#fileInput').on('change', function(e) {
+    Array.from(e.target.files).forEach(function(newFile) {
+        if (!fileAlreadySelected(newFile)) {
+            selectedFiles.push(newFile);
+        }
+    });
+    updateFileList();
+  });
+
+  function fileAlreadySelected(newFile) {
+      return selectedFiles.some(function(existingFile) {
+          return newFile.name === existingFile.name && newFile.size === existingFile.size;
+      });
+  }
+
+  function updateFileList() {
+    var fileTitles = $('#fileTitles');
+    fileTitles.empty(); // Önceki başlık alanlarını temizle
+
+    var row = $('<div class="row"></div>');
+    fileTitles.append(row);
+
+    selectedFiles.forEach(function(file, index){
+        let fileType = file.name.split(".").pop().toLowerCase();
+        var column = $(
+            `<div class="col-md-6 mt-3">
+                <div class="mp-3 d-flex justify-content-between border rounded">
+                    <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                    <div class="p-1 flex-grow-1">
+                        <label class="overflow">${file.name}</label>
+                        <select class="form-control kaydet" name="fileTitles[]">
+                            <option value="Teknik Resim">Teknik Resim</option>
+                            <option value="Şartname">Şartname</option>
+                            <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                            <option value="Diger">Diğer</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index})">
+                        <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                    </button>
+                </div>
+            </div>`
+        );
+
+        row.append(column);
+
+        if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+            row = $('<div class="row"></div>');
+            fileTitles.append(row);
+        }
+    });
+
+  };
+
+  window.removeFile = function(index) {
+      selectedFiles.splice(index, 1);
+      updateFileList();
+  };
+
+  function DosyaTemizle(){
+      selectedFiles = [];
+      updateFileList();
+  };
 
   function yorumPaylas(){
-    
     var yorumData = new FormData();
+    var textareaValue = $('.textarea').summernote('code');
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", data[0].id);
-    yorumData.append("yorum", $('#yorumText').val());
+    yorumData.append("yorum", textareaValue);
     selectedFiles.forEach(function(file) {
       yorumData.append('yfiles', file);
     });
+    //dosya yüklerken önceki dosya yükleme gibi olmalı title işaretlenmeli
     
     $.ajax({
             url: '/yudaDetailComment',
@@ -433,6 +494,24 @@
   LoadDetail();
   LoadComments();
 
+  $(function () {
+    // Summernote
+    $('.textarea').summernote({
+      height:200,
+      toolbar: [
+        ['misc', ['undo', 'redo']],
+        ['style', ['bold', 'italic', 'underline']],
+        ['font', ['superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table'],
+      ]
+    });
+    
+  });
+
 </script>
 {% endblock %}
 
@@ -442,4 +521,6 @@
 <script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- Summernote -->
+<script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
 {% endblock %}
