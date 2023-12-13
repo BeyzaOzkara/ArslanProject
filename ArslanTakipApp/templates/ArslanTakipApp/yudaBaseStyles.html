@@ -1,0 +1,29 @@
+{% load static %}
+
+{% block styles %}
+<style>
+  .toast-orta-center { 
+      top: 30%;   
+      margin: 0 auto;  
+      left: 50%;   
+      margin-left: -150px;
+  }
+  .toast-title {
+      font-size: x-large;
+  }
+  .toast-message {
+      font-size: x-large;
+  }
+  .custom-file-input ~ .custom-file-label::after {
+      content: "Gözat";
+  }
+  .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
+  .overflow {
+      display: block;
+      white-space: nowrap;
+      width: 250px; 
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+</style>
+{% endblock %}

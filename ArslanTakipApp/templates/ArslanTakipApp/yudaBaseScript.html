@@ -1,0 +1,488 @@
+{% load static %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* is template is used with yuda/yId or used with yudaEdit/yId */
+    var formData = new FormData();
+    var full = false;
+    function changeFunction () {
+        let requiredElements = document.getElementById("yudaForm").querySelectorAll("[required]");
+            let req = 0;
+            for(var i = 0; i < requiredElements.length; i++) {
+                if (requiredElements[i].validity.valid){
+                    req++;
+                }
+            }
+            let yuzde = req*100/requiredElements.length;
+            if (yuzde <= 100){
+                yuzde = 100;
+            }
+            document.getElementById('kaydetProgress').style.width = yuzde +'%';
+            if(yuzde >= 100 ){
+                if(full == false){
+                    setTimeout(function(){
+                    document.getElementById('kaydetProgress').style.width = '0%';
+                    setTimeout(function(){$('#yudaKaydet').show();
+                        document.getElementById('kaydetProgress').style.width = '100%';
+                    }, 600);
+
+                }, 600);
+                full = true;
+                };
+                
+            }
+            else {
+                $('#yudaKaydet').hide();
+                full = false;
+        }
+        
+    };
+
+    $(':input, .select').on('edit change', function(){changeFunction()});
+
+    $('.checkSpan').click(
+        function() {
+            var cb = $(this).find(":checkbox")[0];
+
+            if (!$(cb).attr("checked")) {
+                $(cb).attr("checked", "checked");
+                if(this.id=="metreSpan"){
+                    /* $('#matInputDiv').show(); */
+                    $('#minMAT, #maxMAT').show();
+                    $('#minMAT, #maxMAT').prop('required', true);
+                    changeFunction();
+                }
+            } else {
+                $(cb).removeAttr("checked");
+                if(this.id=="metreSpan"){
+                    /* $('#matInputDiv').hide(); */
+                    $('#minMAT, #maxMAT').hide();
+                    $('#minMAT, #maxMAT').prop('required', false);
+                    changeFunction();
+                }
+            }
+            
+        }
+    );
+
+    $('.checkSpan .temizCheckbox').click(
+        function(event){
+            event.stopPropagation();
+    });
+    
+    function toastClick(iconInput, titleInput, position){
+        toastr.remove();
+        toastr.options ={
+            "timeOut" : 2000,
+            "extendedTimeOut" : 0,
+            "progressBar" : true,
+            "showMethod" : 'slideDown',
+            "hideMethod" : 'slideUp',
+        }
+        var pos = {"":"toast-top-right", "oc":"toast-orta-center", "br":"toast-bottom-right", "tc":"toast-top-center"};
+        let posi = pos[position];
+
+        if(iconInput=="success"){
+            toastr.success(titleInput,"",{"positionClass": posi})
+        }
+        else if(iconInput=="info"){
+            toastr.info(titleInput,"BİLGİ",{"positionClass": posi})
+        }
+        else if(iconInput=="error"){
+            toastr.error(titleInput,"",{"positionClass": posi})
+        }
+        else if(iconInput=="warning"){
+            toastr.warning(titleInput,"DİKKAT",{"positionClass": posi})
+        }
+    }
+
+    var deleteIcon = function(cell, formatterParams, onRendered){ 
+        return "<i class='fa fa-trash'></i>";
+    };
+
+    var alasimTab = new Tabulator("#alasimTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1. Tercih üstte olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Alaşım", field:"Alasim"},
+            {title:"Kondüsyon", field:"Kondusyon"},
+            {title:"AlaşımID", field:"AlasimID", visible:false},
+            {title:"KondüsyonID", field:"KondusyonID", visible:false},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                cell.getRow().delete();
+                $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
+                if(alasimTab.getData().length == 0){
+                    $('#alasimTabData').prop('required', true);
+                }
+                changeFunction();
+            }
+            }
+        ],
+    });
+
+    var yuzeyPresTabulator = new Tabulator('#yuzeyPresTabulator', {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1.Tercih üstte olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Yüzey Detay", field:"YuzeyDetay"},
+            {title:"Boy", field:"YuzeyPresBoy"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                cell.getRow().delete();
+                $('#yPresTabData').val(yuzeyPresTabulator.getData());
+                checkNull();
+            }}
+        ]
+    });
+
+    var eloksalTabulator = new Tabulator("#eloksalTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1. Tercih üstte olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Matlaştırma", field:"Matlastirma"},
+            {title:"Renk", field:"Renk"},
+            {title:"Kaplama Kalınlığı", field:"KaplamaKalinligi"},
+            {title:"Boy", field:"EloksalBoy"},
+            {title:"Temiz Kesim", field:"EloksalTemizKesim"},
+            {title:"Matlaştırma ID", field:"MatlastirmaID", visible:false},
+            {title:"Renk ID", field:"RenkID", visible:false},
+            {title:"Kaplama Kalınlığı ID", field:"KaplamaKalinligiID", visible:false},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                cell.getRow().delete();
+                $('#yEloksalTabData').val(eloksalTabulator.getData());
+                checkNull();
+            }}
+        ]
+    });
+
+    var yuzeyBoyaTabulator = new Tabulator("#yuzeyBoyaTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1. Tercih üste olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Tür", field:"Tur"},
+            {title:"Marka", field:"Marka"},
+            {title:"Class", field:"BoyaClass"},
+            {title:"Marka Renk Kodu", field:"MarkaRenkKodu"},
+            {title:"RAL", field:"Ral"},
+            {title:"Tür ID", field:"TurID", visible:false},
+            {title:"Marka ID", field:"BoyaMarkaID", visible:false},
+            {title:"Kalınlık", field:"BoyaKalinlik"},
+            {title:"Kalınlık ID", field:"BoyaKalinlikID", visible:false},
+            {title:"Boy", field:"BoyaBoy"},
+            {title:"Temiz Kesim", field:"BoyaTemizKesim"},
+            {title:"Açıklama", field:"BoyaAciklama"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                cell.getRow().delete();
+                $('#yBoyaTabData').val(yuzeyBoyaTabulator.getData());
+                checkNull();
+            }}
+        ]
+    });
+
+    var ahsapKaplamaTabulator = new Tabulator("#ahsapKaplamaTabulator", {
+        layout:"fitColumns",
+        data:[],
+        movableRows:true,
+        placeholder:"1. Tercih üste olacak şekilde sıralayınız",
+        columns:[
+            {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+            {title:"Ahşap Kaplama", field:"AhsapKaplama"},
+            {title:"Ahşap Kaplama ID", field:"AhsapKaplamaID", visible:false},
+            {title:"Boy", field:"AhsapBoy"},
+            {title:"Temiz Kesim", field:"AhsapTemizKesim"},
+            {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
+                cell.getRow().delete();
+                $('#yAhsapTabData').val(ahsapKaplamaTabulator.getData());
+                checkNull();
+            }}
+        ]
+    });
+
+    function checkNull(){
+        if(ahsapKaplamaTabulator.getData().length == 0 && yuzeyBoyaTabulator.getData().length == 0 && eloksalTabulator.getData().length == 0 && yuzeyPresTabulator.getData().length == 0){
+            $('#yAhsapTabData, #yEloksalTabData, #yPresTabData, #yBoyaTabData').prop('required', true);
+        }
+        else{
+            $('#yAhsapTabData, #yEloksalTabData, #yPresTabData, #yBoyaTabData').removeAttr('required');
+        }
+        changeFunction();
+    }
+
+    $('#metreCheck').on('change.bootstrapSwitch', function(e) {
+        let metreC = e.target.checked;
+        if (!metreC){
+            $('#minMAT, #maxMAT').attr('disabled', 'disabled');
+        }
+        else {
+            $('#minMAT, #maxMAT').removeAttr('disabled');
+        }
+    });
+
+
+    function digerFunction(selectId, digerId){
+        $('#'+selectId).hide();
+        if(selectId.includes('Select')){
+            $('#'+selectId).val(selectId+'ed');
+        };
+        $('#'+digerId).show();
+    }; /* texti kapatmak için de bunu çağır */
+
+    function selectFunction(objId, target, title, diger) {
+        if (objId == 0){
+            if(target != ""){
+                selectFunction(target, target, title, "Diğer");
+            }
+                $('#'+ title+'Div').show();
+        }else{
+            if ($('#'+ title+'Div').is(':visible')){
+                $('#'+ title+'Diger').val("");
+                $('#'+ title+'Div').hide();
+            }
+            if(target != "") {
+                    $.ajax({
+                    url: `/yuda/${objId}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (Data) {
+                        $('#'+target+'ed').nextAll().remove();
+                        
+                        $.each(Data, function(key, value) {
+                            $('#'+target+'').append('<option value=' + value.id + '>' + value.Isim + '</option>');
+                        });
+                        if(diger){
+                            $('#'+target+'').append('<option value="0">'+ diger +'</option>')
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error loading select data:', error);
+                    }
+                });
+            }
+        }
+    };
+
+    selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
+    selectFunction(20, "matlastirmaSelect", "Matlaştırma", "");
+    selectFunction(59,"eloksalKaplamaKalinligiSelect", "Kaplama Kalınlığı", "");
+    selectFunction(67, "turSelect", "Tür", "");
+    selectFunction(73, "ahsapKaplamaSelect", "Ahşap Kaplama", "Diğer");
+    selectFunction(106, "boyaKalinlikSelect", "Boya Kalınlık", "");
+    selectFunction(112, "boyaMarkaSelect", "Marka", "Diğer");
+    /* bütün selectler için arraya alıp for yap */
+    /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
+
+    document.getElementById("AlasimKondusyonEkle").addEventListener("click", function(){
+        /* AlaşımDiger ve KondüsyonDigeri arraye alıp for döndürüp tek if else ile yapılabilir */
+        let alasimID, kondusyonID, alasim, kondusyon = "";
+        if (document.getElementById("alasimDigerDiv").style.display == "none") {
+            alasimID = $('#alasimSelect').val();
+            alasim = $('#alasimSelect option:selected').text();
+        }
+        else {
+            alasim =$('#alasimDiger').val();
+        }
+        if(document.getElementById("kondusyonDigerDiv").style.display == "none"){
+            kondusyonID = $('#kondusyonSelect').val();
+            kondusyon = $('#kondusyonSelect option:selected').text();
+        }
+        else {
+            kondusyon = $('#kondusyonDiger').val();
+        }
+        if(alasim!="Alaşım " && kondusyon!="Kondüsyon "){
+            alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
+            $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
+            $('#alasimTabData').removeAttr('required');
+            changeFunction();
+        }
+    });
+
+    document.getElementById("YuzeyPresEkle").addEventListener("click", function(){
+        let yPresSelect, yPresBoy = "";
+        if($('#yuzeyPresSelect').val() != null && $('#yuzeyPresBoy').val()!=""){
+            yPresSelect = $('#yuzeyPresSelect').val();
+            yPresBoy = $('#yuzeyPresBoy').val();
+
+            yuzeyPresTabulator.addData({YuzeyDetay:yPresSelect, YuzeyPresBoy:yPresBoy}, false);
+            $('#yPresTabData').val(JSON.stringify(yuzeyPresTabulator.getData()));
+            checkNull();
+        }
+    });
+
+    document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
+        let matlastirma, renk, kalinlik, eBoy, eTemiz, matlastirmaId, renkId, kalinlikId = "";
+        if($('#matlastirmaSelect').val() != null && $('#eloksalRenkSelect').val() != null && $('#eloksalKaplamaKalinligiSelect').val() != null && $('#eloksalBoy').val()!=""){
+            matlastirma = $('#matlastirmaSelect option:selected').text();
+            renk =  $('#eloksalRenkSelect option:selected').text();
+            kalinlik =  $('#eloksalKaplamaKalinligiSelect option:selected').text();
+            eBoy = $('#eloksalBoy').val();
+            if($('#eloksalTemiz').is(':checked')){
+                eTemiz = "Temiz Kesim";
+            }
+            else{
+                eTemiz = "Temiz Kesim Değil";
+            }
+            matlastirmaId = $('#matlastirmaSelect').val();
+            renkId =  $('#eloksalRenkSelect').val();
+            kalinlikId =  $('#eloksalKaplamaKalinligiSelect').val();
+            eloksalTabulator.addData({Matlastirma:matlastirma, Renk:renk, KaplamaKalinligi:kalinlik, EloksalBoy:eBoy, EloksalTemizKesim:eTemiz, MatlastirmaID:matlastirmaId, RenkID: renkId, KaplamaKalinligiID:kalinlikId}, false);
+            $('#yEloksalTabData').val(JSON.stringify(eloksalTabulator.getData()));
+            checkNull();
+        }
+    });
+
+    document.getElementById("YuzeyBoyaEkle").addEventListener("click", function(){
+        let boyaMarka, boyaMarkaID, bTemiz, boyaKalinlik, boyaKalinlikID = "";
+        if(document.getElementById("boyaMarkaDiger").style.display == "none"){
+            boyaMarka = $('#boyaMarkaSelect option:selected').text();
+            boyaMarkaID = $('#boyaMarkaSelect').val();
+        }
+        else{
+            boyaMarka = $('#boyaMarkaDiger').val();
+        }
+        if($('#boyaTemiz').is(':checked')){
+            bTemiz = "Temiz Kesim";
+        }
+        else{
+            bTemiz = "Temiz Kesim Değil";
+        }
+        if($('#boyaKalinlikSelect').val() != null){
+            boyaKalinlik = $('#boyaKalinlikSelect option:selected').text();
+            boyaKalinlikID = $('#boyaKalinlikSelect').val();
+        }
+        if($('#RALinput').val() != "" && $('#boyaBoy').val() != "" && $('#turSelect').val() != null){
+            yuzeyBoyaTabulator.addData({Tur: $('#turSelect option:selected').text(), TurID: $('#turSelect').val(), Marka: boyaMarka, MarkaID: boyaMarkaID, BoyaClass:$('#boyaClassSelect option:selected').text(), 
+            MarkaRenkKodu: $('#markaRenkKodu').val(), Ral:$('#RALinput').val(), BoyaKalinlik: boyaKalinlik, BoyaKalinlikID: boyaKalinlikID, 
+            BoyaBoy:$('#boyaBoy').val(), BoyaTemizKesim:bTemiz, BoyaAciklama: $('#boyaAciklama').val()}, false);
+            $('#yBoyaTabData').val(JSON.stringify(yuzeyBoyaTabulator.getData()));
+            checkNull();
+        }
+    });
+
+    document.getElementById("ahsapKaplamaEkle").addEventListener('click', function(){
+        let ahsapKaplama, ahsapKaplamaId, aTemiz = "";
+        if($('#ahsapTemiz').is(':checked')){
+            aTemiz = "Temiz Kesim";
+        }
+        else{
+            aTemiz = "Temiz Kesim Değil";
+        };
+        if(document.getElementById("ahsapKaplamaDigerDiv").style.display == "none"){
+            ahsapKaplama = $('#ahsapKaplamaSelect option:selected').text();
+            ahsapKaplamaID = $('#ahsapKaplamaSelect').val();
+        }
+        else{
+            ahsapKaplama = $('#ahsapKaplamaDiger').val();
+        }
+        if(ahsapKaplama != "" && ahsapKaplama != "Ahşap Kaplama" && $('#ahsapBoy').val() != ""){
+            ahsapKaplamaTabulator.addData({AhsapKaplama:ahsapKaplama, AhsapKaplamaID:ahsapKaplamaId, AhsapBoy:$('#ahsapBoy').val(), AhsapTemizKesim:aTemiz}, false);
+            $('#yAhsapTabData').val(JSON.stringify(ahsapKaplamaTabulator.getData()));
+            checkNull();
+        }
+    });
+
+
+    $('#RALinput').keyup(function() {
+        let defaultClass = "input-group-text ral"
+        if ($('#RALinput').val().length === 4 ) {
+            let ral = "input-group-text ral"+$('#RALinput').val();
+            document.getElementById('RALspan').setAttribute("class", ral)
+        }
+        else {
+            document.getElementById('RALspan').setAttribute("class", defaultClass);
+        }
+    });
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    });
+
+    $(document).ready(function () {
+        bsCustomFileInput.init();
+    });
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    });
+
+    var selectedFiles = [];
+    $('#fileInput').on('change', function(e) {
+        Array.from(e.target.files).forEach(function(newFile) {
+            if (!fileAlreadySelected(newFile)) {
+                selectedFiles.push(newFile);
+            }
+        });
+        updateFileList();
+    });
+
+    function fileAlreadySelected(newFile) {
+        return selectedFiles.some(function(existingFile) {
+            return newFile.name === existingFile.name && newFile.size === existingFile.size;
+        });
+    }
+
+    function updateFileList() {
+        var fileTitles = $('#fileTitles');
+        fileTitles.empty(); // Önceki başlık alanlarını temizle
+
+        var row = $('<div class="row"></div>');
+		fileTitles.append(row);
+
+        selectedFiles.forEach(function(file, index){
+            let fileType = file.name.split(".").pop().toLowerCase();
+            var column = $(
+                `<div class="col-md-6 mt-3">
+                    <div class="mp-3 d-flex justify-content-between border rounded">
+                        <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                        <div class="p-1 flex-grow-1">
+                            <label class="overflow">${file.name}</label>
+                            <select class="form-control kaydet" name="fileTitles[]">
+                                <option value="Teknik Resim">Teknik Resim</option>
+                                <option value="Şartname">Şartname</option>
+                                <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index})">
+                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                        </button>
+                    </div>
+                </div>`
+            );
+
+            row.append(column);
+
+            if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+                row = $('<div class="row"></div>');
+                fileTitles.append(row);
+            }
+        });
+
+    };
+
+    window.removeFile = function(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+    };
+
+    function DosyaTemizle(){
+        selectedFiles = [];
+        updateFileList();
+    };
+
+
+</script>
+{% endblock %}

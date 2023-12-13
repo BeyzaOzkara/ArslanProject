@@ -1,0 +1,180 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+<!-- daterange picker -->
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+<link rel="stylesheet" href="{% static 'ArslanTakipApp/raltohex-background.min.css' %}">
+<link rel="stylesheet" href="{% static 'ArslanTakipApp/raltohex-color.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/toastr/toastr.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
+  {% include 'ArslanTakipApp/yudaBaseStyles.html' %}
+  <style>
+    
+  </style>
+{% endblock %}
+{% block content %}
+
+{% include 'ArslanTakipApp/yudaBase.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+  var yudaData = JSON.parse('{{ yuda_json|escapejs }}');
+  var fileData = JSON.parse('{{ files_json|escapejs }}');
+
+  /* ilk açıldığında yudaData ve fileData gereken yerleri dolduracak. Kaydet butonu yine aynı şekilde mi yapmalıyım */
+
+  function loadPage() {
+    /* yudaData ve fileData ile eski dataları yerleştir. select radio checkbox nasl olacak tabulator nasıl olacak */
+    yudaData.forEach(y => {
+        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
+        console.log(y);
+        console.log(y["AlasimKondusyon"]);
+        for (let i = 0; i < formElements.length; i++) {
+            if(y[formElements[i].name] != "" && y[formElements[i].name] != null){
+                if (formElements[i].name == "AlasimKondusyon") {
+                    alasimTab.setData(y[formElements[i].name]);
+                    $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
+                }
+                else if (formElements[i].name == "YuzeyPres") {
+                    yuzeyPresTabulator.setData(y[formElements[i].name]);
+                    $('#yPresTabData').val(JSON.stringify(yuzeyPresTabulator.getData()));
+                }
+                else if (formElements[i].name == "YuzeyEloksal") {
+                    eloksalTabulator.setData(y[formElements[i].name]);
+                    $('#yEloksalTabData').val(JSON.stringify(eloksalTabulator.getData()));
+                }
+                else if (formElements[i].name == "YuzeyBoya") {
+                    yuzeyBoyaTabulator.setData(y[formElements[i].name]);
+                    $('#yBoyaTabData').val(JSON.stringify(yuzeyBoyaTabulator.getData()));
+                }
+                else if (formElements[i].name == "YuzeyAhsap") {
+                    ahsapKaplamaTabulator.setData(y[formElements[i].name]);
+                    $('#yAhsapTabData').val(JSON.stringify(ahsapKaplamaTabulator.getData()));
+                }
+                else {
+                    formElements[i].value = y[formElements[i].name] || ""; // select burada değişiyor mu değişmiyor, radio ya da checkbox değişiyor mu radio değişmiyor checkboxlar değişmiyor display none olanları değiştir show yap
+                // select radio ve checkboxlar nasıl olacak profil siparis modeli güncelledim başka eklenecek yer var mı 
+                // tabulatorlere nasıl eklemeliyim burada mı başka yerde mi yapmalıyım
+                }
+                checkNull();
+            }
+            
+        };
+
+        $('#birlikteCalisan').val(y.BirlikteCalisan);
+        $('#birlikteCalisan').trigger('change.select2'); // yukarıdaki gibi olmuyor bu yazdığım şekilde oluyor radio ve checkboxlar da muhtemelen böyle olacak
+    });
+    
+  };
+
+  loadPage();
+  document.querySelector("#yudaKaydet").addEventListener('click', function(){
+        var formData = new FormData();
+        formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+
+        selectedFiles.forEach(function(file) {
+            formData.append('files[]', file);
+        });
+
+        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
+        var values = {};
+        
+        for(let i = 0; i < formElements.length; i++) {
+          if (formElements[i].type == "radio") {
+              if($('#'+formElements[i].id).is(':checked')){
+                  values[formElements[i].name] = formElements[i].value;
+                  console.log(formElements[i].value);
+                  formData.append([formElements[i].name], formElements[i].value);
+              }
+          }
+          else if (formElements[i].type == "checkbox" ) {
+              if ($('#'+formElements[i].id).is(':checked')){
+                  if (formElements[i].name == "MetreAgirlikTalebi"){
+                      values[formElements[i].name] = "Var";
+                      formData.append([formElements[i].name], "Var");
+                  }
+                  else {
+                      values[formElements[i].name] = "Temiz Kesim";
+                      formData.append([formElements[i].name], "Temiz Kesim");
+                  };
+              }
+              else {
+                  if (formElements[i].name == "MetreAgirlikTalebi"){
+                      values[formElements[i].name] = "Yok";
+                      formData.append([formElements[i].name], "Yok");
+                  }
+                  else {
+                      values[formElements[i].name] = "Temiz Kesim Değil";
+                      formData.append([formElements[i].name], "Temiz Kesim Değil");
+                  };
+              }
+          }
+          else if (formElements[i].type == "select-multiple"){
+              let results = [];
+              let opt;
+              for (let j=0; j< formElements[i].options.length; j++){
+                  opt = formElements[i].options[j]
+                  if(opt.selected){results.push(opt.value);}
+              };
+              values[formElements[i].name] = results;
+              formData.append([formElements[i].name], results);
+          }
+          else{
+              values[formElements[i].name] = formElements[i].value;
+              formData.append([formElements[i].name], formElements[i].value);
+          }
+        };
+
+        $.ajax({ //yudachange viewine gönder nasıl dönecek gör
+          url: '/yudachange/'+yudaData[0].id,
+          type: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function(response) {
+              // Başarılı yükleme sonrası işlemler
+              alert('Değişiklikler başarıyla kaydedildi! '+response.message);
+          },
+          error: function(response) {
+              // Hata durumunda işlemler
+              alert('Değişiklikler kaydedilemedi. '+response.responseJSON.error);
+          }
+        });
+        
+
+    });
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/toastr/toastr.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+{% include 'ArslanTakipApp/yudaBaseScript.html' %}
+
+{% endblock %}

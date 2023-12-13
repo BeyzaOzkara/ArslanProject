@@ -587,6 +587,7 @@
 
 {% block extra_js %}
 <script>
+    /* is template is used with yuda/yId or used with yudaEdit/yId */
     var formData = new FormData();
     var full = false;
     function changeFunction () {
@@ -1120,7 +1121,6 @@
             }
         };
 
-
         $.ajax({
             url: '/yudakaydet',
             type: 'POST',
@@ -1137,33 +1137,6 @@
             }
         });
         
-        /* var filesList = document.getElementById('fileInput').files;
-        for ( var i = 0; i < filesList.length; i++) {
-            let name = filesList.item(i).name;
-            
-        };
-        
-        console.log("Created FormData, " + [...formData.keys()] + " keys in data");
-        console.log(values); */
-        
-        /* fileData = $('#fileInput').prop('files')[0];
-        formData = new FormData();
-        formData.append('file', fileData);
-        console.log("Created FormData, " + [...formData.keys()] + " keys in data"); */
-
-        /* $.ajax({
-            url: '/yudakaydet',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(){
-                alert("Kaydedildi!");
-            },
-            error: function (error) {
-            console.error('Error posting data:', error);
-            }
-        }); */
 
     });
 

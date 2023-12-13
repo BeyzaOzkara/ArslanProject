@@ -235,7 +235,8 @@ class YudaForm(models.Model):
     SonKullaniciFirma = models.CharField(null=True, blank=True)
     KullanımAlani = models.CharField(null=True, blank=True)
     CizimNo = models.CharField(null=True, blank=True)
-    ProfilSiparisi = models.CharField(null=True, blank=True)
+    ProfilSip = models.CharField(null=True, blank=True) #haftalık mı aylık mı yıllık mı sipariş
+    YillikProfilSiparisiMiktar = models.CharField(null=True, blank=True)
     MusteriOdemeVadesi = models.CharField(null=True, blank=True)
     AlasimKondusyon = models.JSONField(null=True, blank=True)
     DinTolerans = models.CharField(null=True, blank=True)

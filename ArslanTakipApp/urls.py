@@ -40,4 +40,6 @@ urlpatterns = [
     path('yudas/list' ,views.yudas_list),
     path('yudaDetail/<str:yId>', views.yudaDetail),
     path('yudaDetailComment', views.yudaDetailComment),
+    path('yudaEdit/<str:yId>', views.yudaEdit),
+    path('yudachange/<str:yId>', views.yudachange),
 ]
