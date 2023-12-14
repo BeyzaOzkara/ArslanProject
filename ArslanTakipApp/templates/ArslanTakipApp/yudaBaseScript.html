@@ -426,6 +426,7 @@
                 selectedFiles.push(newFile);
             }
         });
+        console.log(selectedFiles);
         updateFileList();
     });
 
@@ -434,6 +435,19 @@
             return newFile.name === existingFile.name && newFile.size === existingFile.size;
         });
     }
+
+    var deletedFileId = [];
+    function removeFile(id){
+        if($('.fileDeleteCheckbox').is(":checked")){
+            deletedFileId.push(id);
+        }
+        else {
+            var index = deletedFileId.indexOf(id);
+            if (index > -1) { // only splice array when item is found
+                sdata.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+    };
 
     function updateFileList() {
         var fileTitles = $('#fileTitles');
@@ -445,7 +459,8 @@
         selectedFiles.forEach(function(file, index){ 
             let fileName = file.name || file.File;
             let fileType = fileName.split(".").pop().toLowerCase();
-            console.log(file);
+            console.log("selectedForEach");
+            console.log(file); // icon yerine checkbox koy üstüne sil yaz checked olanların idlerini silinenler olarak formdataya kaydet
             var column = $(
                 `<div class="col-md-6 mt-3">
                     <div class="mp-3 d-flex justify-content-between border rounded">
@@ -458,13 +473,15 @@
                                 <option value="Paketleme Talimatı">Paketleme Talimatı</option>
                             </select>
                         </div>
-                        <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index})">
-                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
-                        </button>
+                        <span class="input-group-text">
+                            <input type="checkbox" class="fileDeleteCheckbox kaydet" name="FileDelete" id="fileDeleteCheckbox" onchange="removeFile(${file.id})">
+                        </span>
                     </div>
                 </div>`
             );
-
+            /* <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${file.id})">
+                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                        </button> */
             row.append(column);
 
             if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
@@ -475,10 +492,10 @@
 
     };
 
-    window.removeFile = function(index) {
+    /* window.removeFile = function(index) {
         selectedFiles.splice(index, 1);
         updateFileList();
-    };
+    }; */
 
     function DosyaTemizle(){
         selectedFiles = [];

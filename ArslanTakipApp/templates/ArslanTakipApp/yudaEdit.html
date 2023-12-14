@@ -80,9 +80,9 @@
                     }
                     else if (formElements[i].type == "checkbox") {
                         if (fieldValue === "Var" || fieldValue === "Temiz Kesim") {
-                            formElements[i].checked = true; // nasıl spana tıkladığımda istediğim şeyi yapmasını sağlarım
+                            formElements[i].checked = true;
                             if (fieldName == "MetreAgirlikTalebi") {
-                                /* check oluyor ama bu sefer de etrafındaki spana basınca uncheck olmuyor ama hide show hala çalışıyor */
+                                
                                 $("#metreCheckbox").attr("checked", "checked");
                                 $('#minMAT, #maxMAT').show();
                                 $('#minMAT, #maxMAT').prop('required', true);
@@ -103,53 +103,25 @@
         $('#birlikteCalisan').val(y.BirlikteCalisan);
         $('#birlikteCalisan').trigger('change.select2');
     });
-    /* yudaData.forEach(y => {
-        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-        for (let i = 0; i < formElements.length; i++) {
-            if(y[formElements[i].name] != "" && y[formElements[i].name] != null){
-                if (formElements[i].name == "AlasimKondusyon") {
-                    alasimTab.setData(y[formElements[i].name]);
-                    $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
-                }
-                else if (formElements[i].name == "YuzeyPres") {
-                    yuzeyPresTabulator.setData(y[formElements[i].name]);
-                    $('#yPresTabData').val(JSON.stringify(yuzeyPresTabulator.getData()));
-                }
-                else if (formElements[i].name == "YuzeyEloksal") {
-                    eloksalTabulator.setData(y[formElements[i].name]);
-                    $('#yEloksalTabData').val(JSON.stringify(eloksalTabulator.getData()));
-                }
-                else if (formElements[i].name == "YuzeyBoya") {
-                    yuzeyBoyaTabulator.setData(y[formElements[i].name]);
-                    $('#yBoyaTabData').val(JSON.stringify(yuzeyBoyaTabulator.getData()));
-                }
-                else if (formElements[i].name == "YuzeyAhsap") {
-                    ahsapKaplamaTabulator.setData(y[formElements[i].name]);
-                    $('#yAhsapTabData').val(JSON.stringify(ahsapKaplamaTabulator.getData()));
-                }
-                else {
-                    formElements[i].value = y[formElements[i].name] || ""; 
-                    // select burada değişiyor mu değişmiyor, radio ya da checkbox değişiyor mu radio değişmiyor checkboxlar değişmiyor display none olanları değiştir show yap
-                    // select radio ve checkboxlar nasıl olacak profil siparis modeli güncelledim başka eklenecek yer var mı 
-                }
-                checkNull();
-            }
-            
-        };
-
-        $('#birlikteCalisan').val(y.BirlikteCalisan);
-        $('#birlikteCalisan').trigger('change.select2'); // yukarıdaki gibi olmuyor bu yazdığım şekilde oluyor radio ve checkboxlar da muhtemelen böyle olacak
-    });
-     */
   };
 
   loadPage();
   document.querySelector("#yudaKaydet").addEventListener('click', function(){
         var formData = new FormData();
         formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+        sFiles = [];
         selectedFiles.forEach(function(file) {
-            formData.append('files[]', file);
+            if(file.File){
+                sFiles.push(JSON.stringify(file));
+            }
+            else {
+                formData.append('files', file);
+            }
         });
+        formData.append('uploadedFiles', sFiles); //eğer silinenlerin idlerini gönderceksek dosyaları bu şekilde göndermeye gerek yok
+
+        console.log(deletedFileId);
+        formData.append('deletedId', deletedFileId);
 
         const formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
 
@@ -177,51 +149,10 @@
             }
         });
 
-
-        /* for(let i = 0; i < formElements.length; i++) {
-          if (formElements[i].type == "radio") {
-              if($('#'+formElements[i].id).is(':checked')){
-                  console.log(formElements[i].value);
-                  formData.append([formElements[i].name], formElements[i].value);
-              }
-          }
-          else if (formElements[i].type == "checkbox" ) {
-              if ($('#'+formElements[i].id).is(':checked')){
-                  if (formElements[i].name == "MetreAgirlikTalebi"){
-                      formData.append([formElements[i].name], "Var");
-                  }
-                  else {
-                      formData.append([formElements[i].name], "Temiz Kesim");
-                  };
-              }
-              else {
-                  if (formElements[i].name == "MetreAgirlikTalebi"){
-                      formData.append([formElements[i].name], "Yok");
-                  }
-                  else {
-                      formData.append([formElements[i].name], "Temiz Kesim Değil");
-                  };
-              }
-          }
-          else if (formElements[i].type == "select-multiple"){
-              let results = [];
-              let opt;
-              for (let j=0; j< formElements[i].options.length; j++){
-                  opt = formElements[i].options[j]
-                  if(opt.selected){results.push(opt.value);}
-              };
-              formData.append([formElements[i].name], results);
-          }
-          else{
-              formData.append([formElements[i].name], formElements[i].value);
-          }
-        }; */
-
-
         // Log FormData content before posting
-        /* for (const pair of formData.entries()) {
+        for (const pair of formData.entries()) {
             console.log(pair[0] + ': ' + pair[1]);
-        } */
+        }
 
         $.ajax({ //yudachange viewine gönder nasıl dönecek gör
           url: '/yudachange/'+yudaData[0].id,

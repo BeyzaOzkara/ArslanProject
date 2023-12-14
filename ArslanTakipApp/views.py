@@ -1209,14 +1209,20 @@ def delete_file(request, fId):
 
 
 def yudachange(request, yId):
-    print("yudachange")
     if request.method == 'POST':
         print(request.POST)
         changeYuda = YudaForm.objects.get(id = yId)
-        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şey birden fazla
-        print("ikinci print")
-
+        oldFiles = list(UploadFile.objects.filter(FileModel = "YudaForm", FileModelId = yId).values())
+        print(oldFiles)
+         #önceden yüklenmiş olanlar (aralarından silmiş olabiliriler onun için öncekilerle karşılaştır eksilmiş olanı sil)
+        #print(json.loads(request.POST['uploadedFiles']))
+        uploadedFiles = []
         for key, value in request.POST.items():
+            if key == "deletedId":
+                for f in value:
+                    print(f)
+                    delete_file(f)
+                uploadedFiles.append(value)
             if hasattr(changeYuda, key):
                 if key == "BirlikteCalisan":
                     value_list = value.split(',')
