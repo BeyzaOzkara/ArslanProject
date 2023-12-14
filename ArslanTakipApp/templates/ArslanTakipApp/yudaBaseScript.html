@@ -222,16 +222,6 @@
         changeFunction();
     }
 
-    $('#metreCheck').on('change.bootstrapSwitch', function(e) {
-        let metreC = e.target.checked;
-        if (!metreC){
-            $('#minMAT, #maxMAT').attr('disabled', 'disabled');
-        }
-        else {
-            $('#minMAT, #maxMAT').removeAttr('disabled');
-        }
-    });
-
 
     function digerFunction(selectId, digerId){
         $('#'+selectId).hide();
@@ -442,14 +432,16 @@
         var row = $('<div class="row"></div>');
 		fileTitles.append(row);
 
-        selectedFiles.forEach(function(file, index){
-            let fileType = file.name.split(".").pop().toLowerCase();
+        selectedFiles.forEach(function(file, index){ 
+            let fileName = file.name || file.File;
+            let fileType = fileName.split(".").pop().toLowerCase();
+            console.log(file);
             var column = $(
                 `<div class="col-md-6 mt-3">
                     <div class="mp-3 d-flex justify-content-between border rounded">
                         <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                         <div class="p-1 flex-grow-1">
-                            <label class="overflow">${file.name}</label>
+                            <label class="overflow">${fileName}</label>
                             <select class="form-control kaydet" name="fileTitles[]">
                                 <option value="Teknik Resim">Teknik Resim</option>
                                 <option value="Şartname">Şartname</option>

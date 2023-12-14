@@ -10,7 +10,7 @@ import math
 from urllib.parse import unquote
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
@@ -1201,19 +1201,24 @@ def yudaEdit(request, yId):
     yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaEdit.html', {'yuda_json':yudaData, 'files_json':files})
 
+#değişen dosyalar için bir silme defi yaz
+def delete_file(request, fId):
+    file = get_object_or_404(UploadFile, pk=fId)
+    file.delete()
+    print(f"{file.File} silindi")
+
+
 def yudachange(request, yId):
     print("yudachange")
     if request.method == 'POST':
         print(request.POST)
         changeYuda = YudaForm.objects.get(id = yId)
-        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şey birden fazla
+        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şey birden fazla profil siparişi nasıl kaydediliyor ona bak
         print("ikinci print")
 
         print(request.POST.items())
         for key, value in request.POST.items():
-            print(key)
-            print(value)
-            print("  --  ")
+            print(key + "  " + value + "\n  -- ")
             if hasattr(changeYuda, key):
                 print(value)
                 if key == "BirlikteCalisan":
@@ -1221,7 +1226,8 @@ def yudachange(request, yId):
                     setattr(changeYuda, key, value_list)
                 else:
                     setattr(changeYuda, key, value)
-
+        
+        #önceden kayıtlı olan dosylar ve yeni kaydedilecekler arasında karşılaştırma yap farklı olanları ekle silinecekleri sil
         # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
         """ for field in changeYuda._meta.fields:
             print(f"{field.name}: {getattr(changeYuda, field.name)}") """
