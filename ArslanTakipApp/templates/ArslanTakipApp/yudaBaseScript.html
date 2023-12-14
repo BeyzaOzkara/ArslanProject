@@ -43,14 +43,25 @@
 
     $(':input, .select').on('edit change', function(){changeFunction()});
 
-    $('.checkSpan').click(
+    $('#metreCheckbox').on('change', function(){
+        if($('#metreCheckbox').is(":checked")){
+            $('#minMAT, #maxMAT').show();
+            $('#minMAT, #maxMAT').prop('required', true);
+        }
+        else {
+            $('#minMAT, #maxMAT').hide();
+            $('#minMAT, #maxMAT').prop('required', false);
+        }
+        changeFunction();
+    });
+
+    /* $('.checkSpan').click(
         function() {
             var cb = $(this).find(":checkbox")[0];
 
             if (!$(cb).attr("checked")) {
                 $(cb).attr("checked", "checked");
                 if(this.id=="metreSpan"){
-                    /* $('#matInputDiv').show(); */
                     $('#minMAT, #maxMAT').show();
                     $('#minMAT, #maxMAT').prop('required', true);
                     changeFunction();
@@ -58,7 +69,6 @@
             } else {
                 $(cb).removeAttr("checked");
                 if(this.id=="metreSpan"){
-                    /* $('#matInputDiv').hide(); */
                     $('#minMAT, #maxMAT').hide();
                     $('#minMAT, #maxMAT').prop('required', false);
                     changeFunction();
@@ -71,7 +81,7 @@
     $('.checkSpan .temizCheckbox').click(
         function(event){
             event.stopPropagation();
-    });
+    }); */
     
     function toastClick(iconInput, titleInput, position){
         toastr.remove();
@@ -431,7 +441,7 @@
 
         var row = $('<div class="row"></div>');
 		fileTitles.append(row);
-
+        
         selectedFiles.forEach(function(file, index){ 
             let fileName = file.name || file.File;
             let fileType = fileName.split(".").pop().toLowerCase();

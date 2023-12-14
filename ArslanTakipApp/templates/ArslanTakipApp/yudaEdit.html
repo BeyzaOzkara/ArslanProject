@@ -80,7 +80,7 @@
                     }
                     else if (formElements[i].type == "checkbox") {
                         if (fieldValue === "Var" || fieldValue === "Temiz Kesim") {
-                            formElements[i].checked = true;
+                            formElements[i].checked = true; // nasıl spana tıkladığımda istediğim şeyi yapmasını sağlarım
                             if (fieldName == "MetreAgirlikTalebi") {
                                 /* check oluyor ama bu sefer de etrafındaki spana basınca uncheck olmuyor ama hide show hala çalışıyor */
                                 $("#metreCheckbox").attr("checked", "checked");

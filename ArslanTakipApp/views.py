@@ -1213,14 +1213,11 @@ def yudachange(request, yId):
     if request.method == 'POST':
         print(request.POST)
         changeYuda = YudaForm.objects.get(id = yId)
-        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şey birden fazla profil siparişi nasıl kaydediliyor ona bak
+        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şey birden fazla
         print("ikinci print")
 
-        print(request.POST.items())
         for key, value in request.POST.items():
-            print(key + "  " + value + "\n  -- ")
             if hasattr(changeYuda, key):
-                print(value)
                 if key == "BirlikteCalisan":
                     value_list = value.split(',')
                     setattr(changeYuda, key, value_list)
