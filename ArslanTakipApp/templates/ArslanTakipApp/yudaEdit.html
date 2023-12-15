@@ -41,8 +41,8 @@
   var fileData = JSON.parse('{{ files_json|escapejs }}');
 
   console.log(fileData);
-  selectedFiles = fileData;
-  updateFileList(); 
+  oldFiles = fileData;
+  UploadedFiles();
   /* ilk açıldığında yudaData ve fileData gereken yerleri dolduracak. Kaydet butonu yine aynı şekilde mi yapmalıyım */
 
   function loadPage() {
@@ -119,9 +119,8 @@
             }
         });
         formData.append('uploadedFiles', sFiles); //eğer silinenlerin idlerini gönderceksek dosyaları bu şekilde göndermeye gerek yok
-
-        console.log(deletedFileId);
         formData.append('deletedId', deletedFileId);
+        formData.append('oldFiles', oldFiles);
 
         const formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
 
