@@ -1293,19 +1293,21 @@ def yudachange(request, yId):
         #print(json.loads(request.POST['uploadedFiles']))
         
         for key, value in request.POST.items():
-            if key == "deletedId":
-                print(value)
-                """ for f in value:
-                    sonuc = delete_file(f)
-                    if sonuc == False:
-                        response = JsonResponse({"error": "Dosya silinemedi."})
-                        response.status_code = 500 #server error """
             if hasattr(changeYuda, key):
                 if key == "BirlikteCalisan":
                     value_list = value.split(',')
                     setattr(changeYuda, key, value_list)
                 else:
                     setattr(changeYuda, key, value)
+            if key == "deletedId" and value != '':
+                deleteList = value.split(",")
+                for f in deleteList:
+                    delete_file(f)
+            """ 
+                    sonuc = delete_file(f)
+                    if sonuc == False:
+                        response = JsonResponse({"error": "Dosya silinemedi."})
+                        response.status_code = 500 #server error """
         
         #önceden kayıtlı olan dosylar ve yeni kaydedilecekler arasında karşılaştırma yap farklı olanları ekle silinecekleri sil
         # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
