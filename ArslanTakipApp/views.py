@@ -1299,6 +1299,7 @@ def yudachange(request, yId):
                     setattr(changeYuda, key, value_list)
                 else:
                     setattr(changeYuda, key, value)
+            response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
             if key == "deletedId" and value != '':
                 deleteList = value.split(",")
                 for f in deleteList:
@@ -1307,8 +1308,6 @@ def yudachange(request, yId):
                         response = JsonResponse({"error": "Dosya silinemedi."})
                         response.status_code = 500 #server error
         
-        print(request.FILES)
-        # Dosyaları ve başlıkları işleyin
         file_titles = request.POST.getlist('fileTitles[]')
         for file, title in zip(request.FILES.getlist('files'), file_titles):
             UploadFile.objects.create(
@@ -1320,13 +1319,14 @@ def yudachange(request, yId):
                 UploadedBy = changeYuda.ProjeYoneticisi,
                 Note = "",
             )
-        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
-        """ for field in changeYuda._meta.fields:
-            print(f"{field.name}: {getattr(changeYuda, field.name)}") """
-
+        
         changeYuda.save()
 
-    return JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
+    return response
+
+# Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
+""" for field in changeYuda._meta.fields:
+    print(f"{field.name}: {getattr(changeYuda, field.name)}") """
 
 def getFiles(ref, mId):
     allFiles = UploadFile.objects.all()
