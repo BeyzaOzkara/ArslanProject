@@ -304,6 +304,7 @@ class MyFile(models.Model):
 class UploadFile(models.Model):
     File = models.FileField(upload_to='media/')
     FileTitle = models.CharField(null=True, blank=True)
+    FileSize = models.IntegerField(null=True, blank=True)
     FileModel = models.CharField(null=True, blank=True)
     FileModelId = models.CharField(null=True, blank=True)
     UploadDate = models.DateField(auto_now=True, null=True, blank=True)

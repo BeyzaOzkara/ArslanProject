@@ -1077,8 +1077,17 @@ def yuda_kaydet(request):
         try:
             today = datetime.datetime.now().strftime('%j')
             year = datetime.datetime.now().strftime('%y')
+            lastOfDay = YudaForm.objects.filter(YudaNo__startswith=year + '-' + today).order_by('-YudaNo').first()
+            if lastOfDay:
+                # Extract the sequential number part from the latest YudaNo and increment it
+                latest_seq_number = int(lastOfDay.YudaNo[-2:]) + 1
+                sequential_number = f'{latest_seq_number:02}'  # Convert to two-digit string
+            else:
+                # If no YudaNo exists for today, start from 01
+                sequential_number = '01'
+
             y = YudaForm()
-            y.YudaNo = year+"-"+today+"-NN" #aynı günün kaçıncı numarası
+            y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = request.user
 
             for key, value in request.POST.items():
@@ -1098,6 +1107,7 @@ def yuda_kaydet(request):
                 UploadFile.objects.create(
                     File = file,
                     FileTitle = title,
+                    FileSize = file.size,
                     FileModel = "YudaForm",
                     FileModelId = y.id,
                     UploadedBy = y.ProjeYoneticisi,
