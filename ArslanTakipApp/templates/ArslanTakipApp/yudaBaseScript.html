@@ -459,8 +459,7 @@
         selectedFiles.forEach(function(file, index){ 
             let fileName = file.name || file.File;
             let fileType = fileName.split(".").pop().toLowerCase();
-            console.log("selectedForEach");
-            console.log(file); // icon yerine checkbox koy üstüne sil yaz checked olanların idlerini silinenler olarak formdataya kaydet
+            let fileTitle = file.FileTitle || "";
             var column = $(
                 `<div class="col-md-6 mt-3">
                     <div class="mp-3 d-flex justify-content-between border rounded">
@@ -468,9 +467,10 @@
                         <div class="p-1 flex-grow-1">
                             <label class="overflow">${fileName}</label>
                             <select class="form-control kaydet" name="fileTitles[]">
-                                <option value="Teknik Resim">Teknik Resim</option>
-                                <option value="Şartname">Şartname</option>
-                                <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                                <option value="Teknik Resim" ${fileTitle === 'Teknik Resim' ? 'selected' : ''}>Teknik Resim</option>
+                                <option value="Şartname" ${fileTitle === 'Şartname' ? 'selected' : ''}>Şartname</option>
+                                <option value="Paketleme Talimatı" ${fileTitle === 'Paketleme Talimatı' ? 'selected' : ''}>Paketleme Talimatı</option>
+                                <option value="Diger" ${fileTitle === 'Diger' ? 'selected' : ''}>Diğer</option>
                             </select>
                         </div>
                         <span class="input-group-text">
@@ -479,9 +479,7 @@
                     </div>
                 </div>`
             );
-            /* <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${file.id})">
-                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
-                        </button> */
+            
             row.append(column);
 
             if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {

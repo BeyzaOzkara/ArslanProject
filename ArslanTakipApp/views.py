@@ -1238,14 +1238,14 @@ def format_yuda_details2(yList):
     return yuda_details """
 
 def process_alasim(alasim):
-    return "; ".join([f"Alaşım: {item['Alasim']}, Kondüsyon: {item['Kondusyon']}" for item in alasim])
+    return "; <br>".join([f"Alaşım: {item['Alasim']}, Kondüsyon: {item['Kondusyon']}" for item in alasim])
 
 def process_yuzey(json_data, keys, key_names):
     processed_data = []
     for data in json_data:
         details = ", ".join([f"{key_names[key]}: {data[key]}" for key in keys])
         processed_data.append(details)
-    return "; ".join(processed_data)
+    return "; <br>".join(processed_data)
 
 def format_yuda_details(yList):
     key_name_map = {
@@ -1347,7 +1347,6 @@ def upload_files(request, y):
             Note = "",
         )
 
-#değişen dosyalar için bir silme defi yaz
 def delete_file(fId):
     try:
             file = UploadFile.objects.get(id = fId)
