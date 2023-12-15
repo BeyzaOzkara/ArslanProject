@@ -1275,7 +1275,7 @@ def yudaEdit(request, yId):
     return render(request, 'ArslanTakipApp/yudaEdit.html', {'yuda_json':yudaData, 'files_json':files})
 
 #değişen dosyalar için bir silme defi yaz
-def delete_file(request, fId, fModel):
+def delete_file(fId):
     try:
         if UploadFile.objects.filter(id = fId).exists():
             file = get_object_or_404(UploadFile, pk=fId)
