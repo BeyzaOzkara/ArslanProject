@@ -1274,23 +1274,32 @@ def yudaEdit(request, yId):
     yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaEdit.html', {'yuda_json':yudaData, 'files_json':files})
 
+def upload_files(request, y):
+    file_titles = request.POST.getlist('fileTitles[]')
+    for file, title in zip(request.FILES.getlist('files'), file_titles):
+        UploadFile.objects.create(
+            File = file,
+            FileTitle = title,
+            FileSize = file.size,
+            FileModel = "YudaForm",
+            FileModelId = y.id,
+            UploadedBy = y.ProjeYoneticisi,
+            Note = "",
+        )
+
 #değişen dosyalar için bir silme defi yaz
 def delete_file(fId):
     try:
-        if UploadFile.objects.filter(id = fId).exists():
-            file = get_object_or_404(UploadFile, pk=fId)
+            file = UploadFile.objects.get(id = fId)
             file.delete()
             print(f"{file.File} silindi")
             return True
-    except:
+    except UploadFile.objects.get(id = fId).DoesNotExist:
         return False
     
 def yudachange(request, yId):
     if request.method == 'POST':
-        print(request.POST)
         changeYuda = YudaForm.objects.get(id = yId)
-        oldFiles = list(UploadFile.objects.filter(FileModel = "YudaForm", FileModelId = yId).values())
-        #print(json.loads(request.POST['uploadedFiles']))
         
         for key, value in request.POST.items():
             if hasattr(changeYuda, key):
@@ -1299,29 +1308,19 @@ def yudachange(request, yId):
                     setattr(changeYuda, key, value_list)
                 else:
                     setattr(changeYuda, key, value)
-            response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
+            
             if key == "deletedId" and value != '':
                 deleteList = value.split(",")
                 for f in deleteList:
-                    sonuc = delete_file(f)
-                    if sonuc == False:
+                    if not delete_file(f):
                         response = JsonResponse({"error": "Dosya silinemedi."})
-                        response.status_code = 500 #server error
+                        response.status_code = 500  # Server error
+                        return response
         
-        file_titles = request.POST.getlist('fileTitles[]')
-        for file, title in zip(request.FILES.getlist('files'), file_titles):
-            UploadFile.objects.create(
-                File = file,
-                FileTitle = title,
-                FileSize = file.size,
-                FileModel = "YudaForm",
-                FileModelId = changeYuda.id,
-                UploadedBy = changeYuda.ProjeYoneticisi,
-                Note = "",
-            )
-        
+        upload_files(request, changeYuda)
         changeYuda.save()
-
+    
+    response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
     return response
 
 # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
