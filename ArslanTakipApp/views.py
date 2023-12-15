@@ -1155,7 +1155,6 @@ def yudas_list(request):
 
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
-    print("İlk part")
     users = User.objects.values()
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -1228,9 +1227,7 @@ def yudaDetail(request, yId):
                     ahsap += ";  "
             i['YuzeyAhsap'] = ahsap
 
-    print("Son part")
     data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    print(data)
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
 def yudaDetailComment(request):
@@ -1279,10 +1276,14 @@ def yudaEdit(request, yId):
 
 #değişen dosyalar için bir silme defi yaz
 def delete_file(request, fId, fModel):
-    if UploadFile.objects.filter(id = fId).exists():
-        file = get_object_or_404(UploadFile, pk=fId)
-        file.delete()
-        print(f"{file.File} silindi")
+    try:
+        if UploadFile.objects.filter(id = fId).exists():
+            file = get_object_or_404(UploadFile, pk=fId)
+            file.delete()
+            print(f"{file.File} silindi")
+            return True
+    except:
+        return False
     
 def yudachange(request, yId):
     if request.method == 'POST':
@@ -1293,8 +1294,12 @@ def yudachange(request, yId):
         
         for key, value in request.POST.items():
             if key == "deletedId":
-                for f in value:
-                    delete_file(f)
+                print(value)
+                """ for f in value:
+                    sonuc = delete_file(f)
+                    if sonuc == False:
+                        response = JsonResponse({"error": "Dosya silinemedi."})
+                        response.status_code = 500 #server error """
             if hasattr(changeYuda, key):
                 if key == "BirlikteCalisan":
                     value_list = value.split(',')
@@ -1307,8 +1312,7 @@ def yudachange(request, yId):
         """ for field in changeYuda._meta.fields:
             print(f"{field.name}: {getattr(changeYuda, field.name)}") """
 
-        #changeYuda.save()
-        """ print(changeYuda) """
+        changeYuda.save()
 
     return JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
 
