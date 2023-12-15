@@ -47,6 +47,16 @@ def calculate_pagination(page, size):
     limit = page * size
     return (offset, limit)
 
+def get_user_full_name(user_id):
+    user = User.objects.get(id=user_id)
+    return f"{user.first_name} {user.last_name}"
+
+def format_date_time(date):
+    return date.strftime("%d-%m-%Y %H:%M:%S")
+
+def format_date(date):
+    return date.strftime("%d-%m-%Y")
+
 def compare(s, t):
     return sorted(s) == sorted(t)
 
@@ -213,9 +223,9 @@ def kalip_liste(request):
 
     for c in g:
         if c['UretimTarihi'] != None:
-            c['UretimTarihi'] = c['UretimTarihi'].strftime("%d-%m-%Y")
-            c['SonTeniferTarih'] =c['SonTeniferTarih'].strftime("%d-%m-%Y %H:%M:%S")
-            c['SonUretimTarih'] =c['SonUretimTarih'].strftime("%d-%m-%Y")
+            c['UretimTarihi'] = format_date(c['UretimTarihi'])
+            c['SonTeniferTarih'] = format_date_time(c['SonTeniferTarih'])
+            c['SonUretimTarih'] = format_date(c['SonUretimTarih'])
         if c['AktifPasif'] == "Aktif":
             c['AktifPasif'] = True
         elif c['AktifPasif'] == "Pasif":
@@ -276,7 +286,7 @@ def kalip_rapor(request):
         g = list(query.values()[offset:limit])
         for c in g:
             if c['Tarih'] != None:
-                c['Tarih'] = c['Tarih'].strftime("%d-%m-%Y") + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
+                c['Tarih'] = format_date(c['Tarih']) + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
                 c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
                 c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
             #print(c)
@@ -320,8 +330,8 @@ def location_hareket(request):
                 har['kalipVaris'] =list(location_list.filter(id=list(location_list.filter(id=h['kalipVaris_id']))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
             except:
                 har['kalipVaris'] = list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
-            har['kimTarafindan'] = list(users.filter(id=int(h['kimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(h['kimTarafindan_id'])))[0]["last_name"] 
-            har['hareketTarihi'] = h['hareketTarihi'].strftime("%d-%m-%Y %H:%M:%S")
+            har['kimTarafindan'] = get_user_full_name(int(h['kimTarafindan_id']))
+            har['hareketTarihi'] = format_date_time(h['hareketTarihi'])
             harAr.append(har)
         hareket_count = len(harAr)
 
@@ -534,7 +544,7 @@ def format_item(a):
         ttk = math.ceil(a[14])
     b = (locale.format_string("%.0f", math.ceil(a[3]), grouping=True), 
             locale.format_string("%.0f", math.ceil(a[5]), grouping=True),
-            a[12].strftime("%d-%m-%Y"),
+            format_date(a[12]),
             locale.format_string("%.0f", ttk, grouping=True))
     a += b
     return a
@@ -820,9 +830,9 @@ def eksiparis_list(request):
             ekSiparisList.remove(e)
         else:
             siparis1 = siparis2.get(Kimlik = e['SipKimlik'])
-            e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+            e['EkTermin'] = format_date(e['EkTermin'])
             e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
-            e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
+            e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
             if siparis1:
                 e['ProfilNo'] = siparis1.ProfilNo
                 e['FirmaAdi'] = siparis1.FirmaAdi
@@ -834,7 +844,7 @@ def eksiparis_list(request):
                 e['Mm'] = siparis1.Siparismm
                 e['KondusyonTuru'] = siparis1.KondusyonTuru
                 e['SiparisTamam'] = siparis1.SiparisTamam
-                e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
+                e['SonTermin'] = format_date(siparis1.SonTermin)
                 e['BilletTuru'] = siparis1.BilletTuru
                 e['TopTenKg'] = siparis1.TopTenKg
             
@@ -867,9 +877,9 @@ def eksiparis_acil(request):
             ekSiparisList.remove(e)
         else:
             siparis1 = siparis.get(Kimlik = e['SipKimlik'])
-            e['EkTermin'] = e['EkTermin'].strftime("%d-%m-%Y")
+            e['EkTermin'] = format_date(e['EkTermin'])
             e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
-            e['KimTarafindan'] = list(users.filter(id=int(e['KimTarafindan_id'])))[0]["first_name"] + " " + list(users.filter(id=int(e['KimTarafindan_id'])))[0]["last_name"] 
+            e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
             if siparis1:
                 e['ProfilNo'] = siparis1.ProfilNo
                 e['FirmaAdi'] = siparis1.FirmaAdi
@@ -881,7 +891,7 @@ def eksiparis_acil(request):
                 e['Mm'] = siparis1.Siparismm
                 e['KondusyonTuru'] = siparis1.KondusyonTuru
                 e['SiparisTamam'] = siparis1.SiparisTamam
-                e['SonTermin'] = siparis1.SonTermin.strftime("%d-%m-%Y")
+                e['SonTermin'] = format_date(siparis1.SonTermin)
                 e['BilletTuru'] = siparis1.BilletTuru
                 e['TopTenKg'] = siparis1.TopTenKg
 
@@ -1033,8 +1043,8 @@ def baskigecmisi_list(request):
     baskiList = list(baskiQS.filter(**q).values()[offset:limit])
 
     for b in baskiList:
-        b['Start'] = b['Start'].strftime("%d-%m-%Y %H:%M:%S")
-        b['Stop'] = b['Stop'].strftime("%d-%m-%Y %H:%M:%S")
+        b['Start'] = format_date_time(b['Start'])
+        b['Stop'] = format_date_time(b['Stop'])
         b['BilletCount'] = b['Parameters']['billetCount']
         b['dieNumber'] = b['Parameters']['dieNumber']
         b['extTime'] = b['Parameters']['extTime']
@@ -1058,7 +1068,8 @@ def baskigecmisi_list(request):
 
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
-    
+
+#for getting the select options 
 def yuda(request, objId):
     try: 
         int(objId)
@@ -1070,7 +1081,6 @@ def yuda(request, objId):
 
     data = json.dumps(parameters, indent=1)
     return HttpResponse(data)
-
 
 def yuda_kaydet(request):
     if request.method == "POST":
@@ -1090,8 +1100,7 @@ def yuda_kaydet(request):
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = request.user
 
-            for key, value in request.POST.items():
-                
+            for key, value in request.POST.items(): 
                 if hasattr(y, key):
                     if key == "BirlikteCalisan":
                         value_list = value.split(',')
@@ -1123,7 +1132,6 @@ def yuda_kaydet(request):
 
     return response
         
-
 class YudasView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yudaList.html'
 
@@ -1132,52 +1140,45 @@ def yudas_list(request):
     for i in params:
         value = params[i]
         print("Key and Value pair are ({}) = ({})".format(i, value))
+
     size = params.get("size", 7)  # Default size to 10
-    offset, limit = calculate_pagination(params.get("page", 1), size)
+    page = params.get("page", 1)
+    offset, limit = calculate_pagination(page, size)
     filter_list = params.get("filter", [])
     q = {}
-
     y = YudaForm.objects.all()
 
     if len(filter_list) > 0:
         for i in filter_list:
             q = filter_method(i, q)
     
-    yudas = y.filter(**q).order_by("-Tarih")
-    yudaList = list(yudas.values()[offset:limit])
+    filtered_yudas = y.filter(**q).order_by("-Tarih")
+    yudaList = list(filtered_yudas.values()[offset:limit])
 
-    y_count = yudas.count()
-    lastData= {'last_page': math.ceil(y_count/size), 'data': []}
-    lastData['data'] = yudaList
-    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    yudas_count = filtered_yudas.count()
+    last_page = math.ceil(yudas_count / size)
+    response_data = {
+        'last_page' : last_page,
+        'data' : yudaList
+    }
+    data = json.dumps(response_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+def process_comment(comment):
+    comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
+    comment['Tarih'] = format_date(comment['Tarih'])
+    comment['cfiles'] = list(getFiles("Comment", comment['id']))
+    return comment
 
-def yudaDetail(request, yId):
-    #veritabanından yuda no ile ilişkili dosyaların isimlerini al
-    users = User.objects.values()
-    yudaFiles = getFiles("YudaForm", yId)
-    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    yudaComments = getComments("YudaForm", yId)
-    #yorum dosyalarını yorumlara nasıl bağlamalıyım? dosyalarını ayrı mı bağlamalıyım
-    yudaCList = list(yudaComments)
-    for c in yudaCList:
-        c['KullaniciAdi'] = list(users.filter(id=int(c['Kullanici_id'])))[0]["first_name"] + " " + list(users.filter(id=int(c['Kullanici_id'])))[0]["last_name"]
-        c['Tarih'] = c['Tarih'].strftime("%d-%m-%Y %H:%M:%S")
-        c['cfiles'] = list(getFiles("Comment", c['id']))
-        
-    comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    yudaDetails = YudaForm.objects.filter(id = yId).values()
-
-    yList = list(yudaDetails)
+def format_yuda_details2(yList):
     for i in yList:
-        i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
+        i['Tarih'] = format_date(i['Tarih'])
         if i['AlasimKondusyon'] != '': 
             alasimJson = json.loads(i['AlasimKondusyon'])
             alasim = ""
             Sayac = 0
             for a in alasimJson:
-                alasim += "Alaşım: "+ a['Alasim'] + "  Kondüsyon: "+ a['Kondusyon']
+                alasim += "Alaşım: "+ a['Alasim'] + ",  Kondüsyon: "+ a['Kondusyon']
                 Sayac += 1
                 if Sayac != len(alasimJson):
                     alasim += "; "
@@ -1226,8 +1227,67 @@ def yudaDetail(request, yId):
                 if Sayac != len(ahsapJson):
                     ahsap += ";  "
             i['YuzeyAhsap'] = ahsap
+    return yList
+    """ for detail in yuda_details:
+        detail['Tarih'] = format_date(detail['Tarih'])
+        for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
+            if detail[key]:
+                json_data = json.loads(detail[key])
+                formatted_data = "; ".join([", ".join(f"{k}: {v}" for k, v in item.items()) for item in json_data])
+                detail[key] = formatted_data
+    return yuda_details """
 
-    data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+def process_alasim(alasim):
+    return "; ".join([f"Alaşım: {item['Alasim']}, Kondüsyon: {item['Kondusyon']}" for item in alasim])
+
+def process_yuzey(json_data, keys, key_names):
+    processed_data = []
+    for data in json_data:
+        details = ", ".join([f"{key_names[key]}: {data[key]}" for key in keys])
+        processed_data.append(details)
+    return "; ".join(processed_data)
+
+def format_yuda_details(yList):
+    key_name_map = {
+        'YuzeyDetay': 'Yuzey Detay', 'YuzeyPresBoy': 'Boy',
+        'Matlastirma': 'Matlaştırma', 'Renk': 'Renk', 'KaplamaKalinligi': 'Kaplama Kalınlığı', 'EloksalBoy': 'Boy', 'EloksalTemizKesim': 'Temiz Kesim',
+        'Tur': 'Tür', 'Marka': 'Marka', 'MarkaRenkKodu': 'Marka Renk Kodu', 'BoyaClass': 'Boya Class', 'Ral': 'RAL', 'BoyaKalinlik': 'Kalınlık', 'BoyaBoy': 'Boy', 'BoyaTemizKesim': 'Temiz Kesim',
+        'AhsapKaplama': 'Ahşap Kaplama', 'AhsapBoy': 'Boy', 'AhsapTemizKesim': 'Temiz Kesim',
+        # Add more key-name mappings as needed
+    }
+
+    for i in yList:
+        i['Tarih'] = format_date(i['Tarih'])
+        for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
+            if i[key]:
+                json_data = json.loads(i[key])
+                if key == 'AlasimKondusyon':
+                    i[key] = process_alasim(json_data)
+                elif key == 'YuzeyPres':
+                    i[key] = process_yuzey(json_data, ['YuzeyDetay', 'YuzeyPresBoy'], key_name_map)
+                elif key == 'YuzeyEloksal':
+                    i[key] = process_yuzey(json_data, ['Matlastirma', 'Renk', 'KaplamaKalinligi', 'EloksalBoy', 'EloksalTemizKesim'], key_name_map)
+                elif key == 'YuzeyBoya':
+                    i[key] = process_yuzey(json_data, ['Tur', 'Marka', 'MarkaRenkKodu', 'BoyaClass', 'Ral', 'BoyaKalinlik', 'BoyaBoy', 'BoyaTemizKesim'], key_name_map)
+                elif key == 'YuzeyAhsap':
+                    i[key] = process_yuzey(json_data, ['AhsapKaplama', 'AhsapBoy', 'AhsapTemizKesim'], key_name_map)
+    return yList
+
+def yudaDetail(request, yId):
+    #veritabanından yuda no ile ilişkili dosyaların isimlerini al
+    users = User.objects.values()
+    yudaFiles = getFiles("YudaForm", yId)
+    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    yudaComments = getComments("YudaForm", yId)
+
+    yudaCList = [process_comment(comment) for comment in yudaComments]
+    comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    yudaDetails = YudaForm.objects.filter(id = yId).values()
+    yList = list(yudaDetails)
+    formatted_yuda_details = format_yuda_details(yList)
+
+    data = json.dumps(formatted_yuda_details, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
 def yudaDetailComment(request):
@@ -1237,7 +1297,7 @@ def yudaDetailComment(request):
             c = Comment()
             c.Kullanici = request.user
             c.FormModel = "YudaForm"
-            c.FormModelId = (req['formID'])
+            c.FormModelId = req['formID']
             c.Aciklama = req['yorum']
             c.save()
 
@@ -1246,6 +1306,7 @@ def yudaDetailComment(request):
                     File = file,
                     FileModel = "Comment",
                     FileModelId = c.id,
+                    FileSize = file.size,
                     UploadedBy = c.Kullanici,
                     Note = "",
                 )
@@ -1260,7 +1321,6 @@ def yudaDetailComment(request):
 
     return response
 
-
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -1269,7 +1329,7 @@ def yudaEdit(request, yId):
     yudaList = list(yuda)
 
     for i in yudaList:
-        i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
+        i['Tarih'] = format_date(i['Tarih'])
 
     yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaEdit.html', {'yuda_json':yudaData, 'files_json':files})
