@@ -1302,14 +1302,24 @@ def yudachange(request, yId):
             if key == "deletedId" and value != '':
                 deleteList = value.split(",")
                 for f in deleteList:
-                    delete_file(f)
-            """ 
                     sonuc = delete_file(f)
                     if sonuc == False:
                         response = JsonResponse({"error": "Dosya silinemedi."})
-                        response.status_code = 500 #server error """
+                        response.status_code = 500 #server error
         
-        #önceden kayıtlı olan dosylar ve yeni kaydedilecekler arasında karşılaştırma yap farklı olanları ekle silinecekleri sil
+        print(request.FILES)
+        # Dosyaları ve başlıkları işleyin
+        file_titles = request.POST.getlist('fileTitles[]')
+        for file, title in zip(request.FILES.getlist('files'), file_titles):
+            UploadFile.objects.create(
+                File = file,
+                FileTitle = title,
+                FileSize = file.size,
+                FileModel = "YudaForm",
+                FileModelId = changeYuda.id,
+                UploadedBy = changeYuda.ProjeYoneticisi,
+                Note = "",
+            )
         # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
         """ for field in changeYuda._meta.fields:
             print(f"{field.name}: {getattr(changeYuda, field.name)}") """
