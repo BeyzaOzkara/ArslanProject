@@ -162,7 +162,9 @@
           processData: false,
           success: function(response) {
               // Başarılı yükleme sonrası işlemler
-              alert('Değişiklikler başarıyla kaydedildi! '+response.message);
+              alert(response.message);
+              // Redirect to the yudaDetail page with the updated yId
+              window.location.href = '/yudaDetail/' + yudaData[0].id;
           },
           error: function(response) {
               // Hata durumunda işlemler

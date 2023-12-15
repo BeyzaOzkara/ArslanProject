@@ -38,7 +38,7 @@ urlpatterns = [
     path('yudakaydet', views.yuda_kaydet),
     path('yudas', views.YudasView.as_view()),
     path('yudas/list' ,views.yudas_list),
-    path('yudaDetail/<str:yId>', views.yudaDetail),
+    path('yudaDetail/<str:yId>', views.yudaDetail, name='yudaDetail'),
     path('yudaDetailComment', views.yudaDetailComment),
     path('yudaEdit/<str:yId>', views.yudaEdit),
     path('yudachange/<str:yId>', views.yudachange),

@@ -10,7 +10,7 @@ import math
 from urllib.parse import unquote
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
@@ -1152,105 +1152,10 @@ def yudas_list(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def yudaEdit2(request, yId):
-    print("yuda edit")
-    yudaForm = YudaForm.objects.all()
-    if request.method == "GET":
-        try: 
-            yudaDetail = list(yudaForm.filter(id = yId).values())
-            response = yudaDetail
-            print(response)
-        except:
-            response = ""
-    elif request.method == "POST":
-        print(request.POST)
-        """ get the yuda with yId, change the values.  if yuda object exist update it if it doesn't exist save it """
-        """ if yudaForm.filter(id = yId).exists() : #nesneyi updatele
-            changeYuda = YudaForm.objects.get(id = yId)
-            print(request.POST.items())
-            for key, value in request.POST.items():
-                if hasattr(changeYuda, key):
-                    if key == "BirlikteCalisan":
-                        value_list = value.split(',')
-                        setattr(changeYuda, key, value_list)
-                    else:
-                        setattr(changeYuda, key, value)
-            #changeYuda.save()
-            print(changeYuda)
-        else: #nesneyi create
-            today = datetime.datetime.now().strftime('%j')
-            year = datetime.datetime.now().strftime('%y')
-            y = YudaForm()
-            y.YudaNo = year+"-"+today+"-NN" #aynı günün kaçıncı numarası
-            y.ProjeYoneticisi = request.user
-
-            for key, value in request.POST.items():
-                
-                if hasattr(y, key):
-                    if key == "BirlikteCalisan":
-                        value_list = value.split(',')
-                        setattr(y, key, value_list)
-                    else:
-                        setattr(y, key, value)
-            #y.save()
-         """
-        response=""
-
-    pass
-
-def yudaEdit(request, yId):
-    yudaFiles = getFiles("YudaForm", yId)
-    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-
-    yuda = YudaForm.objects.filter(id = yId).values()
-    yudaList = list(yuda)
-
-    for i in yudaList:
-        i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
-
-    yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return render(request, 'ArslanTakipApp/yudaEdit.html', {'yuda_json':yudaData, 'files_json':files})
-
-#değişen dosyalar için bir silme defi yaz
-def delete_file(request, fId):
-    file = get_object_or_404(UploadFile, pk=fId)
-    file.delete()
-    print(f"{file.File} silindi")
-
-
-def yudachange(request, yId):
-    if request.method == 'POST':
-        print(request.POST)
-        changeYuda = YudaForm.objects.get(id = yId)
-        oldFiles = list(UploadFile.objects.filter(FileModel = "YudaForm", FileModelId = yId).values())
-        print(oldFiles)
-         #önceden yüklenmiş olanlar (aralarından silmiş olabiliriler onun için öncekilerle karşılaştır eksilmiş olanı sil)
-        #print(json.loads(request.POST['uploadedFiles']))
-        uploadedFiles = []
-        for key, value in request.POST.items():
-            if key == "deletedId":
-                for f in value:
-                    print(f)
-                    delete_file(f)
-                uploadedFiles.append(value)
-            if hasattr(changeYuda, key):
-                if key == "BirlikteCalisan":
-                    value_list = value.split(',')
-                    setattr(changeYuda, key, value_list)
-                else:
-                    setattr(changeYuda, key, value)
-        
-        #önceden kayıtlı olan dosylar ve yeni kaydedilecekler arasında karşılaştırma yap farklı olanları ekle silinecekleri sil
-        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
-        """ for field in changeYuda._meta.fields:
-            print(f"{field.name}: {getattr(changeYuda, field.name)}") """
-
-        #changeYuda.save()
-        """ print(changeYuda) """
-    return 
 
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
+    print("İlk part")
     users = User.objects.values()
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -1323,7 +1228,9 @@ def yudaDetail(request, yId):
                     ahsap += ";  "
             i['YuzeyAhsap'] = ahsap
 
+    print("Son part")
     data = json.dumps(yList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    print(data)
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
 
 def yudaDetailComment(request):
@@ -1355,6 +1262,55 @@ def yudaDetailComment(request):
             response.status_code = 500 #server error
 
     return response
+
+
+def yudaEdit(request, yId):
+    yudaFiles = getFiles("YudaForm", yId)
+    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    yuda = YudaForm.objects.filter(id = yId).values()
+    yudaList = list(yuda)
+
+    for i in yudaList:
+        i['Tarih'] = i['Tarih'].strftime("%d-%m-%Y")
+
+    yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return render(request, 'ArslanTakipApp/yudaEdit.html', {'yuda_json':yudaData, 'files_json':files})
+
+#değişen dosyalar için bir silme defi yaz
+def delete_file(request, fId, fModel):
+    if UploadFile.objects.filter(id = fId).exists():
+        file = get_object_or_404(UploadFile, pk=fId)
+        file.delete()
+        print(f"{file.File} silindi")
+    
+def yudachange(request, yId):
+    if request.method == 'POST':
+        print(request.POST)
+        changeYuda = YudaForm.objects.get(id = yId)
+        oldFiles = list(UploadFile.objects.filter(FileModel = "YudaForm", FileModelId = yId).values())
+        #print(json.loads(request.POST['uploadedFiles']))
+        
+        for key, value in request.POST.items():
+            if key == "deletedId":
+                for f in value:
+                    delete_file(f)
+            if hasattr(changeYuda, key):
+                if key == "BirlikteCalisan":
+                    value_list = value.split(',')
+                    setattr(changeYuda, key, value_list)
+                else:
+                    setattr(changeYuda, key, value)
+        
+        #önceden kayıtlı olan dosylar ve yeni kaydedilecekler arasında karşılaştırma yap farklı olanları ekle silinecekleri sil
+        # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
+        """ for field in changeYuda._meta.fields:
+            print(f"{field.name}: {getattr(changeYuda, field.name)}") """
+
+        #changeYuda.save()
+        """ print(changeYuda) """
+
+    return JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
 
 def getFiles(ref, mId):
     allFiles = UploadFile.objects.all()
