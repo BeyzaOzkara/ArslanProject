@@ -1357,10 +1357,14 @@ def delete_file(fId):
         return False
     
 def changeFiles(fId, fTitle):
-    file = UploadFile.objects.get(id = fId)
-    if file.FileTitle != fTitle:
-        file.FileTitle = fTitle
-        file.save()
+    try:
+        file = UploadFile.objects.get(id = fId)
+        if file.FileTitle != fTitle:
+            file.FileTitle = fTitle
+            file.save()
+        return True
+    except UploadFile.objects.get(id = fId).DoesNotExist:
+        return False
 
 def yudachange(request, yId):
     if request.method == 'POST':
