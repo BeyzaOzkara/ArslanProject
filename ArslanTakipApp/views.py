@@ -1369,7 +1369,6 @@ def changeFiles(fId, fTitle):
 def yudachange(request, yId):
     if request.method == 'POST':
         changeYuda = YudaForm.objects.get(id = yId)
-        print(request.POST) #İLK ÖNCE FİLE TİTLELARNI DEĞİŞTİR SONRA SİLME İŞLEMLERİNİ YAP
 
         for key, value in request.POST.items():
             if hasattr(changeYuda, key):

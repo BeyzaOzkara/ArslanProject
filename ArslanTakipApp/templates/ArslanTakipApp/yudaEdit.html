@@ -55,7 +55,8 @@
 
     yudaData.forEach(y => {
         let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-        
+        console.log(y);
+        //profil siparişi sorununu hallet4
         for (let i = 0; i < formElements.length; i++) {
             const fieldName = formElements[i].name;
             const fieldValue = y[fieldName];
@@ -75,7 +76,12 @@
                         const matchingRadio = document.querySelector(`input[name='${fieldName}'][value='${fieldValue}']`);
                         if (matchingRadio) {
                             matchingRadio.checked = true;
+                            console.log("input value");
+                            console.log($(`input[name='${fieldName}'][value='${fieldValue}']`));
                         }
+                            console.log("input value bitiş");
+                            console.log($(`input[name='${fieldName}']`));
+                            
                     }
                     else if (formElements[i].type == "checkbox") {
                         if (fieldValue === "Var" || fieldValue === "Temiz Kesim") {
