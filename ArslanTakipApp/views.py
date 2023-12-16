@@ -1356,10 +1356,17 @@ def delete_file(fId):
     except UploadFile.objects.get(id = fId).DoesNotExist:
         return False
     
+def changeFiles(fId, fTitle):
+    file = UploadFile.objects.get(id = fId)
+    if file.FileTitle != fTitle:
+        file.FileTitle = fTitle
+        file.save()
+
 def yudachange(request, yId):
     if request.method == 'POST':
         changeYuda = YudaForm.objects.get(id = yId)
-        
+        print(request.POST) #İLK ÖNCE FİLE TİTLELARNI DEĞİŞTİR SONRA SİLME İŞLEMLERİNİ YAP
+
         for key, value in request.POST.items():
             if hasattr(changeYuda, key):
                 if key == "BirlikteCalisan":
@@ -1367,6 +1374,13 @@ def yudachange(request, yId):
                     setattr(changeYuda, key, value_list)
                 else:
                     setattr(changeYuda, key, value)
+            
+            if key == "oldFileNewTitle" and value != '':
+                for v in json.loads(value):
+                    if not changeFiles(v['id'], v['title']):
+                        response = JsonResponse({"error": "Dosya başlığı değiştirilemedi."})
+                        response.status_code = 500  # Server error
+                        return response
             
             if key == "deletedId" and value != '':
                 deleteList = value.split(",")

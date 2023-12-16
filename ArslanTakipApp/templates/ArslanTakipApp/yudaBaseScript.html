@@ -466,7 +466,7 @@
                         <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                         <div class="p-1 flex-grow-1">
                             <label class="overflow">${fileName}</label>
-                            <select class="form-control kaydet" name="oldFileTitles[]">
+                            <select class="form-control kaydet" name="oldFileTitles">
                                 <option value="Teknik Resim" ${fileTitle === 'Teknik Resim' ? 'selected' : ''}>Teknik Resim</option>
                                 <option value="Şartname" ${fileTitle === 'Şartname' ? 'selected' : ''}>Şartname</option>
                                 <option value="Paketleme Talimatı" ${fileTitle === 'Paketleme Talimatı' ? 'selected' : ''}>Paketleme Talimatı</option>
@@ -475,7 +475,7 @@
                         </div>
                         <span class="input-group-text" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                             <label for="fileDeleteCheckbox" style="margin-bottom: 5px;">Sil</label>
-                            <input type="checkbox" class="fileDeleteCheckbox kaydet" style="margin-bottom: 5px;" name="FileDelete" id="fileDeleteCheckbox" onchange="removeUploadedFiles(${file.id})">
+                            <input type="checkbox" class="fileDeleteCheckbox" style="margin-bottom: 5px;" name="FileDelete" id="fileDeleteCheckbox" onchange="removeUploadedFiles(${file.id})">
                         </span>
                     </div>
                 </div>`

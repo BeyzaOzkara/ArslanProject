@@ -40,7 +40,6 @@
   var yudaData = JSON.parse('{{ yuda_json|escapejs }}');
   var fileData = JSON.parse('{{ files_json|escapejs }}');
 
-  console.log(fileData);
   oldFiles = fileData;
   UploadedFiles();
   /* ilk açıldığında yudaData ve fileData gereken yerleri dolduracak. Kaydet butonu yine aynı şekilde mi yapmalıyım */
@@ -56,7 +55,7 @@
 
     yudaData.forEach(y => {
         let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-        console.log(y);
+        
         for (let i = 0; i < formElements.length; i++) {
             const fieldName = formElements[i].name;
             const fieldValue = y[fieldName];
@@ -111,20 +110,15 @@
         formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
         sFiles = [];
         selectedFiles.forEach(function(file) {
-            if(file.File){
-                sFiles.push(JSON.stringify(file));
-            }
-            else {
-                formData.append('files', file);
-            }
+            formData.append('files', file);
         });
-        formData.append('uploadedFiles', sFiles); //eğer silinenlerin idlerini gönderceksek dosyaları bu şekilde göndermeye gerek yok
-        formData.append('deletedId', deletedFileId);
-        formData.append('oldFiles', oldFiles);
 
         const formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-
+        var oldFileTitleList = [];
         formElements.forEach(element => {
+            if (element.name == "oldFileTitles"){
+                oldFileTitleList.push(element.value);
+            }
             switch(element.type) {
                 case "radio":
                     if ($('#' + element.id).is(':checked')) {
@@ -148,10 +142,20 @@
             }
         });
 
+        const oldFileTitleListWithIds = oldFiles.map((file, index) => {
+            return {
+                id: file.id,
+                title: oldFileTitleList[index]
+            };
+        });
+
+        formData.append("oldFileNewTitle", JSON.stringify(oldFileTitleListWithIds));
+        formData.append('deletedId', deletedFileId);
+
         // Log FormData content before posting
-        for (const pair of formData.entries()) {
+        /* for (const pair of formData.entries()) {
             console.log(pair[0] + ': ' + pair[1]);
-        }
+        } */
 
         $.ajax({ //yudachange viewine gönder nasıl dönecek gör
           url: '/yudachange/'+yudaData[0].id,
