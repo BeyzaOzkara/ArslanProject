@@ -1099,6 +1099,7 @@ def yuda_kaydet(request):
             y = YudaForm()
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = request.user
+            y.Tarih = datetime.datetime.now()
 
             for key, value in request.POST.items(): 
                 if hasattr(y, key):
@@ -1349,10 +1350,10 @@ def upload_files(request, y):
 
 def delete_file(fId):
     try:
-            file = UploadFile.objects.get(id = fId)
-            file.delete()
-            print(f"{file.File} silindi")
-            return True
+        file = UploadFile.objects.get(id = fId)
+        file.delete()
+        print(f"{file.File} silindi")
+        return True
     except UploadFile.objects.get(id = fId).DoesNotExist:
         return False
     

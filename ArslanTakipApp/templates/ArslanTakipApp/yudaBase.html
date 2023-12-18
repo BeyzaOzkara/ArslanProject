@@ -63,7 +63,18 @@
                                   <div class="info-box-content">
                                     <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ</span>
                                     <div class="input-group mt-2">
-                                      <input type="text" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
+                                      <input type="text" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
+                                      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-outline-primary active">
+                                            <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet" value="kg" autocomplete="off"> KG
+                                          </label>
+                                          <label class="btn btn-outline-primary">
+                                            <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off"> ADET
+                                          </label>
+                                      </div>
+                                      <span class="input-group-text" style="font-weight: bold;">
+                                        /
+                                      </span>
                                       <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                           <label class="btn btn-outline-primary active">
                                             <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off"> HAFTA

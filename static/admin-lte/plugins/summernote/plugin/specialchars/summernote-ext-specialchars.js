@@ -26,8 +26,8 @@
         RIGHT: 39,
         ENTER: 13,
       };
-      var COLUMN_LENGTH = 15;
-      var COLUMN_WIDTH = 35;
+      var COLUMN_LENGTH = 20;
+      var COLUMN_WIDTH = 15;
 
       var currentColumn = 0;
       var currentRow = 0;
@@ -36,31 +36,25 @@
 
       // special characters data set
       var specialCharDataSet = [
-        '&quot;', '&amp;', '&lt;', '&gt;', '&iexcl;', '&cent;',
-        '&pound;', '&curren;', '&yen;', '&brvbar;', '&sect;',
-        '&uml;', '&copy;', '&ordf;', '&laquo;', '&not;',
+        '&iexcl;', '&cent;', '&euro;', '&pound;', '&yen;', '&brvbar;', 
+        '&sect;', '&uml;', '&copy;', '&ordf;', '&laquo;', '&not;',
         '&reg;', '&macr;', '&deg;', '&plusmn;', '&sup2;',
         '&sup3;', '&acute;', '&micro;', '&para;', '&middot;',
         '&cedil;', '&sup1;', '&ordm;', '&raquo;', '&frac14;',
         '&frac12;', '&frac34;', '&iquest;', '&times;', '&divide;',
         '&fnof;', '&circ;', '&tilde;', '&ndash;', '&mdash;',
         '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;',
-        '&bdquo;', '&dagger;', '&Dagger;', '&bull;', '&hellip;',
-        '&permil;', '&prime;', '&Prime;', '&lsaquo;', '&rsaquo;',
-        '&oline;', '&frasl;', '&euro;', '&image;', '&weierp;',
-        '&real;', '&trade;', '&alefsym;', '&larr;', '&uarr;',
-        '&rarr;', '&darr;', '&harr;', '&crarr;', '&lArr;',
+        '&bdquo;', '&Dagger;', '&bull;', '&permil;', '&prime;', '&Prime;',
+        '&lsaquo;', '&rsaquo;', '&oline;', '&frasl;', '&trade;', '&alefsym;',
+        '&larr;', '&uarr;', '&rarr;', '&darr;', '&harr;', '&crarr;', '&lArr;',
         '&uArr;', '&rArr;', '&dArr;', '&hArr;', '&forall;',
         '&part;', '&exist;', '&empty;', '&nabla;', '&isin;',
         '&notin;', '&ni;', '&prod;', '&sum;', '&minus;',
         '&lowast;', '&radic;', '&prop;', '&infin;', '&ang;',
         '&and;', '&or;', '&cap;', '&cup;', '&int;',
-        '&there4;', '&sim;', '&cong;', '&asymp;', '&ne;',
-        '&equiv;', '&le;', '&ge;', '&sub;', '&sup;',
-        '&nsub;', '&sube;', '&supe;', '&oplus;', '&otimes;',
-        '&perp;', '&sdot;', '&lceil;', '&rceil;', '&lfloor;',
-        '&rfloor;', '&loz;', '&spades;', '&clubs;', '&hearts;',
-        '&diams;',
+        '&sim;', '&cong;', '&asymp;', '&ne;', '&equiv;', '&le;', '&ge;',
+        '&sub;', '&sup;', '&nsub;', '&sube;', '&supe;', '&oplus;', '&otimes;',
+        '&perp;', '&sdot;', '&lceil;', '&rceil;', '&lfloor;', '&rfloor;'
       ];
 
       context.memo('button.specialchars', function() {

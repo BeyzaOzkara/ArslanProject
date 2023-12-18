@@ -229,13 +229,14 @@ class YudaOnay(models.Model):
 class YudaForm(models.Model):
     YudaNo = models.CharField(null=True, blank=True)
     ProjeYoneticisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_projeyoneticisi", blank=True, null =True)
-    Tarih = models.DateField(auto_now=True, null=True, blank=True)
-    RevTarih = models.DateField(null=True, blank=True) #düzenleme yapıldığındaki tarih
+    Tarih = models.DateField(null=True, blank=True)
+    RevTarih = models.DateField(auto_now=True, null=True, blank=True) #düzenleme yapıldığındaki tarih
     MusteriFirmaAdi = models.CharField(null=True, blank=True)
     SonKullaniciFirma = models.CharField(null=True, blank=True)
     KullanımAlani = models.CharField(null=True, blank=True)
     CizimNo = models.CharField(null=True, blank=True)
     ProfilSip = models.CharField(null=True, blank=True) #haftalık mı aylık mı yıllık mı sipariş
+    ProfilMiktarBirim = models.CharField(null=True, blank=True)
     YillikProfilSiparisiMiktar = models.CharField(null=True, blank=True)
     MusteriOdemeVadesi = models.CharField(null=True, blank=True)
     AlasimKondusyon = models.JSONField(null=True, blank=True)

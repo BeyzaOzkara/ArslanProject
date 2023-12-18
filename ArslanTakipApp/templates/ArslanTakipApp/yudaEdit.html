@@ -76,12 +76,7 @@
                         const matchingRadio = document.querySelector(`input[name='${fieldName}'][value='${fieldValue}']`);
                         if (matchingRadio) {
                             matchingRadio.checked = true;
-                            console.log("input value");
-                            console.log($(`input[name='${fieldName}'][value='${fieldValue}']`));
                         }
-                            console.log("input value bitiş");
-                            console.log($(`input[name='${fieldName}']`));
-                            
                     }
                     else if (formElements[i].type == "checkbox") {
                         if (fieldValue === "Var" || fieldValue === "Temiz Kesim") {
