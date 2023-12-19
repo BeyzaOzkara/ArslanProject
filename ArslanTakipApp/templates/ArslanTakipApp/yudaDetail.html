@@ -35,6 +35,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    #onayChart {
+      width: 50px;
+      height: 50px;
+    }
   </style>
 {% endblock %}
 
@@ -116,7 +120,12 @@
               <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
           </ul>
-          
+          <!-- anketi buraya mı koymalıyım -->
+          <div class="col-12 col-md-12 col-lg-6 order-2 order-md-1" style="height: 265px;">
+            <p style="font-weight: bold;">Onay Anketi</p>
+            <input type="radio" name="onay" id="onayRadio"> ONAY<br/>
+            <input type="radio" name="onay" id="redRadio"> RET<br/>
+          </div>
         </div>
       </div>
 
@@ -149,10 +158,10 @@
         <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
           <i class="fas fa-minus"></i></button>
       </div>
-    </div>
+    </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
     <div class="card-body" id="yorumCard">
       <div class="row" style="height: 265px;">
-        <div class="col-12" id="yorumTextCol">
+        <div class="col-12 col-md-12 col-lg-10 order-2 order-md-1" id="yorumTextCol">
           <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
                           style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
         </div>
@@ -167,6 +176,21 @@
             </div>
           </div>
           <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+        </div>
+        <div class="callout callout-info col-12 col-md-12 col-lg-2 order-2 order-md-1" style="height: 255px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <p style="font-weight: bold;">Onay Anketi</p>
+          <div style="display: inline-block;">
+            <label style="display: inline-block;">
+              <input type="radio" name="onay" id="onayRadio"> ONAY
+            </label>
+            <label style="display: inline-block;">
+              <input type="radio" name="onay" id="redRadio" class="ml-2"> RET 
+            </label>
+          </div>
+          <br/>
+          <div class="chart-container" style="position: relative; height:150px; width:200px;">
+            <canvas id="onayChart"></canvas>
+          </div>
         </div>
       </div>
       <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
@@ -276,7 +300,7 @@
         </div>
         
       </div>
-      <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2" id="yudaDosya">
+      <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2" id="yudaDosya" style="position: relative;">
         <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
         <p class="text-muted">${i.YudaNo} ile ilişkili dosyalar</p>
         <br>
@@ -291,6 +315,11 @@
           <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
           <ul class="list-unstyled dosyalar hide" id="digerDos"></ul>
         </ul>
+        <div class="callout callout-info order-2 order-md-2" id="onayDiv" style="position: absolute; bottom: 0; right: 0;">
+          <p style="font-weight: bold;">Onay Anketi</p>
+          <input type="radio" name="onay" id="onayRadio"> ONAY<br/>
+          <input type="radio" name="onay" id="redRadio"> RET<br/>
+        </div>
       </div>
       
     </div>
@@ -332,13 +361,6 @@
         `);
         digerDosList.append(digerDos);
       }
-      /* const yudaDosya = $('<li style="font-size:1.5em"></li>').html(`
-            <label>${f.FileTitle}</label>
-            <br>
-            <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
-            <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-      `);
-      dosyaList.append(yudaDosya); */
     });
 
   };
@@ -379,7 +401,7 @@
   };
  
   function DosyaEkle() {
-    let changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";
+    let changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";
     document.getElementById('yorumTextCol').setAttribute("class", changedClass);
     $('#dosyaEkleCol').show();
   };
@@ -501,6 +523,30 @@
     
   });
 
+  // Assuming you have variables storing vote counts for ONAY and RET
+const onayVotes = 50; // Replace this with actual vote counts
+const retVotes = 30; // Replace this with actual vote counts
+
+const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
+
+new Chart(voteChartCanvas, {
+    type: 'pie',
+    data: {
+        labels: ['ONAY', 'RET'],
+        datasets: [{
+            label: 'Vote Rates',
+            data: [onayVotes, retVotes],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.8)', // Blue color for ONAY
+                'rgba(255, 99, 132, 0.8)' // Red color for RET
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+      resize: true,
+    }
+});
 </script>
 {% endblock %}
 
@@ -513,4 +559,5 @@
 <!-- Summernote -->
 <script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/chart.js/Chart.min.js' %}"></script>
 {% endblock %}
