@@ -123,8 +123,8 @@
           <!-- anketi buraya mı koymalıyım -->
           <div class="col-12 col-md-12 col-lg-6 order-2 order-md-1" style="height: 265px;">
             <p style="font-weight: bold;">Onay Anketi</p>
-            <input type="radio" name="onay" id="onayRadio"> ONAY<br/>
-            <input type="radio" name="onay" id="redRadio"> RET<br/>
+            <input type="radio" name="onay1" id="onayRadio1"> ONAY<br/>
+            <input type="radio" name="onay1" id="redRadio1"> RET<br/>
           </div>
         </div>
       </div>
@@ -178,14 +178,15 @@
           <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
         </div>
         <div class="callout callout-info col-12 col-md-12 col-lg-2 order-2 order-md-1" style="height: 255px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-          <p style="font-weight: bold;">Onay Anketi</p>
+          <p style="font-weight: bold;">ONAY ANKETİ</p>
           <div style="display: inline-block;">
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio"> ONAY
+              <input type="radio" name="onay" id="onayRadio" value="onay"> ONAY
             </label>
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2"> RET 
+              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret"> RET 
             </label>
+            <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
           </div>
           <br/>
           <div class="chart-container" style="position: relative; height:150px; width:200px;">
@@ -404,6 +405,9 @@
     let changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";
     document.getElementById('yorumTextCol').setAttribute("class", changedClass);
     $('#dosyaEkleCol').show();
+    /* voteChart.data.datasets[0].data = [1000, retVotes];
+    voteChart.update(); */ //bu şekilde update edebilirim ajax ile yeni datayı al
+    // her onay anketine katıldıklarında ajax request ile seçtikleri oyu gönder ve viewde daha önce oy vermişler mi vermişlerse farklı kaydet vermemişlerse yenisini kaydet
   };
   
   var selectedFiles = [];
@@ -522,31 +526,64 @@
     });
     
   });
+  
 
-  // Assuming you have variables storing vote counts for ONAY and RET
-const onayVotes = 50; // Replace this with actual vote counts
-const retVotes = 30; // Replace this with actual vote counts
+  var anketSecimi  = "";
+  // Use event delegation for dynamically added elements
+  $(document).on('change', 'input[type=radio][name=onay]', function() {
+      document.getElementById("btnOnayAnket").disabled = false;
+      anketSecimi = this.value;
+  });
 
-const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
+  function onayAnketGonder() {
 
-new Chart(voteChartCanvas, {
-    type: 'pie',
-    data: {
-        labels: ['ONAY', 'RET'],
-        datasets: [{
-            label: 'Vote Rates',
-            data: [onayVotes, retVotes],
-            backgroundColor: [
-                'rgba(54, 162, 235, 0.8)', // Blue color for ONAY
-                'rgba(255, 99, 132, 0.8)' // Red color for RET
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-      resize: true,
-    }
-});
+    const params = {
+          yId: data[0].id,
+          secim: anketSecimi,
+    };
+
+    $.ajax({
+        url: `/yudaDetailAnket`,
+        method: 'GET',
+        data: { params: JSON.stringify(params)},
+        dataType: 'json',
+        success: function (sonuc) {
+            //canvas data değişecek
+            voteChart.data.datasets[0].data = [sonuc.onay, sonuc.ret];
+            voteChart.update();
+        },
+        error: function (error) {
+            console.error('Error loading poll results:', error);
+        }
+    });
+
+  }
+
+  //değiştirmek için bunları tekrar çağırıp yeni değer atayarak olmuyor yukarıdaki gibi yapılacak 
+  var onayVotes = 50; // Replace this with actual vote counts var onaySayisi = 0; var retSayisi = 0; şeklinde mi yapsam yoksa ilk alındığı halinden itibaren mi
+  const retVotes = 30; // Replace this with actual vote counts const değil var mı kullanmak daha sağlıklı olur ya da oy sayılarını ayrı bi variable yapıp bu constu ona mı atasam
+  // onay anketinde bir seçeneği seçtiği zaman onayVotes ya da retVotes değişecek ve chart yeniden çizilmeli redraw gibi bi özellik var mı ona bak sanırım redraw gerekmiyor chart.update() ile olabilir
+  const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
+
+  const voteChart = new Chart(voteChartCanvas, {
+      type: 'pie',
+      data: {
+          labels: ['ONAY', 'RET'],
+          datasets: [{
+              label: 'Vote Rates',
+              data: [onayVotes, retVotes],
+              backgroundColor: [
+                  'rgba(54, 162, 235, 0.8)', // Blue color for ONAY renkleri değiştir!!
+                  'rgba(255, 99, 132, 0.8)' // Red color for RET ne renk olsa
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+        resize: true,
+      }
+  });
+
 </script>
 {% endblock %}
 

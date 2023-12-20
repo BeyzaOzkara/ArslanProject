@@ -1322,6 +1322,40 @@ def yudaDetailComment(request):
 
     return response
 
+def  yudaDetailAnket(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    yudaId = params.get("yId")
+    secim = params.get("secim")
+
+    if secim == "onay":
+        secim = True
+    else:
+        secim = False
+    
+    # Update or create YudaOnay entry
+    try:
+        yuda_onay, created = YudaOnay.objects.get_or_create(
+            Yuda_id=yudaId,
+            defaults={
+                'Kullanici': request.user,
+                'OnayDurumu': secim
+            }
+        )
+        if not created:
+            yuda_onay.OnayDurumu = secim
+            yuda_onay.save()
+
+        # Calculate counts for true and false
+        onay_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=True).count()
+        ret_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).count()
+
+        return JsonResponse({'onay': onay_count, 'ret': ret_count})
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    #return onay ve ret sayısı
+
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)

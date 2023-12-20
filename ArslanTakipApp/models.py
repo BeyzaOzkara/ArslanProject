@@ -221,10 +221,6 @@ class Termik(models.Model):
     ProgramSet = models.CharField(null=True)
     BatchNo = models.CharField(null=True)
 
-class YudaOnay(models.Model):
-    Aciklama = models.CharField(null=True, blank=True)
-    Tarih = models.DateField(null=True, blank=True)
-    Onay = models.BooleanField(null=True, blank=True)
 
 class YudaForm(models.Model):
     YudaNo = models.CharField(null=True, blank=True)
@@ -254,6 +250,12 @@ class YudaForm(models.Model):
     TalasliImalatAciklama = models.CharField(null=True, blank=True)
     Paketleme = models.CharField(null=True, blank=True)
     PaketlemeAciklama = models.CharField(null=True, blank=True)
+
+class YudaOnay(models.Model):
+    Yuda = models.ForeignKey(YudaForm, on_delete=models.DO_NOTHING, null=True, blank=True)
+    Kullanici = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    Tarih = models.DateField(auto_now=True, null=True, blank=True)
+    OnayDurumu = models.BooleanField(null=True, blank=True)
 
 class Yuda(models.Model):
     """ IstekYapanBolum = models.CharField(null=True, blank=True)
