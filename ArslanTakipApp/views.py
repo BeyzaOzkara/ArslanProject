@@ -1291,8 +1291,12 @@ def yudaDetail(request, yId):
 
     onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
     retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
+    if not YudaOnay.objects.filter(Yuda_id = yId, Kullanici = request.user).first():
+        secim =""
+    else:
+        secim = YudaOnay.objects.get(Yuda_id = yId, Kullanici = request.user).OnayDurumu
 
-    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount})
+    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
 
 def yudaDetailComment(request):
     if request.method == 'POST':
@@ -1361,7 +1365,6 @@ def  yudaDetailAnket(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-    #return onay ve ret sayısı
 
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)

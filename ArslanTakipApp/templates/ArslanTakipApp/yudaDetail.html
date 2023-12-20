@@ -175,10 +175,10 @@
           <p style="font-weight: bold;">ONAY ANKETİ</p>
           <div style="display: inline-block;">
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio" value="onay"> ONAY
+              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected == true %} checked {% endif %} > ONAY
             </label>
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret"> RET 
+              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if Selected  == false %} checked {% endif %} > RET 
             </label>
             <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
           </div>
@@ -200,6 +200,7 @@
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
+  const anketSelected = '{{ Selected|escapejs }}';
 
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
