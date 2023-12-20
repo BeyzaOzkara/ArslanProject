@@ -120,12 +120,6 @@
               <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
             </li>
           </ul>
-          <!-- anketi buraya mı koymalıyım -->
-          <div class="col-12 col-md-12 col-lg-6 order-2 order-md-1" style="height: 265px;">
-            <p style="font-weight: bold;">Onay Anketi</p>
-            <input type="radio" name="onay1" id="onayRadio1"> ONAY<br/>
-            <input type="radio" name="onay1" id="redRadio1"> RET<br/>
-          </div>
         </div>
       </div>
 
@@ -316,11 +310,6 @@
           <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
           <ul class="list-unstyled dosyalar hide" id="digerDos"></ul>
         </ul>
-        <div class="callout callout-info order-2 order-md-2" id="onayDiv" style="position: absolute; bottom: 0; right: 0;">
-          <p style="font-weight: bold;">Onay Anketi</p>
-          <input type="radio" name="onay" id="onayRadio"> ONAY<br/>
-          <input type="radio" name="onay" id="redRadio"> RET<br/>
-        </div>
       </div>
       
     </div>
@@ -405,9 +394,6 @@
     let changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";
     document.getElementById('yorumTextCol').setAttribute("class", changedClass);
     $('#dosyaEkleCol').show();
-    /* voteChart.data.datasets[0].data = [1000, retVotes];
-    voteChart.update(); */ //bu şekilde update edebilirim ajax ile yeni datayı al
-    // her onay anketine katıldıklarında ajax request ile seçtikleri oyu gönder ve viewde daha önce oy vermişler mi vermişlerse farklı kaydet vermemişlerse yenisini kaydet
   };
   
   var selectedFiles = [];
@@ -559,10 +545,8 @@
 
   }
 
-  //değiştirmek için bunları tekrar çağırıp yeni değer atayarak olmuyor yukarıdaki gibi yapılacak 
-  var onayVotes = 50; // Replace this with actual vote counts var onaySayisi = 0; var retSayisi = 0; şeklinde mi yapsam yoksa ilk alındığı halinden itibaren mi
-  const retVotes = 30; // Replace this with actual vote counts const değil var mı kullanmak daha sağlıklı olur ya da oy sayılarını ayrı bi variable yapıp bu constu ona mı atasam
-  // onay anketinde bir seçeneği seçtiği zaman onayVotes ya da retVotes değişecek ve chart yeniden çizilmeli redraw gibi bi özellik var mı ona bak sanırım redraw gerekmiyor chart.update() ile olabilir
+  const onayVotes = JSON.parse('{{ onay|escapejs }}');
+  const retVotes = JSON.parse('{{ ret|escapejs }}');
   const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
 
   const voteChart = new Chart(voteChartCanvas, {

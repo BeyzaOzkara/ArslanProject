@@ -1287,9 +1287,12 @@ def yudaDetail(request, yId):
     yudaDetails = YudaForm.objects.filter(id = yId).values()
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
-
     data = json.dumps(formatted_yuda_details, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments})
+
+    onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
+    retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
+
+    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount})
 
 def yudaDetailComment(request):
     if request.method == 'POST':
