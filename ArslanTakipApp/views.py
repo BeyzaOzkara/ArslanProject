@@ -1337,18 +1337,22 @@ def  yudaDetailAnket(request):
     
     # Update or create YudaOnay entry
     try:
-        yuda_onay, created = YudaOnay.objects.get_or_create(
-            Yuda_id=yudaId,
-            defaults={
-                'Kullanici': request.user,
-                'OnayDurumu': secim
-            }
-        )
-        if not created:
-            yuda_onay.OnayDurumu = secim
-            yuda_onay.save()
+        # Check if the user has already voted for this Yuda_id
+        user_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Kullanici=request.user).first()
 
-        # Calculate counts for true and false
+        if user_vote:
+            # If the user has already voted, update their vote
+            user_vote.OnayDurumu = secim
+            user_vote.save()
+        else:
+            # If the user hasn't voted, create a new vote record
+            YudaOnay.objects.create(
+                Kullanici=request.user,
+                Yuda_id=yudaId,
+                OnayDurumu=secim
+            )
+
+        # Calculate counts for true and false votes for the Yuda_id
         onay_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=True).count()
         ret_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).count()
 
