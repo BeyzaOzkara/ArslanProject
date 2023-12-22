@@ -12,17 +12,19 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views import generic
+from django.views import View, generic
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth.decorators import login_required, permission_required
 from guardian.shortcuts import get_objects_for_user
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db import transaction 
 from aes_cipher import *
 from Crypto.Cipher import AES
@@ -41,6 +43,16 @@ class RegisterView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "registration/register.html"
+
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'registration/password_change_form.html'
+    success_url = reverse_lazy('ArslanTakipApp:custom_password_change_done')
+
+class CustomPasswordChangeDoneView(generic.TemplateView):
+    template_name = 'registration/password_change_done.html'
+    def dispatch(self, request, *args, **kwargs):
+        logout(request)
+        return super().dispatch(request, *args, **kwargs)
 
 def calculate_pagination(page, size):
     offset = (page - 1) * size
@@ -1155,6 +1167,9 @@ def yudas_list(request):
     
     filtered_yudas = y.filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])
+    for o in yudaList:
+        #kaç kişiden onay alması lazım ve yüzde kaçı onaylamış ona bakılacak bölümdeki herkesten mi onay almalı yoksa belli bir sayıda onaya göre mi olmalı
+        o['onayDurumu'] = "40%"
 
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)

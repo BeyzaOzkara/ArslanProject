@@ -1,13 +1,15 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import RegisterView
+from .views import RegisterView, CustomPasswordChangeView, CustomPasswordChangeDoneView
 
 app_name = 'ArslanTakipApp'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('login/', auth_views.LoginView.as_view()),
     path('logout/', auth_views.LogoutView.as_view()),
+    path('change-password/', CustomPasswordChangeView.as_view(), name='password_change'),
+    path('change-password/done/', CustomPasswordChangeDoneView.as_view(), name='custom_password_change_done'),
     path('register/', RegisterView.as_view(), name= "register"),
     path('location/', views.location, name="location"),
     path('location/list/', views.location_list),

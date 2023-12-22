@@ -23,7 +23,7 @@
                     <img src="" alt="User Avatar" class="img-size-50 mr-3 img-circle">
                     <div class="media-body">
                         <h3 class="dropdown-item-title">
-                                {% firstof request.user.get_short_name request.user.get_username %}
+                            {{ request.user.first_name }} {{ request.user.last_name }}
                             <span class="float-right text-sm text-danger"><i class="fas fa-online"></i></span>
                         </h3>
                         <p class="text-sm"><small>Üyelik Tarihi :</small></p>
@@ -33,7 +33,7 @@
             </a>
             <div class="dropdown-divider"></div>
             <div class="dropdown-footer">
-                    <a href="{% block change_password_url %}{% url 'admin:password_change' %}{% endblock %}" class="btn btn-primary btn-sm">Parolayı Değiştir</a>
+                    <a href="{% block change_password_url %}{% url 'password_change' %}{% endblock %}" class="btn btn-primary btn-sm">Parolayı Değiştir</a>
                     <a  href="{% block logout_url %}{{ logout_url }}{% endblock %}" class="btn btn-danger btn-sm">Çıkış Yap</a>
                 </div>
             
