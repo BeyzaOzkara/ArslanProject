@@ -1120,36 +1120,7 @@ def yuda_kaydet(request):
                         setattr(y, key, value_list)
                     else:
                         setattr(y, key, value)
-
             y.save()
-
-            """ yonetimGroup = Group.objects.get(name='Yonetim Bolumu')
-            planlamaGroup = Group.objects.get(name='Planlama Bolumu')
-            kaliteGroup = Group.objects.get(name='Kalite Bolumu')
-            kaliphaneGroup = Group.objects.get(name='Kaliphane Bolumu')
-            presGroup = Group.objects.get(name='Pres Bolumu')
-            paketlemeGroup = Group.objects.get(name='Paketleme Bolumu')
-            yurtIciSatisGroup = Group.objects.get(name='Yurt Ici Satis Bolumu')
-            yurtDisiSatisGroup = Group.objects.get(name='Yurt Disi Satis Bolumu')
-            
-            assign_perm("gorme_yuda", request.user, y)
-            assign_perm("gorme_yuda", yonetimGroup, y)
-            assign_perm("gorme_yuda", kaliphaneGroup, y)
-            assign_perm("gorme_yuda", planlamaGroup, y)
-            assign_perm("gorme_yuda", kaliteGroup, y)
-            assign_perm("gorme_yuda", presGroup, y)
-            assign_perm("gorme_yuda", paketlemeGroup, y) 
-            
-            if yurtIciSatisGroup in request.user.groups.all():
-                assign_perm("gorme_yuda", yurtIciSatisGroup, y)
-            elif yurtDisiSatisGroup in request.user.groups.all():
-                assign_perm("gorme_yuda", yurtDisiSatisGroup, y)
-            
-            mekanikIslemGroup = Group.objects.get(name='Mekanik Islem Bolumu')
-            eloksalGroup = Group.objects.get(name='Eloksal Bolumu')
-            boyahaneGroup = Group.objects.get(name='Boyahane Bolumu')
-            ahsapKaplamaGroup = Group.objects.get(name='Ahsap Kaplama Bolumu')
-            """
 
             group_names = [
                 'Yonetim Bolumu',
@@ -1162,6 +1133,13 @@ def yuda_kaydet(request):
                 'Yurt Ici Satis Bolumu',
             ]
 
+            group_mapping = {
+                'YuzeyEloksal': 'Eloksal Bolumu',
+                'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
+                'YuzeyBoya': 'Boyahane Bolumu',
+                'TalasliImalat': 'Mekanik Islem Bolumu',
+            }
+
             groups = [Group.objects.get(name=name) for name in group_names]
 
             assign_perm("gorme_yuda", request.user, y)
@@ -1171,14 +1149,6 @@ def yuda_kaydet(request):
                         assign_perm("gorme_yuda", group, y)
                 else:
                     assign_perm("gorme_yuda", group, y)
-
-
-            group_mapping = {
-                'YuzeyEloksal': 'Eloksal Bolumu',
-                'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
-                'YuzeyBoya': 'Boyahane Bolumu',
-                'TalasliImalat': 'Mekanik Islem Bolumu',
-            }
 
             # Check field values and assign permissions based on conditions
             for field in y._meta.fields:
@@ -1190,27 +1160,6 @@ def yuda_kaydet(request):
                 if fname == "TalasliImalat" and fvalue is "Var":
                     group = Group.objects.get(name=group_mapping[fname])
                     assign_perm("gorme_yuda", group, y)
-
-            
-
-            """ 
-            for field in y._meta.fields:
-                print(f"{field.name}: {getattr(y, field.name)}")
-                fname = field.name
-                fvalue = getattr(y, field.name)
-                if fname == "YuzeyEloksal":
-                    if fvalue != None and fvalue != "":
-                        assign_perm("gorme_yuda", eloksalGroup, y)
-                if fname == "YuzeyAhsap":
-                    if fvalue != None and fvalue != "":
-                        assign_perm("gorme_yuda", ahsapKaplamaGroup, y)
-                if fname == "YuzeyBoya":
-                    if fvalue != None and fvalue != "":
-                        assign_perm("gorme_yuda", boyahaneGroup, y)
-                if fname == "TalasliImalat":
-                    if fvalue == "Var":
-                        assign_perm("gorme_yuda", mekanikIslemGroup, y) """
-
 
             # Dosyaları ve başlıkları işleyin
             file_titles = request.POST.getlist('fileTitles[]')
