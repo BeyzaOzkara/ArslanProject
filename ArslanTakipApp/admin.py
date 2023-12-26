@@ -39,3 +39,10 @@ admin.site.register(Hareket)
 #@admin.register(Hareket)
 
 admin.site.register(Parameter)
+
+class YudaFormAdmin(GuardedModelAdmin):
+    # Your admin customization here
+    list_display = ('YudaNo', 'ProjeYoneticisi', 'Tarih', 'RevTarih')  # Example: Customize list display
+    search_fields = ('YudaNo', 'MusteriFirmaAdi')  # Example: Add search fields
+
+admin.site.register(YudaForm, YudaFormAdmin)

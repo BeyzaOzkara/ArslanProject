@@ -251,6 +251,14 @@ class YudaForm(models.Model):
     Paketleme = models.CharField(null=True, blank=True)
     PaketlemeAciklama = models.CharField(null=True, blank=True)
 
+    def __str__(self):
+        return self.YudaNo
+
+    class Meta:
+        verbose_name="YudaForm"
+        verbose_name_plural="YudaForms"
+        permissions = [("gorme_yuda", "Yuda Gorme Yetkisi Var")] #tek yetki yeterli olur gibi iki yapmaya gerek var mı
+
 class YudaOnay(models.Model):
     Yuda = models.ForeignKey(YudaForm, on_delete=models.DO_NOTHING, null=True, blank=True)
     Kullanici = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)

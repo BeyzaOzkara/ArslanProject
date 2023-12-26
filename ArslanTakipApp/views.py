@@ -16,14 +16,14 @@ from django.views import View, generic
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from guardian.shortcuts import get_objects_for_user
+from guardian.shortcuts import get_objects_for_user, assign_perm
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
 from django.db import transaction 
 from aes_cipher import *
@@ -1107,7 +1107,7 @@ def yuda_kaydet(request):
             else:
                 # If no YudaNo exists for today, start from 01
                 sequential_number = '01'
-
+            
             y = YudaForm()
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = request.user
@@ -1122,6 +1122,95 @@ def yuda_kaydet(request):
                         setattr(y, key, value)
 
             y.save()
+
+            """ yonetimGroup = Group.objects.get(name='Yonetim Bolumu')
+            planlamaGroup = Group.objects.get(name='Planlama Bolumu')
+            kaliteGroup = Group.objects.get(name='Kalite Bolumu')
+            kaliphaneGroup = Group.objects.get(name='Kaliphane Bolumu')
+            presGroup = Group.objects.get(name='Pres Bolumu')
+            paketlemeGroup = Group.objects.get(name='Paketleme Bolumu')
+            yurtIciSatisGroup = Group.objects.get(name='Yurt Ici Satis Bolumu')
+            yurtDisiSatisGroup = Group.objects.get(name='Yurt Disi Satis Bolumu')
+            
+            assign_perm("gorme_yuda", request.user, y)
+            assign_perm("gorme_yuda", yonetimGroup, y)
+            assign_perm("gorme_yuda", kaliphaneGroup, y)
+            assign_perm("gorme_yuda", planlamaGroup, y)
+            assign_perm("gorme_yuda", kaliteGroup, y)
+            assign_perm("gorme_yuda", presGroup, y)
+            assign_perm("gorme_yuda", paketlemeGroup, y) 
+            
+            if yurtIciSatisGroup in request.user.groups.all():
+                assign_perm("gorme_yuda", yurtIciSatisGroup, y)
+            elif yurtDisiSatisGroup in request.user.groups.all():
+                assign_perm("gorme_yuda", yurtDisiSatisGroup, y)
+            
+            mekanikIslemGroup = Group.objects.get(name='Mekanik Islem Bolumu')
+            eloksalGroup = Group.objects.get(name='Eloksal Bolumu')
+            boyahaneGroup = Group.objects.get(name='Boyahane Bolumu')
+            ahsapKaplamaGroup = Group.objects.get(name='Ahsap Kaplama Bolumu')
+            """
+
+            group_names = [
+                'Yonetim Bolumu',
+                'Planlama Bolumu',
+                'Kalite Bolumu',
+                'Kaliphane Bolumu',
+                'Pres Bolumu',
+                'Paketleme Bolumu',
+                'Yurt Disi Satis Bolumu',
+                'Yurt Ici Satis Bolumu',
+            ]
+
+            groups = [Group.objects.get(name=name) for name in group_names]
+
+            assign_perm("gorme_yuda", request.user, y)
+            for group in groups:
+                if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
+                    if group in request.user.groups.all():
+                        assign_perm("gorme_yuda", group, y)
+                else:
+                    assign_perm("gorme_yuda", group, y)
+
+
+            group_mapping = {
+                'YuzeyEloksal': 'Eloksal Bolumu',
+                'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
+                'YuzeyBoya': 'Boyahane Bolumu',
+                'TalasliImalat': 'Mekanik Islem Bolumu',
+            }
+
+            # Check field values and assign permissions based on conditions
+            for field in y._meta.fields:
+                fname = field.name
+                fvalue = getattr(y, fname)
+                if fname in group_mapping and fvalue is not None and fvalue != "":
+                    group = Group.objects.get(name=group_mapping[fname])
+                    assign_perm("gorme_yuda", group, y)
+                if fname == "TalasliImalat" and fvalue is "Var":
+                    group = Group.objects.get(name=group_mapping[fname])
+                    assign_perm("gorme_yuda", group, y)
+
+            
+
+            """ 
+            for field in y._meta.fields:
+                print(f"{field.name}: {getattr(y, field.name)}")
+                fname = field.name
+                fvalue = getattr(y, field.name)
+                if fname == "YuzeyEloksal":
+                    if fvalue != None and fvalue != "":
+                        assign_perm("gorme_yuda", eloksalGroup, y)
+                if fname == "YuzeyAhsap":
+                    if fvalue != None and fvalue != "":
+                        assign_perm("gorme_yuda", ahsapKaplamaGroup, y)
+                if fname == "YuzeyBoya":
+                    if fvalue != None and fvalue != "":
+                        assign_perm("gorme_yuda", boyahaneGroup, y)
+                if fname == "TalasliImalat":
+                    if fvalue == "Var":
+                        assign_perm("gorme_yuda", mekanikIslemGroup, y) """
+
 
             # Dosyaları ve başlıkları işleyin
             file_titles = request.POST.getlist('fileTitles[]')
@@ -1154,8 +1243,8 @@ def yudas_list(request):
         value = params[i]
         print("Key and Value pair are ({}) = ({})".format(i, value))
 
-    size = params.get("size", 7)  # Default size to 10
-    page = params.get("page", 1)
+    size = params.get("size", 7)  # Default size to 7
+    page = params.get("page", 1)  # Default page to 1
     offset, limit = calculate_pagination(page, size)
     filter_list = params.get("filter", [])
     q = {}
@@ -1168,9 +1257,8 @@ def yudas_list(request):
     filtered_yudas = y.filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])
     for o in yudaList:
-        #kaç kişiden onay alması lazım ve yüzde kaçı onaylamış ona bakılacak bölümdeki herkesten mi onay almalı yoksa belli bir sayıda onaya göre mi olmalı
         o['onayDurumu'] = "40%"
-
+ 
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)
     response_data = {
@@ -1337,11 +1425,10 @@ def yudaDetailComment(request):
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
-            response.status_code = 500 #server error
+            response.status_code = 400 #bad request
         except Exception as e:
             response = JsonResponse({'error': str(e)})
             response.status_code = 500 #server error
-
     return response
 
 def  yudaDetailAnket(request):
@@ -1379,7 +1466,7 @@ def  yudaDetailAnket(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-
+   
 
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
@@ -1459,7 +1546,7 @@ def yudachange(request, yId):
     response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
     return response
 
-# Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla
+# Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla 
 """ for field in changeYuda._meta.fields:
     print(f"{field.name}: {getattr(changeYuda, field.name)}") """
 
