@@ -277,19 +277,42 @@
                     </div>
                 </div>
                 <div class="tab-pane" id="tab_4">
-                    <div class="card">
+                    <div class="card card-primary card-tabs">
                         <div class="card-header d-flex p-0">
-                            <h3 class="card-title p-3">Yüzey Detayları</h3>
-                            <ul class="nav nav-pills ml-auto p-2">
+                            <!-- <h3 class="card-title p-3">Yüzey Detayları</h3> -->
+                            <!-- <ul class="nav nav-pills ml-auto p-2">
                                 <li class="nav-item"><a class="nav-link active" href="#ytab_1" data-toggle="tab">Pres</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#ytab_2" data-toggle="tab" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#ytab_3" data-toggle="tab" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#ytab_4" data-toggle="tab" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a></li>
+                            </ul> -->
+                            <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+                                <li class="pt-2 px-3"><h3 class="card-title">Yüzey Detayları</h3></li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true"> </a>
+                                  </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_1" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Pres</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-profile-tab" data-toggle="pill" href="#ytab_2" role="tab" aria-controls="custom-tabs-two-profile" aria-selected="false" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-messages-tab" data-toggle="pill" href="#ytab_3" role="tab" aria-controls="custom-tabs-two-messages" aria-selected="false" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-settings-tab" data-toggle="pill" href="#ytab_4" role="tab" aria-controls="custom-tabs-two-settings" aria-selected="false" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a>
+                                </li>
                             </ul>
                         </div>
                         <div class="card-body">
                             <div class="tab-content">
-                                <div class="tab-pane active" id="ytab_1">
+                                <div class="tab-pane fade show active" id="ytab_home">
+                                    <div class="row">
+                                        
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="ytab_1">
                                     <div class="row">
                                         <div class="form-group col-lg-4">
                                             <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if(this.value == 'Pres Yüzey'){toastClick('info', 'Müşteriye Pres olarak sevk edilecekse doldurunuz', 'br')}
@@ -320,7 +343,7 @@
                                     </div>
                                     <input type="text" name="YuzeyPres" id="yPresTabData" class="kaydet" style="display: none;" required>
                                 </div>
-                                <div class="tab-pane" id="ytab_2">
+                                <div class="tab-pane fade" id="ytab_2">
                                         <div class="row">
                                             <div class="col-lg-2">
                                                 <div class="form-group">
@@ -378,7 +401,7 @@
                                         </div>
                                     <input type="text" name="YuzeyEloksal" class="kaydet" id="yEloksalTabData" style="display: none;" required>
                                 </div>
-                                <div class="tab-pane" id="ytab_3">
+                                <div class="tab-pane fade" id="ytab_3">
                                     <div class="row">
                                         <div class="form-group col-lg-1">
                                             <select name="turSelect" id="turSelect" class="form-control">
@@ -448,7 +471,7 @@
                                     </div>
                                     <input type="text" name="YuzeyBoya" class="kaydet" id="yBoyaTabData" style="display: none;" required>
                                 </div>
-                                <div class="tab-pane" id="ytab_4">
+                                <div class="tab-pane fade" id="ytab_4">
                                     <div id="ahsapTab">
                                         <div class="row">
                                             <div class="col-lg-6 form-group">
