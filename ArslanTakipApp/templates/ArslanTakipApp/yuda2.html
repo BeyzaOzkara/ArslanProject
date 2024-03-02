@@ -46,6 +46,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .nav-tabs #custom-tabs-two-tab .nav-link.active[href="#ytab_home"],
+    .nav-tabs #custom-tabs-two-tab .nav-link.active[href="#ytab_home"]:hover,
+    .nav-tabs #custom-tabs-two-tab .nav-link.active[href="#ytab_home"]:focus {
+        background-color: #007bff; /* Change this color to match your primary color */
+        color: #fff; /* Text color for active tab */
+    }
   </style>
 
 {% endblock %}
@@ -287,9 +293,9 @@
                                 <li class="nav-item"><a class="nav-link" href="#ytab_4" data-toggle="tab" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a></li>
                             </ul> -->
                             <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
-                                <li class="pt-2 px-3"><h3 class="card-title">Yüzey Detayları</h3></li>
+                                <!-- <li class="pt-2 px-3"><h3 class="card-title">Yüzey Detayları</h3></li> -->
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true"> </a>
+                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Yüzey Detayları</a>
                                   </li>
                                 <li class="nav-item">
                                   <a class="nav-link" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_1" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Pres</a>
@@ -309,7 +315,7 @@
                             <div class="tab-content">
                                 <div class="tab-pane fade show active" id="ytab_home">
                                     <div class="row">
-                                        
+                                        <p>Lütfen Pres, Eloksal, Boya, Ahşap Kaplama ...</p>
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="ytab_1">
