@@ -1,9 +1,10 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import RegisterView, CustomPasswordChangeView, CustomPasswordChangeDoneView
 
 app_name = 'ArslanTakipApp'
+
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('login/', auth_views.LoginView.as_view()),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('hareket', views.HareketView.as_view()),
     path('kalip/', views.KalipView.as_view()),
     path('kalip/liste', views.kalip_liste),
+    path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
     path('qr/', views.qrKalite, name='qr'),
     path('siparis/', views.SiparisView.as_view()),

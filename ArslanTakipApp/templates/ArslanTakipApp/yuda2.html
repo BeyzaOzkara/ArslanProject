@@ -55,6 +55,8 @@
     <div class="card">
         <div class="card-header d-flex p-0">
             <h3 class="card-title p-3">YENİ ÜRÜN DEVREYE ALMA FORMU</h3>
+
+              
             <ul class="nav nav-pills ml-auto p-2">
               <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
@@ -608,20 +610,20 @@
                 }
             }
             let yuzde = req*100/requiredElements.length;
-            if (yuzde <= 100){
-                yuzde = 100;
-            }
+            // if (yuzde <= 100){
+            //     yuzde = 100;
+            // }
             document.getElementById('kaydetProgress').style.width = yuzde +'%';
             if(yuzde >= 100 ){
                 if(full == false){
                     setTimeout(function(){
-                    document.getElementById('kaydetProgress').style.width = '0%';
-                    setTimeout(function(){$('#yudaKaydet').show();
-                        document.getElementById('kaydetProgress').style.width = '100%';
-                    }, 600);
+                        document.getElementById('kaydetProgress').style.width = '0%';
+                        setTimeout(function(){$('#yudaKaydet').show();
+                            document.getElementById('kaydetProgress').style.width = '100%';
+                        }, 600);
 
-                }, 600);
-                full = true;
+                    }, 600);
+                    full = true;
                 };
                 
             }

@@ -258,7 +258,6 @@ var headerMenu = function(){
             let label = document.createElement("span");
             let title = document.createElement("span");
 
-            
             title.textContent = " " + column.getDefinition().title;
             label.appendChild(icon);
             label.appendChild(title);
@@ -313,6 +312,22 @@ var aktAccessor = function(value, data, type, params, column) {
     };
     return value;
 };
+
+var kSayisi = 0;
+var toplamKalip = function(values, data, calcParams) {
+    $.ajax({
+      url: `/kalip/tum`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (sayi) {
+        kSayisi = parseInt(sayi);
+      },
+      error: function (error) {
+          console.error('Error loading kalip sayisi:', error);
+      }
+    });
+    return kSayisi;
+}
 
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
@@ -400,7 +415,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
             {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
             accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
-            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc:"count"},
+            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc: toplamKalip},//"count"},
             {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
             {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
             {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},

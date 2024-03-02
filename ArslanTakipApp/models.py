@@ -257,7 +257,7 @@ class YudaForm(models.Model):
     class Meta:
         verbose_name="YudaForm"
         verbose_name_plural="YudaForms"
-        permissions = [("gorme_yuda", "Yuda Gorme Yetkisi Var")] #tek yetki yeterli olur gibi iki yapmaya gerek var mı
+        permissions = [("gorme_yuda", "Yuda Gorme Yetkisi Var")]
 
 class YudaOnay(models.Model):
     Yuda = models.ForeignKey(YudaForm, on_delete=models.DO_NOTHING, null=True, blank=True)

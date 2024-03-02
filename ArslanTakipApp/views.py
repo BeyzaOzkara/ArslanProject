@@ -69,9 +69,6 @@ def format_date_time(date):
 def format_date(date):
     return date.strftime("%d-%m-%Y")
 
-def compare(s, t):
-    return sorted(s) == sorted(t)
-
 def guncelle(i, b, u):
     for j in b:
         if i == 'KalipNo':
@@ -138,8 +135,8 @@ def hareketSave(dieList, lRec, dieTo, request):
         else:
             print("Hareket not saved")
 
-@login_required #user must be logged in
 #@permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
+@login_required #user must be logged in
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
     loc_list = list(loc.values().order_by('id'))
@@ -199,7 +196,6 @@ def location_list(a):
     childData = root_nodes
     data = json.dumps(childData)
     return data
-
 
 def kalip_liste(request):
     #Kalıp Listesi Detaylı
@@ -361,15 +357,19 @@ def kalip(request):
 class KalipView(generic.TemplateView):
     template_name = 'ArslanTakipApp/kalip.html'
 
+def kalip_tum(request):
+    #şimdilik bütün kalıp sayısını döndür
+    #asıl istenen filter yapıldığında kaç tane kalıp var o sayı döndürülecek
+    kalipSayisi = KalipMs.objects.using('dies').count()
+    data = json.dumps(kalipSayisi, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
 def location_kalip(request):
     #kalıp arşivi sayfasındaki kalıplar
     if request.method == "GET":
         path = request.get_full_path()
         print(path)
         params = json.loads(unquote(request.GET.get('params')))
-        for i in params:
-            value = params[i]
-            print("Key and Value pair are ({}) = ({})".format(i, value))
         size = params["size"]
         page = params["page"]
         filter_list = params["filter"]
@@ -486,7 +486,6 @@ def qrKalite(request):
 
 class qrKaliteView(generic.TemplateView):
     template_name = 'ArslanTakipApp/qrKalite.html'
-
 
 class HareketView(generic.TemplateView):
     template_name = 'ArslanTakipApp/hareket.html'
@@ -1157,7 +1156,7 @@ def yuda_kaydet(request):
                 if fname in group_mapping and fvalue is not None and fvalue != "":
                     group = Group.objects.get(name=group_mapping[fname])
                     assign_perm("gorme_yuda", group, y)
-                if fname == "TalasliImalat" and fvalue is "Var":
+                if fname == "TalasliImalat" and fvalue == "Var":
                     group = Group.objects.get(name=group_mapping[fname])
                     assign_perm("gorme_yuda", group, y)
 
@@ -1306,7 +1305,6 @@ def format_yuda_details(yList):
         'Matlastirma': 'Matlaştırma', 'Renk': 'Renk', 'KaplamaKalinligi': 'Kaplama Kalınlığı', 'EloksalBoy': 'Boy', 'EloksalTemizKesim': 'Temiz Kesim',
         'Tur': 'Tür', 'Marka': 'Marka', 'MarkaRenkKodu': 'Marka Renk Kodu', 'BoyaClass': 'Boya Class', 'Ral': 'RAL', 'BoyaKalinlik': 'Kalınlık', 'BoyaBoy': 'Boy', 'BoyaTemizKesim': 'Temiz Kesim',
         'AhsapKaplama': 'Ahşap Kaplama', 'AhsapBoy': 'Boy', 'AhsapTemizKesim': 'Temiz Kesim',
-        # Add more key-name mappings as needed
     }
 
     for i in yList:
