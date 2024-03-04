@@ -23,10 +23,9 @@
     <div class="card-header">
         <h3 class="card-title" style="font-weight: bold;">YENİ ÜRÜN DEVREYE ALMA FORMLARI</h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-              <i class="fas fa-minus"></i></button>
-            <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
-              <i class="fas fa-times"></i></button>
+            <a class="btn btn-tool" data-toggle="tooltip" title="Ekle" href="yuda">
+              <i class="fas fa-plus"></i></button>
+            </a>
         </div>
     </div>
     <div class="card-body">
@@ -132,7 +131,7 @@
             </td>
             <td class="project-actions text-right">
                 <a class="btn btn-primary btn-sm" href="yudaDetail/${item.id}">
-                    <i class="fas fa-folder">
+                    <i class="fas fa-eye">
                     </i>
                     View
                 </a>
@@ -140,11 +139,6 @@
                     <i class="fas fa-pencil-alt">
                     </i>
                     Edit
-                </a>
-                <a class="btn btn-danger btn-sm" href="#">
-                    <i class="fas fa-trash">
-                    </i>
-                    Delete
                 </a>
             </td>
             `);
