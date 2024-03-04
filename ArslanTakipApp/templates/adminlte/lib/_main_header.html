@@ -6,41 +6,60 @@
 <link rel="icon" type="image/png" href="{% static '/favicon.ico' %}"/>
 {% endblock %}
 
-{% block header_dropdowns %}
+{% block nav_bar %}
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/location" class="nav-link">Lokasyon</a>
+        </li>
+    </ul>
 
-{% block user_info %}
+    {% block nav_custom_menu %}
 
-{% url 'logout' as logout_url %}
-
-{% if request.user.is_authenticated %}
-<li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-            <i class="far fa-user fa-2x"></i>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <a href="#" class="dropdown-item">
-                <div class="media">
-                    <img src="" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                    <div class="media-body">
-                        <h3 class="dropdown-item-title">
-                            {{ request.user.first_name }} {{ request.user.last_name }}
-                            <span class="float-right text-sm text-danger"><i class="fas fa-online"></i></span>
-                        </h3>
-                        <p class="text-sm"><small>Üyelik Tarihii :</small></p>
-                        <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>  <small>{{ request.user.date_joined }}</small></p>
+    <ul class="navbar-nav ml-auto">
+        <ul class="nav navbar-nav">
+            {% block header_dropdowns %}
+            {% block user_info %}
+            {% url 'logout' as logout_url %}
+            {% if request.user.is_authenticated %}
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="far fa-user fa-2x"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <a href="#" class="dropdown-item">
+                        <div class="media">
+                            <img src="" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    {{ request.user.first_name }} {{ request.user.last_name }}
+                                    <span class="float-right text-sm text-danger"><i class="fas fa-online"></i></span>
+                                </h3>
+                                <p class="text-sm"><small>Üyelik Tarihi :</small></p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>  <small>{{ request.user.date_joined }}</small></p>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                        <div class="dropdown-footer">
+                            <a href="{% block change_password_url %}{% url 'password_change' %}{% endblock %}" class="btn btn-primary btn-sm">Parolayı Değiştir</a>
+                            <a  href="{% block logout_url %}{{ logout_url }}{% endblock %}" class="btn btn-danger btn-sm">Çıkış Yap</a>
                     </div>
                 </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-footer">
-                    <a href="{% block change_password_url %}{% url 'password_change' %}{% endblock %}" class="btn btn-primary btn-sm">Parolayı Değiştir</a>
-                    <a  href="{% block logout_url %}{{ logout_url }}{% endblock %}" class="btn btn-danger btn-sm">Çıkış Yap</a>
-                </div>
-            
-        </div>
-    </li>
-{% endif %}
+            </li>
+            {% endif %}
+            {% endblock user_info %}
+            {% endblock header_dropdowns %}
+        </ul>
+    </ul>
 
-{% endblock user_info %}
+    {% endblock nav_custom_menu %}
+
 
 {% endblock %}
