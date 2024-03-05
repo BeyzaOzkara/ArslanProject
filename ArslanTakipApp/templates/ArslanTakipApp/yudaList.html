@@ -14,6 +14,39 @@
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" href="{% static 'ArslanTakipApp/icons.css' %}">
+  <style>
+    #filterPanelOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+        z-index: 999; /* Ensure it overlays other content */
+    }
+
+    #filterPanel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #filterPanel input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #applyFilter {
+        display: block;
+        width: 100%;
+    }
+  </style>
 
 {% endblock %}
 
@@ -21,12 +54,22 @@
 <div class="container-fluid">
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title" style="font-weight: bold;">YENİ ÜRÜN DEVREYE ALMA FORMLARI</h3>
-        <div class="card-tools">
-            <a class="btn btn-tool" data-toggle="tooltip" title="Ekle" href="yuda">
-              <i class="fas fa-plus"></i></button>
-            </a>
+      <h3 class="card-title" style="font-weight: bold;">YENİ ÜRÜN DEVREYE ALMA FORMLARI</h3>
+      <div class="card-tools">
+          <a class="btn btn-tool" data-toggle="tooltip" title="Filtrele" id="filterButton">
+            <i class="fas fa-filter"></i></button></a>
+          <a class="btn btn-tool" data-toggle="tooltip" title="Ekle" href="yuda">
+            <i class="fas fa-plus"></i></button>
+          </a>
+      </div>
+      <div id="filterPanelOverlay">
+        <div id="filterPanel">
+            <!-- Filter options -->
+            <input type="text" id="yudaNoFilter" class="form-control mb-2" placeholder="YudaNo">
+            <input type="text" id="musteriFirmaFilter" class="form-control mb-2" placeholder="Müşteri Firma">
+            <button id="applyFilter" class="btn btn-success">Filtre Uygula</button>
         </div>
+    </div>
     </div>
     <div class="card-body">
         <table class="table table-striped projects">
@@ -79,11 +122,33 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block extra_js %} 
 <script>
     let itemsPerPage = 7;  // Başlangıçta varsayılan değer
     let filterList = [];
     const tableBody = $('#yudaTBody');
+
+  $(document).ready(function() {
+    $('#filterButton').click(function() {
+        $('#filterPanelOverlay').toggle();
+    });
+
+    $('#applyFilter').click(function() {
+        const yudaNoFilter = $('#yudaNoFilter').val();
+        const musteriFirmaFilter = $('#musteriFirmaFilter').val();
+
+        // Apply your filter logic here and reload the data accordingly
+        // For example:
+        // filterList.push({ field: 'yudaNo', value: yudaNoFilter });
+        // filterList.push({ field: 'musteriFirma', value: musteriFirmaFilter });
+        loadPage(currentPage);
+
+        // Hide the filter panel after applying filter
+        $('#filterPanelOverlay').hide();
+    });
+  });
+
+
     function getProjects(data){
         tableBody.empty();  // Önceki verileri temizle
         data.forEach(item => {

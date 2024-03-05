@@ -83,7 +83,7 @@
                                 <div class="col-12 col-sm-4">
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI</span>
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI*</span>
                                       <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" required>
                                       <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
                                     </div>
@@ -118,7 +118,7 @@
                                 <div class="col-12 col-sm-4">
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ</span>
+                                      <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ*</span>
                                       <div class="input-group mt-2">
                                         <input type="text" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -165,7 +165,7 @@
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                     <select name="AlasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer'); if(this.value==0){digerFunction('alasimSelect', 'alasimDigerDiv')}">
-                                        <option value="alasimSelected" id="alasimSelected" selected disabled>Alaşım </option>
+                                        <option value="alasimSelected" id="alasimSelected" selected disabled>Alaşım* </option>
                                         
                                     </select>
                                     <div class="input-group" id="alasimDigerDiv" style="display: none;">
@@ -179,7 +179,7 @@
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                     <select name="KondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer'); if(this.value==0){digerFunction('kondusyonSelect', 'kondusyonDigerDiv')}">
-                                        <option value="kondusyonSelected" id="kondusyonSelected" selected disabled>Kondüsyon </option>
+                                        <option value="kondusyonSelected" id="kondusyonSelected" selected disabled>Kondüsyon* </option>
                                         
                                     </select>
                                     <div class="input-group" id="kondusyonDigerDiv" style="display: none;">
@@ -217,7 +217,7 @@
                                 <div class="col-12 col-sm-4">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
-                                        <span class="info-box-text text-center text-bold">DIN TOLERANS</span>
+                                        <span class="info-box-text text-center text-bold">DIN TOLERANS*</span>
                                         <select name="DinTolerans" id="dinTolerans" class="form-control mb-3 mt-3 kaydet" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
                                             <option value="" selected disabled>Tolerans seçiniz</option>
                                             <option value="EN 755-3">EN 755-3   Yuvarlak Dolu</option>
@@ -236,7 +236,7 @@
                                 <div class="col-12 col-sm-4">
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
-                                        <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI</span>
+                                        <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI*</span>
                                         <!-- multiselect ile seçilsin select2 -->
                                         <div class="form-group mt-3">
                                             <select class="select2bs4 kaydet" multiple="multiple" id="birlikteCalisan" name="BirlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
@@ -260,8 +260,8 @@
                                                 </span>
                                                 </div>
                                                 <input type="text" class="form-control metreInput" value="VAR" style="background-color: transparent;" readonly>
-                                                <input type="text" class="form-control col-lg-4 kaydet" placeholder="minimum (kg/m)" name="MATmin" id="minMAT" style="display: none;">
-                                                <input type="text" class="form-control col-lg-4 kaydet" placeholder="maximum (kg/m)" name="MATmax" id="maxMAT" style="display: none;">
+                                                <input type="number" class="form-control col-lg-4 kaydet" placeholder="minimum (kg/m)" name="MATmin" id="minMAT" style="display: none;">
+                                                <input type="number" class="form-control col-lg-4 kaydet" placeholder="maximum (kg/m)" name="MATmax" id="maxMAT" style="display: none;">
                                             </div>
                                         </div>
                                     </div>

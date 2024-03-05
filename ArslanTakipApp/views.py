@@ -45,14 +45,16 @@ class RegisterView(generic.CreateView):
     template_name = "registration/register.html"
 
 class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
-    template_name = 'registration/password_change_form.html'
-    success_url = reverse_lazy('ArslanTakipApp:custom_password_change_done')
+    template_name = 'registration/password_change_form.html' #registration/password_change_done.html
+    success_url = reverse_lazy('ArslanTakipApp:password_change_done')
 
 class CustomPasswordChangeDoneView(generic.TemplateView):
     template_name = 'registration/password_change_done.html'
-    def dispatch(self, request, *args, **kwargs):
-        logout(request)
-        return super().dispatch(request, *args, **kwargs)
+    def get_success_url(self):
+        return reverse_lazy('ArslanTakipApp:index')
+    # def dispatch(self, request, *args, **kwargs):
+    #     logout(request)
+    #     return super().dispatch(request, *args, **kwargs)
 
 def calculate_pagination(page, size):
     offset = (page - 1) * size
@@ -1122,7 +1124,7 @@ def yuda_kaydet(request):
             y.save()
 
             group_names = [
-                'Yonetim Bolumu',
+                'Ust Yonetim Bolumu',
                 'Planlama Bolumu',
                 'Kalite Bolumu',
                 'Kaliphane Bolumu',
