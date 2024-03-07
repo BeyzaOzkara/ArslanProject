@@ -1164,25 +1164,22 @@ def yuda_kaydet(request):
                     group = Group.objects.get(name=group_mapping[fname])
                     assign_perm("gorme_yuda", group, y)
 
-            
-            try:
-                # Dosyaları ve başlıkları işleyin
-                file_titles = request.POST.getlist('fileTitles[]')
-                for file, title in zip(request.FILES.getlist('files[]'), file_titles):
-                    UploadFile.objects.create(
-                        File = file,
-                        FileTitle = title,
-                        FileSize = file.size,
-                        FileModel = "YudaForm",
-                        FileModelId = y.id,
-                        UploadedBy = y.ProjeYoneticisi,
-                        Note = "",
-                    )
-                response = JsonResponse({'message': 'Kayıt başarılı'})
-            except Exception as e: 
-                logging.error("An error occurred: %s", e, exc_info=True)
-                response = JsonResponse({'error': str(e)})
-                response.status_code = 500 #server error
+            my_errors = open("error.txt", "a")
+            # Dosyaları ve başlıkları işleyin
+            file_titles = request.POST.getlist('fileTitles[]')
+            for file, title in zip(request.FILES.getlist('files[]'), file_titles):
+                my_errors.write(file)
+                UploadFile.objects.create(
+                    File = file,
+                    FileTitle = title,
+                    FileSize = file.size,
+                    FileModel = "YudaForm",
+                    FileModelId = y.id,
+                    UploadedBy = y.ProjeYoneticisi,
+                    Note = "",
+                )
+            my_errors.close()
+            response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
             response.status_code = 500 #server error
