@@ -1168,7 +1168,7 @@ def yuda_kaydet(request):
             # Dosyaları ve başlıkları işleyin
             file_titles = request.POST.getlist('fileTitles[]')
             for file, title in zip(request.FILES.getlist('files[]'), file_titles):
-                my_errors.write(str(file.size) + str(file.name))
+                my_errors.write(str(file.size)+ " , " + str(file.name) + " , " + str(y.id) + " , " + str(y.ProjeYoneticisi))
                 UploadFile.objects.create(
                     File = file,
                     FileTitle = title,
