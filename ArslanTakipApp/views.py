@@ -1,4 +1,5 @@
 import base64, binascii, zlib
+import logging
 import datetime
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
@@ -1112,6 +1113,7 @@ def yuda_kaydet(request):
             y = YudaForm()
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = request.user
+            y.YudaAcanKisi = request.user
             y.Tarih = datetime.datetime.now()
 
             for key, value in request.POST.items(): 
@@ -1179,6 +1181,7 @@ def yuda_kaydet(request):
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
             response.status_code = 500 #server error
         except Exception as e:
+            logging.error("An error occurred: %s", e, exc_info=True)
             response = JsonResponse({'error': str(e)})
             response.status_code = 500 #server error
 
