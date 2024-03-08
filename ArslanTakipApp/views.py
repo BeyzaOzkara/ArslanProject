@@ -1164,11 +1164,9 @@ def yuda_kaydet(request):
                     group = Group.objects.get(name=group_mapping[fname])
                     assign_perm("gorme_yuda", group, y)
 
-            my_errors = open("error.txt", "a")
             # Dosyaları ve başlıkları işleyin
             file_titles = request.POST.getlist('fileTitles[]')
             for file, title in zip(request.FILES.getlist('files[]'), file_titles):
-                my_errors.write(str(file.size)+ " , " + str(file.name) + " , " + str(y.id) + " , " + str(y.ProjeYoneticisi))
                 UploadFile.objects.create(
                     File = file,
                     FileTitle = title,
@@ -1178,9 +1176,9 @@ def yuda_kaydet(request):
                     UploadedBy = y.ProjeYoneticisi,
                     Note = "",
                 )
-            my_errors.close()
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
+            logging.error("An error occurred: %s", e, exc_info=True)
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
             response.status_code = 500 #server error
         except Exception as e:

@@ -282,66 +282,55 @@
                     </div>
                 </div>
                 <div class="tab-pane" id="tab_4">
-                    <div class="card card-primary card-tabs">
-                        <div class="card-header d-flex p-0">
-                            <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
-                                <!-- <li class="pt-2 px-3"><h3 class="card-title">Yüzey Detayları</h3></li> -->
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Yüzey Detayları</a>
-                                  </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_1" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Pres</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" id="custom-tabs-two-profile-tab" data-toggle="pill" href="#ytab_2" role="tab" aria-controls="custom-tabs-two-profile" aria-selected="false" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" id="custom-tabs-two-messages-tab" data-toggle="pill" href="#ytab_3" role="tab" aria-controls="custom-tabs-two-messages" aria-selected="false" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" id="custom-tabs-two-settings-tab" data-toggle="pill" href="#ytab_4" role="tab" aria-controls="custom-tabs-two-settings" aria-selected="false" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a>
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="card">
                         <div class="card-body">
-                            <div class="tab-content">
-                                <div class="tab-pane fade show active" id="ytab_home">
-                                    <div class="row">
-                                        <p>Lütfen Pres, Eloksal, Boya, Ahşap Kaplama ...</p>
-                                    </div>
+                            <div class="row">
+                                <div class="col-5 col-sm-2">
+                                  <div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
+                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Yüzey Detayları</a>
+                                    <a class="nav-link" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_1" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Pres</a>
+                                    <a class="nav-link" id="custom-tabs-two-profile-tab" data-toggle="pill" href="#ytab_2" role="tab" aria-controls="custom-tabs-two-profile" aria-selected="false" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a>
+                                    <a class="nav-link" id="custom-tabs-two-messages-tab" data-toggle="pill" href="#ytab_3" role="tab" aria-controls="custom-tabs-two-messages" aria-selected="false" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a>
+                                    <a class="nav-link" id="custom-tabs-two-settings-tab" data-toggle="pill" href="#ytab_4" role="tab" aria-controls="custom-tabs-two-settings" aria-selected="false" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a>
+                                  </div>
                                 </div>
-                                <div class="tab-pane fade" id="ytab_1">
-                                    <div class="row">
-                                        <div class="form-group col-lg-4">
-                                            <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if(this.value == 'Pres Yüzey'){toastClick('info', 'Müşteriye Pres olarak sevk edilecekse doldurunuz', 'br')}
-                                                                                                                    else if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal'){toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','br')}
-                                                                                                                    else if(this.value == 'Boya Kalite'){toastClick('info', 'Boya işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın. ','br')}">
-                                                <option value="yuzeyPresDetay" id="yuzeyPresSelected" selected disabled>Yüzey Detay</option>
-                                                <option value="Pres Yüzey">Pres Yüzey</option>
-                                                <option value="Eloksal Kalite">Eloksal Kalite</option>
-                                                <option value="Boya Kalite">Boya Kalite</option>
-                                                <option value="Parlak Eloksal">Parlak Eloksal</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-1">
-                                            <input type="number" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
-                                        </div>
-                                        <div class="form-group col-lg-1">
-                                            <button type="button" id="YuzeyPresEkle" class="btn btn-outline-primary" >Ekle</button>
-                                        </div> 
+                                <div class="col-7 col-sm-10">
+                                  <div class="tab-content" id="vert-tabs-tabContent">
+                                    <div class="tab-pane text-left fade show active" id="ytab_home" role="tabpanel" aria-labelledby="vert-tabs-home-tab">
+                                       <p>Lütfen Pres, Eloksal, Boya, Ahşap Kaplama ...</p> 
                                     </div>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="info-box">
-                                                <div class="info-box-content">
-                                                    <div id="yuzeyPresTabulator"></div>
+                                    <div class="tab-pane fade" id="ytab_1" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
+                                        <div class="row">
+                                            <div class="form-group col-lg-4">
+                                                <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if(this.value == 'Pres Yüzey'){toastClick('info', 'Müşteriye Pres olarak sevk edilecekse doldurunuz', 'br')}
+                                                                                                                        else if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal'){toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','br')}
+                                                                                                                        else if(this.value == 'Boya Kalite'){toastClick('info', 'Boya işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın. ','br')}">
+                                                    <option value="yuzeyPresDetay" id="yuzeyPresSelected" selected disabled>Yüzey Detay</option>
+                                                    <option value="Pres Yüzey">Pres Yüzey</option>
+                                                    <option value="Eloksal Kalite">Eloksal Kalite</option>
+                                                    <option value="Boya Kalite">Boya Kalite</option>
+                                                    <option value="Parlak Eloksal">Parlak Eloksal</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-lg-1">
+                                                <input type="number" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
+                                            </div>
+                                            <div class="form-group col-lg-1">
+                                                <button type="button" id="YuzeyPresEkle" class="btn btn-outline-primary" >Ekle</button>
+                                            </div> 
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="info-box">
+                                                    <div class="info-box-content">
+                                                        <div id="yuzeyPresTabulator"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <input type="text" name="YuzeyPres" id="yPresTabData" class="kaydet" style="display: none;" required>     
                                     </div>
-                                    <input type="text" name="YuzeyPres" id="yPresTabData" class="kaydet" style="display: none;" required>
-                                </div>
-                                <div class="tab-pane fade" id="ytab_2">
+                                    <div class="tab-pane fade" id="ytab_2" role="tabpanel" aria-labelledby="vert-tabs-messages-tab">
                                         <div class="row">
                                             <div class="col-lg-2">
                                                 <div class="form-group">
@@ -380,7 +369,7 @@
                                                         <input type="checkbox" class="temizCheckbox" id="eloksalTemiz">
                                                       </span>
                                                     </div>
-                                                    <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                    <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent; font-size: medium;" readonly>
                                                 </div>
                                                 <div class="col-lg-4" >
                                                     <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-primary">Ekle</button>
@@ -398,124 +387,125 @@
                                             </div>
                                         </div>
                                     <input type="text" name="YuzeyEloksal" class="kaydet" id="yEloksalTabData" style="display: none;" required>
-                                </div>
-                                <div class="tab-pane fade" id="ytab_3">
-                                    <div class="row">
-                                        <div class="form-group col-lg-1">
-                                            <select name="turSelect" id="turSelect" class="form-control">
-                                                <option value="Tür" id="turSelected" selected disabled>Tür </option>
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-5">
-                                        <div class="row">
-                                            <div class="input-group col-lg-9">
-                                                <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control col-lg-4" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
-                                                    <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
-                                                </select>
-                                                <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
-                                                <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
-                                                <select name="boyaClassSelect" id="boyaClassSelect" class="form-control col-lg-3" onclick="toastClick('info','Belirtilmediyse Class 1','')">
-                                                    <option value="boyaClass" selected>Class 1</option>
-                                                    <option value="boyaClass2">Class 2</option>
-                                                    <option value="boyaClass3">Class 3</option>
-                                                </select>
-                                                <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <div class="input-group ">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text ral" id="RALspan" style="color: rgb(231, 231, 231);">...</span>
-                                                        <span class="input-group-text" id="">RAL </span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="RALinput" maxlength="4" size="4">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                        <div class="form-group input-group col-lg-1">
-                                            <select name="boyaKalinlikSelect" id="boyaKalinlikSelect" class="form-control">
-                                                <option value="boyaKalınlık" selected disabled>Kalınlık</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-1">
-                                            <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
-                                        </div>
-                                        <div class="form-group col-lg-3">
-                                        <div class="row">
-                                            <div class="input-group col-lg-5">
-                                                <div class="input-group-prepend">
-                                                  <span class="input-group-text checkSpan">
-                                                    <input type="checkbox" class="temizCheckbox" id="boyaTemiz">
-                                                  </span>
-                                                </div>
-                                                <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
-                                            </div>
-                                            <div class="col-lg-7">
-                                                <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
-                                            </div>
-                                        </div>    
-                                        </div>
-                                        
-                                        <div class="form-group col-lg-1">
-                                            <button type="button" id="YuzeyBoyaEkle" class="btn btn-outline-primary" >Ekle</button>
-                                        </div> 
                                     </div>
-                                    <div class="row">
-                                        <div class="col-12 info-box">
-                                            <div class="info-box-content">
-                                                <div id="yuzeyBoyaTabulator"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <input type="text" name="YuzeyBoya" class="kaydet" id="yBoyaTabData" style="display: none;" required>
-                                </div>
-                                <div class="tab-pane fade" id="ytab_4">
-                                    <div id="ahsapTab">
+                                    <div class="tab-pane fade" id="ytab_3" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
                                         <div class="row">
-                                            <div class="col-lg-6 form-group">
-                                                <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="if(this.value==0){ digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')}">
-                                                    <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
+                                            <div class="form-group col-lg-1">
+                                                <select name="turSelect" id="turSelect" class="form-control">
+                                                    <option value="Tür" id="turSelected" selected disabled>Tür </option>
                                                 </select>
-                                                <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
-                                                    <input type="text" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
-                                                    <div class="input-group-append">
-                                                        <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                            </div>
+                                            <div class="col-lg-5">
+                                            <div class="row">
+                                                <div class="input-group col-lg-9">
+                                                    <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control col-lg-4" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
+                                                        <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
+                                                    </select>
+                                                    <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
+                                                    <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                                    <select name="boyaClassSelect" id="boyaClassSelect" class="form-control col-lg-3" onclick="toastClick('info','Belirtilmediyse Class 1','')">
+                                                        <option value="boyaClass" selected>Class 1</option>
+                                                        <option value="boyaClass2">Class 2</option>
+                                                        <option value="boyaClass3">Class 3</option>
+                                                    </select>
+                                                    <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <div class="input-group ">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text ral" id="RALspan" style="color: rgb(231, 231, 231);">...</span>
+                                                            <span class="input-group-text" id="">RAL </span>
+                                                        </div>
+                                                        <input type="text" class="form-control" id="RALinput" maxlength="4" size="4">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-1">
-                                                <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
                                             </div>
-                                            <div class="col-lg-2 form-group">
-                                                <div class="row">
-                                                <div class="input-group col-lg-8">
+                                            <div class="form-group input-group col-lg-1">
+                                                <select name="boyaKalinlikSelect" id="boyaKalinlikSelect" class="form-control">
+                                                    <option value="boyaKalınlık" selected disabled>Kalınlık</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-lg-1">
+                                                <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                            <div class="row">
+                                                <div class="input-group col-lg-4">
                                                     <div class="input-group-prepend">
                                                       <span class="input-group-text checkSpan">
-                                                        <input type="checkbox" class="temizCheckbox" id="ahsapTemiz">
+                                                        <input type="checkbox" class="temizCheckbox" id="boyaTemiz">
                                                       </span>
                                                     </div>
                                                     <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
                                                 </div>
-                                                <div class="col-lg-4" >
-                                                    <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-primary">Ekle</button>
+                                                <div class="col-lg-6">
+                                                    <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
                                                 </div>
+                                                <div class="col-lg-1">
+                                                    <button type="button" id="YuzeyBoyaEkle" class="btn btn-outline-primary" >Ekle</button>
                                                 </div>
                                             </div>
-                                            <!-- <div class="col-lg-2 form-group">
-                                                
-                                            </div> -->
+                                            </div> 
                                         </div>
                                         <div class="row">
                                             <div class="col-12 info-box">
                                                 <div class="info-box-content">
-                                                    <div id="ahsapKaplamaTabulator"></div>
+                                                    <div id="yuzeyBoyaTabulator"></div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="text" name="YuzeyAhsap" class="kaydet" id="yAhsapTabData" style="display: none;" required>
+                                        <input type="text" name="YuzeyBoya" class="kaydet" id="yBoyaTabData" style="display: none;" required>
                                     </div>
+                                    <div class="tab-pane fade" id="ytab_4" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
+                                        <div id="ahsapTab">
+                                            <div class="row">
+                                                <div class="col-lg-6 form-group">
+                                                    <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="if(this.value==0){ digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')}">
+                                                        <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
+                                                    </select>
+                                                    <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
+                                                        <input type="text" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
+                                                        <div class="input-group-append">
+                                                            <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-1">
+                                                    <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
+                                                </div>
+                                                <div class="col-lg-2 form-group">
+                                                    <div class="row">
+                                                    <div class="input-group col-lg-8">
+                                                        <div class="input-group-prepend">
+                                                          <span class="input-group-text checkSpan">
+                                                            <input type="checkbox" class="temizCheckbox" id="ahsapTemiz">
+                                                          </span>
+                                                        </div>
+                                                        <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                    </div>
+                                                    <div class="col-lg-4" >
+                                                        <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-primary">Ekle</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="col-lg-2 form-group">
+                                                    
+                                                </div> -->
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 info-box">
+                                                    <div class="info-box-content">
+                                                        <div id="ahsapKaplamaTabulator"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="YuzeyAhsap" class="kaydet" id="yAhsapTabData" style="display: none;" required>
+                                        </div>    
+                                    </div>
+                                  </div>
                                 </div>
-                            </div>
+                              </div>
                         </div>
                     </div>
                 </div>
