@@ -216,22 +216,49 @@
         </div>
       `);
     cardYuda.append(yudaHeader);
-
-    const yudaBody = $('<div class="card-body"></div>').html(`
-    <div class="row" id="yudaRow">
-      <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme -->
-      <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
-        <div class="row">
-          <div class="col-12 col-sm-4">
-            <div class="info-box bg-light h-100">
-              <div class="info-box-content" id="siparisDiv">
-                <span class="info-box-text text-center text-muted">SİPARİŞ</span>
-                <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi || " - - "}</span>
-                <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
-                <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
-                <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
-                <span class="info-box-number text-center text-muted mb-0">Ödeme Vadesi: ${i.MusteriOdemeVadesi || " - - "}</span>
-                <span class="info-box-number text-center text-muted mb-0">Çizim No: ${i.CizimNo || " - - "}</span>
+    // boş olanlar gözükmesin
+    const yudaBody = $('<div class="card-body"></div>');
+    let htmlContent = `
+      <div class="row" id="yudaRow">
+        <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme -->
+        <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+          <div class="row">
+            <div class="col-12 col-sm-4">
+              <div class="info-box bg-light h-100">
+                <div class="info-box-content" id="siparisDiv">
+                  <span class="info-box-text text-center text-muted">SİPARİŞ</span>
+    `;
+    if (i.MusteriFirmaAdi) {
+      htmlContent += `
+                    <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi || " - - "}</span>
+                    `;
+    };
+    if (i.SonKullaniciFirma) {
+      htmlContent += `
+                    <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
+                    `;
+    };
+    if (i.KullanimAlani) {
+      htmlContent += `
+                    <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
+                    `;
+    };
+    if (i.ProfilSiparisi) {
+      htmlContent += `
+                    <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
+                    `;
+    };
+    if (i.MusteriOdemeVadesi) {
+      htmlContent += `
+                    <span class="info-box-number text-center text-muted mb-0">Ödeme Vadesi: ${i.MusteriOdemeVadesi || " - - "}</span>
+                    `;
+    };
+    if (i.CizimNo) {
+      htmlContent += `
+                    <span class="info-box-number text-center text-muted mb-0">Çizim No: ${i.CizimNo || " - - "}</span>
+                    `;
+    };
+    htmlContent += `
               </div>
             </div>
           </div>
@@ -249,8 +276,18 @@
                 <span class="info-box-text text-center text-muted">TOLERANSLAR</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.DinTolerans || " - - "}<span>
                 <span class="info-box-number text-center text-muted mb-0">${i.BirlikteCalisan || " - - "}<span>
+    `;
+    if (i.MetreAgirlikTalebi) {
+      htmlContent += `
                 <span class="info-box-number text-center text-muted mb-0">Metre Ağırlık Talebi ${i.MetreAgirlikTalebi || " - - "}<span>
+      `;
+    };
+    if (i.OnemliOlculer) {
+      htmlContent += `
                 <span class="info-box-number text-center text-muted mb-0">Önemli Ölçüler: ${i.OnemliOlculer || " - - "}<span>
+      `;
+    };
+    htmlContent += `
               </div>
             </div>
           </div>
@@ -260,17 +297,35 @@
             <div class="info-box bg-light">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">YÜZEY</span>
+    `;
+    if (i.YuzeyPres){
+      htmlContent += `
                 <span class="info-box-text text-center text-muted">Pres:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyPres || " - - "}</span>
-                <hr>
+                <hr>   
+      `;
+    }
+    if (i.YuzeyEloksal){
+      htmlContent += `
                 <span class="info-box-text text-center text-muted">Eloksal:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyEloksal || " - - "}
                 <hr>
+      `;
+    }
+    if (i.YuzeyBoya){
+      htmlContent += `
                 <span class="info-box-text text-center text-muted">Boya:</span>
-                </span><span class="info-box-number text-center text-muted mb-0">${i.YuzeyBoya || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.YuzeyBoya || " - - "}</span>
                 <hr>
+      `;
+    }
+    if (i.YuzeyAhsap){
+      htmlContent += `
                 <span class="info-box-text text-center text-muted">Ahşap Kaplama:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyAhsap || " - - "}</span>
+      `;
+    };
+    htmlContent += `
               </div>
             </div>
           </div>
@@ -280,7 +335,14 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">TALAŞLI İMALAT</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat || " - - "} <br> Açıklama: ${i.TalasliImalatAciklama || " - - "}</span>
+                <span class="info-box-number text-center text-muted mb-0">${i.TalasliImalat || " - - "} 
+    `;
+    if (i.TalasliImalatAciklama){
+      htmlContent +=`
+                  <br> Açıklama: ${i.TalasliImalatAciklama || " - - "}</span>
+                  `;
+    }
+    htmlContent += `
               </div>
             </div>
           </div>
@@ -288,7 +350,14 @@
             <div class="info-box bg-light h-100">
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">PAKETLEME</span>
-                <span class="info-box-number text-center text-muted mb-0">${i.Paketleme || " - - "} <br> Açıklama: ${i.PaketlemeAciklama || " - - "}<span>
+                <span class="info-box-number text-center text-muted mb-0">${i.Paketleme || " - - "} 
+    `;
+    if (i.PaketlemeAciklama){
+      htmlContent += `
+                  <br> Açıklama: ${i.PaketlemeAciklama || " - - "}<span>
+                    `;
+    }          
+    htmlContent +=  `
               </div>
             </div>
           </div>
@@ -313,8 +382,9 @@
       </div>
       
     </div>
+    `;
 
-    `);
+    yudaBody.html(htmlContent);
     cardYuda.append(yudaBody);
 
     const teknikList = $('#teknik');
