@@ -201,6 +201,38 @@
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
 
+  
+  // if (i.MusteriFirmaAdi) {
+  //     htmlContent += `
+  //                   <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi || " - - "}</span>
+  //                   `;
+  //   };
+  //   if (i.SonKullaniciFirma) {
+  //     htmlContent += `
+  //                   <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
+  //                   `;
+  //   };
+  //   if (i.KullanimAlani) {
+  //     htmlContent += `
+  //                   <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
+  //                   `;
+  //   };
+  //   if (i.ProfilSiparisi) {
+  //     htmlContent += `
+  //                   <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
+  //                   `;
+  //   };
+  //   if (i.MusteriOdemeVadesi) {
+  //     htmlContent += `
+  //                   <span class="info-box-number text-center text-muted mb-0">Ödeme Vadesi: ${i.MusteriOdemeVadesi || " - - "}</span>
+  //                   `;
+  //   };
+  //   if (i.CizimNo) {
+  //     htmlContent += `
+  //                   <span class="info-box-number text-center text-muted mb-0">Çizim No: ${i.CizimNo || " - - "}</span>
+  //                   `;
+  //   };
+
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
 
@@ -228,36 +260,20 @@
                 <div class="info-box-content" id="siparisDiv">
                   <span class="info-box-text text-center text-muted">SİPARİŞ</span>
     `;
-    if (i.MusteriFirmaAdi) {
-      htmlContent += `
-                    <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi || " - - "}</span>
-                    `;
+    const propertyNames = {
+        MusteriFirmaAdi: 'Müşteri Firma Adı',
+        SonKullaniciFirma: 'Son Kullanıcı Firma',
+        KullanimAlani: 'Kullanım Alanı',
+        ProfilSiparisi: 'Profil Siparişi',
+        MusteriOdemeVadesi: 'Müşteri Ödeme Vadesi',
+        CizimNo: 'Çizim No'
     };
-    if (i.SonKullaniciFirma) {
-      htmlContent += `
-                    <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
-                    `;
-    };
-    if (i.KullanimAlani) {
-      htmlContent += `
-                    <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
-                    `;
-    };
-    if (i.ProfilSiparisi) {
-      htmlContent += `
-                    <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
-                    `;
-    };
-    if (i.MusteriOdemeVadesi) {
-      htmlContent += `
-                    <span class="info-box-number text-center text-muted mb-0">Ödeme Vadesi: ${i.MusteriOdemeVadesi || " - - "}</span>
-                    `;
-    };
-    if (i.CizimNo) {
-      htmlContent += `
-                    <span class="info-box-number text-center text-muted mb-0">Çizim No: ${i.CizimNo || " - - "}</span>
-                    `;
-    };
+
+    for (const prop in propertyNames) {
+        if (i[prop]) {
+            htmlContent += `<span class="info-box-number text-center text-muted mb-0">${propertyNames[prop]}: ${i[prop]}</span>`;
+        }
+    }
     htmlContent += `
               </div>
             </div>
@@ -302,24 +318,24 @@
       htmlContent += `
                 <span class="info-box-text text-center text-muted">Pres:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyPres || " - - "}</span>
-                <hr>   
       `;
     }
     if (i.YuzeyEloksal){
+      if (i.YuzeyPres) {htmlContent += `<hr>`;};
       htmlContent += `
                 <span class="info-box-text text-center text-muted">Eloksal:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyEloksal || " - - "}
-                <hr>
       `;
     }
     if (i.YuzeyBoya){
+      if (i.YuzeyEloksal) {htmlContent += `<hr>`;};
       htmlContent += `
                 <span class="info-box-text text-center text-muted">Boya:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyBoya || " - - "}</span>
-                <hr>
       `;
     }
     if (i.YuzeyAhsap){
+      if (i.YuzeyAhsap) {htmlContent += `<hr>`;};
       htmlContent += `
                 <span class="info-box-text text-center text-muted">Ahşap Kaplama:</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.YuzeyAhsap || " - - "}</span>
@@ -391,36 +407,24 @@
     const sartList = $('#sart');
     const paketList = $('#paket');
     const digerDosList = $('#digerDos');
-    
+
     files.forEach(f => {
-      if (f.FileTitle == "Teknik Resim") {
-        const teknikDos = $('<li style="font-size:1.5em"></li>').html(`
-              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
+        const listItem = $('<li style="font-size:1.5em"></li>').html(`
+            <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1">
+                <i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)}
+            </a>
             <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
         `);
-        teknikList.append(teknikDos);
-      }
-      else if(f.FileTitle == "Şartname") {
-        const sartDos = $('<li style="font-size:1.5em"></li>').html(`
-              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-        `);
-        sartList.append(sartDos);
-      }
-      else if (f.FileTitle == "Paketleme Talimatı") {
-        const paketDos = $('<li style="font-size:1.5em"></li>').html(`
-              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-        `);
-        paketList.append(paketDos);
-      }
-      else {
-        const digerDos = $('<li style="font-size:1.5em"></li>').html(`
-              <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1"><i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)} </a>
-              <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-        `);
-        digerDosList.append(digerDos);
-      }
+
+        if (f.FileTitle === "Teknik Resim") {
+            teknikList.append(listItem);
+        } else if (f.FileTitle === "Şartname") {
+            sartList.append(listItem);
+        } else if (f.FileTitle === "Paketleme Talimatı") {
+            paketList.append(listItem);
+        } else {
+            digerDosList.append(listItem);
+        }
     });
 
   };

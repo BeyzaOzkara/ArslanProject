@@ -123,7 +123,7 @@
                                         <input type="text" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn btn-outline-primary active">
-                                                <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet" value="kg" autocomplete="off"> KG
+                                                <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet" value="kg" autocomplete="off" required> KG
                                               </label>
                                               <label class="btn btn-outline-primary">
                                                 <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off"> ADET
@@ -132,7 +132,7 @@
                                         <span class="input-group-text" style="font-weight: bold;">/</span>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn btn-outline-primary active">
-                                              <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off"> HAFTA
+                                              <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off" required> HAFTA
                                             </label>
                                             <label class="btn btn-outline-primary">
                                               <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off"> AY
@@ -227,7 +227,7 @@
                                             <option value="EN 755-7">EN 755-7   Dikişsiz Boru</option>
                                             <option value="EN 755-8">EN 755-8   Dikişli Boru (Portol)</option>
                                             <option value="EN 755-9">EN 755-9   Profil</option>
-                                            <option value="EN 12020-2">EN 12020-2   Profiller için hassas olerans</option>
+                                            <option value="EN 12020-2">EN 12020-2   Profiller için hassas tolerans</option>
                                             <option value="Diger">Diğer</option>
                                         </select>
                                     </div>
@@ -526,7 +526,7 @@
                             <div class="row">
                                 <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
                                     <label class="btn btn-outline-primary active">
-                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off"> VAR
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off" required> VAR
                                     </label>
                                     <label class="btn btn-outline-primary">
                                       <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off"> YOK
@@ -556,7 +556,7 @@
                             <div class="row">
                                 <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
                                     <label class="btn btn-outline-primary active">
-                                      <input type="radio" name="Paketleme" class="kaydet" id="pStandart" value="Standart Palet" autocomplete="off"> STANDART PALET
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pStandart" value="Standart Palet" autocomplete="off" required> STANDART PALET
                                     </label>
                                     <label class="btn btn-outline-primary">
                                       <input type="radio" name="Paketleme" class="kaydet" id="pIhracat" value="Ihracat Palet" autocomplete="off"> İHRACAT PALET

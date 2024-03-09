@@ -31,7 +31,11 @@ from aes_cipher import *
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import locale
-
+from django.contrib import messages
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 # Create your views here.
 
 
@@ -49,13 +53,24 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'registration/password_change_form.html' #registration/password_change_done.html
     success_url = reverse_lazy('ArslanTakipApp:password_change_done')
 
+    def post(self, request, *args, **kwargs):
+        print("burda")
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Update the session to prevent logout
+            messages.success(request, 'Your password has been successfully changed.')
+            return redirect(self.success_url)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            return render(request, self.template_name)
+
 class CustomPasswordChangeDoneView(generic.TemplateView):
     template_name = 'registration/password_change_done.html'
     def get_success_url(self):
         return reverse_lazy('ArslanTakipApp:index')
-    # def dispatch(self, request, *args, **kwargs):
-    #     logout(request)
-    #     return super().dispatch(request, *args, **kwargs)
 
 def calculate_pagination(page, size):
     offset = (page - 1) * size
