@@ -587,7 +587,7 @@
                                 <div class="col-12">
                                     <div class="input-group">
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple required>
                                             <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
                                         </div>
                                         <div class="input-group-append">
@@ -1049,7 +1049,17 @@
         });
     }
 
+    function validateFiles() {
+        if (selectedFiles.length === 0) {
+            $('#fileInput').val('');
+            $('#fileInput').next('label').html('Dosyaları Seçin');
+            changeFunction();
+        }
+        return true;
+    }
+
     function updateFileList() {
+        validateFiles();
         var fileTitles = $('#fileTitles');
         fileTitles.empty(); // Önceki başlık alanlarını temizle
 
@@ -1086,6 +1096,7 @@
         });
 
     };
+    
 
     window.removeFile = function(index) {
         selectedFiles.splice(index, 1);
@@ -1094,6 +1105,10 @@
 
     function DosyaTemizle(){
         selectedFiles = [];
+        $('#fileInput').val('');
+        $('#fileInput').next('label').html('Dosyaları Seçin');
+        //document.getElementById("fileInput").validity.valid = false;
+        changeFunction();
         updateFileList();
     };
 
