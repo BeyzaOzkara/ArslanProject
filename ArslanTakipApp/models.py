@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import Index, Q
+from django.contrib.auth.models import Group
 
 # Create your models here.
 class Location(models.Model):
@@ -262,7 +263,7 @@ class YudaForm(models.Model):
 
 class YudaOnay(models.Model):
     Yuda = models.ForeignKey(YudaForm, on_delete=models.DO_NOTHING, null=True, blank=True)
-    Kullanici = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    Group = models.ForeignKey(Group, on_delete=models.DO_NOTHING, null=True, blank=True)
     Tarih = models.DateField(auto_now=True, null=True, blank=True)
     OnayDurumu = models.BooleanField(null=True, blank=True)
 

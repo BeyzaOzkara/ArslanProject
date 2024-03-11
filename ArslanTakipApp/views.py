@@ -1362,10 +1362,10 @@ def yudaDetail(request, yId):
 
     onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
     retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
-    if not YudaOnay.objects.filter(Yuda_id = yId, Kullanici = request.user).first():
+    if not YudaOnay.objects.filter(Yuda_id = yId, Group = request.user.groups.first()).first():
         secim =""
     else:
-        secim = YudaOnay.objects.get(Yuda_id = yId, Kullanici = request.user).OnayDurumu
+        secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
 
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
 
@@ -1412,16 +1412,16 @@ def  yudaDetailAnket(request):
     # Update or create YudaOnay entry
     try:
         # Check if the user has already voted for this Yuda_id
-        user_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Kullanici=request.user).first()
+        group_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Group=request.user.groups.first()).first()
 
-        if user_vote:
+        if group_vote:
             # If the user has already voted, update their vote
-            user_vote.OnayDurumu = secim
-            user_vote.save()
+            group_vote.OnayDurumu = secim
+            group_vote.save()
         else:
             # If the user hasn't voted, create a new vote record
             YudaOnay.objects.create(
-                Kullanici=request.user,
+                Group=request.user.groups.first(),
                 Yuda_id=yudaId,
                 OnayDurumu=secim
             )
