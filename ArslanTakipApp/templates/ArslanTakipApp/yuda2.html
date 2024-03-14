@@ -23,6 +23,9 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
   <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
   <style>
+    .required-info {
+        border: 1px solid red !important;
+    }
     .toast-orta-center { 
         top: 30%;   
         margin: 0 auto;  
@@ -81,7 +84,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12 col-sm-4">
-                                  <div class="info-box bg-light">
+                                  <div class="info-box bg-light  required-info">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI*</span>
                                       <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" required>
@@ -116,28 +119,28 @@
                                   </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
-                                  <div class="info-box bg-light">
+                                  <div class="info-box bg-light required-info">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ*</span>
                                       <div class="input-group mt-2">
                                         <input type="text" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                            <label class="btn btn-outline-primary active">
-                                                <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet" value="kg" autocomplete="off" required> KG
+                                            <label class="btn btn-outline-danger active">
+                                                <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet is-warning" value="kg" autocomplete="off" required> KG
                                               </label>
-                                              <label class="btn btn-outline-primary">
+                                              <label class="btn btn-outline-danger">
                                                 <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off"> ADET
                                               </label>
                                         </div>
                                         <span class="input-group-text" style="font-weight: bold;">/</span>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                            <label class="btn btn-outline-primary active">
+                                            <label class="btn btn-outline-danger active">
                                               <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off" required> HAFTA
                                             </label>
-                                            <label class="btn btn-outline-primary">
+                                            <label class="btn btn-outline-danger">
                                               <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off"> AY
                                             </label>
-                                            <label class="btn btn-outline-primary">
+                                            <label class="btn btn-outline-danger">
                                               <input type="radio" name="ProfilSip" id="sipYil" class="kaydet" value="YIL" autocomplete="off"> YIL
                                             </label>
                                         </div>
@@ -215,7 +218,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
+                                    <div class="info-box bg-light required-info">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">DIN TOLERANS*</span>
                                         <select name="DinTolerans" id="dinTolerans" class="form-control mb-3 mt-3 kaydet" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
@@ -234,7 +237,7 @@
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
-                                    <div class="info-box bg-light">
+                                    <div class="info-box bg-light required-info">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI*</span>
                                         <!-- multiselect ile seçilsin select2 -->
@@ -525,13 +528,13 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
-                                    <label class="btn btn-outline-primary active">
+                                    <label class="btn btn-outline-danger">
                                       <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off" required> VAR
                                     </label>
-                                    <label class="btn btn-outline-primary">
+                                    <label class="btn btn-outline-danger">
                                       <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off"> YOK
                                     </label>
-                                    <label class="btn btn-outline-primary">
+                                    <label class="btn btn-outline-danger">
                                       <input type="radio" class="kaydet" name="TalasliImalat" id="tMusteri" value="Müşteri Yapacak" autocomplete="off"> MÜŞTERİ YAPACAK
                                     </label>
                                 </div>
@@ -555,14 +558,14 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
-                                    <label class="btn btn-outline-primary active">
+                                    <label class="btn btn-outline-danger active">
                                       <input type="radio" name="Paketleme" class="kaydet" id="pStandart" value="Standart Palet" autocomplete="off" required> STANDART PALET
                                     </label>
-                                    <label class="btn btn-outline-primary">
-                                      <input type="radio" name="Paketleme" class="kaydet" id="pIhracat" value="Ihracat Palet" autocomplete="off"> İHRACAT PALET
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pIhracat" value="Ihracat Palet" autocomplete="off" required> İHRACAT PALET
                                     </label>
-                                    <label class="btn btn-outline-primary">
-                                      <input type="radio" name="Paketleme" class="kaydet" id="pOzel" value="Ozel Paketleme" autocomplete="off"> ÖZEL PAKETLEME
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pOzel" value="Ozel Paketleme" autocomplete="off" required> ÖZEL PAKETLEME
                                     </label>
                                 </div>
                             </div>
@@ -585,7 +588,7 @@
                         <div class="card-body" id="dosyaBody">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="input-group">
+                                    <div class="input-group border border-danger">
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple required>
                                             <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
@@ -619,6 +622,75 @@
 
 {% block extra_js %}
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var infoBoxes = document.querySelectorAll('.info-box');
+    infoBoxes.forEach(function(infoBox) {
+      var inputs = infoBox.querySelectorAll('input[required]');
+      
+      var checkRequiredFields = function() {
+        var empty = false;
+        inputs.forEach(function(requiredInput) {
+          if (requiredInput.value.trim() === '') {
+            empty = true;
+          }
+        });
+
+        if (empty) {
+          infoBox.classList.add('required-info');
+        } else {
+          infoBox.classList.remove('required-info');
+        }
+      };
+
+      inputs.forEach(function(input) {
+        input.addEventListener('blur', checkRequiredFields);
+      });
+    });
+
+    var radios = document.querySelectorAll('input[type="radio"][required]');
+   // console.log(radios);
+
+    
+
+    radios.forEach(function(radio) {
+        console.log("burda")
+        console.log(radio);
+        var radioLabel2 = radio.closest('label');
+        console.log(radioLabel2);
+
+        var checkRadioRequired = function() {
+            var empty2 = false;
+            console.log("check req")
+            radios.forEach(function(radio1) {
+                console.log(radio1);
+                var radioGroupName = radio1.getAttribute('name');
+                console.log(radioGroupName);
+                var checked = document.querySelector('input[name="' + radioGroupName + '"]:checked');
+                if (!checked) {
+                    empty2 = true;
+                }
+            });
+
+            radios.forEach(function(radio) {
+                var radioLabel = radio.closest('label');
+                console.log(radioLabel);
+                if (radio.checked) {
+                    radioLabel.classList.remove('btn-outline-danger');
+                    radioLabel.classList.add('btn-outline-primary');
+                } else {
+                    radioLabel.classList.remove('btn-outline-primary');
+                }
+            });
+
+            if (empty2) {
+                document.body.classList.add('required-info');
+            } else {
+                document.body.classList.remove('required-info');
+            }
+        };
+        radio.addEventListener('change', checkRadioRequired);
+    });
+});
     /* is template is used with yuda/yId or used with yudaEdit/yId */
     var formData = new FormData();
     var full = false;
@@ -1041,6 +1113,7 @@
             }
         });
         updateFileList();
+        toggleRequiredInfo();
     });
 
     function fileAlreadySelected(newFile) {
@@ -1054,6 +1127,7 @@
             $('#fileInput').val('');
             $('#fileInput').next('label').html('Dosyaları Seçin');
             changeFunction();
+            toggleRequiredInfo();
         }
         return true;
     }
@@ -1096,11 +1170,21 @@
         });
 
     };
-    
 
+    function toggleRequiredInfo() {
+        var fileInput = document.getElementById('fileInput');
+        var inputGroup = fileInput.closest('.input-group');
+        if (selectedFiles.length === 0) {
+            inputGroup.classList.add('border', 'border-danger');
+        } else {
+            inputGroup.classList.remove('border', 'border-danger');
+        }
+    }
+    
     window.removeFile = function(index) {
         selectedFiles.splice(index, 1);
         updateFileList();
+        toggleRequiredInfo();
     };
 
     function DosyaTemizle(){
@@ -1110,6 +1194,7 @@
         //document.getElementById("fileInput").validity.valid = false;
         changeFunction();
         updateFileList();
+        toggleRequiredInfo();
     };
 
     document.querySelector("#yudaKaydet").addEventListener('click', function(){

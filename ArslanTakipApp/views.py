@@ -36,6 +36,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from .forms import PasswordChangingForm
 # Create your views here.
 
 
@@ -49,28 +50,35 @@ class RegisterView(generic.CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/register.html"
 
-class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
-    template_name = 'registration/password_change_form.html' #registration/password_change_done.html
-    success_url = reverse_lazy('ArslanTakipApp:password_change_done')
+class PasswordChangeView(PasswordChangeView):
+    form_class = PasswordChangingForm
+    success_url = reverse_lazy('ArslanTakipApp:password_success')
 
-    def post(self, request, *args, **kwargs):
-        print("burda")
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Update the session to prevent logout
-            messages.success(request, 'Your password has been successfully changed.')
-            return redirect(self.success_url)
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
-            return render(request, self.template_name)
+def password_success(request):
+    return render(request, 'registration/password_change_done.html')
 
-class CustomPasswordChangeDoneView(generic.TemplateView):
-    template_name = 'registration/password_change_done.html'
-    def get_success_url(self):
-        return reverse_lazy('ArslanTakipApp:index')
+# class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+#     template_name = 'registration/password_change_form.html' #registration/password_change_done.html
+#     success_url = reverse_lazy('ArslanTakipApp:password_change_done')
+
+#     def post(self, request, *args, **kwargs):
+#         print("burda")
+#         form = PasswordChangeForm(request.user, request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             update_session_auth_hash(request, user)  # Update the session to prevent logout
+#             messages.success(request, 'Your password has been successfully changed.')
+#             return redirect(self.success_url)
+#         else:
+#             for field, errors in form.errors.items():
+#                 for error in errors:
+#                     messages.error(request, f"{field}: {error}")
+#             return render(request, self.template_name)
+
+# class CustomPasswordChangeDoneView(generic.TemplateView):
+#     template_name = 'registration/password_change_done.html'
+#     def get_success_url(self):
+#         return reverse_lazy('ArslanTakipApp:index')
 
 def calculate_pagination(page, size):
     offset = (page - 1) * size
@@ -1408,20 +1416,47 @@ def  yudaDetailAnket(request):
         secim = True
     else:
         secim = False
-    
+
+    predefined_group_names = [
+        'Ust Yonetim Bolumu',
+        'Planlama Bolumu',
+        'Kalite Bolumu',
+        'Kaliphane Bolumu',
+        'Pres Bolumu',
+        'Paketleme Bolumu',
+        'Yurt Disi Satis Bolumu',
+        'Yurt Ici Satis Bolumu',
+        'Eloksal Bolumu',
+        'Ahsap Kaplama Bolumu',
+        'Boyahane Bolumu',
+        'Mekanik Islem Bolumu',
+    ]
+
+    user_group = None
+    for group_name in predefined_group_names:
+        group = Group.objects.get(name=group_name)
+        if request.user.groups.filter(name=group_name).exists():
+            user_group = group
+            break
+
+    if user_group is None:
+        return JsonResponse({'error': 'User does not belong to any predefined group'}, status=400)
+
+        
+    # groups.first() şeklinde yapmak çok sağlıklı olmayabilir.
     # Update or create YudaOnay entry
     try:
-        # Check if the user has already voted for this Yuda_id
-        group_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Group=request.user.groups.first()).first()
+        # Check if the users group has already voted for this Yuda_id
+        group_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Group=user_group).first()
 
         if group_vote:
-            # If the user has already voted, update their vote
+            # If the group has already voted, update their vote
             group_vote.OnayDurumu = secim
             group_vote.save()
         else:
-            # If the user hasn't voted, create a new vote record
+            # If the group hasn't voted, create a new vote record
             YudaOnay.objects.create(
-                Group=request.user.groups.first(),
+                Group=user_group,
                 Yuda_id=yudaId,
                 OnayDurumu=secim
             )
