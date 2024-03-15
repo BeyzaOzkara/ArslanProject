@@ -152,7 +152,6 @@
     function getProjects(data){
         tableBody.empty();  // Önceki verileri temizle
         data.forEach(item => {
-            console.log(item);
             const row = $('<tr></tr>').html(`
             <td>
                 #
@@ -272,7 +271,6 @@
           currentPage = parseInt($(this).text());
         }
 
-        console.log("renderpag loader block");
         loadPage(currentPage);
       });
     };
