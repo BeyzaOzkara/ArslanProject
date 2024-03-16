@@ -43,7 +43,7 @@ urlpatterns = [
     path('yuda/', views.YudaView.as_view()),
     path('yuda/<str:objId>', views.yuda),
     path('yudakaydet', views.yuda_kaydet),
-    path('yudas', views.YudasView.as_view()),
+    path('yudas', views.YudasView.as_view(), name='yudas'),
     path('yudas/list' ,views.yudas_list),
     path('yudaDetail/<str:yId>', views.yudaDetail, name='yudaDetail'),
     path('yudaDetailComment', views.yudaDetailComment),

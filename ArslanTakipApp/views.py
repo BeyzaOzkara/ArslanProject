@@ -56,29 +56,6 @@ class PasswordChangeView(PasswordChangeView):
 def password_success(request):
     return render(request, 'registration/password_change_done.html')
 
-# class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
-#     template_name = 'registration/password_change_form.html' #registration/password_change_done.html
-#     success_url = reverse_lazy('ArslanTakipApp:password_change_done')
-
-#     def post(self, request, *args, **kwargs):
-#         print("burda")
-#         form = PasswordChangeForm(request.user, request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             update_session_auth_hash(request, user)  # Update the session to prevent logout
-#             messages.success(request, 'Your password has been successfully changed.')
-#             return redirect(self.success_url)
-#         else:
-#             for field, errors in form.errors.items():
-#                 for error in errors:
-#                     messages.error(request, f"{field}: {error}")
-#             return render(request, self.template_name)
-
-# class CustomPasswordChangeDoneView(generic.TemplateView):
-#     template_name = 'registration/password_change_done.html'
-#     def get_success_url(self):
-#         return reverse_lazy('ArslanTakipApp:index')
-
 def calculate_pagination(page, size):
     offset = (page - 1) * size
     limit = page * size
