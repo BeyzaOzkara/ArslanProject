@@ -23,9 +23,18 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
   <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
   <style>
-    .required-info {
+    /* .required-info {
         border: 1px solid red !important;
+    } */
+        .required-info {
+    border: 1px solid red;
     }
+
+    /* Green border when required fields are filled */
+    .validated {
+    border: 1px solid green;
+    }
+
     .toast-orta-center { 
         top: 30%;   
         margin: 0 auto;  
@@ -129,7 +138,7 @@
                                                 <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet is-warning" value="kg" autocomplete="off" required> KG
                                               </label>
                                               <label class="btn btn-outline-danger">
-                                                <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off"> ADET
+                                                <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off" required> ADET
                                               </label>
                                         </div>
                                         <span class="input-group-text" style="font-weight: bold;">/</span>
@@ -138,10 +147,10 @@
                                               <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off" required> HAFTA
                                             </label>
                                             <label class="btn btn-outline-danger">
-                                              <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off"> AY
+                                              <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off" required> AY
                                             </label>
                                             <label class="btn btn-outline-danger">
-                                              <input type="radio" name="ProfilSip" id="sipYil" class="kaydet" value="YIL" autocomplete="off"> YIL
+                                              <input type="radio" name="ProfilSip" id="sipYil" class="kaydet" value="YIL" autocomplete="off" required> YIL
                                             </label>
                                         </div>
                                       </div>
@@ -243,9 +252,9 @@
                                         <!-- multiselect ile seçilsin select2 -->
                                         <div class="form-group mt-3">
                                             <select class="select2bs4 kaydet" multiple="multiple" id="birlikteCalisan" name="BirlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
-                                                <option value="Aparatı Var">Aparatı Var</option>
+                                                <option value="Birlikte Çalışan Aparatı Var">Aparatı Var</option>
                                                 <option value="Kendisiyle Çalışır">Kendisiyle Çalışır</option>
-                                                <option value="Yok">Yok</option>
+                                                <option value="Birlikte Çalışan Aparatı Yok">Yok</option>
                                             </select>
                                         </div>
                                     </div>
@@ -532,10 +541,10 @@
                                       <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off" required> VAR
                                     </label>
                                     <label class="btn btn-outline-danger">
-                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off"> YOK
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off" required> YOK
                                     </label>
                                     <label class="btn btn-outline-danger">
-                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tMusteri" value="Müşteri Yapacak" autocomplete="off"> MÜŞTERİ YAPACAK
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tMusteri" value="Müşteri Yapacak" autocomplete="off" required> MÜŞTERİ YAPACAK
                                     </label>
                                 </div>
                             </div>
@@ -622,75 +631,68 @@
 
 {% block extra_js %}
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var infoBoxes = document.querySelectorAll('.info-box');
-    infoBoxes.forEach(function(infoBox) {
-      var inputs = infoBox.querySelectorAll('input[required]');
-      
-      var checkRequiredFields = function() {
-        var empty = false;
-        inputs.forEach(function(requiredInput) {
-          if (requiredInput.value.trim() === '') {
-            empty = true;
-          }
+
+    function requiredFunction(t){
+        console.log("required func");
+        console.log(t.value);
+        if (t.type == "select-multiple"){
+            let results = [];
+            let opt;
+            for (let j=0; j< t.options.length; j++){
+                opt = t.options[j]
+                if(opt.selected){results.push(opt.value);}
+            };
+            console.log(t.name);
+            console.log(results);
+        }
+
+    };
+
+    //$(':input[required]').on('change', function() {requiredFunction(this)});
+    
+    $(document).ready(function() {
+        function checkRequiredInfoBox($infoBox) {
+            console.log("check");
+            let $requiredInputs = $infoBox.find('[required]');
+            console.log($requiredInputs);
+            let allFilled = true;
+            $requiredInputs.each(function() {
+                console.log("Field Value:", $(this).val());
+                if ($(this).val() === '') {
+                    allFilled = false;
+                    return false; // Exit the loop early if any field is empty
+                }
+            });
+            return allFilled;
+        }
+        // Event delegation for input and select elements within .required-info boxes
+        $(document).on('input change', '.required-info input, .required-info select', function() {
+            let $infoBox = $(this).closest('.required-info');
+            if (checkRequiredInfoBox($infoBox)) {
+                $infoBox.addClass('validated').removeClass('required-info');
+            } else {
+                $infoBox.removeClass('validated').addClass('required-info');
+            } //required-info silinip validated olduğunda bi sonraki durumda yazdığımız ya da seçtiğimiz şeyleri silersek hala yeşil durmaya devam etmiş olur. validated olanlarında kontrol edilmesi gerek
         });
 
-        if (empty) {
-          infoBox.classList.add('required-info');
-        } else {
-          infoBox.classList.remove('required-info');
-        }
-      };
+        // Event delegation for radio button groups
+        $(document).on('change', '.btn-group-toggle input[type="radio"]', function() {
 
-      inputs.forEach(function(input) {
-        input.addEventListener('blur', checkRequiredFields);
-      });
-    });
+            let $radioLabels = $(this).closest('.btn-group-toggle').find('label');
+            console.log('Radio Labels:', $radioLabels);
 
-    var radios = document.querySelectorAll('input[type="radio"][required]');
-   // console.log(radios);
+            let isChecked = $(this).is(':checked');
 
-    
-
-    radios.forEach(function(radio) {
-        console.log("burda")
-        console.log(radio);
-        var radioLabel2 = radio.closest('label');
-        console.log(radioLabel2);
-
-        var checkRadioRequired = function() {
-            var empty2 = false;
-            console.log("check req")
-            radios.forEach(function(radio1) {
-                console.log(radio1);
-                var radioGroupName = radio1.getAttribute('name');
-                console.log(radioGroupName);
-                var checked = document.querySelector('input[name="' + radioGroupName + '"]:checked');
-                if (!checked) {
-                    empty2 = true;
-                }
-            });
-
-            radios.forEach(function(radio) {
-                var radioLabel = radio.closest('label');
-                console.log(radioLabel);
-                if (radio.checked) {
-                    radioLabel.classList.remove('btn-outline-danger');
-                    radioLabel.classList.add('btn-outline-primary');
+            $radioLabels.each(function() {
+                let $label = $(this);
+                if (isChecked) {
+                $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
                 } else {
-                    radioLabel.classList.remove('btn-outline-primary');
+                $label.addClass('btn-outline-danger').removeClass('btn-outline-primary');
                 }
             });
-
-            if (empty2) {
-                document.body.classList.add('required-info');
-            } else {
-                document.body.classList.remove('required-info');
-            }
-        };
-        radio.addEventListener('change', checkRadioRequired);
+        });
     });
-});
     /* is template is used with yuda/yId or used with yudaEdit/yId */
     var formData = new FormData();
     var full = false;
@@ -728,6 +730,9 @@
     };
 
     $(':input, .select').on('edit change', function(){changeFunction()});
+
+
+
 
     $('.checkSpan').click(
         function() {

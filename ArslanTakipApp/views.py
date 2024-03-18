@@ -432,7 +432,6 @@ def location_kalip(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
-
 key = b'arslandenemebyz1'
 
 def encrypt_aes_ecb(key, plaintext):
