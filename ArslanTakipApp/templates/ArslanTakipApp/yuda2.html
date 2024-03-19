@@ -647,36 +647,26 @@
     //     }
 
     // };
-    
-    function checkRequiredInfoBox(i){
-        let $reqInputs = i.find('[required]');
-        let allFilled = true;
-        $reqInputs.each(function(r) {
-            let iType = $(this).attr('type') || $(this).prop('type');
-            // console.log("type: " + iType);
-            if (iType == 'text') {
-                if ($(this).val() === '') {
-                    allFilled = false; 
-                // return false; Exit the loop early if any field is empty
-                }
-            }
-            else {
-                allFilled = checkRequiredField($(this));
-            }
-            
-        });
-    };
 
-    function checkRequiredField(i) {
+    function checkRequiredField(i, allFilled) {
         let sType = i.attr('type') || i.prop('type');
         console.log("sType: " + sType);
-        if (sType == 'radio') {
+        if (sType == 'text') {
+            if (i.val() === '') {
+                allFilled = false; 
+                // return false; // Exit the loop early if any field is empty
+            }
+        }
+        else if (sType == 'radio') {
             let $radioLabels = i.closest('.btn-group-toggle').find('label');
             let isChecked = i.is(':checked');
             $radioLabels.each(function() {
                 let $label = $(this);
                 if (isChecked && !$label.hasClass('btn-outline-primary')) {
                     $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
+                }
+                else if(!isChecked && !$label.hasClass('btn-outline-primary')){
+                    allFilled = false;
                 }
             });
         }
@@ -690,70 +680,36 @@
             console.log("file type");
         }
 
+        return allFilled;
     };
 
     $(':input[required]').on('change', function() {
-        let $infoBox = $(this).closest('.required-info') || $(this).closest('.validated');
-        console.log("info box : ")
+        let $infoBox = $(this).closest('.required-info');
         console.log($infoBox);
+        if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
+        
+        console.log($(this))
+        let allFilled = true;
         if ($infoBox.length == 0){ // info box içinde olmayanlar --> talaşlı imalat, paketleme ve dosya
-            checkRequiredField($(this));
+            console.log("if");
+            allFilled = checkRequiredField($(this), allFilled);
         }
         else { // info-box içinde olanlar
-            console.log($(this).val());
-            let checkResult = checkRequiredInfoBox($infoBox);
-            console.log(checkResult);
+            console.log("else");
+            let checkResult = false;
+            let $reqInputs = $infoBox.find('[required]');
+            console.log($reqInputs)
+            $reqInputs.each(function(r) {
+                allFilled = checkRequiredField($(this), allFilled);
+            });
         }
-        
+        console.log("check: " + allFilled);
+        if (allFilled) {
+            $infoBox.addClass('validated').removeClass('required-info');
+        } else {
+            $infoBox.removeClass('validated').addClass('required-info');
+        } 
     });
-
-    // $(document).ready(function() {
-    //     function checkRequiredInfoBox($infoBox) {
-    //         console.log("check");
-    //         let $requiredInputs = $infoBox.find('[required]');
-    //         console.log($requiredInputs);
-    //         let allFilled = true;
-    //         $requiredInputs.each(function() {
-    //             console.log("Field Value:", $(this).val());
-    //             if ($(this).val() === '') {
-    //                 allFilled = false;
-    //                 return false; // Exit the loop early if any field is empty
-    //             }
-    //         });
-    //         return allFilled;
-    //     }
-    //     // Event delegation for input and select elements within .required-info boxes
-    //     $(document).on('input change', '.required-info input, .required-info select, .validated input, .validated select', function() {
-    //         console.log($(this).val());
-    //         let $infoBox = $(this).closest('.required-info') || $(this).closest('.validated');
-    //         console.log("info");
-    //         console.log($infoBox);
-    //         if (checkRequiredInfoBox($infoBox)) {
-    //             $infoBox.addClass('validated').removeClass('required-info');
-    //         } else {
-    //             $infoBox.removeClass('validated').addClass('required-info');
-    //         } 
-    //         //required-info silinip validated olduğunda bi sonraki durumda yazdığımız ya da seçtiğimiz şeyleri silersek hala yeşil durmaya devam etmiş olur. validated olanlarında kontrol edilmesi gerek
-    //     });
-
-    //     // Event delegation for radio button groups
-    //     $(document).on('change', '.btn-group-toggle input[type="radio"]', function() {
-
-    //         let $radioLabels = $(this).closest('.btn-group-toggle').find('label');
-    //         console.log('Radio Labels:', $radioLabels);
-
-    //         let isChecked = $(this).is(':checked');
-
-    //         $radioLabels.each(function() {
-    //             let $label = $(this);
-    //             if (isChecked) {
-    //             $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
-    //             } else {
-    //             $label.addClass('btn-outline-danger').removeClass('btn-outline-primary');
-    //             }
-    //         });
-    //     });
-    // });
     
     /* is template is used with yuda/yId or used with yudaEdit/yId */
     var formData = new FormData();
