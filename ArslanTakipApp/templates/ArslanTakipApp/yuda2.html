@@ -632,67 +632,129 @@
 {% block extra_js %}
 <script>
 
-    function requiredFunction(t){
-        console.log("required func");
-        console.log(t.value);
-        if (t.type == "select-multiple"){
-            let results = [];
-            let opt;
-            for (let j=0; j< t.options.length; j++){
-                opt = t.options[j]
-                if(opt.selected){results.push(opt.value);}
-            };
-            console.log(t.name);
-            console.log(results);
+    // function requiredFunction(t){
+    //     console.log("required func");
+    //     console.log(t.value);
+    //     if (t.type == "select-multiple"){
+    //         let results = [];
+    //         let opt;
+    //         for (let j=0; j< t.options.length; j++){
+    //             opt = t.options[j]
+    //             if(opt.selected){results.push(opt.value);}
+    //         };
+    //         console.log(t.name);
+    //         console.log(results);
+    //     }
+
+    // };
+    
+    function checkRequiredInfoBox(i){
+        let $reqInputs = i.find('[required]');
+        let allFilled = true;
+        $reqInputs.each(function(r) {
+            let iType = $(this).attr('type') || $(this).prop('type');
+            // console.log("type: " + iType);
+            if (iType == 'text') {
+                if ($(this).val() === '') {
+                    allFilled = false; 
+                // return false; Exit the loop early if any field is empty
+                }
+            }
+            else {
+                allFilled = checkRequiredField($(this));
+            }
+            
+        });
+    };
+
+    function checkRequiredField(i) {
+        let sType = i.attr('type') || i.prop('type');
+        console.log("sType: " + sType);
+        if (sType == 'radio') {
+            let $radioLabels = i.closest('.btn-group-toggle').find('label');
+            let isChecked = i.is(':checked');
+            $radioLabels.each(function() {
+                let $label = $(this);
+                if (isChecked && !$label.hasClass('btn-outline-primary')) {
+                    $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
+                }
+            });
+        }
+        else if (sType == 'select-one') {
+            console.log("select onee");
+        }
+        else if (sType == 'select-multiple') {
+            console.log("select multii");
+        }
+        else if (sType == 'file') {
+            console.log("file type");
         }
 
     };
 
-    //$(':input[required]').on('change', function() {requiredFunction(this)});
-    
-    $(document).ready(function() {
-        function checkRequiredInfoBox($infoBox) {
-            console.log("check");
-            let $requiredInputs = $infoBox.find('[required]');
-            console.log($requiredInputs);
-            let allFilled = true;
-            $requiredInputs.each(function() {
-                console.log("Field Value:", $(this).val());
-                if ($(this).val() === '') {
-                    allFilled = false;
-                    return false; // Exit the loop early if any field is empty
-                }
-            });
-            return allFilled;
+    $(':input[required]').on('change', function() {
+        let $infoBox = $(this).closest('.required-info') || $(this).closest('.validated');
+        console.log("info box : ")
+        console.log($infoBox);
+        if ($infoBox.length == 0){ // info box içinde olmayanlar --> talaşlı imalat, paketleme ve dosya
+            checkRequiredField($(this));
         }
-        // Event delegation for input and select elements within .required-info boxes
-        $(document).on('input change', '.required-info input, .required-info select', function() {
-            let $infoBox = $(this).closest('.required-info');
-            if (checkRequiredInfoBox($infoBox)) {
-                $infoBox.addClass('validated').removeClass('required-info');
-            } else {
-                $infoBox.removeClass('validated').addClass('required-info');
-            } //required-info silinip validated olduğunda bi sonraki durumda yazdığımız ya da seçtiğimiz şeyleri silersek hala yeşil durmaya devam etmiş olur. validated olanlarında kontrol edilmesi gerek
-        });
-
-        // Event delegation for radio button groups
-        $(document).on('change', '.btn-group-toggle input[type="radio"]', function() {
-
-            let $radioLabels = $(this).closest('.btn-group-toggle').find('label');
-            console.log('Radio Labels:', $radioLabels);
-
-            let isChecked = $(this).is(':checked');
-
-            $radioLabels.each(function() {
-                let $label = $(this);
-                if (isChecked) {
-                $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
-                } else {
-                $label.addClass('btn-outline-danger').removeClass('btn-outline-primary');
-                }
-            });
-        });
+        else { // info-box içinde olanlar
+            console.log($(this).val());
+            let checkResult = checkRequiredInfoBox($infoBox);
+            console.log(checkResult);
+        }
+        
     });
+
+    // $(document).ready(function() {
+    //     function checkRequiredInfoBox($infoBox) {
+    //         console.log("check");
+    //         let $requiredInputs = $infoBox.find('[required]');
+    //         console.log($requiredInputs);
+    //         let allFilled = true;
+    //         $requiredInputs.each(function() {
+    //             console.log("Field Value:", $(this).val());
+    //             if ($(this).val() === '') {
+    //                 allFilled = false;
+    //                 return false; // Exit the loop early if any field is empty
+    //             }
+    //         });
+    //         return allFilled;
+    //     }
+    //     // Event delegation for input and select elements within .required-info boxes
+    //     $(document).on('input change', '.required-info input, .required-info select, .validated input, .validated select', function() {
+    //         console.log($(this).val());
+    //         let $infoBox = $(this).closest('.required-info') || $(this).closest('.validated');
+    //         console.log("info");
+    //         console.log($infoBox);
+    //         if (checkRequiredInfoBox($infoBox)) {
+    //             $infoBox.addClass('validated').removeClass('required-info');
+    //         } else {
+    //             $infoBox.removeClass('validated').addClass('required-info');
+    //         } 
+    //         //required-info silinip validated olduğunda bi sonraki durumda yazdığımız ya da seçtiğimiz şeyleri silersek hala yeşil durmaya devam etmiş olur. validated olanlarında kontrol edilmesi gerek
+    //     });
+
+    //     // Event delegation for radio button groups
+    //     $(document).on('change', '.btn-group-toggle input[type="radio"]', function() {
+
+    //         let $radioLabels = $(this).closest('.btn-group-toggle').find('label');
+    //         console.log('Radio Labels:', $radioLabels);
+
+    //         let isChecked = $(this).is(':checked');
+
+    //         $radioLabels.each(function() {
+    //             let $label = $(this);
+    //             if (isChecked) {
+    //             $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
+    //             } else {
+    //             $label.addClass('btn-outline-danger').removeClass('btn-outline-primary');
+    //             }
+    //         });
+    //     });
+    // });
+    
     /* is template is used with yuda/yId or used with yudaEdit/yId */
     var formData = new FormData();
     var full = false;
