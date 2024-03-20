@@ -30,11 +30,6 @@ from aes_cipher import *
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import locale
-from django.contrib import messages
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
 from .forms import PasswordChangingForm
 # Create your views here.
 

@@ -706,9 +706,7 @@
                 }
             }
             let yuzde = req*100/requiredElements.length;
-            // if (yuzde <= 100){
-            //     yuzde = 100;
-            // }
+            // if (yuzde <= 100){yuzde = 100;}
             document.getElementById('kaydetProgress').style.width = yuzde +'%';
             if(yuzde >= 100 ){
                 if(full == false){
@@ -731,9 +729,6 @@
     };
 
     $(':input, .select').on('edit change', function(){changeFunction()});
-
-
-
 
     $('.checkSpan').click(
         function() {
