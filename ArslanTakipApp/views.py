@@ -1139,7 +1139,7 @@ def yuda_kaydet(request):
             groups = [Group.objects.get(name=name) for name in group_names]
 
             assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
-            for group in groups:
+            for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
                         assign_perm("gorme_yuda", group, y)
@@ -1169,7 +1169,7 @@ def yuda_kaydet(request):
                     UploadedBy = y.ProjeYoneticisi,
                     Note = "",
                 )
-            response = JsonResponse({'message': 'Kayıt başarılı'})
+            response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
             response.status_code = 500 #server error
@@ -1201,7 +1201,7 @@ def yudas_list(request):
     
     filtered_yudas = y.filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])
-    for o in yudaList:
+    for o in yudaList: # hangi grupların yetkisi var ise bölüm şeklinde göndermem lazım
         o['onayDurumu'] = "40%"
  
     yudas_count = filtered_yudas.count()

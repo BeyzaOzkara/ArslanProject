@@ -299,7 +299,7 @@
                             <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
                                 <!-- <li class="pt-2 px-3"><h3 class="card-title">Yüzey Detayları</h3></li> -->
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true" style="color: #007bff;">.</a>
+                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true" style="color: #ffffff;"><i class="fa fa-question-circle" aria-hidden="true"></i></a>
                                   </li>
                                 <li class="nav-item">
                                   <a class="nav-link" id="custom-tabs-two-pres-tab" data-toggle="pill" href="#ytab_1" role="tab" aria-controls="custom-tabs-two-pres" aria-selected="true">Pres</a>
@@ -1263,6 +1263,7 @@
             success: function(response) {
                 // Başarılı yükleme sonrası işlemler
                 alert('Dosyalar başarıyla yüklendi! '+response.message);
+                window.location.href = "yudaDetail/"+response.id;
             },
             error: function(response) {
                 // Hata durumunda işlemler
