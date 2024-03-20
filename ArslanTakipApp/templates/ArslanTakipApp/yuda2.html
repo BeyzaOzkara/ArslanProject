@@ -632,29 +632,11 @@
 {% block extra_js %}
 <script>
 
-    // function requiredFunction(t){
-    //     console.log("required func");
-    //     console.log(t.value);
-    //     if (t.type == "select-multiple"){
-    //         let results = [];
-    //         let opt;
-    //         for (let j=0; j< t.options.length; j++){
-    //             opt = t.options[j]
-    //             if(opt.selected){results.push(opt.value);}
-    //         };
-    //         console.log(t.name);
-    //         console.log(results);
-    //     }
-
-    // };
-
     function checkRequiredField(i, allFilled) {
         let sType = i.attr('type') || i.prop('type');
-        console.log("sType: " + sType);
         if (sType == 'text') {
             if (i.val() === '') {
                 allFilled = false; 
-                // return false; // Exit the loop early if any field is empty
             }
         }
         else if (sType == 'radio') {
@@ -670,40 +652,41 @@
                 }
             });
         }
-        else if (sType == 'select-one') {
-            console.log("select onee");
-        }
         else if (sType == 'select-multiple') {
-            console.log("select multii");
+            let results = [];
+            let opt;
+            for (let j=0; j< i[0].options.length; j++){
+                opt = i[0].options[j]
+                if(opt.selected){results.push(opt.value);}
+            };
+            if (results.length == 0) {
+                allFilled = false;
+            }
+        }
+        else if (sType == 'select-one') {
+            console.log("select onee"); // bir kere seçtikten sonra seçimi kaldıramadıklarından bir şey eklememe gerek yok, false olma durumu olmuyor.
         }
         else if (sType == 'file') {
-            console.log("file type");
+            console.log("file type"); // dosyaları aşağıda updateFile vs functionlarında hallettim
         }
 
         return allFilled;
     };
 
     $(':input[required]').on('change', function() {
-        let $infoBox = $(this).closest('.required-info');
-        console.log($infoBox);
-        if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
-        
-        console.log($(this))
         let allFilled = true;
+        let $infoBox = $(this).closest('.required-info');
+        if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
         if ($infoBox.length == 0){ // info box içinde olmayanlar --> talaşlı imalat, paketleme ve dosya
-            console.log("if");
             allFilled = checkRequiredField($(this), allFilled);
         }
         else { // info-box içinde olanlar
-            console.log("else");
             let checkResult = false;
             let $reqInputs = $infoBox.find('[required]');
-            console.log($reqInputs)
             $reqInputs.each(function(r) {
                 allFilled = checkRequiredField($(this), allFilled);
             });
         }
-        console.log("check: " + allFilled);
         if (allFilled) {
             $infoBox.addClass('validated').removeClass('required-info');
         } else {
