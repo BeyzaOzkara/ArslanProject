@@ -1143,8 +1143,8 @@ def yuda_kaydet(request):
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
                         assign_perm("gorme_yuda", group, y)
-                # else:
-                #     assign_perm("gorme_yuda", group, y)
+                else:
+                    assign_perm("gorme_yuda", group, y)
 
             # Check field values and assign permissions based on conditions
             for field in y._meta.fields:
