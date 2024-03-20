@@ -1138,19 +1138,19 @@ def yuda_kaydet(request):
 
             groups = [Group.objects.get(name=name) for name in group_names]
 
-            assign_perm("gorme_yuda", request.user, y)
+            assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
             for group in groups:
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
                         assign_perm("gorme_yuda", group, y)
-                else:
-                    assign_perm("gorme_yuda", group, y)
+                # else:
+                #     assign_perm("gorme_yuda", group, y)
 
             # Check field values and assign permissions based on conditions
             for field in y._meta.fields:
                 fname = field.name
                 fvalue = getattr(y, fname)
-                if fname in group_mapping and fvalue is not None and fvalue != "":
+                if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat":
                     group = Group.objects.get(name=group_mapping[fname])
                     assign_perm("gorme_yuda", group, y)
                 if fname == "TalasliImalat" and fvalue == "Var":
