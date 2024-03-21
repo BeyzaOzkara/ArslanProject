@@ -1195,7 +1195,8 @@ def yudas_list(request):
     offset, limit = calculate_pagination(page, size)
     filter_list = params.get("filter", [])
     q = {}
-    y = YudaForm.objects.all()
+    #y = YudaForm.objects.all()
+    y = get_objects_for_user(request.user, "gorme_yuda", YudaForm.objects.all()) #user görme yetkisinin olduğu yudaları görsün
 
     if len(filter_list) > 0:
         for i in filter_list:
