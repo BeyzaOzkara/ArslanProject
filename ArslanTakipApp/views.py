@@ -23,7 +23,7 @@ from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimR
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from guardian.shortcuts import get_objects_for_user, assign_perm
+from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
 from django.db import transaction 
 from aes_cipher import *
@@ -1204,9 +1204,17 @@ def yudas_list(request):
     
     filtered_yudas = y.filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])
+
     for o in yudaList: # hangi grupların yetkisi var ise bölüm şeklinde göndermem lazım
         o['onayDurumu'] = "40%"
- 
+        o['grup'] = []
+        gr_perm = get_groups_with_perms(y.get(id=o['id']), attach_perms=True)
+        for j in gr_perm:
+            if gr_perm[j] == ['gorme_yuda']:
+                # print("i[j]")
+                # print(j.name)
+                o['grup'].append(j.name.split(' Bolumu')[0])
+          
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)
     response_data = {

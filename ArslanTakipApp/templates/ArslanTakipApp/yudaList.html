@@ -152,7 +152,8 @@
     function getProjects(data){
         tableBody.empty();  // Önceki verileri temizle
         data.forEach(item => {
-            const row = $('<tr></tr>').html(`
+          let grup = item.grup;
+            let html1 = `
             <td>
                 #
             </td>
@@ -168,15 +169,11 @@
             <td>
                 <a>${item.MusteriFirmaAdi}</a>
             </td>
-            <td class="project_progress">
-                <span class="badge badge-success">Kalıphane</span>
-                <span class="badge badge-success">Pres</span>
-                <span class="badge badge-success">Kalite</span>
-                <span class="badge badge-success">Planlama</span>
-                <span class="badge badge-success">Yönetim</span>
-                <span class="badge badge-success">Paketleme</span>
-                <span class="badge badge-success">Success</span>
-                <span class="badge badge-success">Success</span>
+            <td class="project_progress">`;
+             grup.forEach(i => {
+                html1 += `<span class="badge badge-success">${i}</span>`
+            });
+            html1 += `
             </td>
             <td class="project-state">
                 <span class="badge badge-success">Success</span>
@@ -195,7 +192,8 @@
                     </i>
                 </a>
             </td>
-            `);
+            `;
+            const row = $('<tr></tr>').html(html1);
             tableBody.append(row);
         });
     };
