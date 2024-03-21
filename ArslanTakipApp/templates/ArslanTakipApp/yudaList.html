@@ -133,9 +133,14 @@
     $('#applyFilter').click(function() {
         const yudaNoFilter = $('#yudaNoFilter').val();
         const musteriFirmaFilter = $('#musteriFirmaFilter').val();
+        filterList = [];
 
-        if (yudaNoFilter != "") {filterList.push({ field: 'YudaNo', type:'like', value: yudaNoFilter });};
-        if (musteriFirmaFilter != ""){filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });};
+        if (yudaNoFilter != "") {
+          filterList.push({ field: 'YudaNo', type:'like', value: yudaNoFilter });
+        };
+        if (musteriFirmaFilter != ""){
+          filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });
+        };
         
         loadPage(1);
 
