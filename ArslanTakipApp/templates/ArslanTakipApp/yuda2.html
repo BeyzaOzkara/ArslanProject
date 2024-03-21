@@ -204,7 +204,7 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                    <button type="button" id="AlasimKondusyonEkle" class="btn btn-outline-primary" >Ekle</button>
+                                    <button type="button" id="AlasimKondusyonEkle" class="btn btn-outline-danger" >Ekle</button>
                                     </div>
                                 </div>
                             </div>
@@ -319,7 +319,7 @@
                             <div class="tab-content">
                                 <div class="tab-pane fade show active" id="ytab_home">
                                     <div class="row">
-                                        <p>Lütfen Pres, Eloksal, Boya, Ahşap Kaplama ...</p>
+                                        <p></p>
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="ytab_1">
@@ -806,6 +806,8 @@
                 $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
                 if(alasimTab.getData().length == 0){
                     $('#alasimTabData').prop('required', true);
+                    $('#AlasimKondusyonEkle').removeClass('btn-outline-primary');
+                    $('#AlasimKondusyonEkle').addClass('btn-outline-danger');
                 }
                 changeFunction();
             }
@@ -989,10 +991,14 @@
         else {
             kondusyon = $('#kondusyonDiger').val();
         }
-        if(alasim!="Alaşım " && kondusyon!="Kondüsyon "){
+        if(alasim!="Alaşım* " && kondusyon!="Kondüsyon* "){
             alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
             $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
             $('#alasimTabData').removeAttr('required');
+            if ($('#AlasimKondusyonEkle').hasClass('btn-outline-danger')) {
+                $('#AlasimKondusyonEkle').removeClass('btn-outline-danger');
+                $('#AlasimKondusyonEkle').addClass('btn-outline-primary');
+            }
             changeFunction();
         }
     });

@@ -1438,6 +1438,13 @@ def  yudaDetailAnket(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
    
+def yudaDelete(request, yId):
+    users = User.objects.values()
+    yuda = YudaForm.objects.get(id = yId)
+    yuda.Silindi = True
+    yuda.save()
+    return HttpResponseRedirect("/yudas")
+
 
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)

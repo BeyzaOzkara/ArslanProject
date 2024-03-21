@@ -252,6 +252,7 @@ class YudaForm(models.Model):
     TalasliImalatAciklama = models.CharField(null=True, blank=True)
     Paketleme = models.CharField(null=True, blank=True)
     PaketlemeAciklama = models.CharField(null=True, blank=True)
+    Silindi = models.BooleanField(null=True)
 
     def __str__(self):
         return self.YudaNo
