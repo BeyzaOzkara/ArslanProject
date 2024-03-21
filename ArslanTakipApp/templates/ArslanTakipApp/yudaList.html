@@ -134,24 +134,16 @@
         const yudaNoFilter = $('#yudaNoFilter').val();
         const musteriFirmaFilter = $('#musteriFirmaFilter').val();
 
-        // Apply your filter logic here and reload the data accordingly
-        // For example:
-        // filterList.push({ field: 'yudaNo', value: yudaNoFilter });
-        // filterList.push({ field: 'musteriFirma', value: musteriFirmaFilter });
-        loadPage(currentPage);
+        if (yudaNoFilter != "") {filterList.push({ field: 'YudaNo', type:'like', value: yudaNoFilter });};
+        if (musteriFirmaFilter != ""){filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });};
+        
+        loadPage(1);
 
         // Hide the filter panel after applying filter
         $('#filterPanelOverlay').hide();
     });
   });
 
-  // <div class="progress progress-sm">
-  //                   <div class="progress-bar bg-green" role="progressbar" aria-volumenow="57" aria-volumemin="0" aria-volumemax="100" style="width: ${item.onayDurumu}">
-  //                   </div>
-  //               </div>
-  //               <small>
-  //                   ${item.onayDurumu} Onay
-  //               </small>
     function getProjects(data){
         tableBody.empty();  // Önceki verileri temizle
         data.forEach(item => {

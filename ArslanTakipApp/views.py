@@ -790,9 +790,11 @@ class EkSiparisView(generic.TemplateView):
 
 def filter_method(i, a):
     if i["type"] == "like":
-        a[i['field'] + "__startswith"] = i['value']
+        a[i['field'] + "__istartswith"] = i['value']
     elif i["type"] == "=":
         a[i['field']] = i['value']
+    elif i["type"] == "has":
+        a[i['field'] + "__icontains"] = i['value']
     return a
 
 def eksiparis_list(request):
