@@ -1108,6 +1108,7 @@ def yuda_kaydet(request):
             y = YudaForm()
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
+            print(y.ProjeYoneticisi)
             y.YudaAcanKisi = request.user
             y.Tarih = datetime.datetime.now()
 
@@ -1141,6 +1142,7 @@ def yuda_kaydet(request):
             groups = [Group.objects.get(name=name) for name in group_names]
 
             assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
+            assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
             for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
