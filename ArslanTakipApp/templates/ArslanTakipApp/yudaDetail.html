@@ -387,13 +387,13 @@
         <h5 class="text-muted">Proje dosyaları</h5>
         <ul class="list-unstyled" id="dosyaList"">
           <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Teknik Resim</li>
-          <ul class="list-unstyled dosyalar hide" id="teknik"></ul>
+          <ul class="list-unstyled dosyalar" id="teknik"></ul>
           <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Şartname</li>
-          <ul class="list-unstyled dosyalar hide" id="sart"></ul>
+          <ul class="list-unstyled dosyalar" id="sart"></ul>
           <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Paketleme Talimatı</li>
-          <ul class="list-unstyled dosyalar hide" id="paket"></ul>
+          <ul class="list-unstyled dosyalar" id="paket"></ul>
           <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
-          <ul class="list-unstyled dosyalar hide" id="digerDos"></ul>
+          <ul class="list-unstyled dosyalar" id="digerDos"></ul>
         </ul>
       </div>
       
@@ -429,9 +429,9 @@
 
   };
 
-  function dosyaFunc(e) {
-    $(e).next('ul').toggle();
-  };
+  // function dosyaFunc(e) { //<ul class="list-unstyled dosyalar hide" id="digerDos"></ul> hide ekle
+  //   $(e).next('ul').toggle();
+  // };
 
   const yorumCol = $('#yorumCol');
   function LoadComments() {
