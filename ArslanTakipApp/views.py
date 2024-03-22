@@ -1108,7 +1108,6 @@ def yuda_kaydet(request):
             y = YudaForm()
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
             y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
-            print(y.ProjeYoneticisi)
             y.YudaAcanKisi = request.user
             y.Tarih = datetime.datetime.now()
 
@@ -1207,16 +1206,17 @@ def yudas_list(request):
     filtered_yudas = y.filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])
 
-    for o in yudaList: # hangi grupların yetkisi var ise bölüm şeklinde göndermem lazım
-        o['onayDurumu'] = "40%"
-        o['grup'] = []
-        gr_perm = get_groups_with_perms(y.get(id=o['id']), attach_perms=True)
-        for j in gr_perm:
-            if gr_perm[j] == ['gorme_yuda']:
-                # print("i[j]")
-                # print(j.name)
-                o['grup'].append(j.name.split(' Bolumu')[0])
-          
+    for o in yudaList:
+        o['durumlar'] = {}
+        for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda']]:
+            yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
+            if yuda_onay:
+                if yuda_onay.OnayDurumu is True:
+                    o['durumlar'][group] = 'success'
+                elif yuda_onay.OnayDurumu is False:
+                    o['durumlar'][group] = 'danger'
+            else: o['durumlar'][group] = 'warning'
+        
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)
     response_data = {

@@ -152,7 +152,7 @@
     function getProjects(data){
         tableBody.empty();  // Önceki verileri temizle
         data.forEach(item => {
-          let grup = item.grup;
+          let durumlar = item.durumlar;
             let html1 = `
             <td>
                 #
@@ -170,9 +170,9 @@
                 <a>${item.MusteriFirmaAdi}</a>
             </td>
             <td class="project_progress">`;
-             grup.forEach(i => {
-                html1 += `<span class="badge badge-success">${i}</span>`
-            });
+            Object.entries(durumlar).forEach(([group, status]) => {
+              html1 += `<span class="badge badge-${status}">${group}</span>`
+            })
             html1 += `
             </td>
             <td class="project-state">

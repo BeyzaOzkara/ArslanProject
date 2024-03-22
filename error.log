@@ -967,3 +967,31 @@ Traceback (most recent call last):
     raise self.error(
 django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 196: 'endif', expected 'endblock'. Did you forget to register or load this tag?
 "GET /yudas HTTP/1.1" 500 184865
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1220, in yudas_list
+    yuda_with_perms = get_groups_with_perms(y, attach_perms=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\guardian\shortcuts.py", line 367, in get_groups_with_perms
+    ctype = get_content_type(obj)
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\guardian\ctypes.py", line 10, in get_content_type
+    return get_content_type_function(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\guardian\ctypes.py", line 14, in get_default_content_type
+    return ContentType.objects.get_for_model(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\contrib\contenttypes\models.py", line 41, in get_for_model
+    opts = self._get_opts(model, for_concrete_model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\contrib\contenttypes\models.py", line 28, in _get_opts
+    model = model._meta.concrete_model
+            ^^^^^^^^^^^
+AttributeError: 'QuerySet' object has no attribute '_meta'
+"GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D HTTP/1.1" 500 97579
