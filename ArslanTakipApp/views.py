@@ -1107,7 +1107,7 @@ def yuda_kaydet(request):
             
             y = YudaForm()
             y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
-            y.ProjeYoneticisi = request.user
+            y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
             y.YudaAcanKisi = request.user
             y.Tarih = datetime.datetime.now()
 
