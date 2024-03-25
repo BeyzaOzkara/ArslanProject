@@ -1347,7 +1347,7 @@ def yudaDetail(request, yId):
     
     yudaCList = [process_comment(comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    print(comments)
+    # print(comments)
     yudaDetails = YudaForm.objects.filter(id = yId).values()
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
@@ -1373,7 +1373,6 @@ def yudaDetailComment(request):
             c.Aciklama = req['yorum']
             if 'replyID' in req:
                 replyID = req['replyID']
-                print(Comment.objects.get(id=replyID))
                 c.ReplyTo = Comment.objects.get(id=replyID)
             c.save()
 

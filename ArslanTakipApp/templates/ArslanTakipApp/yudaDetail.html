@@ -39,6 +39,9 @@
       width: 50px;
       height: 50px;
     }
+    .nested-replies {
+        margin-left: 20px; /* Adjust the indentation level as needed */
+    }
   </style>
 {% endblock %}
 
@@ -402,80 +405,163 @@
   //   $(e).next('ul').toggle();
   // };
 
-  const yorumCol = $('#yorumCol');
-  function LoadComments() {
-    yorumCol.empty();
-    comments.forEach(c => {
-      const yorumlar = $('<div class="post"></div>').html(`
-            <div class="user-block">
-              <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-              <span class="username" style="color: blue;">
-                ${c.KullaniciAdi}
-              </span>
-              <span class="description">${c.Tarih}</span>
-            </div>
-            <!-- /.user-block -->
-            <p>
-              ${c.Aciklama}
-            </p>
-      `);
-      // Check if the comment is a reply
-      // if (c.ReplyTo_id) {
-      //     console.log(c.replyToKullanici);
-      //     const replyInfo = $('<div></div>').addClass('reply-info').text('Reply to: ' + c.replyToKullanici);
-      //     yorumlar.prepend(replyInfo); // Add reply info at the beginning of the comment
-      //     yorumlar.addClass('reply-comment'); // Add a class to style reply comments differently
-      // };
-      if(c.replies.length >0) {
-        console.log(c.replies);
-        const repliesContainer = $('<div class="replies-container"></div>');
 
-            c.replies.forEach(reply => {
-                const replyElement = $('<div class="reply"></div>').html(`
-                    <div class="user-block">
-                        <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                        <span class="username" style="color: green;">
-                            ${reply.KullaniciAdi}
-                        </span>
-                        <span class="description">${reply.Tarih}</span>
-                    </div>
-                    <!-- /.user-block -->
-                    <p>
-                        ${reply.Aciklama}
-                    </p>
-                `);
+//   function nestedReplies(r) {
+//     const nesRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
-                repliesContainer.append(replyElement);
-            });
-
-            yorumlar.append(repliesContainer);
-      }
-
-      c.cfiles.forEach(cf => {
-        const cfiles = $('<p></p>').html(`
-              <a href="/media/${cf.File}" target="_blank" class="link-black text-sm"><i class="fas fa-link mr-1"></i>  ${cf.File.substring(6)}</a>
-        `);
-        yorumlar.append(cfiles);
-      });
-
-      // Add a reply button
-      const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>');
-      replyButton.on('click', () => {
-          handleReply(c.id);
-      });
-      yorumlar.append(replyButton); //bastığımızda ne yapmasını istiyoruz ?? altına yorum editörümü açılsın yoksa zaten sayfada olan editörün üstüne şu kişiye cevap şeklinde bi yazı mı
-
-      /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
-      yorumCol.append(yorumlar);
+//     r.forEach(reply => {
+//       const replyElement = $('<div class="reply"></div>').html(`
+//           <div class="user-block">
+//               <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+//               <span class="username" style="color: green;">
+//                   ${reply.KullaniciAdi}
+//               </span>
+//               <span class="description">${reply.Tarih}</span>
+//           </div>
+//           <!-- /.user-block -->
+//           <p>
+//               ${reply.Aciklama}
+//           </p>
+//       `);
+//       const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>');
+//       replyButton.on('click', () => {
+//           handleReply(reply.id);
+//       });
+//       replyElement.append(replyButton);
       
-    });
-    
-  };
+//       if (reply.replies.length > 0) {
+//         replyElement.append(nestedReplies(reply.replies));
+//       }
 
-  function handleReply(commentId) {
-      console.log('Reply clicked for comment ID:', commentId);
-      yorumPaylas(commentId);
-  }
+//       nesRepliesContainer.append(replyElement);
+//     });
+    
+//     return nesRepliesContainer;
+//   }
+//   const yorumCol = $('#yorumCol');
+//   function LoadComments(comments) {
+//     yorumCol.empty();
+
+
+//     comments.forEach(c => {
+//       const yorumlar = $('<div class="post"></div>').html(`
+//             <div class="user-block">
+//               <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+//               <span class="username" style="color: blue;">
+//                 ${c.KullaniciAdi}
+//               </span>
+//               <span class="description">${c.Tarih}</span>
+//             </div>
+//             <!-- /.user-block -->
+//             <p>
+//               ${c.Aciklama}
+//             </p>
+//       `);
+//       // Add a reply button
+//       const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>');
+//       replyButton.on('click', () => {
+//           handleReply(c.id);
+//       });
+//       yorumlar.append(replyButton);
+//       if(c.replies.length >0) {
+//         const repliesContainer = $('<div class="replies-container nested-replies"></div>');
+//         repliesContainer.append(nestedReplies(c.replies));
+//         yorumlar.append(repliesContainer);
+//       }
+
+//       c.cfiles.forEach(cf => {
+//         const cfiles = $('<p></p>').html(`
+//               <a href="/media/${cf.File}" target="_blank" class="link-black text-sm"><i class="fas fa-link mr-1"></i>  ${cf.File.substring(6)}</a>
+//         `);
+//         yorumlar.append(cfiles);
+//       });
+//  //bastığımızda ne yapmasını istiyoruz ?? altına yorum editörümü açılsın yoksa zaten sayfada olan editörün üstüne şu kişiye cevap şeklinde bi yazı mı
+
+//       /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
+//       yorumCol.append(yorumlar);
+      
+//     });
+    
+//   };
+
+//   function handleReply(commentId) {
+//       console.log('Reply clicked for comment ID:', commentId);
+//       yorumPaylas(commentId);
+//   }
+
+function createReplyElement(reply) {
+    const userBlock = `
+        <div class="user-block">
+            <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+            <span class="username" style="color: green;">${reply.KullaniciAdi}</span>
+            <span class="description">${reply.Tarih}</span>
+        </div>`;
+    const replyContent = `<p>${reply.Aciklama}</p>`;
+    const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>').on('click', () => {
+        handleReply(reply.id);
+    });
+    const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent, replyButton);
+
+    if (reply.replies.length > 0) {
+        const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
+        replyElement.append(nestedRepliesContainer);
+    }
+
+    return replyElement;
+}
+
+function createCommentElement(comment) {
+    const userBlock = `
+        <div class="user-block">
+            <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+            <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
+            <span class="description">${comment.Tarih}</span>
+        </div>`;
+    const commentContent = `<p>${comment.Aciklama}</p>`;
+    const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>').on('click', () => {
+        handleReply(comment.id);
+    });
+    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent, replyButton);
+
+    if (comment.replies.length > 0) {
+        const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
+        commentElement.append(repliesContainer);
+    }
+
+    comment.cfiles.forEach(cf => {
+        const fileLink = $('<a href="/media/${cf.File}" target="_blank" class="link-black text-sm"></a>').text(`${cf.File.substring(6)}`).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileElement = $('<p></p>').append(fileLink);
+        commentElement.append(fileElement);
+    });
+
+    return commentElement;
+}
+
+function nestedReplies(replies) {
+    const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
+
+    replies.forEach(reply => {
+        const replyElement = createReplyElement(reply);
+        nestedRepliesContainer.append(replyElement);
+    });
+
+    return nestedRepliesContainer;
+}
+
+function LoadComments(comments) {
+    const yorumCol = $('#yorumCol');
+    yorumCol.empty();
+
+    comments.forEach(comment => {
+        const commentElement = createCommentElement(comment);
+        yorumCol.append(commentElement);
+    });
+}
+
+function handleReply(commentId) {
+    // console.log('Reply clicked for comment ID:', commentId);
+    yorumPaylas(commentId);
+}
  
   function DosyaEkle() {
     let changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";
@@ -581,7 +667,7 @@
   };
 
   LoadDetail();
-  LoadComments();
+  LoadComments(comments);
 
   $(function () {
     // Summernote
