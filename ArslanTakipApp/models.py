@@ -337,5 +337,4 @@ class Comment(models.Model):
     Aciklama = models.CharField(null=True, blank=True)
     ReplyTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
 
-    def __str__(self):
-        return f"{self.Kullanici.username}'s comment on {self.FormModel} {self.FormModelId}"
+    

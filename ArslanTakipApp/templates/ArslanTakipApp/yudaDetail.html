@@ -420,11 +420,36 @@
             </p>
       `);
       // Check if the comment is a reply
-      if (c.ReplyTo) {
-          const replyInfo = $('<div></div>').addClass('reply-info').text('Reply to: ' + c.ReplyTo.KullaniciAdi);
-          yorumlar.prepend(replyInfo); // Add reply info at the beginning of the comment
-          yorumlar.addClass('reply-comment'); // Add a class to style reply comments differently
-      };
+      // if (c.ReplyTo_id) {
+      //     console.log(c.replyToKullanici);
+      //     const replyInfo = $('<div></div>').addClass('reply-info').text('Reply to: ' + c.replyToKullanici);
+      //     yorumlar.prepend(replyInfo); // Add reply info at the beginning of the comment
+      //     yorumlar.addClass('reply-comment'); // Add a class to style reply comments differently
+      // };
+      if(c.replies.length >0) {
+        console.log(c.replies);
+        const repliesContainer = $('<div class="replies-container"></div>');
+
+            c.replies.forEach(reply => {
+                const replyElement = $('<div class="reply"></div>').html(`
+                    <div class="user-block">
+                        <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                        <span class="username" style="color: green;">
+                            ${reply.KullaniciAdi}
+                        </span>
+                        <span class="description">${reply.Tarih}</span>
+                    </div>
+                    <!-- /.user-block -->
+                    <p>
+                        ${reply.Aciklama}
+                    </p>
+                `);
+
+                repliesContainer.append(replyElement);
+            });
+
+            yorumlar.append(repliesContainer);
+      }
 
       c.cfiles.forEach(cf => {
         const cfiles = $('<p></p>').html(`
@@ -449,7 +474,7 @@
 
   function handleReply(commentId) {
       console.log('Reply clicked for comment ID:', commentId);
-      //yorumPaylas(commentId);
+      yorumPaylas(commentId);
   }
  
   function DosyaEkle() {

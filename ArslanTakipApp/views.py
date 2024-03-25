@@ -1239,6 +1239,10 @@ def process_comment(comment):
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
     comment['Tarih'] = format_date(comment['Tarih'])
     comment['cfiles'] = list(getFiles("Comment", comment['id']))
+    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id']).values()]
+    # if comment['ReplyTo_id'] != None:
+    #     com = Comment.objects.get(id = comment['ReplyTo_id']).Kullanici_id
+    #     comment['replyToKullanici'] = get_user_full_name(com)
     return comment
 
 def format_yuda_details2(yList):
@@ -1339,11 +1343,11 @@ def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    yudaComments = getComments("YudaForm", yId)
-
+    yudaComments = getParentComments("YudaForm", yId)
+    
     yudaCList = [process_comment(comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-
+    print(comments)
     yudaDetails = YudaForm.objects.filter(id = yId).values()
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
@@ -1369,6 +1373,7 @@ def yudaDetailComment(request):
             c.Aciklama = req['yorum']
             if 'replyID' in req:
                 replyID = req['replyID']
+                print(Comment.objects.get(id=replyID))
                 c.ReplyTo = Comment.objects.get(id=replyID)
             c.save()
 
@@ -1550,9 +1555,9 @@ def getFiles(ref, mId):
 
     return filteredFiles
 
-def getComments(ref, mId):
+def getParentComments(ref, mId):
     allComments = Comment.objects.all()
-    filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId)).values()
+    filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId) & Q(ReplyTo__isnull = True)).values()
     
     return filteredComments
 
