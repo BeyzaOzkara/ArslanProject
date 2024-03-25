@@ -175,10 +175,10 @@
           <p style="font-weight: bold;">ONAY ANKETİ</p>
           <div style="display: inline-block;">
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected == true %} checked {% endif %} > ONAY
+              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected %} checked {% endif %} > ONAY
             </label>
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if Selected  == false %} checked {% endif %} > RET 
+              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if not Selected %} checked {% endif %} > RET 
             </label>
             <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
           </div>
@@ -200,38 +200,6 @@
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
-
-  
-  // if (i.MusteriFirmaAdi) {
-  //     htmlContent += `
-  //                   <span class="info-box-number text-center text-muted mb-0">Müşteri Firma Adı: ${i.MusteriFirmaAdi || " - - "}</span>
-  //                   `;
-  //   };
-  //   if (i.SonKullaniciFirma) {
-  //     htmlContent += `
-  //                   <span class="info-box-number text-center text-muted mb-0">Son Kullancı Firma: ${i.SonKullaniciFirma || " - - "}</span>
-  //                   `;
-  //   };
-  //   if (i.KullanimAlani) {
-  //     htmlContent += `
-  //                   <span class="info-box-number text-center text-muted mb-0">Kullanım Alanı: ${i.KullanimAlani || " - - "}</span>
-  //                   `;
-  //   };
-  //   if (i.ProfilSiparisi) {
-  //     htmlContent += `
-  //                   <span class="info-box-number text-center text-muted mb-0">Profil Siparişi: ${i.ProfilSiparisi || " - - "}</span>
-  //                   `;
-  //   };
-  //   if (i.MusteriOdemeVadesi) {
-  //     htmlContent += `
-  //                   <span class="info-box-number text-center text-muted mb-0">Ödeme Vadesi: ${i.MusteriOdemeVadesi || " - - "}</span>
-  //                   `;
-  //   };
-  //   if (i.CizimNo) {
-  //     htmlContent += `
-  //                   <span class="info-box-number text-center text-muted mb-0">Çizim No: ${i.CizimNo || " - - "}</span>
-  //                   `;
-  //   };
 
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
@@ -274,6 +242,7 @@
             htmlContent += `<span class="info-box-number text-center text-muted mb-0">${propertyNames[prop]}: ${i[prop]}</span>`;
         }
     }
+    htmlContent += `<span class="info-box-number text-center text-muted mb-0">Miktar: ${i.YillikProfilSiparisiMiktar} ${i.ProfilMiktarBirim}/${i.ProfilSip}</span>`;
     htmlContent += `
               </div>
             </div>
@@ -450,19 +419,38 @@
               ${c.Aciklama}
             </p>
       `);
+      // Check if the comment is a reply
+      if (c.ReplyTo) {
+          const replyInfo = $('<div></div>').addClass('reply-info').text('Reply to: ' + c.ReplyTo.KullaniciAdi);
+          yorumlar.prepend(replyInfo); // Add reply info at the beginning of the comment
+          yorumlar.addClass('reply-comment'); // Add a class to style reply comments differently
+      };
+
       c.cfiles.forEach(cf => {
         const cfiles = $('<p></p>').html(`
               <a href="/media/${cf.File}" target="_blank" class="link-black text-sm"><i class="fas fa-link mr-1"></i>  ${cf.File.substring(6)}</a>
         `);
         yorumlar.append(cfiles);
       });
-      
+
+      // Add a reply button
+      const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>');
+      replyButton.on('click', () => {
+          handleReply(c.id);
+      });
+      yorumlar.append(replyButton); //bastığımızda ne yapmasını istiyoruz ?? altına yorum editörümü açılsın yoksa zaten sayfada olan editörün üstüne şu kişiye cevap şeklinde bi yazı mı
+
       /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
       yorumCol.append(yorumlar);
       
     });
     
   };
+
+  function handleReply(commentId) {
+      console.log('Reply clicked for comment ID:', commentId);
+      //yorumPaylas(commentId);
+  }
  
   function DosyaEkle() {
     let changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";
@@ -535,7 +523,7 @@
       updateFileList();
   };
 
-  function yorumPaylas(){
+  function yorumPaylas(yId=null){
     var yorumData = new FormData();
     var textareaValue = $('.textarea').summernote('code');
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
@@ -544,6 +532,9 @@
     selectedFiles.forEach(function(file) {
       yorumData.append('yfiles', file);
     });
+    if (yId != null) {
+      yorumData.append("replyID", yId);
+    }
     //dosya yüklerken önceki dosya yükleme gibi olmalı title işaretlenmeli
     
     $.ajax({

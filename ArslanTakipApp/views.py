@@ -44,6 +44,15 @@ class RegisterView(generic.CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/register.html"
 
+def login_success(request):
+    user_g = request.user.groups.all()
+    if user_g.filter(name__contains = " Bolumu").exists():
+        return redirect("/yudas")
+    elif user_g.filter(name__contains = ' Operatoru').exists():
+        return redirect("/location")
+    else:
+        return redirect("/")
+
 class PasswordChangeView(PasswordChangeView):
     form_class = PasswordChangingForm
     success_url = reverse_lazy('ArslanTakipApp:password_success')
@@ -135,7 +144,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 #@permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
-    loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
+    loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
 
     # Create a dictionary for O(1) lookups
@@ -1290,14 +1299,6 @@ def format_yuda_details2(yList):
                     ahsap += ";  "
             i['YuzeyAhsap'] = ahsap
     return yList
-    """ for detail in yuda_details:
-        detail['Tarih'] = format_date(detail['Tarih'])
-        for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
-            if detail[key]:
-                json_data = json.loads(detail[key])
-                formatted_data = "; ".join([", ".join(f"{k}: {v}" for k, v in item.items()) for item in json_data])
-                detail[key] = formatted_data
-    return yuda_details """
 
 def process_alasim(alasim):
     return "; <br>".join([f"Alaşım: {item['Alasim']}, Kondüsyon: {item['Kondusyon']}" for item in alasim])
@@ -1336,7 +1337,6 @@ def format_yuda_details(yList):
 
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
-    users = User.objects.values()
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     yudaComments = getComments("YudaForm", yId)
@@ -1355,7 +1355,7 @@ def yudaDetail(request, yId):
         secim =""
     else:
         secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
-
+    
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
 
 def yudaDetailComment(request):
@@ -1367,6 +1367,9 @@ def yudaDetailComment(request):
             c.FormModel = "YudaForm"
             c.FormModelId = req['formID']
             c.Aciklama = req['yorum']
+            if 'replyID' in req:
+                replyID = req['replyID']
+                c.ReplyTo = Comment.objects.get(id=replyID)
             c.save()
 
             for file in request.FILES.getlist('yfiles'):

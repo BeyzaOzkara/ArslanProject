@@ -335,4 +335,7 @@ class Comment(models.Model):
     FormModelId = models.CharField(null=True, blank=True)
     Tarih = models.DateTimeField(auto_now=True, null=True, blank=True)
     Aciklama = models.CharField(null=True, blank=True)
-    #yüklenecek dosyalar için ne yazabilirim?
+    ReplyTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+
+    def __str__(self):
+        return f"{self.Kullanici.username}'s comment on {self.FormModel} {self.FormModelId}"

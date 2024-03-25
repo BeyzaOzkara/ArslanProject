@@ -149,7 +149,7 @@ MEDIA_URL = 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = "/yudas"
+LOGIN_REDIRECT_URL = "/login_success"
 LOGOUT_REDIRECT_URL = "/" 
 
 AUTHENTICATION_BACKENDS = (
