@@ -5,8 +5,6 @@
 <!-- Specify content of main body of page -->
 {% block content %}
 <h1>Arslan Alüminyum</h1>
-
-<p>Test site for Arslan Alüminyum</p>
   
   {% if user.is_authenticated %}
   <div class="container-fluid">
@@ -115,6 +113,20 @@
     {% endif %}
     </div>
   {% endif %}
-
+  {% if not user.is_authenticated %}
+  <div class="container-fluid">
+    <h3>Lütfen Giriş Yapınız</h3>
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+          <a href="/login" class="small-box-footer">
+            <i class="fas fa-arrow-circle-right"></i>
+            <span>GİRİŞ YAP</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   {% endblock %}
