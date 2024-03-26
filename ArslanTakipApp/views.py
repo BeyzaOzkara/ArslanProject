@@ -1210,7 +1210,13 @@ def yudas_list(request):
 
     if len(filter_list) > 0:
         for i in filter_list:
-            q = filter_method(i, q)
+            if i['field'] != 'YudaAcanKisi':
+                q = filter_method(i, q)
+            else:
+                print(i['field'])
+                yuda_acan_kisi_filter = User.objects.filter(username__icontains=i['value']) # firstname lastname kontrol edilebilir
+                if yuda_acan_kisi_filter.exists():
+                    q[i['field'] + "__in"] = yuda_acan_kisi_filter
     
     filtered_yudas = y.filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])

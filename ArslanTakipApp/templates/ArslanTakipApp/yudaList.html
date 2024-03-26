@@ -67,6 +67,7 @@
             <!-- Filter options -->
             <input type="text" id="yudaNoFilter" class="form-control mb-2" placeholder="YudaNo">
             <input type="text" id="musteriFirmaFilter" class="form-control mb-2" placeholder="Müşteri Firma">
+            <input type="text" id="musteriTemsilcisiFilter" class="form-control mb-2" placeholder="Müşteri Temsilcisi">
             <button id="applyFilter" class="btn btn-success">Filtre Uygula</button>
         </div>
     </div>
@@ -133,6 +134,7 @@
     $('#applyFilter').click(function() {
         const yudaNoFilter = $('#yudaNoFilter').val();
         const musteriFirmaFilter = $('#musteriFirmaFilter').val();
+        const musteriTemsilcisiFilter = $('#musteriTemsilcisiFilter').val();
         filterList = [];
 
         if (yudaNoFilter != "") {
@@ -140,6 +142,9 @@
         };
         if (musteriFirmaFilter != ""){
           filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });
+        };
+        if (musteriTemsilcisiFilter != ""){
+          filterList.push({ field: 'YudaAcanKisi', type:'like', value: musteriTemsilcisiFilter });
         };
         
         loadPage(1);

@@ -3094,3 +3094,16 @@ Traceback (most recent call last):
        ^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute 'OnayDurumu'
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D HTTP/1.1" 500 88337
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1213, in yudas_list
+    print(i.field)
+          ^^^^^^^
+AttributeError: 'dict' object has no attribute 'field'
+"GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22YudaAcanKisi%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%22deneme%22%7D%5D%7D HTTP/1.1" 500 73880
