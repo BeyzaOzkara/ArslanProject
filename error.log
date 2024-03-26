@@ -3052,3 +3052,45 @@ Traceback (most recent call last):
     raise self.model.DoesNotExist(
 ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
 "GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D HTTP/1.1" 500 20697
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1221, in yudas_list
+    yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
+                                                                  ~~~~~^~~~~~~~~~
+TypeError: unsupported operand type(s) for +: 'bool' and 'str'
+"GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D HTTP/1.1" 500 82611
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1221, in yudas_list
+    yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
+                                                                  ~~~~~^~~~~~~~~~
+TypeError: unsupported operand type(s) for +: 'bool' and 'str'
+"GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D HTTP/1.1" 500 82613
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1236, in yudas_list
+    o['durumlar'][group] = yudaOnay(yuda_onay, o, 'durumlar', group)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1199, in yudaOnay
+    if yuda_onay.OnayDurumu is True:
+       ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'OnayDurumu'
+"GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D HTTP/1.1" 500 88337

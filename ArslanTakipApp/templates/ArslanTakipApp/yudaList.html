@@ -153,6 +153,7 @@
         tableBody.empty();  // Önceki verileri temizle
         data.forEach(item => {
           let durumlar = item.durumlar;
+          console.log(durumlar)
             let html1 = `
             <td>
                 #
@@ -171,12 +172,30 @@
             </td>
             <td class="project_progress">`;
             Object.entries(durumlar).forEach(([group, status]) => {
-              html1 += `<span class="badge badge-${status}">${group}</span>`
+              if (group != "Ust Yonetim") {
+                html1 += `<span class="badge badge-${status}">${group}</span>`
+              }
             })
             html1 += `
             </td>
             <td class="project-state">
-                <span class="badge badge-success">Success</span>
+              `
+              if (durumlar["Ust Yonetim"]) {
+                let b = "";
+                if (durumlar["Ust Yonetim"] == 'success'){
+                  b = "Onaylandı"
+                }
+                else if (durumlar["Ust Yonetim"] == 'warning') {
+                  b = "Onay Bekleniyor";
+                }
+                else {
+                  b = "Reddedildi"
+                }
+                html1 +=
+                `<span class="badge badge-${durumlar["Ust Yonetim"]}">${b}</span>`
+              }
+              html1 +=
+              `
             </td>
             <td class="project-actions text-right">
                 <a class="btn btn-primary btn-sm" href="yudaDetail/${item.id}">
