@@ -99,8 +99,6 @@
 {% block extra_js %}
 
 <script>
-
-  //modal gözleri düzenlenecek, yine gelen gozCounta göre göz seçenekleri eklenecek
   function alignModal() {
     var modalDialog = $(this).find(".modal-dialog");
     modalDialog.css("margin-top", Math.max(0, 
@@ -122,27 +120,24 @@
 
     //kaç fırın gözü var ona göre cardlar oluşturulacak.
     let gozCount = data[data.length-1]['gozCount'];
+    console.log(gozCount);
     const data2 = data.slice(0, (data.length-1));
     //gozCount a göre card oluştur içine infoboxları ekle ve rowa appendle
     rowBody.empty();
     rowGozBody.empty();
+    const flexBasis = `${100 / gozCount}%`;
+    console.log(flexBasis)
     
     for (j=1; j<=gozCount; j++){
-      let colName = ""
-      if (gozCount!=5){
-        colName = "col-md-"+(12/gozCount);
-      }
-      else {colName = "col-md-"+(10/gozCount);}
-      const card = $('<div class="'+colName+'" style="height:'+(oneThirdHeight*2)+'px">').html(`
-        <div class="card h-100 bg-gradient-info text-white" style="text-align: center;">
+      const card = $(`<div class="card-container"></div>`).html(`
+        <div class="card h-100 bg-gradient-info text-white" style="text-align: center; flex-basis: ${flexBasis};">
           <div class="card-body ${j} goz align-items-center" id="cardBody${j}">
           </div>
         </div>
       `);
       rowBody.append(card);
       cardList.push( $('#cardBody'+j));
-
-      const gozCard = $('<div class="'+colName+'">').html(`
+      const gozCard = $('<div class="card-container">').html(`
         <div class="card bg-info text-white">
           <label for="check${j}">
             <div class="card-body">
@@ -182,7 +177,6 @@
             profilNo = item.kalipNo;
             yanNo = "";
           }
-
           const box = $('<div class="info-box border-0" style="width: 100%; color: black; overflow: hidden;"></div>').html(`
           <div class="info-box-content">
             <div class="row">
@@ -291,8 +285,6 @@
     }
       
     });
-    //card boyutunu almıyor neden? aşağıda olduğu için olabilir mi 
-    //card height yukarı alınabilir
 
     $(".modal").on("shown.bs.modal", alignModal);
 
@@ -338,11 +330,11 @@
       method: 'GET',
       dataType: 'json',
       success: function (data) {
-        console.log(data);
+        // console.log(data);
         if (data.length !=0){
           data = JSON.parse(data);
         }
-        console.log("renderdata ajax");
+        // console.log("renderdata ajax");
         renderData(data);
       },
       error: function (data) {
