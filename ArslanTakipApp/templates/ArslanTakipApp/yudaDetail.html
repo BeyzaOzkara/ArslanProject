@@ -356,15 +356,14 @@
         <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
         <p class="text-muted">${i.YudaNo} ile ilişkili dosyalar</p>
         <br>
-        <h5 class="text-muted">Proje dosyaları</h5>
         <ul class="list-unstyled" id="dosyaList"">
-          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Teknik Resim</li>
+          <li style="font-weight:bold; font-size:1.5em; cursor:pointer;" onclick="dosyaFunc(this)">Teknik Resim</li>
           <ul class="list-unstyled dosyalar" id="teknik"></ul>
-          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Şartname</li>
+          <li style="font-weight:bold; font-size:1.5em; cursor:pointer;" onclick="dosyaFunc(this)">Şartname</li>
           <ul class="list-unstyled dosyalar" id="sart"></ul>
-          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Paketleme Talimatı</li>
+          <li style="font-weight:bold; font-size:1.5em; cursor:pointer;" onclick="dosyaFunc(this)">Paketleme Talimatı</li>
           <ul class="list-unstyled dosyalar" id="paket"></ul>
-          <li style="font-weight:bold; font-size:2em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
+          <li style="font-weight:bold; font-size:1.5em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
           <ul class="list-unstyled dosyalar" id="digerDos"></ul>
         </ul>
       </div>
@@ -381,7 +380,7 @@
     const digerDosList = $('#digerDos');
 
     files.forEach(f => {
-        const listItem = $('<li style="font-size:1.5em"></li>').html(`
+        const listItem = $('<li style="font-size:1.2em"></li>').html(`
             <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1">
                 <i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)}
             </a>

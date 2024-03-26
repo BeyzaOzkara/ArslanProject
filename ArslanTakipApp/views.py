@@ -1014,7 +1014,7 @@ def kalipfirini_meydan(request):
     page = params["page"]
     offset, limit = calculate_pagination(page, size)
 
-    loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location) #Location.objects.all() 
+    loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location) #Location.objects.all()
     
     if not request.user.is_superuser:
         loc_id = loc.get(locationName__contains = "MEYDAN").id

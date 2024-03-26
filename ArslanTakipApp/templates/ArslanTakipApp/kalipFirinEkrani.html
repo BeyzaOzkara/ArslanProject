@@ -309,7 +309,7 @@
       filterMode: "remote",
       ajaxURL:"/kalipfirini/meydan",
       ajaxURLGenerator:function(url, config, params){
-          return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+          return url + "?params=" + encodeURI(JSON.stringify(params));
       },
       columns: [
         {title:"Kalıp No", field:"kalipNo",  headerFilter:"input", cellClick:function(e, cell){
@@ -330,12 +330,10 @@
       method: 'GET',
       dataType: 'json',
       success: function (data) {
-        // console.log(data);
         if (data.length !=0){
           data = JSON.parse(data);
-        }
-        // console.log("renderdata ajax");
         renderData(data);
+        }
       },
       error: function (data) {
         alert(data.responseJSON.error);
