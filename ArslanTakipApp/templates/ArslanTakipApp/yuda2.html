@@ -96,7 +96,7 @@
                                   <div class="info-box bg-light  required-info">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI*</span>
-                                      <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" required>
+                                      <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()" required>
                                       <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
                                     </div>
                                   </div>
@@ -105,7 +105,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">SON KULLANICI FİRMA</span>
-                                      <input type="text" name="SonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2 kaydet" placeholder="Paylaşıldıysa lütfen girin">
+                                      <input type="text" name="SonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()" placeholder="Paylaşıldıysa lütfen girin">
                                     </div>
                                   </div>
                                 </div>
@@ -113,7 +113,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİLİN KULLANILDIĞI YER</span>
-                                      <input type="text" name="KullanimAlani" id="kullanimAlani" class="form-control mt-2 kaydet" placeholder="ÖRN: Solar Otomotiv..">
+                                      <input type="text" name="KullanimAlani" id="kullanimAlani" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()" placeholder="ÖRN: Solar Otomotiv..">
                                     </div>
                                   </div>
                                 </div>
@@ -123,7 +123,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ RESİM/PARÇA NO</span>
-                                      <input type="text" name="CizimNo" id="cizimNo" class="form-control mt-2 kaydet">
+                                      <input type="text" name="CizimNo" id="cizimNo" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                   </div>
                                 </div>
@@ -132,7 +132,7 @@
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ*</span>
                                       <div class="input-group mt-2">
-                                        <input type="text" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
+                                        <input type="number" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn btn-outline-danger active">
                                                 <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet is-warning" value="kg" autocomplete="off" required> KG
@@ -161,7 +161,7 @@
                                   <div class="info-box bg-light">
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">MÜŞTERİ ÖDEME VADESİ</span>
-                                      <input type="text" name="MusteriOdemeVadesi" id="musteriOdemeVadesi" class="form-control mt-2 kaydet">
+                                      <input type="text" name="MusteriOdemeVadesi" id="musteriOdemeVadesi" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                   </div>
                                 </div>
@@ -181,7 +181,7 @@
                                         
                                     </select>
                                     <div class="input-group" id="alasimDigerDiv" style="display: none;">
-                                        <input type="text" class="form-control" name="AlasimDiger" placeholder="Alaşım" id="alasimDiger">
+                                        <input type="text" class="form-control" name="AlasimDiger" placeholder="Alaşım" id="alasimDiger" oninput="this.value = this.value.toUpperCase()">
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="alasimDigerSpan" onclick="digerFunction('alasimDigerDiv', 'alasimSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                         </div>
@@ -195,7 +195,7 @@
                                         
                                     </select>
                                     <div class="input-group" id="kondusyonDigerDiv" style="display: none;">
-                                        <input type="text" class="form-control" placeholder="Kondüsyon" id="kondusyonDiger">
+                                        <input type="text" class="form-control" placeholder="Kondüsyon" id="kondusyonDiger" oninput="this.value = this.value.toUpperCase()">
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="kondusyonDigerSpan" onclick="digerFunction('kondusyonDigerDiv', 'kondusyonSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                         </div>
@@ -285,7 +285,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</span>
-                                        <textarea name="OnemliOlculer" class="form-control mt-3 kaydet" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi"></textarea>
+                                        <textarea name="OnemliOlculer" class="form-control mt-3 kaydet" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi" oninput="this.value = this.value.toUpperCase()"></textarea>
                                     </div>
                                     </div>
                                 </div>
@@ -429,14 +429,14 @@
                                                 <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control col-lg-4" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
                                                     <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
                                                 </select>
-                                                <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
+                                                <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;" oninput="this.value = this.value.toUpperCase()">
                                                 <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                                 <select name="boyaClassSelect" id="boyaClassSelect" class="form-control col-lg-3" onclick="toastClick('info','Belirtilmediyse Class 1','')">
-                                                    <option value="boyaClass" selected>Class 1</option>
-                                                    <option value="boyaClass2">Class 2</option>
-                                                    <option value="boyaClass3">Class 3</option>
+                                                    <option value="boyaClass" selected>CLASS 1</option>
+                                                    <option value="boyaClass2">CLASS 2</option>
+                                                    <option value="boyaClass3">CLASS 3</option>
                                                 </select>
-                                                <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
+                                                <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                             <div class="col-lg-3">
                                                 <div class="input-group ">
@@ -468,7 +468,7 @@
                                                 <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
                                             </div>
                                             <div class="col-lg-7">
-                                                <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
+                                                <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama" oninput="this.value = this.value.toUpperCase()">
                                             </div>
                                         </div>    
                                         </div>
@@ -558,7 +558,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                        <input type="text" name="TalasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2 kaydet">
+                                        <input type="text" name="TalasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     </div>
                                 </div>
@@ -588,7 +588,7 @@
                                     <div class="info-box bg-light">
                                     <div class="info-box-content">
                                         <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                        <input type="text" name="PaketlemeAciklama" id="paketlemeAciklama" class="form-control mt-2 kaydet">
+                                        <input type="text" name="PaketlemeAciklama" id="paketlemeAciklama" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     </div>
                                 </div>
