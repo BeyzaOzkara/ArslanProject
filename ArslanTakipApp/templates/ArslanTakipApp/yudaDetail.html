@@ -419,6 +419,16 @@
     return nestedRepliesContainer;
   }
 
+  function fileInputChange(e, r){
+    console.log("burda")
+      Array.from(e.target.files).forEach(function(newFile) {
+          if (!fileAlreadySelected(newFile)) {
+              selectedFiles.push(newFile);
+              updateFileList(r);
+          }
+      });
+  }
+
   function createReplyElement(reply) {
     const userBlock = `<div class="user-block">
                           <img class="img-circle img-bordered-sm" src="/static/admin-lte/dist/img/avatar5.png" alt="user image">
@@ -432,7 +442,6 @@
     });
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent, replyButton);
 
-    // Add reply form collapse structure
     const replyFormCollapse = $(`<div class="collapse" id="replyComment${reply.id}"></div>`).html(`
           <form>
               <div class="form-group">
@@ -444,11 +453,11 @@
                   <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${reply.id}" style="height: 265px;display: none;">
                     <div class="input-group">
                       <div class="custom-file">
-                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${reply.id}" lang="tr" multiple>
+                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${reply.id}" lang="tr" onchange="fileInputChange(event, ${reply.id})" multiple>
                           <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
                       </div>
                       <div class="input-group-append">
-                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${reply.id})">Temizle</span>
                       </div>
                     </div>
                     <div id="fileTitles${reply.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
@@ -458,6 +467,7 @@
               </div>
               <button type="button" class="btn btn-default" onclick="handleReply(${reply.id})">Gönder</button>
           </form>`);
+
     replyElement.append(replyFormCollapse);
 
     if (reply.replies.length > 0) {
@@ -493,11 +503,11 @@
                     <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${comment.id}" style="height: 265px;display: none;">
                       <div class="input-group">
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" multiple>
+                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" onchange="fileInputChange(event, ${comment.id})" multiple>
                             <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
                         </div>
                         <div class="input-group-append">
-                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${comment.id})">Temizle</span>
                         </div>
                       </div>
                       <div id="fileTitles${comment.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
@@ -609,9 +619,9 @@
       updateFileList(cId);
   };
 
-  function DosyaTemizle(){
+  function DosyaTemizle(cId){
       selectedFiles = [];
-      updateFileList();
+      updateFileList(cId);
   };
 
   function yorumPaylas(yId=""){
@@ -627,24 +637,24 @@
       yorumData.append("replyID", yId);
     }
     //dosya yüklerken önceki dosya yükleme gibi olmalı title işaretlenmeli
-    for (var pair of yorumData.entries()) {
-        console.log(pair[0]+ ', ' + pair[1]); 
-    }
-    // $.ajax({
-    //         url: '/yudaDetailComment',
-    //         type: 'POST',
-    //         data: yorumData,
-    //         contentType: false,
-    //         processData: false,
-    //         success: function(response) {
-    //             // Başarılı yükleme sonrası işlemler
-    //             window.location.reload();
-    //         },
-    //         error: function(response) {
-    //             // Hata durumunda işlemler
-    //             alert('Yorum kaydedilemedi. '+response.responseJSON.error);
-    //         }
-    // });
+    // for (var pair of yorumData.entries()) {
+    //     console.log(pair[0]+ ', ' + pair[1]); 
+    // }
+    $.ajax({
+            url: '/yudaDetailComment',
+            type: 'POST',
+            data: yorumData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                // Başarılı yükleme sonrası işlemler
+                window.location.reload();
+            },
+            error: function(response) {
+                // Hata durumunda işlemler
+                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+            }
+    });
 
   };
 
