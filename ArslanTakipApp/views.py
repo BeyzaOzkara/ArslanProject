@@ -1150,6 +1150,7 @@ def yuda_kaydet(request):
             groups = [Group.objects.get(name=name) for name in group_names]
 
             assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
+            assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
             assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
             for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
@@ -1246,9 +1247,6 @@ def process_comment(comment):
     comment['Tarih'] = format_date(comment['Tarih'])
     comment['cfiles'] = list(getFiles("Comment", comment['id']))
     comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id']).values()]
-    # if comment['ReplyTo_id'] != None:
-    #     com = Comment.objects.get(id = comment['ReplyTo_id']).Kullanici_id
-    #     comment['replyToKullanici'] = get_user_full_name(com)
     return comment
 
 def format_yuda_details2(yList):
