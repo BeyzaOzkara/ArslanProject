@@ -528,7 +528,8 @@ function createCommentElement(comment) {
     }
 
     comment.cfiles.forEach(cf => {
-        const fileLink = $('<a href="/media/${cf.File}" target="_blank" class="link-black text-sm"></a>').text(`${cf.File.substring(6)}`).prepend('<i class="fas fa-link mr-1"></i>');
+      console.log(cf.File)
+        const fileLink = $(`<a href="/media/${cf.File}" target="_blank" class="link-black text-sm"></a>`).text(`${cf.File.substring(6)}`).prepend('<i class="fas fa-link mr-1"></i>');
         const fileElement = $('<p></p>').append(fileLink);
         commentElement.append(fileElement);
     });
