@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from .views import RegisterView
 
 app_name = 'ArslanTakipApp'
@@ -21,30 +22,30 @@ urlpatterns = [
     path('location/kalip', views.location_kalip),
     path('location/hareket', views.location_hareket),
     # path('location/update', views.location_update),
-    path('hareket', views.HareketView.as_view()),
-    path('kalip/', views.KalipView.as_view()),
+    path('hareket', login_required(views.HareketView.as_view())),
+    path('kalip/', login_required(views.KalipView.as_view())),
     path('kalip/liste', views.kalip_liste),
     path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
     path('qr/', views.qrKalite, name='qr'),
-    path('siparis/', views.SiparisView.as_view()),
+    path('siparis/', login_required(views.SiparisView.as_view())),
     path('siparis/list', views.siparis_list),
     path('siparis/max', views.siparis_max),
     path('siparis/child/<str:pNo>', views.siparis_child),
     path('siparis/ekle', views.siparis_ekle),
-    path('eksiparis/', views.EkSiparisView.as_view()),
+    path('eksiparis/', login_required(views.EkSiparisView.as_view())),
     path('siparis/presKodu/<str:pNo>', views.siparis_presKodu),
     path('eksiparis/list', views.eksiparis_list),
     path('eksiparis/acil', views.eksiparis_acil),
-    path('kalipfirini/', views.KalipFirinView.as_view()),
+    path('kalipfirini/', login_required(views.KalipFirinView.as_view())),
     path('kalipfirini/meydan', views.kalipfirini_meydan),
     path('kalipfirini/goz', views.kalipfirini_goz),
-    path('baskigecmisi/', views.BaskiGecmisiView.as_view()),
+    path('baskigecmisi/', login_required(views.BaskiGecmisiView.as_view())),
     path('baskigecmisi/list', views.baskigecmisi_list),
-    path('yuda/', views.YudaView.as_view()),
+    path('yuda/', login_required(views.YudaView.as_view())),
     path('yuda/<str:objId>', views.yuda),
     path('yudakaydet', views.yuda_kaydet),
-    path('yudas', views.YudasView.as_view(), name='yudas'),
+    path('yudas', login_required(views.YudasView.as_view()), name='yudas'),
     path('yudas/list' ,views.yudas_list),
     path('yudaDetail/<str:yId>', views.yudaDetail, name='yudaDetail'),
     path('yudaDetailComment', views.yudaDetailComment),
