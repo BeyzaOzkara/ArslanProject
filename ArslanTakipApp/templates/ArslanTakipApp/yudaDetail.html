@@ -436,11 +436,18 @@
                           <span class="description">${reply.Tarih}</span>
                       </div>`;
     const replyContent = `<p>${reply.Aciklama}</p>`;
+    const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
+
+    reply.cfiles.forEach(cf => {
+        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileElement = $('<p></p>').append(fileLink);
+        replyElement.append(fileElement);
+    });
+
     const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
         const replyForm = replyElement.find(`#replyComment${reply.id}`);
         replyForm.collapse('toggle');
     });
-    const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent, replyButton);
 
     const replyFormCollapse = $(`<div class="collapse" id="replyComment${reply.id}"></div>`).html(`
           <form>
@@ -468,12 +475,13 @@
               <button type="button" class="btn btn-default" onclick="handleReply(${reply.id})">Gönder</button>
           </form>`);
 
-    replyElement.append(replyFormCollapse);
+    replyElement.append(replyButton, replyFormCollapse);
 
     if (reply.replies.length > 0) {
         const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
         replyElement.append(nestedRepliesContainer);
     }
+
 
     return replyElement;
 }
@@ -485,51 +493,52 @@
                           <span class="description">${comment.Tarih}</span>
                       </div>`;
     const commentContent = `<p>${comment.Aciklama}</p>`;
-    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
-        const replyForm = commentElement.find(`#replyComment${comment.id}`);
-        replyForm.collapse('toggle');
-    });
-    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent, replyButton);
-
-    const replyFormCollapse = $(`<div class="collapse" id="replyComment${comment.id}"></div>`).html(` 
-            <form>
-                <div class="form-group">
-
-                  <div class="row" style="height: 265px;">
-                    <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
-                      <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
-                                      style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                    </div>
-                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${comment.id}" style="height: 265px;display: none;">
-                      <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" onchange="fileInputChange(event, ${comment.id})" multiple>
-                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
-                        </div>
-                        <div class="input-group-append">
-                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${comment.id})">Temizle</span>
-                        </div>
-                      </div>
-                      <div id="fileTitles${comment.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
-                    </div>
-                  </div>
-                  <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
-                </div>
-                <button type="button" class="btn btn-default" onclick="handleReply(${comment.id})">Gönder</button>
-            </form>`);
-        
-    commentElement.append(replyFormCollapse);
-
-    if (comment.replies.length > 0) {
-        const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
-        commentElement.append(repliesContainer);
-    }
+    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     comment.cfiles.forEach(cf => {
         const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
         const fileElement = $('<p></p>').append(fileLink);
         commentElement.append(fileElement);
     });
+
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
+        const replyForm = commentElement.find(`#replyComment${comment.id}`);
+        replyForm.collapse('toggle');
+    });
+
+    const replyFormCollapse = $(`<div class="collapse" id="replyComment${comment.id}"></div>`).html(` 
+          <form>
+              <div class="form-group">
+
+                <div class="row" style="height: 265px;">
+                  <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
+                    <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
+                                    style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                  </div>
+                  <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${comment.id}" style="height: 265px;display: none;">
+                    <div class="input-group">
+                      <div class="custom-file">
+                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" onchange="fileInputChange(event, ${comment.id})" multiple>
+                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                      </div>
+                      <div class="input-group-append">
+                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${comment.id})">Temizle</span>
+                      </div>
+                    </div>
+                    <div id="fileTitles${comment.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                  </div>
+                </div>
+                <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
+              </div>
+              <button type="button" class="btn btn-default" onclick="handleReply(${comment.id})">Gönder</button>
+          </form>`);
+        
+    commentElement.append(replyButton, replyFormCollapse);
+
+    if (comment.replies.length > 0) {
+        const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
+        commentElement.append(repliesContainer);
+    }
 
     return commentElement;
   };
