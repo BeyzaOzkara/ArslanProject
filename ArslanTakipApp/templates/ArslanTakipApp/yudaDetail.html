@@ -205,6 +205,7 @@
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
+  var selectedFiles = [];
 
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
@@ -403,7 +404,6 @@
   };
 
   
-  var selectedFiles = [];
   // function dosyaFunc(e) { //<ul class="list-unstyled dosyalar hide" id="digerDos"></ul> hide ekle
   //   $(e).next('ul').toggle();
   // };

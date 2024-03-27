@@ -132,7 +132,7 @@
                                     <div class="info-box-content">
                                       <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ*</span>
                                       <div class="input-group mt-2">
-                                        <input type="number" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
+                                        <input type="text" oninput="this.value = formatNumber(this.value)" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
                                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn btn-outline-danger active">
                                                 <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet is-warning" value="kg" autocomplete="off" required> KG
@@ -272,8 +272,8 @@
                                                 </span>
                                                 </div>
                                                 <input type="text" class="form-control metreInput" value="VAR" style="background-color: transparent;" readonly>
-                                                <input type="number" class="form-control col-lg-4 kaydet" placeholder="minimum (kg/m)" name="MATmin" id="minMAT" style="display: none;">
-                                                <input type="number" class="form-control col-lg-4 kaydet" placeholder="maximum (kg/m)" name="MATmax" id="maxMAT" style="display: none;">
+                                                <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control col-lg-4 kaydet" placeholder="minimum (kg/m)" name="MATmin" id="minMAT" style="display: none;">
+                                                <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control col-lg-4 kaydet" placeholder="maximum (kg/m)" name="MATmax" id="maxMAT" style="display: none;">
                                             </div>
                                         </div>
                                     </div>
@@ -341,7 +341,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-lg-1">
-                                            <input type="number" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
+                                            <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
                                         </div>
                                         <div class="form-group col-lg-1">
                                             <button type="button" id="YuzeyPresEkle" class="btn btn-outline-primary" >Ekle</button>
@@ -386,7 +386,7 @@
                                             </div>
                                             <div class="col-lg-1">
                                                 <div class="form-group">
-                                                    <input type="number" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" min="0" id="eloksalBoy">
+                                                    <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" min="0" id="eloksalBoy">
                                                 </div>
                                             </div>
                                             <div class="col-lg-2 form-group">
@@ -455,7 +455,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-lg-1">
-                                            <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
+                                            <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
                                         </div>
                                         <div class="form-group col-lg-3">
                                         <div class="row">
@@ -494,14 +494,14 @@
                                                     <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
                                                 </select>
                                                 <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
-                                                    <input type="text" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
+                                                    <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
                                                     <div class="input-group-append">
                                                         <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-lg-1">
-                                                <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
+                                                <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
                                             </div>
                                             <div class="col-lg-2 form-group">
                                                 <div class="row">
@@ -636,6 +636,27 @@
 
 {% block extra_js %}
 <script>
+
+    function formatNumber(number) {
+        number = number.replace(/[^\d,]/g, '')
+        var parts = [];
+        var partsWithComma = number.split(',');
+        var integerPart = partsWithComma[0].replace(/\D/g, ''); // Remove non-numeric characters from integer part
+
+        while (integerPart.length > 3) {
+            parts.unshift(integerPart.slice(-3));
+            integerPart = integerPart.slice(0, -3);
+        }
+        if (integerPart) {
+            parts.unshift(integerPart);
+        }
+        let a = parts.join('.');
+        if (partsWithComma.length > 1) {
+            a += (',' + partsWithComma[1].replace(/[^\d]/g, '')); // Remove non-numeric characters from decimal part
+        }
+
+        return a;
+    }
 
     function checkRequiredField(i, allFilled) {
         let sType = i.attr('type') || i.prop('type');
