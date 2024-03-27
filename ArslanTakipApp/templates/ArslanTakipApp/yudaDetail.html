@@ -196,6 +196,8 @@
     </div>
   </div>
 </div>
+
+
 {% endblock %}
 
 {% block extra_js %}
@@ -404,102 +406,59 @@
   //   $(e).next('ul').toggle();
   // };
 
+function nestedReplies(replies) {
+    const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
-//   function nestedReplies(r) {
-//     const nesRepliesContainer = $('<div class="replies-container nested-replies"></div>');
+    replies.forEach(reply => {
+        const replyElement = createReplyElement(reply);
+        nestedRepliesContainer.append(replyElement);
+    });
 
-//     r.forEach(reply => {
-//       const replyElement = $('<div class="reply"></div>').html(`
-//           <div class="user-block">
-//               <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-//               <span class="username" style="color: green;">
-//                   ${reply.KullaniciAdi}
-//               </span>
-//               <span class="description">${reply.Tarih}</span>
-//           </div>
-//           <!-- /.user-block -->
-//           <p>
-//               ${reply.Aciklama}
-//           </p>
-//       `);
-//       const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>');
-//       replyButton.on('click', () => {
-//           handleReply(reply.id);
-//       });
-//       replyElement.append(replyButton);
-      
-//       if (reply.replies.length > 0) {
-//         replyElement.append(nestedReplies(reply.replies));
-//       }
-
-//       nesRepliesContainer.append(replyElement);
-//     });
-    
-//     return nesRepliesContainer;
-//   }
-//   const yorumCol = $('#yorumCol');
-//   function LoadComments(comments) {
-//     yorumCol.empty();
-
-
-//     comments.forEach(c => {
-//       const yorumlar = $('<div class="post"></div>').html(`
-//             <div class="user-block">
-//               <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-//               <span class="username" style="color: blue;">
-//                 ${c.KullaniciAdi}
-//               </span>
-//               <span class="description">${c.Tarih}</span>
-//             </div>
-//             <!-- /.user-block -->
-//             <p>
-//               ${c.Aciklama}
-//             </p>
-//       `);
-//       // Add a reply button
-//       const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>');
-//       replyButton.on('click', () => {
-//           handleReply(c.id);
-//       });
-//       yorumlar.append(replyButton);
-//       if(c.replies.length >0) {
-//         const repliesContainer = $('<div class="replies-container nested-replies"></div>');
-//         repliesContainer.append(nestedReplies(c.replies));
-//         yorumlar.append(repliesContainer);
-//       }
-
-//       c.cfiles.forEach(cf => {
-//         const cfiles = $('<p></p>').html(`
-//               <a href="/media/${cf.File}" target="_blank" class="link-black text-sm"><i class="fas fa-link mr-1"></i>  ${cf.File.substring(6)}</a>
-//         `);
-//         yorumlar.append(cfiles);
-//       });
-//  //bastığımızda ne yapmasını istiyoruz ?? altına yorum editörümü açılsın yoksa zaten sayfada olan editörün üstüne şu kişiye cevap şeklinde bi yazı mı
-
-//       /* yorumların dosyalarını nasıl eklemeliyim?? dosyaları yorumlar constuına değilde başka bir const ile eklesem? */
-//       yorumCol.append(yorumlar);
-      
-//     });
-    
-//   };
-
-//   function handleReply(commentId) {
-//       console.log('Reply clicked for comment ID:', commentId);
-//       yorumPaylas(commentId);
-//   }
-
+    return nestedRepliesContainer;
+}
 function createReplyElement(reply) {
     const userBlock = `
         <div class="user-block">
-            <img class="img-circle img-bordered-sm" src="/static/admin-lte/dist/img/avatar5.png" alt="user image">
-            <span class="username" style="color: green;">${reply.KullaniciAdi}</span>
+            <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+            <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
             <span class="description">${reply.Tarih}</span>
         </div>`;
     const replyContent = `<p>${reply.Aciklama}</p>`;
-    const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>').on('click', () => {
-        handleReply(reply.id);
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
+        const replyForm = replyElement.find(`#replyComment${reply.id}`);
+        replyForm.collapse('toggle');
     });
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent, replyButton);
+
+    // Add reply form collapse structure
+    const replyFormCollapse = `
+        <div class="collapse" id="replyComment${reply.id}">
+            <form>
+                <div class="form-group">
+                  <div class="row" style="height: 265px;">
+                    <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${reply.id}">
+                      <textarea class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
+                                      style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${reply.id}" style="height: 265px;display: none;">
+                      <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${reply.id}" lang="tr" multiple>
+                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                        </div>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                        </div>
+                      </div>
+                      <div id="fileTitles${reply.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                    </div>
+                  </div>
+                  <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${reply.id})"></i>
+                </div>
+                <button type="button" class="btn btn-default" onclick="handleReply(${reply.id})">Gönder</button>
+            </form>
+        </div>`;
+    replyElement.append(replyFormCollapse);
 
     if (reply.replies.length > 0) {
         const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
@@ -512,15 +471,47 @@ function createReplyElement(reply) {
 function createCommentElement(comment) {
     const userBlock = `
         <div class="user-block">
-            <img class="img-circle img-bordered-sm" src="/static/admin-lte/dist/img/avatar5.png" alt="user image">
+            <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
             <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
             <span class="description">${comment.Tarih}</span>
         </div>`;
     const commentContent = `<p>${comment.Aciklama}</p>`;
-    const replyButton = $('<button type="button" class="btn btn-sm btn-primary reply-btn">Cevapla</button>').on('click', () => {
-        handleReply(comment.id);
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
+        const replyForm = commentElement.find(`#replyComment${comment.id}`);
+        replyForm.collapse('toggle');
     });
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent, replyButton);
+
+    // Add reply form collapse structure
+    const replyFormCollapse = `
+        <div class="collapse" id="replyComment${comment.id}">
+            <form>
+                <div class="form-group">
+
+                  <div class="row" style="height: 265px;">
+                    <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
+                      <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
+                                      style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${comment.id}" style="height: 265px;display: none;">
+                      <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" multiple>
+                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                        </div>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                        </div>
+                      </div>
+                      <div id="fileTitles${comment.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                    </div>
+                  </div>
+                  <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
+                </div>
+                <button type="button" class="btn btn-default" onclick="handleReply(${comment.id})">Gönder</button>
+            </form>
+        </div>`;
+    commentElement.append(replyFormCollapse);
 
     if (comment.replies.length > 0) {
         const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
@@ -528,24 +519,12 @@ function createCommentElement(comment) {
     }
 
     comment.cfiles.forEach(cf => {
-      console.log(cf.File)
-        const fileLink = $(`<a href="/media/${cf.File}" target="_blank" class="link-black text-sm"></a>`).text(`${cf.File.substring(6)}`).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
         const fileElement = $('<p></p>').append(fileLink);
         commentElement.append(fileElement);
     });
 
     return commentElement;
-}
-
-function nestedReplies(replies) {
-    const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
-
-    replies.forEach(reply => {
-        const replyElement = createReplyElement(reply);
-        nestedRepliesContainer.append(replyElement);
-    });
-
-    return nestedRepliesContainer;
 }
 
 function LoadComments(comments) {
@@ -558,15 +537,20 @@ function LoadComments(comments) {
     });
 }
 
+
+
 function handleReply(commentId) {
-    // console.log('Reply clicked for comment ID:', commentId);
+    console.log('Reply clicked for comment ID:', commentId);
     yorumPaylas(commentId);
 }
  
-  function DosyaEkle() {
-    let changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";
-    document.getElementById('yorumTextCol').setAttribute("class", changedClass);
-    $('#dosyaEkleCol').show();
+  function DosyaEkle(a="") {
+    let changedClass = ""
+    if (a ==""){changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";}
+    else {changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";}
+    
+    document.getElementById('yorumTextCol'+a).setAttribute("class", changedClass);
+    $('#dosyaEkleCol'+a).show();
   };
   
   var selectedFiles = [];
@@ -634,35 +618,37 @@ function handleReply(commentId) {
       updateFileList();
   };
 
-  function yorumPaylas(yId=null){
+  function yorumPaylas(yId=""){
     var yorumData = new FormData();
-    var textareaValue = $('.textarea').summernote('code');
+    var textareaValue = $(`#yorumText${yId}`).summernote('code');
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", data[0].id);
     yorumData.append("yorum", textareaValue);
     selectedFiles.forEach(function(file) {
       yorumData.append('yfiles', file);
     });
-    if (yId != null) {
+    if (yId != "") {
       yorumData.append("replyID", yId);
     }
     //dosya yüklerken önceki dosya yükleme gibi olmalı title işaretlenmeli
-    
-    $.ajax({
-            url: '/yudaDetailComment',
-            type: 'POST',
-            data: yorumData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                // Başarılı yükleme sonrası işlemler
-                window.location.reload();
-            },
-            error: function(response) {
-                // Hata durumunda işlemler
-                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
-            }
-    });
+    for (var pair of yorumData.entries()) {
+        console.log(pair[0]+ ', ' + pair[1]); 
+    }
+    // $.ajax({
+    //         url: '/yudaDetailComment',
+    //         type: 'POST',
+    //         data: yorumData,
+    //         contentType: false,
+    //         processData: false,
+    //         success: function(response) {
+    //             // Başarılı yükleme sonrası işlemler
+    //             window.location.reload();
+    //         },
+    //         error: function(response) {
+    //             // Hata durumunda işlemler
+    //             alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+    //         }
+    // });
 
   };
 
