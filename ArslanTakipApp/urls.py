@@ -48,6 +48,7 @@ urlpatterns = [
     path('yudas', login_required(views.YudasView.as_view()), name='yudas'),
     path('yudas/list' ,views.yudas_list),
     path('yudaDetail/<str:yId>', views.yudaDetail, name='yudaDetail'),
+    path('yudaDetail2/<str:yId>', views.yudaDetail2, name='yudaDetail2'),
     path('yudaDetailComment', views.yudaDetailComment),
     path('yudaDetailAnket', views.yudaDetailAnket),
     path('yudaDetailSvg', views.yudaDetailSvg),

@@ -1152,7 +1152,7 @@ def yuda_kaydet(request):
 
             assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
             assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
-            assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+            assign_perm(["gorme_yuda", "yonetici_yuda"], y.ProjeYoneticisi, y) # Assign permission to the current user
             for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
@@ -1409,12 +1409,6 @@ def format_yuda_tab(yD):
 def format_row(row):
     formatted_data = []
     olmaz = ["id", "YudaNo", "YudaAcanKisi_id", "ProjeYoneticisi_id", "Tarih", "RevTarih", "Silindi", "ProfilSip", "ProfilMiktarBirim", "YillikProfilSiparisiMiktar", "Metre Ağırlık Talebi", "MATmin", "MATmax"]
-    siparis = ["MusteriFirmaAdi", "SonKullaniciFirma", "KullanımAlani", "CizimNo","ProfilSip", "ProfilMiktarBirim", "YillikProfilSiparisiMiktar", "MusteriOdemeVadesi"]
-    alasimkondusyon = ["AlasimKondusyon"]
-    tolerans = ["DIN Tolerans", "Birlikte Çalışan Aparatı Var mı", "Metre Ağırlık Talebi", "MATmin", "MATmax","Önemli Ölçüler"]
-    yuzeydetay = ["YuzeyPres", "YuzeyEloksal", "YuzeyBoya", "YuzeyAhsap"]
-    talasli = ["TalasliImalat", "TalasliImalatAciklama"]
-    paketleme =  ["Paketleme", "PaketlemeAciklama"]
 
     key_mapping = {
         "MusteriFirmaAdi": "Müşteri Firma Adı", "SonKullaniciFirma": "Son Kullanıcı Firma", "KullanımAlani": "Kullanım Alanı", "CizimNo": "Çizim Numarası", 
@@ -1423,17 +1417,17 @@ def format_row(row):
         "TalasliImalat": "Talaşlı İmalat", "TalasliImalatAciklama": "Açıklama", "Paketleme": "Paketleme", "PaketlemeAciklama": "Açıklama"
     }
     main_rows = {
-        "Sipariş": siparis,
-        "Alaşım ve Kondüsyon": alasimkondusyon,
-        "Tolerans": tolerans,
-        "Yüzey Detayları": yuzeydetay,
-        "Talaşlı İmalat": talasli,
-        "Paketleme": paketleme
+        "Sipariş": ["MusteriFirmaAdi", "SonKullaniciFirma", "KullanımAlani", "CizimNo","ProfilSip", "ProfilMiktarBirim", "YillikProfilSiparisiMiktar", "MusteriOdemeVadesi"],
+        "Alaşım ve Kondüsyon": ["AlasimKondusyon"],
+        "Tolerans": ["DIN Tolerans", "Birlikte Çalışan Aparatı Var mı", "Metre Ağırlık Talebi", "MATmin", "MATmax","Önemli Ölçüler"],
+        "Yüzey Detayları": ["YuzeyPres", "YuzeyEloksal", "YuzeyBoya", "YuzeyAhsap"],
+        "Talaşlı İmalat": ["TalasliImalat", "TalasliImalatAciklama"],
+        "Paketleme": ["Paketleme", "PaketlemeAciklama"]
     }
 
     for main_row_title, main_row_keys in main_rows.items():
         main_row_data = {"Baslik": main_row_title, "Icerik": "", "_children": []}
-        if main_row_title == "Sipariş":
+        if main_row_title == "Sipariş": # miktar girilmesi zorunlu olduğu için başka kontrol yok, zorunlu olma durumu değişirse burası da değişecek
             miktar_content = f"{row['YillikProfilSiparisiMiktar']} {row['ProfilMiktarBirim']} / {row['ProfilSip']}"
             main_row_data["_children"].append({"Baslik": "Miktar", "Icerik": miktar_content})
         if main_row_title == "Tolerans":
@@ -1446,86 +1440,36 @@ def format_row(row):
         for key in main_row_keys:
             if key in row and key not in olmaz and row[key]:
                 if key == "AlasimKondusyon":
-                    # Extract and add each item under "AlasimKondusyon" separately
                     alaşım_kondüsyon_data = json.loads(row[key])
                     for item in alaşım_kondüsyon_data:
                         item_row = {"Baslik": alaşım_kondüsyon_data.index(item)+1, "Icerik": f"Alaşım: {item['Alasim']} - Kondüsyon: {item['Kondusyon']}"}
                         main_row_data["_children"].append(item_row)
-                if key in ["YuzeyPres", "YuzeyEloksal", "YuzeyBoya", "YuzeyAhsap"]:
-                    # Extract and add each item under these sections separately
+                elif key in ["YuzeyPres", "YuzeyEloksal", "YuzeyBoya", "YuzeyAhsap"]:
                     yuzey_data = json.loads(row[key])
                     parent_item = {"Baslik": key_mapping[key], "Icerik": "", "_children": []}
-                    print("ss")
-                    print(yuzey_data)
-                    formatted_data2 = {}
 
-                    # Loop through the queryset data
-                    for index, item in enumerate(yuzey_data, start=1):
-                        yuzey_detay = item["YuzeyDetay"]
-                        yuzey_pres_boy = item["YuzeyPresBoy"]
-
-                        # Create the child item dictionary
-                        child_item = {"Baslik": str(index), "Icerik": f"Boy: {yuzey_pres_boy}"}
-
-                        # Check if the yuzey_detay exists in formatted_data
-                        if yuzey_detay not in formatted_data:
-                            # Create a new main item
-                            formatted_data2[yuzey_detay] = {
-                                "Baslik": yuzey_detay,
-                                "Icerik": "dene",  # Replace "dene" with your actual content if needed
-                                "_children": []
-                            }
-
-                        # Append the child item to the corresponding _children list
-                        formatted_data2[yuzey_detay]["_children"].append(child_item)
-                        print(formatted_data2)
-
-                    # Convert the formatted_data dictionary values to a list
-                    formatted_data_list = list(formatted_data2.values())
-                    print("bb")
-                    for item in yuzey_data:
-                        child_item = {"Baslik": "", "Icerik":""}
-                        if 'YuzeyDetay' in item:
-                            print("yuzey")
-                            # if len(yuzey_data) == 1:
-                            #     print(item)
-                            #     child_item = {"Baslik": "", "Icerik": ""}
-                            # else:
-                            #     print(item)
-                            #     child_item = {"Baslik": yuzey_data.index(item)+1, "Icerik": "", "_children": []}
-                            #     a = {"Baslik": item['YuzeyDetay'], "Icerik": f"Boy: {item['YuzeyPresBoy']}"}
-                            #     child_item['_children'].append(a)
-                            # parent_item['_children'].append({"Başlık": item['YuzeyDetay'], "İçerik": ""})
-                            # for index, sub_item in enumerate(item['_children'], start=1):
-                            #     sub_detail_item = {"Başlık": str(index), "İçerik": f"Boy: {sub_item['Boy']}"}
-                            #     parent_item['_children'][-1]['_children'].append(sub_detail_item)
-                        elif 'Matlastirma' in item:
-                            print("eloksal")
-                            if len(yuzey_data) == 1:
-                                child_item = {"Baslik": "", "Icerik": ""}
-                            else:
-                                child_item = {"Baslik": yuzey_data.index(item)+1, "Icerik": "", "_children": []}
-                        elif 'BoyaClass' in item:
-                            print("boya")
-                            if len(yuzey_data) == 1:
-                                child_item = {"Baslik": "", "Icerik": ""}
-                            else:
-                                child_item = {"Baslik": yuzey_data.index(item)+1, "Icerik": "", "_children": []}
-                        elif 'AhsapKaplama' in item:
-                            print("ahsap")
-                            if len(yuzey_data) == 1:
-                                child_item = {"Baslik": "", "Icerik": f"{item['AhsapKaplama']},  Boy: {item['AhsapBoy']},  {item['AhsapTemizKesim']}", "_children": []}
-                            else:
-                                child_item = {"Baslik": yuzey_data.index(item)+1, "Icerik": "", "_children": []}
-                                a = {"Baslik": "", "Icerik": f"{item['AhsapKaplama']}, Boy: {item['AhsapBoy']}, {item['AhsapTemizKesim']}"}
-                                child_item['_children'].append(a)
-                        parent_item['_children'].append(child_item)
-                    print("bitti")
-                        # for detail_key, detail_value in item.items():
-                        #     print(f"detail_key: {detail_key}")
-                        #     print(f"detail_value: {detail_value}")
-                        #     detail_item = {"Baslik": detail_key, "Icerik": detail_value}
-                        #     child_item["_children"].append(detail_item)
+                    child_item = []
+                    for i in yuzey_data:
+                        if  len(yuzey_data) == 1:
+                            if key == 'YuzeyPres':
+                                child_item = [{'Baslik':i['YuzeyDetay'], 'Icerik':  f"Boy: {i['YuzeyPresBoy']}"}]
+                            elif key == 'YuzeyEloksal':
+                                child_item = [{'Baslik':"", 'Icerik':  f"{i['Renk']}, {i['KaplamaKalinligi']}µ {i['EloksalBoy']}mm, {i['EloksalTemizKesim']}"}]
+                            elif key == 'YuzeyBoya':
+                                child_item = [{'Baslik':"", 'Icerik':  f"{i['Marka']} {i['MarkaRenkKodu']} {i['BoyaClass']} RAL {i['Ral']} {i['Tur']} </br> {i['BoyaKalinlik']}µ {i['BoyaBoy']}mm, {i['BoyaTemizKesim']}"}]
+                            elif key == 'YuzeyAhsap':
+                                child_item = [{'Baslik': "", 'Icerik': f"{i['AhsapKaplama']}, Boy: {i['AhsapBoy']}"}]
+                        else:
+                            if key == 'YuzeyPres':
+                                child_item.append({'Baslik':i['YuzeyDetay'], 'Icerik':  f"Boy: {i['YuzeyPresBoy']}"})
+                            elif key == 'YuzeyEloksal':
+                                child_item.append({'Baslik':"", 'Icerik':  f"{i['Renk']}, {i['KaplamaKalinligi']}µ {i['EloksalBoy']}mm, {i['EloksalTemizKesim']}"})
+                            elif key == 'YuzeyBoya':
+                                child_item.append({'Baslik':"", 'Icerik':  f"{i['Marka']} {i['MarkaRenkKodu']} {i['BoyaClass']} RAL {i['Ral']} {i['Tur']} </br> {i['BoyaKalinlik']}µ {i['BoyaBoy']}mm, {i['BoyaTemizKesim']}"})
+                            elif key == 'YuzeyAhsap':
+                                child_item.append({'Baslik': "", 'Icerik': f"{i['AhsapKaplama']}, Boy: {i['AhsapBoy']}"})
+                            
+                    parent_item['_children'] = child_item
                     main_row_data["_children"].append(parent_item)
                 else:
                     child_row = {"Baslik": key_mapping[key], "Icerik": row[key]}
@@ -1535,24 +1479,27 @@ def format_row(row):
 
     return formatted_data
 
-  
 def yudaDetail(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
+    # print(yudaFiles)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    # if yudaFiles.filter(FileTitle = "Şartname").exists():
+    #     fi = UploadFile.objects.get(Q(FileModel = "YudaForm") & Q(FileModelId = yId) & Q(FileTitle = 'Şartname'))
+    #     print(fi.File.path)
+    #     yudaDetailSvg(request, fi.File.path)
+        
 
     yudaComments = getParentComments("YudaForm", yId)
     yudaCList = [process_comment(comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    # print(comments)
-    yudaDetails = YudaForm.objects.filter(id = yId).values()
-    print(yudaDetails)
-    # data2 = format_yuda_tab(yudaDetails)
 
-    # formatted_data = format_row(yudaDetails[0])
-    # print(formatted_data)
+    yudaDetails = YudaForm.objects.filter(id = yId).values()
+    # print(f"yudaDetails{yudaDetails}")
+
+    formatted_data = format_row(yudaDetails[0])
     
-    # print(data2)
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
     data = json.dumps(formatted_yuda_details, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -1564,12 +1511,48 @@ def yudaDetail(request, yId):
     else:
         secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
     
-    # data2 = json.dumps(data2, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    # formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     
-    # return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
+    # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
 
+
+def yudaDetail2(request, yId):
+    #veritabanından yuda no ile ilişkili dosyaların isimlerini al
+    yudaFiles = getFiles("YudaForm", yId)
+    print(yudaFiles)
+    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    if yudaFiles.filter(FileTitle = "Şartname").exists():
+        fi = UploadFile.objects.get(Q(FileModel = "YudaForm") & Q(FileModelId = yId) & Q(FileTitle = 'Şartname'))
+        print(fi.File.path)
+        yudaDetailSvg(request, fi.File.path)
+        
+
+    yudaComments = getParentComments("YudaForm", yId)
+    yudaCList = [process_comment(comment) for comment in yudaComments]
+    comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    yudaDetails = YudaForm.objects.filter(id = yId).values()
+    # print(f"yudaDetails{yudaDetails}")
+
+    formatted_data = format_row(yudaDetails[0])
+    
+    yList = list(yudaDetails)
+    formatted_yuda_details = format_yuda_details(yList)
+    data = json.dumps(formatted_yuda_details, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
+    retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
+    if not YudaOnay.objects.filter(Yuda_id = yId, Group = request.user.groups.first()).first():
+        secim =""
+    else:
+        secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
+    
+    formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    
+    return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
+    
 
 def yudaDetailComment(request):
     if request.method == 'POST':
@@ -1667,8 +1650,8 @@ def  yudaDetailAnket(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
    
-def yudaDetailSvg(request):
-    areas, perimeters, paths = dxf_file_area_calculation("C:/Users/beyza.ozkara/Desktop/section calculator/16693.dxf")
+def yudaDetailSvg(request, path):
+    areas, perimeters, paths = dxf_file_area_calculation(path)
     # print(f"areas: {areas} \nperimeters: {perimeters} \npaths: {paths}")
     kalipTip =""
     zivana = 0
@@ -1707,8 +1690,8 @@ def yudaDetailSvg(request):
             svg = svg + paths[i] + f'id = "p{i}" class="ciz" />' + '\n'
     
     data = {
-        'svg': svg,  # Replace with your actual SVG content
-        'printed_info': {  # Add the printed information as a dictionary
+        'svg': svg, 
+        'printed_info': {
             'kalip_tip': kalipTip,
             'zivana': zivana,
             'section_area': section_area,
@@ -1719,6 +1702,8 @@ def yudaDetailSvg(request):
             'shape_factor': total_perimeter / (gramaj * 10)
         }
     }
+
+
     return JsonResponse(data)
 
 def yudaDelete(request, yId):
