@@ -169,9 +169,9 @@
           else if (bolumFilter[0] == '' && bolumFilter.length != 1){
             filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
           }
-          
         };
-        if (musteriTemsilcisiSelect != null){
+        console.log(musteriTemsilcisiSelect)
+        if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
           filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
         };
         
@@ -189,7 +189,7 @@
 
   function getTemsilci(data){
     $('#musteriTemsilcisiSelect').empty();
-    $('#musteriTemsilcisiSelect').append('<option value="" disabled selected> </option>');
+    $('#musteriTemsilcisiSelect').append('<option value="" selected> </option>');
     $.each(data, function(key, value) {
         $('#musteriTemsilcisiSelect').append('<option value=' + value.id + '>' + value.full_name + '</option>');
     });
