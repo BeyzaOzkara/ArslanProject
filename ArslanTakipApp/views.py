@@ -1228,7 +1228,7 @@ def yudas_list(request):
                     elif bolum == 'Mekanik Islem':
                         q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
     
-    filtered_yudas = y.filter(**q).order_by("-Tarih")
+    filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih")
     yudaList = list(filtered_yudas.values()[offset:limit])
     
     for o in yudaList:
