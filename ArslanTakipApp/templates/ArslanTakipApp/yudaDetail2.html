@@ -1,0 +1,615 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+  <style>
+    .hide {
+      display: none;
+    }
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
+    .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
+    .overflow {
+        display: block;
+        white-space: nowrap;
+        width: 120px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #onayChart {
+      width: 50px;
+      height: 50px;
+    }
+    .nested-replies {
+        margin-left: 20px; /* Adjust the indentation level as needed */
+    }
+    path:hover {
+      fill: green !important;
+    }
+    circle:hover {
+      fill: green !important;
+    }
+    path {
+      fill:white;
+      stroke:none
+    }
+    circle {
+      fill:white;
+      stroke:none
+    }
+    #po {
+      fill:black;
+      stroke:none
+    }
+
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1>Yeni Ürün Devreye Alma Formu</h1>
+  <div class="card" id="yudaCard">
+    <div class="card-header">
+      
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- dxf kesit çizim -->
+        <div class="col-12 col-md-12 col-lg-5 order-2 order-md-1">
+          <div class="card">
+            <div class="card-body" id="svgCard">
+              <svg id="svgContainer" width="100%">
+                <g>
+
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme için tabulator-->
+        <div class="col-12 col-md-12 col-lg-7 order-1 order-md-2" id="de">
+          <div class="card">
+            <div class="card-body" id="bilgiCard" style="height: 300px;">
+              <div id="bilgiTabulator"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+  <!-- yorumlar -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Paylaşılanlar</h3>
+      <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+          <i class="fas fa-minus"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12" id="yorumCol">
+            
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- yorum yazma (richtext) -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Yorum Yap</h3>
+      <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+          <i class="fas fa-minus"></i></button>
+      </div>
+    </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
+    <div class="card-body" id="yorumCard">
+      <div class="row" style="height: 265px;">
+        <div class="col-12 col-md-12 col-lg-10 order-2 order-md-1" id="yorumTextCol">
+          <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
+                          style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+        </div>
+        <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;display: none;">
+          <div class="input-group">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+            </div>
+            <div class="input-group-append">
+                <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+            </div>
+          </div>
+          <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+        </div>
+        <div class="callout callout-info col-12 col-md-12 col-lg-2 order-2 order-md-1" style="height: 255px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <p style="font-weight: bold;">ONAY ANKETİ</p>
+          <div style="display: inline-block;">
+            <label style="display: inline-block;">
+              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected %} checked {% endif %} > ONAY
+            </label>
+            <label style="display: inline-block;">
+              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if not Selected %} checked {% endif %} > RET 
+            </label>
+            <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
+          </div>
+          <br/>
+          <div class="chart-container" style="position: relative; height:150px; width:200px;">
+            <canvas id="onayChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
+      <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
+    </div>
+  </div>
+
+
+
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var data = JSON.parse('{{ yuda_json|escapejs }}');
+  var files = JSON.parse('{{ files_json|escapejs }}');
+  var comments = JSON.parse('{{ comment_json|escapejs }}');
+  var data2 = JSON.parse('{{ data2|escapejs }}');
+  console.log(data2);
+  var selectedFiles = [];
+
+  var tableBilgi = new Tabulator("#bilgiTabulator", {
+    height:"100%",
+    layout:"fitDataFill",
+    placeholder:"YUDA Bilgileri",
+    dataTree:true,
+    dataTreeStartExpanded:true,
+    data: data2,
+    columns:[
+        {
+            columns:[
+            {title:"BAŞLIK", field:"Baslik"},
+            {title:"İÇERİK", field:"Icerik"},
+            ],
+            
+        },
+    ],
+  }); 
+
+  function LoadSvg() {
+    $.ajax({
+        url: '/yudaDetailSvg',
+        type: 'GET',
+        success: function(data) {
+          var svgC = `${data.svg}`;
+          $('g').html(svgC);
+          const svg = document.querySelector('svg');
+          const g = document.querySelector('g');
+          const { xMin, xMax, yMin, yMax } = [...svg.children].reduce((acc, el) => {
+            const { x, y, width, height } = el.getBBox();
+            if (!acc.xMin || x < acc.xMin) acc.xMin = x;
+            if (!acc.xMax || x + width > acc.xMax) acc.xMax = x + width;
+            if (!acc.yMin || y < acc.yMin) acc.yMin = y;
+            if (!acc.yMax || y + height > acc.yMax) acc.yMax = y + height;
+            return acc;
+          }, {});
+          const viewbox = `${xMin*1.05} ${yMin*1.05} ${(xMax - xMin)*1.05} ${(yMax - yMin)*1.05}`;
+
+          svg.setAttribute('viewBox', viewbox);
+          g.setAttribute('transform', `scale(1, -1) translate(0, -${(yMax - yMin)})`);
+
+          
+          let svgHeight = document.getElementById("svgCard").clientHeight;
+          document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+          // tableBilgi.redraw(true);
+          // var printedInfoHtml = `
+          //     <div class="printed-info">
+          //         <p>${data.printed_info.kalip_tip}</p>
+          //     `;
+          // if (data.printed_info.zivana != 0){
+          //   printedInfoHtml += `
+          //           <p>Zıvana Sayısı: ${data.printed_info.zivana}</p>`};
+          // printedInfoHtml += `
+          //           <p>Kesit Alanı: ${data.printed_info.section_area.toFixed(2)} mm²</p>
+          //           <p>Gramaj: ${data.printed_info.gramaj.toFixed(2)} kg/m</p>
+          //           <p>Dış Çevre: ${data.printed_info.outer_perimeter.toFixed(2)} mm</p>
+          //           <p>İç Çevre: ${data.printed_info.inner_perimeter.toFixed(2)} mm</p>
+          //           <p>Şekil Faktörü: ${data.printed_info.shape_factor.toFixed(2)}</p>
+          //       </div>`;
+          //   $('.printed-info-container').html(printedInfoHtml);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching SVG content:', error);
+        }
+
+      }); 
+
+  }
+
+  function resizeTable(){
+    let svgHeight = document.getElementById("svgCard").clientHeight;
+    document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+
+  }
+
+  window.addEventListener("resize", (event) => {
+    resizeTable()
+  });
+
+  // Paylaşılanlar ve Yorum Yap 
+  function nestedReplies(replies) {
+    const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
+
+    replies.forEach(reply => {
+        const replyElement = createReplyElement(reply);
+        nestedRepliesContainer.append(replyElement);
+    });
+
+    return nestedRepliesContainer;
+  }
+
+  function fileInputChange(e, r){
+    console.log("burda")
+      Array.from(e.target.files).forEach(function(newFile) {
+          if (!fileAlreadySelected(newFile)) {
+              selectedFiles.push(newFile);
+              updateFileList(r);
+          }
+      });
+  }
+
+  function createReplyElement(reply) {
+    const userBlock = `<div class="user-block">
+                          <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                          <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
+                          <span class="description">${reply.Tarih}</span>
+                      </div>`;
+    const replyContent = `<p>${reply.Aciklama}</p>`;
+    const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
+
+    reply.cfiles.forEach(cf => {
+        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileElement = $('<p></p>').append(fileLink);
+        replyElement.append(fileElement);
+    });
+
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
+        const replyForm = replyElement.find(`#replyComment${reply.id}`);
+        replyForm.collapse('toggle');
+    });
+
+    const replyFormCollapse = $(`<div class="collapse" id="replyComment${reply.id}"></div>`).html(`
+          <form>
+              <div class="form-group">
+                <div class="row" style="height: 265px;">
+                  <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${reply.id}">
+                    <textarea class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
+                                    style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                  </div>
+                  <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${reply.id}" style="height: 265px;display: none;">
+                    <div class="input-group">
+                      <div class="custom-file">
+                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${reply.id}" lang="tr" onchange="fileInputChange(event, ${reply.id})" multiple>
+                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                      </div>
+                      <div class="input-group-append">
+                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${reply.id})">Temizle</span>
+                      </div>
+                    </div>
+                    <div id="fileTitles${reply.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                  </div>
+                </div>
+                <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${reply.id})"></i>
+              </div>
+              <button type="button" class="btn btn-default" onclick="handleReply(${reply.id})">Gönder</button>
+          </form>`);
+
+    replyElement.append(replyButton, replyFormCollapse);
+
+    if (reply.replies.length > 0) {
+        const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
+        replyElement.append(nestedRepliesContainer);
+    }
+
+
+    return replyElement;
+}
+
+  function createCommentElement(comment) {
+    const userBlock = `<div class="user-block">
+                          <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                          <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
+                          <span class="description">${comment.Tarih}</span>
+                      </div>`;
+    const commentContent = `<p>${comment.Aciklama}</p>`;
+    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
+
+    comment.cfiles.forEach(cf => {
+        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileElement = $('<p></p>').append(fileLink);
+        commentElement.append(fileElement);
+    });
+
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
+        const replyForm = commentElement.find(`#replyComment${comment.id}`);
+        replyForm.collapse('toggle');
+    });
+
+    const replyFormCollapse = $(`<div class="collapse" id="replyComment${comment.id}"></div>`).html(` 
+          <form>
+              <div class="form-group">
+
+                <div class="row" style="height: 265px;">
+                  <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
+                    <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
+                                    style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                  </div>
+                  <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${comment.id}" style="height: 265px;display: none;">
+                    <div class="input-group">
+                      <div class="custom-file">
+                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" onchange="fileInputChange(event, ${comment.id})" multiple>
+                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                      </div>
+                      <div class="input-group-append">
+                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${comment.id})">Temizle</span>
+                      </div>
+                    </div>
+                    <div id="fileTitles${comment.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                  </div>
+                </div>
+                <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
+              </div>
+              <button type="button" class="btn btn-default" onclick="handleReply(${comment.id})">Gönder</button>
+          </form>`);
+        
+    commentElement.append(replyButton, replyFormCollapse);
+
+    if (comment.replies.length > 0) {
+        const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
+        commentElement.append(repliesContainer);
+    }
+
+    return commentElement;
+  };
+
+  function LoadComments(comments) {
+    const yorumCol = $('#yorumCol');
+    yorumCol.empty();
+
+    comments.forEach(comment => {
+        const commentElement = createCommentElement(comment);
+        yorumCol.append(commentElement);
+    });
+  };
+
+  function handleReply(commentId) {
+    console.log('Reply clicked for comment ID:', commentId);
+    yorumPaylas(commentId);
+  };
+ 
+  function DosyaEkle(a="") {
+    let changedClass = ""
+    if (a ==""){changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";}
+    else {changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";}
+    
+    document.getElementById('yorumTextCol'+a).setAttribute("class", changedClass);
+    $('#dosyaEkleCol'+a).show();
+  };
+  
+  $('#fileInput').on('change', function(e) {
+    Array.from(e.target.files).forEach(function(newFile) {
+        if (!fileAlreadySelected(newFile)) {
+            selectedFiles.push(newFile);
+        }
+    });
+    updateFileList();
+  });
+
+  function fileAlreadySelected(newFile) {
+      return selectedFiles.some(function(existingFile) {
+          return newFile.name === existingFile.name && newFile.size === existingFile.size;
+      });
+  };
+
+  function updateFileList(cId="") {
+    var fileTitles = $(`#fileTitles${cId}`);
+    fileTitles.empty(); // Önceki başlık alanlarını temizle
+
+    var row = $('<div class="row"></div>');
+    fileTitles.append(row);
+
+    selectedFiles.forEach(function(file, index){
+        let fileType = file.name.split(".").pop().toLowerCase();
+        var column = $(
+            `<div class="col-md-6 mt-3">
+                <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
+                    <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                    <div class="p-1 flex-grow-1">
+                        <label class="overflow">${file.name}</label>
+                        <select class="form-control kaydet" name="fileTitles[]">
+                            <option value="Diger">Diğer</option>
+                            <option value="Öneri">Öneri</option>
+                            <option value="Teknik Resim">Teknik Resim</option>
+                            <option value="Şartname">Şartname</option>
+                            <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
+                        <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                    </button>
+                </div>
+            </div>`
+        );
+
+        row.append(column);
+
+        if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+            row = $('<div class="row"></div>');
+            fileTitles.append(row);
+        }
+    });
+
+  };
+
+  window.removeFile = function(index, cId) {
+      selectedFiles.splice(index, 1);
+      updateFileList(cId);
+  };
+
+  function DosyaTemizle(cId){
+      selectedFiles = [];
+      updateFileList(cId);
+  };
+
+  function yorumPaylas(yId=""){
+    var yorumData = new FormData();
+    var textareaValue = $(`#yorumText${yId}`).summernote('code');
+    yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    yorumData.append("formID", data[0].id);
+    yorumData.append("yorum", textareaValue);
+    selectedFiles.forEach(function(file) {
+      yorumData.append('yfiles', file);
+    });
+    if (yId != "") {
+      yorumData.append("replyID", yId);
+    }
+    //dosya yüklerken önceki dosya yükleme gibi olmalı title işaretlenmeli
+    // for (var pair of yorumData.entries()) {
+    //     console.log(pair[0]+ ', ' + pair[1]); 
+    // }
+    $.ajax({
+            url: '/yudaDetailComment',
+            type: 'POST',
+            data: yorumData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                // Başarılı yükleme sonrası işlemler
+                window.location.reload();
+            },
+            error: function(response) {
+                // Hata durumunda işlemler
+                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+            }
+    });
+
+  };
+
+  LoadComments(comments);
+  LoadSvg();
+  resizeTable();
+
+  $(function () {
+    // Summernote
+    $('.textarea').summernote({
+      disableResizeEditor: true,
+      height:200,
+      toolbar: [
+        //['misc', ['undo', 'redo']],
+        ['style', ['bold', 'italic', 'underline']],
+        ['font', ['superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table'],
+        ['custom', ['specialchars']],
+      ]
+    });
+    
+  });
+  
+
+  var anketSecimi  = "";
+  // Use event delegation for dynamically added elements
+  $(document).on('change', 'input[type=radio][name=onay]', function() {
+      document.getElementById("btnOnayAnket").disabled = false;
+      anketSecimi = this.value;
+  });
+
+  function onayAnketGonder() {
+
+    const params = {
+          yId: data[0].id,
+          secim: anketSecimi,
+    };
+
+    $.ajax({
+        url: `/yudaDetailAnket`,
+        method: 'GET',
+        data: { params: JSON.stringify(params)},
+        dataType: 'json',
+        success: function (sonuc) {
+            //canvas data değişecek
+            voteChart.data.datasets[0].data = [sonuc.onay, sonuc.ret];
+            voteChart.update();
+        },
+        error: function (error) {
+            console.error('Error loading poll results:', error);
+        }
+    });
+
+  }
+
+  const onayVotes = JSON.parse('{{ onay|escapejs }}');
+  const retVotes = JSON.parse('{{ ret|escapejs }}');
+  const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
+
+  const voteChart = new Chart(voteChartCanvas, {
+      type: 'pie',
+      data: {
+          labels: ['ONAY', 'RET'],
+          datasets: [{
+              label: 'Vote Rates',
+              data: [onayVotes, retVotes],
+              backgroundColor: [
+                  'rgba(54, 162, 235, 0.8)', // Blue color for ONAY renkleri değiştir!!
+                  'rgba(255, 99, 132, 0.8)' // Red color for RET ne renk olsa
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+        resize: true,
+      }
+  });
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<!-- Select2 -->
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- Summernote -->
+<script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/chart.js/Chart.min.js' %}"></script>
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+{% endblock %}

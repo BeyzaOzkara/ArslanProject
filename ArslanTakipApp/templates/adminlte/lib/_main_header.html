@@ -15,12 +15,20 @@
         <li class="nav-item d-none d-sm-inline-block">
             <a href="/" class="nav-link">Home</a>
         </li>
+        
+        {% if perms.ArslanTakipApp.view_location %}
         <li class="nav-item d-none d-sm-inline-block">
             <a href="/location" class="nav-link">Kalıp Arşivi</a>
         </li>
+        {% endif %}
         <li class="nav-item d-none d-sm-inline-block">
             <a href="/yudas" class="nav-link">YUDA Listesi</a>
-        </li> 
+        </li>
+        {% if perms.ArslanTakipApp.kalipEkran_view_location %}
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/kalipfirini" class="nav-link">Kalıp Fırını</a>
+        </li>
+        {% endif %}
     </ul>
 
     {% block nav_custom_menu %}
@@ -38,7 +46,7 @@
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <a href="#" class="dropdown-item">
                         <div class="media">
-                            <img src="" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <img src="/static/ArslanTakipApp/aaLogo.png" alt="User Avatar" class="img-size-50 mr-3 img-circle">
                             <div class="media-body">
                                 <h3 class="dropdown-item-title">
                                     {{ request.user.first_name }} {{ request.user.last_name }}

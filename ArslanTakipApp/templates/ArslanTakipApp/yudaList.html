@@ -14,6 +14,7 @@
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" href="{% static 'ArslanTakipApp/icons.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
   <style>
     #filterPanelOverlay {
         display: none;
@@ -65,9 +66,21 @@
       <div id="filterPanelOverlay">
         <div id="filterPanel">
             <!-- Filter options -->
-            <input type="text" id="yudaNoFilter" class="form-control mb-2" placeholder="YudaNo">
-            <input type="text" id="musteriFirmaFilter" class="form-control mb-2" placeholder="Müşteri Firma">
-            <input type="text" id="musteriTemsilcisiFilter" class="form-control mb-2" placeholder="Müşteri Temsilcisi">
+            <label for="yudaNoFilter">Yuda No: </label>
+            <input type="text" id="yudaNoFilter" name="yudaNoFilter" class="form-control mb-2">
+            <label for="musteriFirmaFilter">Müşteri Firma: </label>
+            <input type="text" id="musteriFirmaFilter" name="musteriFirmaFilter" class="form-control mb-2">
+            <label for="musteriTemsilcisiSelect">Müşteri Temsilcisi: </label>
+            <select class="form-control mb-2" id="musteriTemsilcisiSelect" name="musteriTemsilcisiSelect" data-placeholder="Seçim Yapınız"></select>
+            <div class="form-group">
+              <label for="bolumFilter">Bölüm: </label>
+              <select class="select2bs4 form-control mb-2" multiple="multiple" id="bolumFilter" name="bolumFilter" data-placeholder="Seçim Yapınız" style="width: 100%;">
+                <option></option>
+                <option value="Boya">Boya</option>
+                <option value="Eloksal">Eloksal</option>
+                <option value="Mekanik Islem">Mekanik İşlem</option>
+              </select>
+            </div>
             <button id="applyFilter" class="btn btn-success">Filtre Uygula</button>
         </div>
     </div>
@@ -82,16 +95,19 @@
                     <th style="width: 15%">
                         YUDA NO
                     </th>
-                    <th style="width: 20%;">
+                    <th style="width: 15%;">
                         Müşteri Firma
+                    </th>
+                    <th style="width: 12%;">
+                        Müşteri Temsilcisi
                     </th>
                     <th style="width: 39%;">
                         Onay
                     </th>
-                    <th style="width: 10%" class="text-center">
+                    <th style="width: 8%" class="text-center">
                         Durum
                     </th>
-                    <th style="width: 15%">
+                    <th style="width: 10%">
                     </th>
                 </tr>
             </thead>
@@ -134,7 +150,9 @@
     $('#applyFilter').click(function() {
         const yudaNoFilter = $('#yudaNoFilter').val();
         const musteriFirmaFilter = $('#musteriFirmaFilter').val();
-        const musteriTemsilcisiFilter = $('#musteriTemsilcisiFilter').val();
+        const bolumFilter = $('#bolumFilter').val();
+        console.log(bolumFilter)
+        const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
         filterList = [];
 
         if (yudaNoFilter != "") {
@@ -143,8 +161,17 @@
         if (musteriFirmaFilter != ""){
           filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });
         };
-        if (musteriTemsilcisiFilter != ""){
-          filterList.push({ field: 'YudaAcanKisi', type:'like', value: musteriTemsilcisiFilter });
+        if (bolumFilter.length != 0){
+          if (bolumFilter[0] != '') {
+            filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
+          }
+          else if (bolumFilter[0] == '' && bolumFilter.length != 1){
+            filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
+          }
+          
+        };
+        if (musteriTemsilcisiSelect != null){
+          filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
         };
         
         loadPage(1);
@@ -152,7 +179,20 @@
         // Hide the filter panel after applying filter
         $('#filterPanelOverlay').hide();
     });
+  
+    $('.select2bs4').select2({
+      theme: 'bootstrap4',
+      allowClear: true
+    });
   });
+
+  function getTemsilci(data){
+    $('#musteriTemsilcisiSelect').empty();
+    $('#musteriTemsilcisiSelect').append('<option value="" disabled selected> </option>');
+    $.each(data, function(key, value) {
+        $('#musteriTemsilcisiSelect').append('<option value=' + value.id + '>' + value.full_name + '</option>');
+    });
+  }
 
     function getProjects(data){
         tableBody.empty();  // Önceki verileri temizle
@@ -173,6 +213,9 @@
             </td>
             <td>
                 <a>${item.MusteriFirmaAdi}</a>
+            </td>
+            <td>
+                <a>${item.MusteriTemsilcisi}</a>
             </td>
             <td class="project_progress">`;
             Object.entries(durumlar).forEach(([group, status]) => {
@@ -311,7 +354,7 @@
             success: function (paginatedData) {
                 getProjects(paginatedData.data);
                 renderPagination(paginatedData.last_page);
-
+                getTemsilci(paginatedData.temsil)
             },
             error: function (error) {
                 console.error('Error loading paginated data:', error);
@@ -333,5 +376,6 @@
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
 
 {% endblock %}

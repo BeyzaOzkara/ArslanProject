@@ -42,6 +42,25 @@
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
+    path:hover {
+      fill: green !important;
+    }
+    circle:hover {
+      fill: green !important;
+    }
+    path {
+      fill:white;
+      stroke:none
+    }
+    circle {
+      fill:white;
+      stroke:none
+    }
+    #po {
+      fill:black;
+      stroke:none
+    }
+
   </style>
 {% endblock %}
 
@@ -113,10 +132,10 @@
         </div>
         <!-- dosyalar -->
         <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+          <h3 class="text-primary">DXF KESİT ÇİZİMİ</h3>
           <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
           <p class="text-muted">Yuda No ..-...-.. ile ilişkili dosyalar</p>
           <br>
-          <h5 class="text-muted">Proje dosyaları</h5>
           <ul class="list-unstyled">
             <li>
               <a href="" class="btn-link text-secondary mr-1"><!-- <span class="fiv-cla fiv-icon-${fileType} border-right-0 rounded-left"></span> --><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a> <!-- dosya uzantılarına göre icon getir -->
@@ -195,6 +214,51 @@
       <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
     </div>
   </div>
+
+  <div class="modal fade" id="dxfKesitModal" tabindex="-1" aria-labelledby="dxfKesitModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">DXF KESİT ÇİZİMİ</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="card container-fluid">
+                <div class="card-body">
+                  <div class="row">
+                    <svg id="svgContainer" width="100%">
+                      <g id="g">
+<path d="M78.0 27.5 A2.5 2.5 0 0 1 75.5 30.0L74.19 30.0 A5.0 5.0 0 0 1 70.66 28.54 L69.16 27.04 A5.0 5.0 0 0 1 67.7 23.51 L67.7 16.49 A5.0 5.0 0 0 1 69.16 12.96 L70.66 11.46 A5.0 5.0 0 0 1 74.19 10.0 L75.5 10.0 A2.5 2.5 0 0 1 78.0 12.5 A0.5 0.5 0 0 1 77.5 13.0 L75.8 13.0 A0.5 0.5 0 0 0 75.3 13.5 L75.3 15.0 A1.0 1.0 0 0 0 76.3 16.0 L78.3 16.0 A1.5 1.5 0 0 0 79.8 14.53 L80.0 5.0 L80.0 4.0 A4.0 4.0 0 0 0 76.0 0.0 L4.0 0.0 A4.0 4.0 0 0 0 0.0 4.0 L0.0 5.0 L0.2 14.53 A1.5 1.5 0 0 0 1.7 16.0 L3.7 16.0 A1.0 1.0 0 0 0 4.7 15.0 L4.7 13.5 A0.5 0.5 0 0 0 4.2 13.0 L2.5 13.0 A0.5 0.5 0 0 1 2.0 12.5 A2.5 2.5 0 0 1 4.5 10.0 L5.81 10.0 A5.0 5.0 0 0 1 9.34 11.46 L10.84 12.96 A5.0 5.0 0 0 1 12.3 16.49 L12.3 23.51 A5.0 5.0 0 0 1 10.84 27.04 L9.34 28.54 A5.0 5.0 0 0 1 5.81 30.0 L4.5 30.0 A2.5 2.5 0 0 1 2.0 27.5 A0.5 0.5 0 0 1 2.5 27.0 L4.2 27.0 A0.5 0.5 0 0 0 4.7 26.5 L4.7 25.0 A1.0 1.0 0 0 0 3.7 24.0 L1.7 24.0 A1.5 1.5 0 0 0 0.2 25.47 L0.0 35.0 L0.0 45.0 L0.2 54.53 A1.5 1.5 0 0 0 1.7 56.0 L3.7 56.0 A1.0 1.0 0 0 0 4.7 55.0 L4.7 53.5 A0.5 0.5 0 0 0 4.2 53.0 L2.5 53.0 A0.5 0.5 0 0 1 2.0 52.5 A2.5 2.5 0 0 1 4.5 50.0 L5.81 50.0 A5.0 5.0 0 0 1 9.34 51.46 L10.84 52.96 A5.0 5.0 0 0 1 12.3 56.49 L12.3 63.51 A5.0 5.0 0 0 1 10.84 67.04 L9.34 68.54 A5.0 5.0 0 0 1 5.81 70.0 L4.5 70.0 A2.5 2.5 0 0 1 2.0 67.5 A0.5 0.5 0 0 1 2.5 67.0 L4.2 67.0 A0.5 0.5 0 0 0 4.7 66.5 L4.7 65.0 A1.0 1.0 0 0 0 3.7 64.0 L1.7 64.0 A1.5 1.5 0 0 0 0.2 65.47 L0.0 75.0 L0.0 76.0 A4.0 4.0 0 0 0 4.0 80.0 L5.0 80.0 L14.53 79.8 A1.5 1.5 0 0 0 16.0 78.3 L16.0 76.3 A1.0 1.0 0 0 0 15.0 75.3 L13.5 75.3 A0.5 0.5 0 0 0 13.0 75.8 L13.0 77.5 A0.5 0.5 0 0 1 12.5 78.0 A2.5 2.5 0 0 1 10.0 75.5 L10.0 74.19 A5.0 5.0 0 0 1 11.46 70.66 L12.96 69.16 A5.0 5.0 0 0 1 16.49 67.7 L23.51 67.7 A5.0 5.0 0 0 1 27.04 69.16 L28.54 70.66 A5.0 5.0 0 0 1 30.0 74.19 L30.0 75.5 A2.5 2.5 0 0 1 27.5 78.0 A0.5 0.5 0 0 1 27.0 77.5 L27.0 75.8 A0.5 0.5 0 0 0 26.5 75.3 L25.0 75.3 A1.0 1.0 0 0 0 24.0 76.3 L24.0 78.3 A1.5 1.5 0 0 0 25.47 79.8 L35.0 80.0 L45.0 80.0 L54.53 79.8 A1.5 1.5 0 0 0 56.0 78.3 L56.0 76.3 A1.0 1.0 0 0 0 55.0 75.3 L53.5 75.3 A0.5 0.5 0 0 0 53.0 75.8 L53.0 77.5 A0.5 0.5 0 0 1 52.5 78.0 A2.5 2.5 0 0 1 50.0 75.5 L50.0 74.19 A5.0 5.0 0 0 1 51.46 70.66 L52.96 69.16 A5.0 5.0 0 0 1 56.49 67.7 L63.51 67.7 A5.0 5.0 0 0 1 67.04 69.16 L68.54 70.66 A5.0 5.0 0 0 1 70.0 74.19 L70.0 75.5 A2.5 2.5 0 0 1 67.5 78.0 A0.5 0.5 0 0 1 67.0 77.5 L67.0 75.8 A0.5 0.5 0 0 0 66.5 75.3 L65.0 75.3 A1.0 1.0 0 0 0 64.0 76.3 L64.0 78.3 A1.5 1.5 0 0 0 65.47 79.8 L75.0 80.0 L76.0 80.0 A4.0 4.0 0 0 0 80.0 76.0 L80.0 75.0 L79.8 65.47 A1.5 1.5 0 0 0 78.3 64.0 L76.3 64.0 A1.0 1.0 0 0 0 75.3 65.0 L75.3 66.5 A0.5 0.5 0 0 0 75.8 67.0 L77.5 67.0 A0.5 0.5 0 0 1 78.0 67.5 A2.5 2.5 0 0 1 75.5 70.0 L74.19 70.0 A5.0 5.0 0 0 1 70.66 68.54 L69.16 67.04 A5.0 5.0 0 0 1 67.7 63.51 L67.7 56.49 A5.0 5.0 0 0 1 69.16 52.96 L70.66 51.46 A5.0 5.0 0 0 1 74.19 50.0 L75.5 50.0 A2.5 2.5 0 0 1 78.0 52.5 A0.5 0.5 0 0 1 77.5 53.0 L75.8 53.0 A0.5 0.5 0 0 0 75.3 53.5 L75.3 55.0 A1.0 1.0 0 0 0 76.3 56.0 L78.3 56.0 A1.5 1.5 0 0 0 79.8 54.53 L80.0 45.0 L80.0 35.0 L79.8 25.47 A1.5 1.5 0 0 0 78.3 24.0 L76.3 24.0 A1.0 1.0 0 0 0 75.3 25.0 L75.3 26.5 A0.5 0.5 0 0 0 75.8 27.0 L77.5 27.0 A0.5 0.5 0 0 1 78.0 27.5 Z" style="fill:black;stroke:none" />
+<path d="M8.2 72.3 A0.5 0.5 0 0 0 7.7 71.8 L2.3 71.8 A0.5 0.5 0 0 0 1.8 72.3 L1.8 76.0 A2.2 2.2 0 0 0 4.0 78.2 L7.7 78.2 A0.5 0.5 0 0 0 8.2 77.7 Z" style="fill:white;stroke:none" />
+<path d="M74.05 33.12 A8.0 8.0 0 0 1 68.66 30.78L66.75 28.87 A4.0 4.0 0 0 0 63.92 27.7 L56.3 27.7 L52.3 23.7 L52.3 16.08 A4.0 4.0 0 0 0 51.13 13.25 L49.22 11.34 A8.0 8.0 0 0 1 46.88 5.95 A1.5 1.5 0 0 0 45.38 4.5 L34.62 4.5 A1.5 1.5 0 0 0 33.12 5.95 A8.0 8.0 0 0 1 30.78 11.34 L28.87 13.25 A4.0 4.0 0 0 0 27.7 16.08 L27.7 23.7 L23.7 27.7 L16.08 27.7 A4.0 4.0 0 0 0 13.25 28.87 L11.34 30.78 A8.0 8.0 0 0 1 5.95 33.12 A1.5 1.5 0 0 0 4.5 34.62 L4.5 45.38 A1.5 1.5 0 0 0 5.95 46.88 A8.0 8.0 0 0 1 11.34 49.22 L13.25 51.13 A4.0 4.0 0 0 0 16.08 52.3 L23.7 52.3 L27.7 56.3 L27.7 63.92 A4.0 4.0 0 0 0 28.87 66.75 L30.78 68.66 A8.0 8.0 0 0 1 33.12 74.05 A1.5 1.5 0 0 0 34.62 75.5 L45.38 75.5 A1.5 1.5 0 0 0 46.88 74.05 A8.0 8.0 0 0 1 49.22 68.66 L51.13 66.75 A4.0 4.0 0 0 0 52.3 63.92 L52.3 56.3 L56.3 52.3 L63.92 52.3 A4.0 4.0 0 0 0 66.75 51.13 L68.66 49.22 A8.0 8.0 0 0 1 74.05 46.88 A1.5 1.5 0 0 0 75.5 45.38 L75.5 34.62 A1.5 1.5 0 0 0 74.05 33.12 Z" style="fill:white;stroke:none" />
+<path d="M76.0 78.2 A2.2 2.2 0 0 0 78.2 76.0L78.2 72.3 A0.5 0.5 0 0 0 77.7 71.8 L72.3 71.8 A0.5 0.5 0 0 0 71.8 72.3 L71.8 77.7 A0.5 0.5 0 0 0 72.3 78.2 L76.0 78.2 Z" style="fill:white;stroke:none" />
+<path d="M77.7 8.2 A0.5 0.5 0 0 0 78.2 7.7L78.2 4.0 A2.2 2.2 0 0 0 76.0 1.8 L72.3 1.8 A0.5 0.5 0 0 0 71.8 2.3 L71.8 7.7 A0.5 0.5 0 0 0 72.3 8.2 L77.7 8.2 Z" style="fill:white;stroke:none" />
+<path d="M4.0 1.8 A2.2 2.2 0 0 0 1.8 4.0L1.8 7.7 A0.5 0.5 0 0 0 2.3 8.2 L7.7 8.2 A0.5 0.5 0 0 0 8.2 7.7 L8.2 2.3 A0.5 0.5 0 0 0 7.7 1.8 L4.0 1.8 Z" style="fill:white;stroke:none" />
+<path d="M30.0 4.5 A2.5 2.5 0 0 0 27.5 2.0 A0.5 0.5 0 0 0 27.0 2.5 L27.0 4.2 A0.5 0.5 0 0 1 26.5 4.7 L25.0 4.7 A1.0 1.0 0 0 1 24.0 3.7 L24.0 1.8 L16.0 1.8 L16.0 3.7 A1.0 1.0 0 0 1 15.0 4.7 L13.5 4.7 A0.5 0.5 0 0 1 13.0 4.2 L13.0 2.5 A0.5 0.5 0 0 0 12.5 2.0 A2.5 2.5 0 0 0 10.0 4.5 L10.0 5.81 A5.0 5.0 0 0 0 11.46 9.34 L12.96 10.84 A5.0 5.0 0 0 0 16.49 12.3 L23.51 12.3 A5.0 5.0 0 0 0 27.04 10.84 L28.54 9.34 A5.0 5.0 0 0 0 30.0 5.81 Z" style="fill:white;stroke:none" />
+<path d="M70.0 4.5 A2.5 2.5 0 0 0 67.5 2.0 A0.5 0.5 0 0 0 67.0 2.5 L67.0 4.2 A0.5 0.5 0 0 1 66.5 4.7 L65.0 4.7 A1.0 1.0 0 0 1 64.0 3.7 L64.0 1.8 L56.0 1.8 L56.0 3.7 A1.0 1.0 0 0 1 55.0 4.7 L53.5 4.7 A0.5 0.5 0 0 1 53.0 4.2 L53.0 2.5 A0.5 0.5 0 0 0 52.5 2.0 A2.5 2.5 0 0 0 50.0 4.5 L50.0 5.81 A5.0 5.0 0 0 0 51.46 9.34 L52.96 10.84 A5.0 5.0 0 0 0 56.49 12.3 L63.51 12.3 A5.0 5.0 0 0 0 67.04 10.84 L68.54 9.34 A5.0 5.0 0 0 0 70.0 5.81 Z" style="fill:white;stroke:none" />
+<circle r="3.4" cx="20.0" cy="20.0"  style="fill:white;stroke:none" />
+<circle r="3.4" cx="60.0" cy="20.0"  style="fill:white;stroke:none" />
+<circle r="3.4" cx="60.0" cy="60.0"  style="fill:white;stroke:none" />
+<circle r="3.4" cx="20.0" cy="60.0"  style="fill:white;stroke:none" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="row col-lg-12 printed-info-container">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 
@@ -215,6 +279,7 @@
     const yudaHeader = $('<div class="card-header"></div>').html(`
         <h3 class="card-title"> ${i.YudaNo}</h3>
         <div class="card-tools">
+        <button type="button" class="btn btn-sm btn-outline-primary mr-2" id="btnDxfModal" onclick="dxfModalAc()">DXF KESİT ÇİZİMİ</button>
           <h5 class="card-title">Tarih:  ${i.Tarih} </h5>
           <h5 class="card-title mr-2 ml-2"> | </h5>
           <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
@@ -355,7 +420,7 @@
         </div>
         
       </div>
-      <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2" id="yudaDosya" style="position: relative;">
+      <div class="col-12 col-md-12 col-lg-2 order-1 order-md-2" id="yudaDosya" style="position: relative;">
         <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
         <p class="text-muted">${i.YudaNo} ile ilişkili dosyalar</p>
         <br>
@@ -369,6 +434,15 @@
           <li style="font-weight:bold; font-size:1.5em; cursor:pointer;" onclick="dosyaFunc(this)">Diğer</li>
           <ul class="list-unstyled dosyalar" id="digerDos"></ul>
         </ul>
+      </div>
+      <div class="col-12 col-md-12 col-lg-2 order-1 order-md-2" id="dxfKesit" style="position: relative;">
+        <div class="row">
+          <svg id="svgContainer" width="100%">
+            <g id="g">
+              
+            </g>
+          </svg>
+        </div>
       </div>
       
     </div>
@@ -403,7 +477,39 @@
 
   };
 
-  
+
+  function dxfModalAc() {
+    $.ajax({
+        url: '/yudaDetailSvg',
+        type: 'GET',
+        success: function(data) {
+          var svgC = `${data.svg}`
+          // $('#g').html(svgC);
+          var printedInfoHtml = `
+              <div class="printed-info">
+                  <p>${data.printed_info.kalip_tip}</p>
+              `;
+          if (data.printed_info.zivana != 0){
+            printedInfoHtml += `
+                    <p>Zıvana Sayısı: ${data.printed_info.zivana}</p>`};
+          printedInfoHtml += `
+                    <p>Kesit Alanı: ${data.printed_info.section_area.toFixed(2)} mm²</p>
+                    <p>Gramaj: ${data.printed_info.gramaj.toFixed(2)} kg/m</p>
+                    <p>Dış Çevre: ${data.printed_info.outer_perimeter.toFixed(2)} mm</p>
+                    <p>İç Çevre: ${data.printed_info.inner_perimeter.toFixed(2)} mm</p>
+                    <p>Şekil Faktörü: ${data.printed_info.shape_factor.toFixed(2)}</p>
+                </div>`;
+            $('.printed-info-container').html(printedInfoHtml);
+
+          // Show the modal
+          $('#dxfKesitModal').modal('show');
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching SVG content:', error);
+        }
+      }); 
+
+  }
   // function dosyaFunc(e) { //<ul class="list-unstyled dosyalar hide" id="digerDos"></ul> hide ekle
   //   $(e).next('ul').toggle();
   // };
