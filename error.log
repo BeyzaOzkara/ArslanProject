@@ -7515,3 +7515,53 @@ Traceback (most recent call last):
     raise e.__class__(
 ValueError: Field 'id' expected a number but got ''.
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22YudaAcanKisi_id%22%2C%22type%22%3A%22%3D%22%2C%22value%22%3A%22%22%7D%5D%7D HTTP/1.1" 500 131495
+Internal Server Error: /yudaDetail2/122
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1531, in yudaDetail2
+    svgData = yudaDetailSvg(request, fi.File.path)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1655, in yudaDetailSvg
+    areas, perimeters, paths = dxf_file_area_calculation(path)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\dxfsvg.py", line 52, in dxf_file_area_calculation
+    doc = ezdxf.readfile(file_path)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\ezdxf\filemanagement.py", line 138, in readfile
+    if is_binary_dxf_file(filename):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\ezdxf\lldxf\validator.py", line 316, in is_binary_dxf_file
+    with open(filename, "rb") as fp:
+         ^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\beyza.ozkara\\ArslanDjango\\env\\ArslanProject\\media\\media\\16693.dxf'
+"GET /yudaDetail2/122 HTTP/1.1" 500 92146
+Internal Server Error: /yudaDetail2/122
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1531, in yudaDetail2
+    svgData = yudaDetailSvg(request, fi.File.path)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1655, in yudaDetailSvg
+    areas, perimeters, paths = dxf_file_area_calculation(path)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\dxfsvg.py", line 52, in dxf_file_area_calculation
+    doc = ezdxf.readfile(file_path)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\ezdxf\filemanagement.py", line 138, in readfile
+    if is_binary_dxf_file(filename):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\ezdxf\lldxf\validator.py", line 316, in is_binary_dxf_file
+    with open(filename, "rb") as fp:
+         ^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\beyza.ozkara\\ArslanDjango\\env\\ArslanProject\\media\\media\\16693.dxf'
+"GET /yudaDetail2/122 HTTP/1.1" 500 92274

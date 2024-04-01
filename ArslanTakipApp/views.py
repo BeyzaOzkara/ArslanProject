@@ -1522,7 +1522,6 @@ def yudaDetail(request, yId):
 def yudaDetail2(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
-    print(yudaFiles)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     svgData = ""

@@ -202,27 +202,31 @@
   });
   
   function LoadSvg() {
-    
-    var svgC = `${svgData.svg}`;
-    $('g').html(svgC);
-    const svg = document.querySelector('svg');
-    const g = document.querySelector('g');
-    const { xMin, xMax, yMin, yMax } = [...svg.children].reduce((acc, el) => {
-      const { x, y, width, height } = el.getBBox();
-      if (!acc.xMin || x < acc.xMin) acc.xMin = x;
-      if (!acc.xMax || x + width > acc.xMax) acc.xMax = x + width;
-      if (!acc.yMin || y < acc.yMin) acc.yMin = y;
-      if (!acc.yMax || y + height > acc.yMax) acc.yMax = y + height;
-      return acc;
-    }, {});
-    const viewbox = `${xMin*1.05} ${yMin*1.05} ${(xMax - xMin)*1.05} ${(yMax - yMin)*1.05}`;
+    if (svgData != "") {
+      var svgC = `${svgData.svg}`;
+      $('g').html(svgC);
+      const svg = document.querySelector('svg');
+      const g = document.querySelector('g');
+      const { xMin, xMax, yMin, yMax } = [...svg.children].reduce((acc, el) => {
+        const { x, y, width, height } = el.getBBox();
+        if (!acc.xMin || x < acc.xMin) acc.xMin = x;
+        if (!acc.xMax || x + width > acc.xMax) acc.xMax = x + width;
+        if (!acc.yMin || y < acc.yMin) acc.yMin = y;
+        if (!acc.yMax || y + height > acc.yMax) acc.yMax = y + height;
+        return acc;
+      }, {});
+      const viewbox = `${xMin*1.05} ${yMin*1.05} ${(xMax - xMin)*1.05} ${(yMax - yMin)*1.05}`;
 
-    svg.setAttribute('viewBox', viewbox);
-    g.setAttribute('transform', `scale(1, -1) translate(0, -${(yMax - yMin)})`);
+      svg.setAttribute('viewBox', viewbox);
+      g.setAttribute('transform', `scale(1, -1) translate(0, -${(yMax - yMin)})`);
 
-    
-    let svgHeight = document.getElementById("svgCard").clientHeight;
-    document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+      
+      let svgHeight = document.getElementById("svgCard").clientHeight;
+      document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+    }
+    else {
+      document.getElementById("bilgiCard").setAttribute("style", `height: 400px`) ;
+    }
   }
 
 
