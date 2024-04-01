@@ -1161,6 +1161,7 @@ def yuda_kaydet(request):
                 else:
                     assign_perm("gorme_yuda", group, y)
 
+
             # Check field values and assign permissions based on conditions
             for field in y._meta.fields:
                 fname = field.name
@@ -1524,10 +1525,10 @@ def yudaDetail2(request, yId):
     print(yudaFiles)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
+    svgData = ""
     if yudaFiles.filter(FileTitle = "Şartname").exists():
         fi = UploadFile.objects.get(Q(FileModel = "YudaForm") & Q(FileModelId = yId) & Q(FileTitle = 'Şartname'))
-        print(fi.File.path)
-        yudaDetailSvg(request, fi.File.path)
+        svgData = yudaDetailSvg(request, fi.File.path)
         
     yudaComments = getParentComments("YudaForm", yId)
     yudaCList = [process_comment(comment) for comment in yudaComments]
@@ -1550,8 +1551,8 @@ def yudaDetail2(request, yId):
         secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
     
     formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    
-    return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
+    svgData = json.dumps(svgData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'svgData': svgData, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     
 
 def yudaDetailComment(request):
@@ -1704,7 +1705,7 @@ def yudaDetailSvg(request, path):
     }
 
 
-    return JsonResponse(data)
+    return data
 
 def yudaDelete(request, yId):
     users = User.objects.values()
@@ -1762,6 +1763,12 @@ def changeFiles(fId, fTitle):
 def yudachange(request, yId):
     if request.method == 'POST':
         changeYuda = YudaForm.objects.get(id = yId)
+        group_mapping = {
+            'YuzeyEloksal': 'Eloksal Bolumu',
+            'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
+            'YuzeyBoya': 'Boyahane Bolumu',
+            'TalasliImalat': 'Mekanik Islem Bolumu',
+        }
 
         for key, value in request.POST.items():
             if hasattr(changeYuda, key):
@@ -1770,6 +1777,17 @@ def yudachange(request, yId):
                     setattr(changeYuda, key, value_list)
                 else:
                     setattr(changeYuda, key, value)
+
+            # Check field values and assign permissions based on conditions
+            for field in changeYuda._meta.fields:
+                fname = field.name
+                fvalue = getattr(changeYuda, fname)
+                if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat":
+                    group = Group.objects.get(name=group_mapping[fname])
+                    assign_perm("gorme_yuda", group, changeYuda)
+                if fname == "TalasliImalat" and fvalue == "Var":
+                    group = Group.objects.get(name=group_mapping[fname])
+                    assign_perm("gorme_yuda", group, changeYuda)
             
             if key == "oldFileNewTitle" and value != '':
                 for v in json.loads(value):

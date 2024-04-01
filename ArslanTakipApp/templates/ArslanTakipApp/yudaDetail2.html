@@ -179,7 +179,8 @@
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var data2 = JSON.parse('{{ data2|escapejs }}');
-  console.log(data2);
+  var svgData = JSON.parse('{{ svgData|escapejs }}');
+  console.log(svgData)
   var selectedFiles = [];
 
   var tableBilgi = new Tabulator("#bilgiTabulator", {
@@ -201,54 +202,80 @@
   });
   
   function LoadSvg() {
-    $.ajax({
-        url: '/yudaDetailSvg',
-        type: 'GET',
-        success: function(data) {
-          var svgC = `${data.svg}`;
-          $('g').html(svgC);
-          const svg = document.querySelector('svg');
-          const g = document.querySelector('g');
-          const { xMin, xMax, yMin, yMax } = [...svg.children].reduce((acc, el) => {
-            const { x, y, width, height } = el.getBBox();
-            if (!acc.xMin || x < acc.xMin) acc.xMin = x;
-            if (!acc.xMax || x + width > acc.xMax) acc.xMax = x + width;
-            if (!acc.yMin || y < acc.yMin) acc.yMin = y;
-            if (!acc.yMax || y + height > acc.yMax) acc.yMax = y + height;
-            return acc;
-          }, {});
-          const viewbox = `${xMin*1.05} ${yMin*1.05} ${(xMax - xMin)*1.05} ${(yMax - yMin)*1.05}`;
+    
+    var svgC = `${svgData.svg}`;
+    $('g').html(svgC);
+    const svg = document.querySelector('svg');
+    const g = document.querySelector('g');
+    const { xMin, xMax, yMin, yMax } = [...svg.children].reduce((acc, el) => {
+      const { x, y, width, height } = el.getBBox();
+      if (!acc.xMin || x < acc.xMin) acc.xMin = x;
+      if (!acc.xMax || x + width > acc.xMax) acc.xMax = x + width;
+      if (!acc.yMin || y < acc.yMin) acc.yMin = y;
+      if (!acc.yMax || y + height > acc.yMax) acc.yMax = y + height;
+      return acc;
+    }, {});
+    const viewbox = `${xMin*1.05} ${yMin*1.05} ${(xMax - xMin)*1.05} ${(yMax - yMin)*1.05}`;
 
-          svg.setAttribute('viewBox', viewbox);
-          g.setAttribute('transform', `scale(1, -1) translate(0, -${(yMax - yMin)})`);
+    svg.setAttribute('viewBox', viewbox);
+    g.setAttribute('transform', `scale(1, -1) translate(0, -${(yMax - yMin)})`);
+
+    
+    let svgHeight = document.getElementById("svgCard").clientHeight;
+    document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+  }
+
+
+  // function LoadSvg() {
+  //   $.ajax({
+  //       url: '/yudaDetailSvg',
+  //       type: 'GET',
+  //       success: function(data) {
+  //         var svgC = `${data.svg}`;
+  //         $('g').html(svgC);
+  //         const svg = document.querySelector('svg');
+  //         const g = document.querySelector('g');
+  //         const { xMin, xMax, yMin, yMax } = [...svg.children].reduce((acc, el) => {
+  //           const { x, y, width, height } = el.getBBox();
+  //           if (!acc.xMin || x < acc.xMin) acc.xMin = x;
+  //           if (!acc.xMax || x + width > acc.xMax) acc.xMax = x + width;
+  //           if (!acc.yMin || y < acc.yMin) acc.yMin = y;
+  //           if (!acc.yMax || y + height > acc.yMax) acc.yMax = y + height;
+  //           return acc;
+  //         }, {});
+  //         const viewbox = `${xMin*1.05} ${yMin*1.05} ${(xMax - xMin)*1.05} ${(yMax - yMin)*1.05}`;
+
+  //         svg.setAttribute('viewBox', viewbox);
+  //         g.setAttribute('transform', `scale(1, -1) translate(0, -${(yMax - yMin)})`);
 
           
-          let svgHeight = document.getElementById("svgCard").clientHeight;
-          document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
-          // tableBilgi.redraw(true);
-          // var printedInfoHtml = `
-          //     <div class="printed-info">
-          //         <p>${data.printed_info.kalip_tip}</p>
-          //     `;
-          // if (data.printed_info.zivana != 0){
-          //   printedInfoHtml += `
-          //           <p>Zıvana Sayısı: ${data.printed_info.zivana}</p>`};
-          // printedInfoHtml += `
-          //           <p>Kesit Alanı: ${data.printed_info.section_area.toFixed(2)} mm²</p>
-          //           <p>Gramaj: ${data.printed_info.gramaj.toFixed(2)} kg/m</p>
-          //           <p>Dış Çevre: ${data.printed_info.outer_perimeter.toFixed(2)} mm</p>
-          //           <p>İç Çevre: ${data.printed_info.inner_perimeter.toFixed(2)} mm</p>
-          //           <p>Şekil Faktörü: ${data.printed_info.shape_factor.toFixed(2)}</p>
-          //       </div>`;
-          //   $('.printed-info-container').html(printedInfoHtml);
-        },
-        error: function(xhr, status, error) {
-          console.error('Error fetching SVG content:', error);
-        }
+  //         let svgHeight = document.getElementById("svgCard").clientHeight;
+  //         document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+  //         // tableBilgi.redraw(true);
+  //         // var printedInfoHtml = `
+  //         //     <div class="printed-info">
+  //         //         <p>${data.printed_info.kalip_tip}</p>
+  //         //     `;
+  //         // if (data.printed_info.zivana != 0){
+  //         //   printedInfoHtml += `
+  //         //           <p>Zıvana Sayısı: ${data.printed_info.zivana}</p>`};
+  //         // printedInfoHtml += `
+  //         //           <p>Kesit Alanı: ${data.printed_info.section_area.toFixed(2)} mm²</p>
+  //         //           <p>Gramaj: ${data.printed_info.gramaj.toFixed(2)} kg/m</p>
+  //         //           <p>Dış Çevre: ${data.printed_info.outer_perimeter.toFixed(2)} mm</p>
+  //         //           <p>İç Çevre: ${data.printed_info.inner_perimeter.toFixed(2)} mm</p>
+  //         //           <p>Şekil Faktörü: ${data.printed_info.shape_factor.toFixed(2)}</p>
+  //         //       </div>`;
+  //         //   $('.printed-info-container').html(printedInfoHtml);
+  //       },
+  //       error: function(xhr, status, error) {
+  //         console.error('Error fetching SVG content:', error);
+  //       }
 
-      }); 
+  //     }); 
 
-  }
+  // }
+
 
   function resizeTable(){
     let svgHeight = document.getElementById("svgCard").clientHeight;
