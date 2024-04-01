@@ -26,9 +26,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
 from django.db import transaction 
-from aes_cipher import *
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+# from aes_cipher import *
+# from Crypto.Cipher import AES
+# from Crypto.Util.Padding import pad, unpad
 import locale
 from .forms import PasswordChangingForm
 from .dxfsvg import dxf_file_area_calculation
@@ -439,17 +439,17 @@ def location_kalip(request):
 
 key = b'arslandenemebyz1'
 
-def encrypt_aes_ecb(key, plaintext):
-    cipher = AES.new(key, AES.MODE_ECB)
-    padded_plaintext = pad(plaintext.encode('utf8'), AES.block_size)
-    ciphertext = cipher.encrypt(padded_plaintext)
-    return ciphertext
-#sepet numarası S250 olacak şekilde
-def decrypt_aes_ecb(key, ciphertext):
-    cipher = AES.new(key, AES.MODE_ECB)
-    decrypted_data = cipher.decrypt(ciphertext)
-    unpadded_data = unpad(decrypted_data, AES.block_size)
-    return unpadded_data.decode('utf-8')
+# def encrypt_aes_ecb(key, plaintext):
+#     cipher = AES.new(key, AES.MODE_ECB)
+#     padded_plaintext = pad(plaintext.encode('utf8'), AES.block_size)
+#     ciphertext = cipher.encrypt(padded_plaintext)
+#     return ciphertext
+# #sepet numarası S250 olacak şekilde
+# def decrypt_aes_ecb(key, ciphertext):
+#     cipher = AES.new(key, AES.MODE_ECB)
+#     decrypted_data = cipher.decrypt(ciphertext)
+#     unpadded_data = unpad(decrypted_data, AES.block_size)
+#     return unpadded_data.decode('utf-8')
 
 def qrKalite(request):
     if request.method == "GET":
