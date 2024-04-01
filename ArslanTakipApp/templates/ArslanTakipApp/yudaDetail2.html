@@ -84,6 +84,9 @@
                 </g>
               </svg>
             </div>
+            <div class="card-body" id="nonSvgCard" style="display: none;">
+              <p>DENEME</p>
+            </div>
           </div>
         </div>
         <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme için tabulator-->
@@ -225,7 +228,9 @@
       document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
     }
     else {
-      document.getElementById("bilgiCard").setAttribute("style", `height: 400px`) ;
+      document.getElementById("bilgiCard").setAttribute("style", `height: 500px`);
+      $('#svgCard').hide();
+      $('#nonSvgCard').show();
     }
   }
 
@@ -283,7 +288,7 @@
 
   function resizeTable(){
     let svgHeight = document.getElementById("svgCard").clientHeight;
-    if (svgData == "") {svgHeight = 400}
+    if (svgData == "") {svgHeight = 500};
     document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`);
 
   }
