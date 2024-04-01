@@ -283,7 +283,8 @@
 
   function resizeTable(){
     let svgHeight = document.getElementById("svgCard").clientHeight;
-    document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`) ;
+    if (svgData == "") {svgHeight = 400}
+    document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`);
 
   }
 
