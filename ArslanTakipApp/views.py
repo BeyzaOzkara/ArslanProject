@@ -1152,7 +1152,8 @@ def yuda_kaydet(request):
 
             assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
             assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
-            assign_perm(["gorme_yuda", "yonetici_yuda"], y.ProjeYoneticisi, y) # Assign permission to the current user
+            assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+            assign_perm("acan_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
             for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
@@ -1528,7 +1529,6 @@ def yudaDetail2(request, yId):
         print(fi.File.path)
         yudaDetailSvg(request, fi.File.path)
         
-
     yudaComments = getParentComments("YudaForm", yId)
     yudaCList = [process_comment(comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
