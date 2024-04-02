@@ -1242,7 +1242,7 @@ def yudas_list(request):
                     elif bolum == 'Mekanik Islem':
                         q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
     
-    filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih")
+    filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
     yudaList = list(filtered_yudas.values()[offset:limit])
     
     for o in yudaList:
@@ -1581,6 +1581,10 @@ def yudaDetailComment(request):
                 c.ReplyTo = Comment.objects.get(id=replyID)
             c.save()
 
+            y = YudaForm.objects.get(id=req['formID'])
+            y.GuncelTarih = datetime.datetime.now()
+            y.save()
+
             for file in request.FILES.getlist('yfiles'):
                 UploadFile.objects.create(
                     File = file,
@@ -1775,6 +1779,7 @@ def changeFiles(fId, fTitle):
 def yudachange(request, yId):
     if request.method == 'POST':
         changeYuda = YudaForm.objects.get(id = yId)
+        changeYuda.RevTarih = datetime.datetime.now()
         group_mapping = {
             'YuzeyEloksal': 'Eloksal Bolumu',
             'YuzeyAhsap': 'Ahsap Kaplama Bolumu',

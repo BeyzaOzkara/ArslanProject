@@ -75,7 +75,7 @@
     <div class="card-body">
       <div class="row">
         <!-- dxf kesit çizim -->
-        <div class="col-12 col-md-12 col-lg-5 order-2 order-md-1">
+        <div class="col-12 col-md-12 col-lg-5 order-2 order-md-1" id="svgDiv">
           <div class="card">
             <div class="card-body" id="svgCard">
               <svg id="svgContainer" width="100%">
@@ -84,13 +84,23 @@
                 </g>
               </svg>
             </div>
-            <div class="card-body" id="nonSvgCard" style="display: none;">
-              <p>DXF KESİT ÇİZİMİ İÇİN HENÜZ DOSYA YÜKLENMEDİ</p>
+            <div class="card-body" id="nonSvgCard" style="display: none; height: 500px">
+              <p class="mt-4">DXF KESİT ÇİZİMİ İÇİN HENÜZ DOSYA YÜKLENMEDİ</p>
+              <!-- sadece kalıphane bölümündekiler görecek şekilde düzenlenecek -->
+              <div class="input-group mt-4"> 
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" name="dxfFileInput" id="dxfFileInput">
+                  <label class="custom-file-label" for="dxfFileInput">DXF Dosyası Seçiniz</label>
+                </div>
+                <div class="input-group-append">
+                  <span class="input-group-text" id="dxfUpload" onclick="dxfKesitYukle()">Yükle</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme için tabulator-->
-        <div class="col-12 col-md-12 col-lg-7 order-1 order-md-2" id="de">
+        <div class="col-12 col-md-12 col-lg-7 order-1 order-md-2" id="tabDiv">
           <div class="card">
             <div class="card-body" id="bilgiCard" style="height: 500px;">
               <div id="bilgiTabulator"></div>
@@ -183,7 +193,6 @@
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var data2 = JSON.parse('{{ data2|escapejs }}');
   var svgData = JSON.parse('{{ svgData|escapejs }}');
-  console.log(svgData)
   var selectedFiles = [];
 
   var tableBilgi = new Tabulator("#bilgiTabulator", {
@@ -234,6 +243,10 @@
     }
   }
 
+  function dxfKesitYukle() {
+    console.log("dxfYükle");
+    // dxfFileInputtaki dosyaları al
+  }
 
   // function LoadSvg() {
   //   $.ajax({
@@ -472,6 +485,10 @@
       });
   };
 
+  $('#dxfFileInput').on('change', function(e) {
+    console.log(e);
+  });
+
   function updateFileList(cId="") {
     var fileTitles = $(`#fileTitles${cId}`);
     fileTitles.empty(); // Önceki başlık alanlarını temizle
@@ -577,6 +594,8 @@
         ['custom', ['specialchars']],
       ]
     });
+
+    bsCustomFileInput.init();
     
   });
   
@@ -649,4 +668,5 @@
 <script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/chart.js/Chart.min.js' %}"></script>
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %} "></script>
 {% endblock %}
