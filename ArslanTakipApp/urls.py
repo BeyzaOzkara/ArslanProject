@@ -9,6 +9,7 @@ app_name = 'ArslanTakipApp'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('login/', auth_views.LoginView.as_view()),
+    # path('login/', views.user_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view()),
     path('login_success/', views.login_success, name='login_success'),
     # path('change-password/', CustomPasswordChangeView.as_view(), name='password_change'),

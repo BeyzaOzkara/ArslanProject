@@ -85,14 +85,14 @@
               </svg>
             </div>
             <div class="card-body" id="nonSvgCard" style="display: none;">
-              <p>DENEME</p>
+              <p>DXF KESİT ÇİZİMİ İÇİN HENÜZ DOSYA YÜKLENMEDİ</p>
             </div>
           </div>
         </div>
         <!-- sipariş, alaşım kondüsyon, tolerans, yüzey (pres, eloksal, boya, ahşap arrayler), talaşlı imalat, paketleme için tabulator-->
         <div class="col-12 col-md-12 col-lg-7 order-1 order-md-2" id="de">
           <div class="card">
-            <div class="card-body" id="bilgiCard" style="height: 300px;">
+            <div class="card-body" id="bilgiCard" style="height: 500px;">
               <div id="bilgiTabulator"></div>
             </div>
           </div>
@@ -291,7 +291,7 @@
     if (svgData == "") {svgHeight = 500};
     document.getElementById("bilgiCard").setAttribute("style", `height: ${svgHeight}px`);
 
-  }
+  };
 
   window.addEventListener("resize", (event) => {
     resizeTable()
