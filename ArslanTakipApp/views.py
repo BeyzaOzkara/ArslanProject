@@ -1543,7 +1543,6 @@ def yudaDetail(request, yId):
     # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
 
-
 def yudaDetail2(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
@@ -1578,7 +1577,6 @@ def yudaDetail2(request, yId):
     svgData = json.dumps(svgData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'svgData': svgData, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     
-
 def yudaDetailComment(request):
     if request.method == 'POST':
         try:
@@ -1606,6 +1604,15 @@ def yudaDetailComment(request):
                     UploadedBy = c.Kullanici,
                     Note = "",
                 )
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                'notifications_group',  # Name of the WebSocket group for notifications
+                {
+                    'type': 'send_notification',
+                    'message': 'New blog added to YUDA!'  # Notification message
+                }
+            )
             
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
@@ -1616,7 +1623,7 @@ def yudaDetailComment(request):
             response.status_code = 500 #server error
     return response
 
-def  yudaDetailAnket(request):
+def yudaDetailAnket(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     yudaId = params.get("yId")
     secim = params.get("secim")

@@ -10172,3 +10172,5 @@ Traceback (most recent call last):
     raise self.error(
 django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 94: 'extra_js'. Did you forget to register or load this tag?
 [35;1mHTTP GET / 500 [0.16, 127.0.0.1:53163][0m
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [2.16, 127.0.0.1:50043][0m
