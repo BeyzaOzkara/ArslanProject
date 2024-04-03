@@ -26,6 +26,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
 from django.db import transaction 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 # from aes_cipher import *
 # from Crypto.Cipher import AES
 # from Crypto.Util.Padding import pad, unpad
@@ -1194,6 +1196,16 @@ def yuda_kaydet(request):
                     UploadedBy = y.ProjeYoneticisi,
                     Note = "",
                 )
+
+            # Trigger a notification when a new blog is added to YUDA
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                'notifications_group',  # Name of the WebSocket group for notifications
+                {
+                    'type': 'send_notification',
+                    'message': 'New blog added to YUDA!'  # Notification message
+                }
+            )
             response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})

@@ -37,12 +37,14 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.150.43', 'arslan']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'ArslanTakipApp',
     'StokApp',
     'adminlte3',
     'adminlte3_theme',
     'tabulator',
     "mailer",
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +84,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ArslanProject.wsgi.application'
-
+ASGI_APPLICATION = "ArslanProject.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -172,8 +174,8 @@ EMAIL_USE_TLS = True
 EMAIL_TLS_VERSION = 'TLSv1.2'
 # EMAIL_SSL_CERTFILE = None
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
-EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
+EMAIL_HOST_USER = str(os.getenv('EMAIL_USER')) #'yazilim@arslanaluminyum.com'
+EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_PASSWORD')) #'rHE7Je'
 EMAIL_TIMEOUT = None
 
 logger = logging.getLogger('django.email')
