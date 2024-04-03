@@ -29,8 +29,9 @@
                 {% block login_form_links %}
                 {% endblock %}
             </div>
-            <div class="col-xs-4">
+            <div class="col-xs-4 ml-2">
                 <button type="submit" class="btn btn-primary btn-block btn-flat">Giriş Yap</button>
+                <p><a href="{% url 'password_reset' %}" style="color: lightcoral;">Şifremi Unuttum</a></p>
             </div>
         </div>
     </form>

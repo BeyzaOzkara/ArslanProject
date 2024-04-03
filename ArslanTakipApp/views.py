@@ -17,7 +17,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView
+from django.contrib.messages.views import SuccessMessageMixin
 from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment
 from django.template import loader
 import json
@@ -44,19 +45,14 @@ class RegisterView(generic.CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/register.html"
 
-# def user_login(request):
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data['username']
-#             password = form.cleaned_data['password']
-#             user = authenticate(request, username=username, password=password)
-#             if user:
-#                 login(request, user)    
-#                 login_success(request)
-#     else:
-#         form = LoginForm()
-#     return render(request, 'registration/login.html', {'form': form})
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name = 'registration/password_reset.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_message ="Girilen E-posta adresi ile bir hesap mevcutsa, " \
+                    "şifrenizi ayarlamak için size talimatlar gönderdik. Kısa bir süre içinde almış olmanız gerekiyor." \
+                    "Eğer bir e-posta almadıysanız, lütfen kayıt olduğunuz adresi doğru girdiğinizden emin olun ve spam klasörünüzü kontrol edin."
+    success_url = reverse_lazy('ArslanTakipApp:index')
 
 def login_success(request):
     user_g = request.user.groups.all()

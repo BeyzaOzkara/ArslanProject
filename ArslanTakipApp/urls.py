@@ -2,7 +2,7 @@ from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
-from .views import RegisterView
+from .views import RegisterView, ResetPasswordView
 
 app_name = 'ArslanTakipApp'
 
@@ -12,6 +12,13 @@ urlpatterns = [
     # path('login/', views.user_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view()),
     path('login_success/', views.login_success, name='login_success'),
+    path('password_reset/', ResetPasswordView.as_view(), name='password_reset'),
+    path('password-reset-confirm/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'),
+         name='password_reset_confirm'),
+    path('password-reset-complete/',
+         auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'),
+         name='password_reset_complete'),
     # path('change-password/', CustomPasswordChangeView.as_view(), name='password_change'),
     # path('change-password/done/', CustomPasswordChangeDoneView.as_view(), name='password_change_done'),
     # path('password-change/', views.PasswordChangeView.as_view(), name='password_change'),
@@ -22,7 +29,6 @@ urlpatterns = [
     path('location/list/', views.location_list),
     path('location/kalip', views.location_kalip),
     path('location/hareket', views.location_hareket),
-    # path('location/update', views.location_update),
     path('hareket', login_required(views.HareketView.as_view())),
     path('kalip/', login_required(views.KalipView.as_view())),
     path('kalip/liste', views.kalip_liste),

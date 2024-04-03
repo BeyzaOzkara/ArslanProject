@@ -10,18 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+dotenv_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(dotenv_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5a3gd-zj_#1h$bstcn)(o3a7--(j!95a(g(kbz-e=khb-%_qwi'
+SECRET_KEY = str(os.getenv('SECRET_KEY')) #'django-insecure-5a3gd-zj_#1h$bstcn)(o3a7--(j!95a(g(kbz-e=khb-%_qwi'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -156,6 +161,21 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
+
+# email configs
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'webmail.arslanaluminyum.com'
+# EMAIL_USE_SSL = True
+EMAIL_USE_TLS = True
+EMAIL_TLS_VERSION = 'TLSv1.2'
+# EMAIL_SSL_CERTFILE = None
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
+EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
+
+logger = logging.getLogger('django.email')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
 LOGGING = {
     'version': 1,
