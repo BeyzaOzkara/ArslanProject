@@ -1198,14 +1198,14 @@ def yuda_kaydet(request):
                 )
 
             # Trigger a notification when a new blog is added to YUDA
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                'notifications_group',  # Name of the WebSocket group for notifications
-                {
-                    'type': 'send_notification',
-                    'message': 'New blog added to YUDA!'  # Notification message
-                }
-            )
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     'notifications_group',  # Name of the WebSocket group for notifications
+            #     {
+            #         'type': 'send_notification',
+            #         'message': 'New blog added to YUDA!'  # Notification message
+            #     }
+            # )
             response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
