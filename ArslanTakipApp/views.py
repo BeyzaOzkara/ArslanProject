@@ -81,8 +81,11 @@ def get_user_full_name(user_id):
     user = User.objects.get(id=user_id)
     return f"{user.first_name} {user.last_name}"
 
-def format_date_time(date):
+def format_date_time_s(date):
     return date.strftime("%d-%m-%Y %H:%M:%S")
+
+def format_date_time(date):
+    return date.strftime("%d-%m-%Y %H:%M")
 
 def format_date(date):
     return date.strftime("%d-%m-%Y")
@@ -250,7 +253,7 @@ def kalip_liste(request):
     for c in g:
         if c['UretimTarihi'] != None:
             c['UretimTarihi'] = format_date(c['UretimTarihi'])
-            c['SonTeniferTarih'] = format_date_time(c['SonTeniferTarih'])
+            c['SonTeniferTarih'] = format_date_time_s(c['SonTeniferTarih'])
             c['SonUretimTarih'] = format_date(c['SonUretimTarih'])
         if c['AktifPasif'] == "Aktif":
             c['AktifPasif'] = True
@@ -357,7 +360,7 @@ def location_hareket(request):
             except:
                 har['kalipVaris'] = list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
             har['kimTarafindan'] = get_user_full_name(int(h['kimTarafindan_id']))
-            har['hareketTarihi'] = format_date_time(h['hareketTarihi'])
+            har['hareketTarihi'] = format_date_time_s(h['hareketTarihi'])
             harAr.append(har)
         hareket_count = len(harAr)
 
@@ -1073,8 +1076,8 @@ def baskigecmisi_list(request):
     baskiList = list(baskiQS.filter(**q).values()[offset:limit])
 
     for b in baskiList:
-        b['Start'] = format_date_time(b['Start'])
-        b['Stop'] = format_date_time(b['Stop'])
+        b['Start'] = format_date_time_s(b['Start'])
+        b['Stop'] = format_date_time_s(b['Stop'])
         b['BilletCount'] = b['Parameters']['billetCount']
         b['dieNumber'] = b['Parameters']['dieNumber']
         b['extTime'] = b['Parameters']['extTime']
@@ -1254,6 +1257,7 @@ def yudas_list(request):
     yudaList = list(filtered_yudas.values()[offset:limit])
     
     for o in yudaList:
+        o['Tarih'] = format_date_time(o['Tarih'])
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
         for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda']]:
