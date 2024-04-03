@@ -86,6 +86,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ArslanProject.wsgi.application'
 ASGI_APPLICATION = "ArslanProject.asgi.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("arslan", 6379)],
+        },
+    },
+}
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
