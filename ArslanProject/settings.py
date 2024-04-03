@@ -172,6 +172,7 @@ EMAIL_TLS_VERSION = 'TLSv1.2'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
 EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
+EMAIL_TIMEOUT = None
 
 logger = logging.getLogger('django.email')
 logger.setLevel(logging.DEBUG)
