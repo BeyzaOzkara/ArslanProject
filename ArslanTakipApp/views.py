@@ -1351,8 +1351,13 @@ def process_alasim(alasim):
 def process_yuzey(json_data, keys, key_names):
     processed_data = []
     for data in json_data:
-        details = ", ".join([f"{key_names[key]}: {data[key]}" for key in keys])
-        processed_data.append(details)
+        details = []
+        for key in keys:
+            if 'Boy' in key_names[key]:
+                details.append(f"{key_names[key]}: {data[key]} mm")
+            else:
+                details.append(f"{key_names[key]}: {data[key]}")
+        processed_data.append(", ".join(details))
     return "; <br>".join(processed_data)
 
 def format_yuda_details(yList):
@@ -1479,22 +1484,22 @@ def format_row(row):
                     for i in yuzey_data:
                         if  len(yuzey_data) == 1:
                             if key == 'YuzeyPres':
-                                child_item = [{'Baslik':i['YuzeyDetay'], 'Icerik':  f"Boy: {i['YuzeyPresBoy']}"}]
+                                child_item = [{'Baslik':i['YuzeyDetay'], 'Icerik':  f"Boy: {i['YuzeyPresBoy']}mm"}]
                             elif key == 'YuzeyEloksal':
                                 child_item = [{'Baslik':"", 'Icerik':  f"{i['Renk']}, {i['KaplamaKalinligi']}µ {i['EloksalBoy']}mm, {i['EloksalTemizKesim']}"}]
                             elif key == 'YuzeyBoya':
                                 child_item = [{'Baslik':"", 'Icerik':  f"{i['Marka']} {i['MarkaRenkKodu']} {i['BoyaClass']} RAL {i['Ral']} {i['Tur']} </br> {i['BoyaKalinlik']}µ {i['BoyaBoy']}mm, {i['BoyaTemizKesim']}"}]
                             elif key == 'YuzeyAhsap':
-                                child_item = [{'Baslik': "", 'Icerik': f"{i['AhsapKaplama']}, Boy: {i['AhsapBoy']}"}]
+                                child_item = [{'Baslik': "", 'Icerik': f"{i['AhsapKaplama']}, Boy: {i['AhsapBoy']}mm"}]
                         else:
                             if key == 'YuzeyPres':
-                                child_item.append({'Baslik':i['YuzeyDetay'], 'Icerik':  f"Boy: {i['YuzeyPresBoy']}"})
+                                child_item.append({'Baslik':i['YuzeyDetay'], 'Icerik':  f"Boy: {i['YuzeyPresBoy']}mm"})
                             elif key == 'YuzeyEloksal':
                                 child_item.append({'Baslik':"", 'Icerik':  f"{i['Renk']}, {i['KaplamaKalinligi']}µ {i['EloksalBoy']}mm, {i['EloksalTemizKesim']}"})
                             elif key == 'YuzeyBoya':
                                 child_item.append({'Baslik':"", 'Icerik':  f"{i['Marka']} {i['MarkaRenkKodu']} {i['BoyaClass']} RAL {i['Ral']} {i['Tur']} </br> {i['BoyaKalinlik']}µ {i['BoyaBoy']}mm, {i['BoyaTemizKesim']}"})
                             elif key == 'YuzeyAhsap':
-                                child_item.append({'Baslik': "", 'Icerik': f"{i['AhsapKaplama']}, Boy: {i['AhsapBoy']}"})
+                                child_item.append({'Baslik': "", 'Icerik': f"{i['AhsapKaplama']}, Boy: {i['AhsapBoy']}mm"})
                             
                     parent_item['_children'] = child_item
                     main_row_data["_children"].append(parent_item)
@@ -1517,15 +1522,12 @@ def yudaDetail(request, yId):
     #     print(fi.File.path)
     #     yudaDetailSvg(request, fi.File.path)
         
-
     yudaComments = getParentComments("YudaForm", yId)
     yudaCList = [process_comment(comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
     # print(f"yudaDetails{yudaDetails}")
-
-    formatted_data = format_row(yudaDetails[0])
     
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
@@ -1537,8 +1539,6 @@ def yudaDetail(request, yId):
         secim =""
     else:
         secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
-    
-    formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     
     # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
