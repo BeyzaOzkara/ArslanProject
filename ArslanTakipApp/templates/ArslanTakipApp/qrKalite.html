@@ -16,8 +16,8 @@
     console.log("burda");
     
     const nCount = document.getElementById('notification-count');
-    console.log(nCount);
-    const socket = new WebSocket('ws://0.0.0.0:8000/ws/notifications/');
+    console.log(window.location.host);
+    const socket = new WebSocket('ws://'+ window.location.host+'/ws/notifications/');
 
     socket.onmessage = function(event) {
         console.log("notif");
