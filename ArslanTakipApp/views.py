@@ -489,18 +489,33 @@ def qrKalite(request):
         f.close() """
         #1 ve 9 arasındaysa başına 2 sıfır 10 ve 99 arasındaysa 1 sıfır
         # Şifre çözme
-        unhexli = binascii.unhexlify('819a7b20eed64469c8adaa3ccf01ad06')
-        #print(unhexli)
-        decrypted_text = decrypt_aes_ecb(key, unhexli)
-        #print("Çözülmüş Veri:", decrypted_text)   
+    #     unhexli = binascii.unhexlify('819a7b20eed64469c8adaa3ccf01ad06')
+    #     #print(unhexli)
+    #     decrypted_text = decrypt_aes_ecb(key, unhexli)
+    #     #print("Çözülmüş Veri:", decrypted_text)   
 
-        ty = request.GET.get('type', '')
-        no = request.GET.get('no', '')
+    #     ty = request.GET.get('type', '')
+    #     no = request.GET.get('no', '')
         
+    #     context = {
+    #         "type" : unhexli,
+    #         "no" : decrypted_text,
+    #     }
+
+    # return render(request, 'ArslanTakipApp/qrKalite.html', context)
         context = {
-            "type" : unhexli,
-            "no" : decrypted_text,
+            "type" : "deneme",
+            "no": "denemee"
         }
+        
+        # channel_layer = get_channel_layer()
+        # async_to_sync(channel_layer.group_send)(
+        #     'notifications_group',  # Name of the WebSocket group for notifications
+        #     {
+        #         'type': 'send_notification',
+        #         'message': 'New blog added to YUDA!'  # Notification message
+        #     }
+        # )
 
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
@@ -1604,15 +1619,6 @@ def yudaDetailComment(request):
                     UploadedBy = c.Kullanici,
                     Note = "",
                 )
-
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                'notifications_group',  # Name of the WebSocket group for notifications
-                {
-                    'type': 'send_notification',
-                    'message': 'New blog added to YUDA!'  # Notification message
-                }
-            )
             
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:

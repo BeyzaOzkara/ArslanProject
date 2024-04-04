@@ -91,9 +91,10 @@
 
 {% endblock %}
 
-{% block javascript %}
+{% block extra_js %}
 <script>
-    const socket = new WebSocket('ws://127.0.0.1:8000/ws/notifications/');
+    console.log("burda")
+    const socket = new WebSocket('ws://0.0.0.0:8000/ws/notifications/');
 
     socket.onmessage = function(event) {
         console.log("notif");
