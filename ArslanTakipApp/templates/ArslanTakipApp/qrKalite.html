@@ -7,7 +7,7 @@
 <h1>Arslan Alüminyum</h1>
 <h1>~~YAPIM AŞAMASINDA~~</h1>
 <h2>{{type}}</h2>
-<h2>{{no}}</h2> 
+<h2 id="de">{{no}}</h2> 
 <input type="button" name="deneme" id="btnDeneme" onclick="sendDeneme()">
 
 {% endblock %}
@@ -28,8 +28,7 @@
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         console.log("DATA: ", data);
-        
-        // document.getElementById('notification-count').innerHTML == (data.message + '\n');
+        document.getElementById('de').innerHTML == (data.message + '\n');
         
         // const notification = JSON.parse(event.data);
         // const notificationList = document.getElementById('notification-list');
@@ -53,7 +52,7 @@
     function sendDeneme() {
         console.log("send deneme")
         socket.send(JSON.stringify({
-            'message': 'Mesaj deneme'
+            'message': '4'
         }));
         console.log("d2")
     };

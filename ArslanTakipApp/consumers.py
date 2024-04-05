@@ -24,7 +24,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        print(message)
         # Process the message as needed
         await self.channel_layer.group_send(
             self.group_name, 
@@ -36,6 +35,5 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         message = event['message']
-        print(message)
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
