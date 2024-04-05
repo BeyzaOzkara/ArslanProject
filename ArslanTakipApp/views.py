@@ -513,16 +513,15 @@ def qrKalite(request):
 def qrKalite_deneme(request):
     try:
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
+        channel_layer.group_send(
             'notifications_group',  # Name of the WebSocket group for notifications
             {
                 'type': 'send_notification',
                 'message': 'QR Page!'  # Notification message
             }
         )
-        response = JsonResponse({'message': str(channel_layer)})
+        response = JsonResponse({'message': "gitti"})
     except Exception as e:
-        print(e)
         response = JsonResponse({'error': str(e)})
         response.status_code = 500 #server error
 

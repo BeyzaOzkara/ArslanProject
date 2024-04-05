@@ -51,7 +51,7 @@
                         <i class="fas fa-envelope mr-2"></i> Yeni YUDA Eklendi | 24-089-01
                         <span class="float-right text-muted text-sm">3 mins</span>
                     </a> -->
-                    <div id="notification-list" class="dropdown-divider"></div>
+                    <div id="notification-list"></div>
                     <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                 </div>
             </li>
@@ -93,24 +93,24 @@
 
 {% block extra_js %}
 <script>
-    console.log("burda")
-    const socket = new WebSocket('ws://0.0.0.0:8000/ws/notifications/');
+    // console.log("burda")
+    // const socket = new WebSocket('ws://0.0.0.0:8000/ws/notifications/');
 
-    socket.onmessage = function(event) {
-        console.log("notif");
-        const notification = JSON.parse(event.data);
-        const notificationList = document.getElementById('notification-list');
-        const notificationCount = document.getElementById('notification-count');
+    // socket.onmessage = function(event) {
+    //     console.log("notif");
+    //     const notification = JSON.parse(event.data);
+    //     const notificationList = document.getElementById('notification-list');
+    //     const notificationCount = document.getElementById('notification-count');
 
-        // Update notification count
-        notificationCount.innerText = parseInt(notificationCount.innerText) + 1;
+    //     // Update notification count
+    //     notificationCount.innerText = parseInt(notificationCount.innerText) + 1;
 
-        // Add new notification to the list
-        const newNotification = document.createElement('a');
-        newNotification.classList.add('dropdown-item');
-        newNotification.href = '#';
-        newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${notification.message}`;
-        notificationList.insertBefore(newNotification, notificationList.firstChild);
-    };
+    //     // Add new notification to the list
+    //     const newNotification = document.createElement('a');
+    //     newNotification.classList.add('dropdown-item');
+    //     newNotification.href = '#';
+    //     newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${notification.message}`;
+    //     notificationList.insertBefore(newNotification, notificationList.firstChild);
+    // };
 </script>
 {% endblock %}

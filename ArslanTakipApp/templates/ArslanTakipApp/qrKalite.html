@@ -7,7 +7,8 @@
 <h1>Arslan Alüminyum</h1>
 <h1>~~YAPIM AŞAMASINDA~~</h1>
 <h2>{{type}}</h2>
-<h2 id="de">{{no}}</h2> 
+<h2>{{no}}</h2>
+<p id="de"></p>
 <input type="button" name="deneme" id="btnDeneme" onclick="sendDeneme()">
 
 {% endblock %}
@@ -28,21 +29,25 @@
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         console.log("DATA: ", data);
-        document.getElementById('de').innerHTML == (data.message + '\n');
+        document.getElementById('de').innerHTML = data.message;
+
+        if (data.type != "connection_established") {
+            const notificationList = document.getElementById('notification-list');
+            const nCount = document.getElementById('notification-count');
+
+            // // Update notification count
+            console.log(nCount.innerText);
+            if (nCount.innerText == "") {nCount.innerText = 0;};
+            nCount.innerText = parseInt(nCount.innerText) + 1; //data.message;
+
+            // Add new notification to the list
+            const newNotification = document.createElement('a');
+            newNotification.classList.add('dropdown-item');
+            newNotification.href = '#';
+            newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${data.message}`;
+            notificationList.insertBefore(newNotification, data.firstChild);
+        }
         
-        // const notification = JSON.parse(event.data);
-        // const notificationList = document.getElementById('notification-list');
-        // const notificationCount = document.getElementById('notification-count');
-
-        // // Update notification count
-        // notificationCount.innerText = parseInt(notificationCount.innerText) + 1;
-
-        // // Add new notification to the list
-        // const newNotification = document.createElement('a');
-        // newNotification.classList.add('dropdown-item');
-        // newNotification.href = '#';
-        // newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${notification.message}`;
-        // notificationList.insertBefore(newNotification, notificationList.firstChild);
     };
 
     socket.onclose = function(e) {
@@ -50,11 +55,20 @@
     };
 
     function sendDeneme() {
-        console.log("send deneme")
         socket.send(JSON.stringify({
             'message': '4'
         }));
-        console.log("d2")
+        
+        // $.ajax({
+        //     url: 'deneme',
+        //     method: 'GET',
+        //     success: function(response){
+        //         console.log(response.message);
+        //     },
+        //     error: function (error) {
+        //     console.error('Error :', error);
+        //     }
+        // });
     };
 
 </script>
