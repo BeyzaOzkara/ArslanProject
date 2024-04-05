@@ -1,26 +1,27 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
 import json
 
-class NotificationConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
+class NotificationConsumer(WebsocketConsumer):
+    def connect(self):
         self.group_name = 'notifications_group'
-        await self.channel_layer.group_add(
+        async_to_sync(self.channel_layer.group_add)(
             self.group_name,
             self.channel_name
         )
-        await self.accept()
+        self.accept()
 
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
+    def disconnect(self, close_code):
+        async_to_sync(self.channel_layer.group_discard)(
             self.group_name,
             self.channel_name
         )
 
-    async def receive(self, text_data):
+    def receive(self, text_data):
         data = json.loads(text_data)
         message = data['message']
         # Process the message as needed
-        await self.channel_layer.group_send(
+        async_to_sync(self.channel_layer.group_send)(
             'notifications_group',  # Name of the WebSocket group
             {
                 'type': 'send_notification',
