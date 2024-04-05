@@ -511,15 +511,19 @@ def qrKalite(request):
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 def qrKalite_deneme(request):
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        'notifications_group',  # Name of the WebSocket group for notifications
-        {
-            'type': 'send_notification',
-            'message': 'QR Page!'  # Notification message
-        }
-    )
-    response = JsonResponse({'message': channel_layer})
+    try:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'notifications_group',  # Name of the WebSocket group for notifications
+            {
+                'type': 'send_notification',
+                'message': 'QR Page!'  # Notification message
+            }
+        )
+        response = JsonResponse({'message': channel_layer})
+    except Exception as e:
+        response = JsonResponse({'error': str(e)})
+        response.status_code = 500 #server error
 
     return response
 
