@@ -8,11 +8,28 @@
 <h1>~~YAPIM AŞAMASINDA~~</h1>
 <h2>{{type}}</h2>
 <h2>{{no}}</h2> 
+<input type="button" name="deneme" id="btnDeneme" onclick="sendDeneme()">
 
 {% endblock %}
 
 {% block javascript %}
+
+{% include 'adminlte/lib/_scripts.html' %}
 <script>
+    function sendDeneme() {
+        $.ajax({
+            url: `deneme`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                console.log(response.message);
+            },
+            error: function (error) {
+                console.error('Error loading:', error);
+            }
+        });
+    }
+
     console.log("burda");
     
     const nCount = document.getElementById('notification-count');

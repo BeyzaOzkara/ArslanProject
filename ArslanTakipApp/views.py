@@ -507,17 +507,21 @@ def qrKalite(request):
             "type" : "deneme",
             "no": "denemee"
         }
-        
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'notifications_group',  # Name of the WebSocket group for notifications
-            {
-                'type': 'send_notification',
-                'message': 'New blog added to YUDA!'  # Notification message
-            }
-        )
 
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
+
+def qrKalite_deneme(request):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'notifications_group',  # Name of the WebSocket group for notifications
+        {
+            'type': 'send_notification',
+            'message': 'QR Page!'  # Notification message
+        }
+    )
+    response = JsonResponse({'message': channel_layer})
+
+    return response
 
 class qrKaliteView(generic.TemplateView):
     template_name = 'ArslanTakipApp/qrKalite.html'

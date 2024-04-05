@@ -35,6 +35,7 @@ urlpatterns = [
     path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
     path('qr/', views.qrKalite, name='qr'),
+    path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
     path('siparis/', login_required(views.SiparisView.as_view())),
     path('siparis/list', views.siparis_list),
     path('siparis/max', views.siparis_max),
