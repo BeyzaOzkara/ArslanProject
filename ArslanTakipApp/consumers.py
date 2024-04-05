@@ -13,7 +13,7 @@ class NotificationConsumer(WebsocketConsumer):
 
         self.send(text_data = json.dumps({
             'type': 'connection_established',
-            'message': str(self.group_name)
+            'message': str(self.group_name) + str(self.channel_name)
         }))
 
     def disconnect(self, close_code):
@@ -28,7 +28,7 @@ class NotificationConsumer(WebsocketConsumer):
         print(message)
         # Process the message as needed
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, 
+            self.group_name, 
             {
                 "type": "send_notification", 
                 "message": message
