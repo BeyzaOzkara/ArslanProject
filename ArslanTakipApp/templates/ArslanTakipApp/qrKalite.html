@@ -24,8 +24,8 @@
             success: function (response) {
                 console.log(response.message);
             },
-            error: function (error) {
-                console.error('Error loading:', error);
+            error: function (response) {
+                console.error('Error loading:', +response.responseJSON.error);
             }
         });
     }
