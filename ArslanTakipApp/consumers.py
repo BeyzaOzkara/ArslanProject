@@ -11,6 +11,11 @@ class NotificationConsumer(WebsocketConsumer):
         )
         self.accept()
 
+        self.send(text_data = json.dumps({
+            'type': 'connection_established',
+            'message': 'You are now connected!'
+        }))
+
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
             self.group_name,
@@ -20,6 +25,7 @@ class NotificationConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        print(message)
         # Process the message as needed
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, 
@@ -30,6 +36,5 @@ class NotificationConsumer(WebsocketConsumer):
 
     def notif_message(self, event):
         message = event['message']
-
         # Send message to WebSocket
         self.send(text_data=json.dumps({"message": message}))

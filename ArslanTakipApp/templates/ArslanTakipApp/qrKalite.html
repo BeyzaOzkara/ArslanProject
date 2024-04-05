@@ -26,10 +26,11 @@
     }
 
     socket.onmessage = function(event) {
-        console.log("notif");
-        
         const data = JSON.parse(event.data);
-        document.getElementById('notification-count').innerHTML == (data.message + '\n');
+        console.log("DATA: ", data);
+        
+        // document.getElementById('notification-count').innerHTML == (data.message + '\n');
+        
         // const notification = JSON.parse(event.data);
         // const notificationList = document.getElementById('notification-list');
         // const notificationCount = document.getElementById('notification-count');
