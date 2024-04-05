@@ -13,7 +13,7 @@ class NotificationConsumer(WebsocketConsumer):
 
         self.send(text_data = json.dumps({
             'type': 'connection_established',
-            'message': 'You are now connected!'
+            'message': str(self.group_name)
         }))
 
     def disconnect(self, close_code):
@@ -31,10 +31,12 @@ class NotificationConsumer(WebsocketConsumer):
             self.room_group_name, 
             {
                 "type": "send_notification", 
-                "message": message}
+                "message": message
+            }
         )
 
     def notif_message(self, event):
         message = event['message']
+        print(message)
         # Send message to WebSocket
         self.send(text_data=json.dumps({"message": message}))

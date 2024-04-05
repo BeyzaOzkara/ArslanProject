@@ -51,9 +51,11 @@
     };
 
     function sendDeneme() {
+        console.log("send deneme")
         socket.send(JSON.stringify({
             'message': 'Mesaj deneme'
         }));
+        console.log("d2")
     };
 
 </script>
