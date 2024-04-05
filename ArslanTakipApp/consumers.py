@@ -18,13 +18,18 @@ class NotificationConsumer(WebsocketConsumer):
         )
 
     def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data['message']
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
         # Process the message as needed
         async_to_sync(self.channel_layer.group_send)(
-            'notifications_group',  # Name of the WebSocket group
+            self.room_group_name, 
             {
-                'type': 'send_notification',
-                'message': message
-            }
+                "type": "send_notification", 
+                "message": message}
         )
+
+    def notif_message(self, event):
+        message = event['message']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({"message": message}))

@@ -16,29 +16,20 @@
 
 {% include 'adminlte/lib/_scripts.html' %}
 <script>
-    function sendDeneme() {
-        $.ajax({
-            url: `deneme`,
-            method: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                console.log(response.message);
-            },
-            error: function (response) {
-                console.error('Error loading:', +response.responseJSON.error);
-            }
-        });
-    }
-    
-    const nCount = document.getElementById('notification-count');
-    console.log(nCount);
     const socket = new WebSocket('ws://192.168.150.230:8000/ws/notifications/');
     // const socket = new WebSocket(`ws://${window.location.host}/ws/notifications/`);
     console.log(socket);
     console.log("socket altı");
 
+    socket.onopen = function(e) {
+        console.log("open")
+    }
+
     socket.onmessage = function(event) {
         console.log("notif");
+        
+        const data = JSON.parse(event.data);
+        document.getElementById('notification-count').innerHTML == (data.message + '\n');
         // const notification = JSON.parse(event.data);
         // const notificationList = document.getElementById('notification-list');
         // const notificationCount = document.getElementById('notification-count');
@@ -53,5 +44,16 @@
         // newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${notification.message}`;
         // notificationList.insertBefore(newNotification, notificationList.firstChild);
     };
+
+    socket.onclose = function(e) {
+        console.log("close")
+    };
+
+    function sendDeneme() {
+        socket.send(JSON.stringify({
+            'message': 'Mesaj deneme'
+        }));
+    };
+
 </script>
 {% endblock %}
