@@ -197,10 +197,10 @@
           <p style="font-weight: bold;">ONAY ANKETİ</p>
           <div style="display: inline-block;">
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected %} checked {% endif %} > ONAY
+              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected == True %} checked {% endif %} > ONAY
             </label>
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if not Selected %} checked {% endif %} > RET 
+              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if Selected == False %} checked {% endif %} > RET 
             </label>
             <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
           </div>
