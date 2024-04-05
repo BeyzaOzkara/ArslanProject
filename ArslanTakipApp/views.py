@@ -520,8 +520,9 @@ def qrKalite_deneme(request):
                 'message': 'QR Page!'  # Notification message
             }
         )
-        response = JsonResponse({'message': channel_layer})
+        response = JsonResponse({'message': str(channel_layer)})
     except Exception as e:
+        print(e)
         response = JsonResponse({'error': str(e)})
         response.status_code = 500 #server error
 
