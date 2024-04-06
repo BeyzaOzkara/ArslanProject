@@ -24,6 +24,9 @@
         console.log("open");
     }
     
+    socket.onclose = function(e) {
+        console.log("close")
+    };
 
     socket.onmessage = function(event) { //düzenlenecek
         const data = JSON.parse(event.data);
@@ -48,34 +51,30 @@
         
     };
 
-    // function markAsRead(notificationId) {
-    //     const message = {
-    //         type: 'mark_as_read',
-    //         notification_id: notificationId,
-    //     };
-    //     socket.send(JSON.stringify(message));
-    // } //markAsRead(123);
+    function markAsRead(notificationId) {
+        const message = {
+            type: 'mark_as_read',
+            notification_id: notificationId,
+        };
+        socket.send(JSON.stringify(message));
+    } //markAsRead(123);
 
 
     function sendDeneme() {
-        socket.send(JSON.stringify({
-            'message': '4'
-        }));
+        // socket.send(JSON.stringify({
+        //     'message': '4'
+        // }));
         
-        // $.ajax({
-        //     url: 'deneme',
-        //     method: 'GET',
-        //     success: function(response){
-        //         console.log("Cevap: " + response.message);
-        //     },
-        //     error: function (error) {
-        //     console.error('Error :', error);
-        //     }
-        // });
-    };
-
-    socket.onclose = function(e) {
-        console.log("close")
+        $.ajax({
+            url: 'deneme',
+            method: 'GET',
+            success: function(response){
+                console.log("Cevap: " + response.message);
+            },
+            error: function (error) {
+            console.error('Error :', error);
+            }
+        });
     };
 
 </script>
