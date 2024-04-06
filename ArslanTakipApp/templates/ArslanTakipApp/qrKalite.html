@@ -17,7 +17,7 @@
 
 {% include 'adminlte/lib/_scripts.html' %}
 <script>
-    const socket = new WebSocket('ws://0.0.0.0:8000/ws/notifications/');
+    const socket = new WebSocket('ws://'+ window.location.host +'/ws/notifications/');
     console.log(socket);
 
     socket.onopen = function(e) {
