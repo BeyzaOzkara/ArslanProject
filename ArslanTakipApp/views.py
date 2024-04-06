@@ -19,7 +19,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -511,13 +511,23 @@ def qrKalite(request):
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 def qrKalite_deneme(request):
-    try:
+    user = request.user
+    message = "Deneme Notif"
+
+    try: 
+        Notification.objects.create(user=user, message=message)
+
         channel_layer = get_channel_layer()
-        channel_layer.group_send(
-            'notifications_group',  # Name of the WebSocket group for notifications
+        room_group_name = f'notifications_{user.id}'
+        async_to_sync(channel_layer.group_send)(
+            room_group_name,
             {
                 'type': 'send_notification',
-                'message': 'QR Page!'  # Notification message
+                'notification': {
+                    'message': message,
+                    'is_read': False,
+                    'timestamp': datetime.datetime.now()
+                }
             }
         )
         response = JsonResponse({'message': "gitti"})
@@ -526,6 +536,22 @@ def qrKalite_deneme(request):
         response.status_code = 500 #server error
 
     return response
+
+    # try:
+    #     channel_layer = get_channel_layer()
+    #     channel_layer.group_send(
+    #         'notifications_group',  # Name of the WebSocket group for notifications
+    #         {
+    #             'type': 'send_notification',
+    #             'message': 'QR Page!'  # Notification message
+    #         }
+    #     )
+    #     response = JsonResponse({'message': "gitti"})
+    # except Exception as e:
+    #     response = JsonResponse({'error': str(e)})
+    #     response.status_code = 500 #server error
+
+    # return response
 
 class qrKaliteView(generic.TemplateView):
     template_name = 'ArslanTakipApp/qrKalite.html'

@@ -18,15 +18,17 @@
 {% include 'adminlte/lib/_scripts.html' %}
 <script>
     const socket = new WebSocket('ws://192.168.150.230:8000/ws/notifications/');
-    // const socket = new WebSocket(`ws://${window.location.host}/ws/notifications/`);
     console.log(socket);
-    console.log("socket altı");
 
     socket.onopen = function(e) {
-        console.log("open")
+        console.log("open");
     }
+    
+    socket.onclose = function(e) {
+        console.log("close")
+    };
 
-    socket.onmessage = function(event) {
+    socket.onmessage = function(event) { //düzenlenecek
         const data = JSON.parse(event.data);
         console.log("DATA: ", data);
         document.getElementById('de').innerHTML = data.message;
@@ -36,7 +38,6 @@
             const nCount = document.getElementById('notification-count');
 
             // // Update notification count
-            console.log(nCount.innerText);
             if (nCount.innerText == "") {nCount.innerText = 0;};
             nCount.innerText = parseInt(nCount.innerText) + 1; //data.message;
 
@@ -44,31 +45,36 @@
             const newNotification = document.createElement('a');
             newNotification.classList.add('dropdown-item');
             newNotification.href = '#';
-            newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${data.message}`;
+            newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${data.message}<span class="float-right text-muted text-sm">3 dk</span>`;
             notificationList.insertBefore(newNotification, data.firstChild);
         }
         
     };
 
-    socket.onclose = function(e) {
-        console.log("close")
-    };
+    function markAsRead(notificationId) {
+        const message = {
+            type: 'mark_as_read',
+            notification_id: notificationId,
+        };
+        socket.send(JSON.stringify(message));
+    } //markAsRead(123);
+
 
     function sendDeneme() {
-        socket.send(JSON.stringify({
-            'message': '4'
-        }));
+        // socket.send(JSON.stringify({
+        //     'message': '4'
+        // }));
         
-        // $.ajax({
-        //     url: 'deneme',
-        //     method: 'GET',
-        //     success: function(response){
-        //         console.log(response.message);
-        //     },
-        //     error: function (error) {
-        //     console.error('Error :', error);
-        //     }
-        // });
+        $.ajax({
+            url: 'deneme',
+            method: 'GET',
+            success: function(response){
+                console.log("Cevap: " + response.message);
+            },
+            error: function (error) {
+            console.error('Error :', error);
+            }
+        });
     };
 
 </script>
