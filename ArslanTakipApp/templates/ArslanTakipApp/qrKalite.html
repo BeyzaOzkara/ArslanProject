@@ -61,20 +61,20 @@
 
 
     function sendDeneme() {
-        // socket.send(JSON.stringify({
-        //     'message': '4'
-        // }));
+        socket.send(JSON.stringify({
+            'message': '4'
+        }));
         
-        $.ajax({
-            url: 'deneme',
-            method: 'GET',
-            success: function(response){
-                console.log("Cevap: " + response.message);
-            },
-            error: function (error) {
-            console.error('Error :', error);
-            }
-        });
+        // $.ajax({
+        //     url: 'deneme',
+        //     method: 'GET',
+        //     success: function(response){
+        //         console.log("Cevap: " + response.message);
+        //     },
+        //     error: function (error) {
+        //     console.error('Error :', error);
+        //     }
+        // });
     };
 
 </script>
