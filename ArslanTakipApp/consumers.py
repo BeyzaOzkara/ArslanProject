@@ -40,20 +40,18 @@ import json
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope['user']
-        self.room_name = f'user_{self.user.id}_notifications'
-        self.room_group_name = f'notifications_{self.user.id}'
+        self.room_name = f'user__notifications'
+        self.room_group_name = f'notifications_'
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
-
-        # await self.send(text_data = json.dumps({
-        #     'type': 'connection_established',
-        #     'message': 'Connection established!'
-        # }))
-
-        await self.send_unread_notifications()
+        await self.send(text_data = json.dumps({
+            'type': 'connection_established',
+            'message': self.user,
+        }))
+        # await self.send_unread_notifications()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -68,15 +66,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         if message_type == 'mark_as_read':
             notification_id = data_json.get('notification_id')
             await self.mark_notification_as_read(notification_id)
-        # message = data_json["message"]
-        # # Process the message as needed
-        # await self.channel_layer.group_send(
-        #     self.group_name, 
-        #     {
-        #         "type": "chat.message", 
-        #         "message": message
-        #     }
-        # )
 
     async def send_notification(self, event):
         notification_data = event['notification']
@@ -106,9 +95,3 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'is_read': notification.is_read,
                 'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
             }})
-
-
-    # async def chat_message(self, event):
-    #     message = event['message']
-    #     # Send message to WebSocket
-    #     await self.send(text_data=json.dumps({"message": message}))
