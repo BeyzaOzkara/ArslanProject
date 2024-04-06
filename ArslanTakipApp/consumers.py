@@ -49,7 +49,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data = json.dumps({
             'type': 'connection_established',
-            'message': self.user,
+            'message': self.user.username,
         }))
         # await self.send_unread_notifications()
 
