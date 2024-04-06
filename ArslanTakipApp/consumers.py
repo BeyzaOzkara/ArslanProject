@@ -39,7 +39,7 @@ import json
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.user = self.scope['user']
+        self.user = self.scope["user"]
         self.room_name = f'user__notifications'
         self.room_group_name = f'notifications_'
         await self.channel_layer.group_add(
@@ -49,7 +49,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data = json.dumps({
             'type': 'connection_established',
-            'message': self.user.username,
+            'message': self.scope,
         }))
         # await self.send_unread_notifications()
 
