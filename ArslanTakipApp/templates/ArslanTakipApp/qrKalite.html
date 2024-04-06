@@ -24,9 +24,6 @@
         console.log("open");
     }
     
-    socket.onclose = function(e) {
-        console.log("close")
-    };
 
     socket.onmessage = function(event) { //düzenlenecek
         const data = JSON.parse(event.data);
@@ -51,13 +48,13 @@
         
     };
 
-    function markAsRead(notificationId) {
-        const message = {
-            type: 'mark_as_read',
-            notification_id: notificationId,
-        };
-        socket.send(JSON.stringify(message));
-    } //markAsRead(123);
+    // function markAsRead(notificationId) {
+    //     const message = {
+    //         type: 'mark_as_read',
+    //         notification_id: notificationId,
+    //     };
+    //     socket.send(JSON.stringify(message));
+    // } //markAsRead(123);
 
 
     function sendDeneme() {
@@ -75,6 +72,10 @@
         //     console.error('Error :', error);
         //     }
         // });
+    };
+
+    socket.onclose = function(e) {
+        console.log("close")
     };
 
 </script>

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'adminlte3',
     'adminlte3_theme',
     'tabulator',
-    "mailer",
+    'mailer',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
