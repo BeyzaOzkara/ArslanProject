@@ -1291,9 +1291,7 @@ def yudas_list(request):
 
     if len(filter_list) > 0:
         for i in filter_list:
-            if i['field'] != 'Bolum':
-                q = filter_method(i, q)
-            else:
+            if i['field'] == 'Bolum':
                 for bolum in i['value']:
                     if bolum == 'Boya':
                         q['YuzeyBoya__gt'] = ""
@@ -1301,6 +1299,11 @@ def yudas_list(request):
                         q['YuzeyEloksal__gt'] = ""
                     elif bolum == 'Mekanik Islem':
                         q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
+            elif i['field'] == 'Dosya':
+                file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
+                q['id__in'] = list(file_ids)
+            else:
+                q = filter_method(i, q)
     
     filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
     yudaList = list(filtered_yudas.values()[offset:limit])

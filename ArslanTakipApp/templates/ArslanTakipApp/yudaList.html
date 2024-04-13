@@ -82,6 +82,8 @@
                 <option value="Mekanik Islem">Mekanik İşlem</option>
               </select>
             </div>
+            <label for="dosyaFilter">Dosya Adı: </label>
+            <input type="text" id="dosyaFilter" name="dosyaFilter" class="form-control mb-2">
             <button id="applyFilter" class="btn btn-success">Filtre Uygula</button>
         </div>
     </div>
@@ -152,8 +154,9 @@
         const yudaNoFilter = $('#yudaNoFilter').val();
         const musteriFirmaFilter = $('#musteriFirmaFilter').val();
         const bolumFilter = $('#bolumFilter').val();
-        console.log(bolumFilter)
         const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
+        const dosyaFilter = $('#dosyaFilter').val();
+        console.log(dosyaFilter);
         filterList = [];
 
         if (yudaNoFilter != "") {
@@ -173,6 +176,9 @@
         console.log(musteriTemsilcisiSelect)
         if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
           filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
+        };
+        if (dosyaFilter != "") {
+          filterList.push({ field: 'Dosya', type:'like', value: dosyaFilter });
         };
         
         loadPage(1);
