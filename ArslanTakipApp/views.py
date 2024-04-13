@@ -533,7 +533,7 @@ def qrKalite_deneme(request):
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
         response = JsonResponse({'error': str(e)})
-        response.status_code = 500 #server error
+        #response.status_code = 500 server error
 
     return response
 
