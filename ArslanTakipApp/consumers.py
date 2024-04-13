@@ -40,8 +40,8 @@ import json
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
-        self.room_name = f'user__notifications'
-        self.room_group_name = f'notifications_'
+        self.room_name = f'user_{self.user.id}_notifications'
+        self.room_group_name = f'notifications_{self.user.id}'
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
