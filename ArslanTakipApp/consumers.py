@@ -49,9 +49,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data = json.dumps({
             'type': 'connection_established',
-            'message': str(self.user),
+            'message': str(self.user) + ' ' + str(self.user.id),
         }))
-        # await self.send_unread_notifications()
+        await self.send_unread_notifications()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(

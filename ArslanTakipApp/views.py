@@ -512,15 +512,14 @@ def qrKalite(request):
 
 def qrKalite_deneme(request):
     user = request.user
-    message = "Deneme Notif"
+    message = "Yuda Kaydet"
 
     try: 
         Notification.objects.create(user=user, message=message)
 
         channel_layer = get_channel_layer()
-        room_group_name = f'notifications_{user.id}'
         async_to_sync(channel_layer.group_send)(
-            room_group_name,
+            f'notifications_{user.id}',
             {
                 'type': 'send_notification',
                 'notification': {
@@ -533,7 +532,7 @@ def qrKalite_deneme(request):
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
         response = JsonResponse({'error': str(e)})
-        #response.status_code = 500 server error
+        response.status_code = 500 #server error
 
     return response
 
