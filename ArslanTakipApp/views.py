@@ -564,7 +564,7 @@ def notif(request, id):
     d = n.message
     d = d[d.find("(")+1:d.find(")")]
     if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
-        yuda = YudaForm.objects.filter(YudaNo = d)
+        yuda = YudaForm.objects.get(YudaNo = d)
         id = yuda.id
         return HttpResponseRedirect(f"/yuda/{id}")
 
