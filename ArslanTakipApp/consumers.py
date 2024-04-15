@@ -76,6 +76,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 await self.send_notification({'notification': {
                     'id': notification.id,
                     'message': notification.message,
+                    'subject': notification.subject,
                     'is_read': notification.is_read,
                     'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
                 }})
