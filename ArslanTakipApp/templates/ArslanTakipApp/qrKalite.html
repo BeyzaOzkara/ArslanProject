@@ -57,6 +57,12 @@
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
+
+            const maxNotifications = 5; // Change this to your desired limit
+            if (notificationList.children.length > maxNotifications) {
+                notificationList.style.overflowY = 'auto'; // Enable vertical scrolling
+                notificationList.style.maxHeight = '200px'; // Set a max height for the scrollable area
+            }
         }
     };
 
