@@ -1,7 +1,10 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+import logging
 
 class NotificationConsumer(AsyncWebsocketConsumer):
+    logger = logging.getLogger(__name__)
+
     async def connect(self):
         self.user = self.scope["user"]
         self.room_name = f'user_{self.user.id}_notifications'
@@ -15,6 +18,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             'type': 'connection_established',
             'message': str(self.user) + ' ' + str(self.user.id),
         }))
+        self.logger.debug(f"WebSocket connected for user {self.scope['user']}")
         await self.send_unread_notifications()
 
     async def disconnect(self, close_code):
@@ -22,23 +26,30 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        self.logger.debug("WebSocket disconnected")
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message_type = data_json.get('type')
+        self.logger.debug(f"Received message: {text_data}")
 
         if message_type == 'mark_as_read':
             notification_id = data_json.get('notification_id')
+            self.logger.debug(f"Received message with type mark_as_read")
             await self.mark_notification_as_read(notification_id)
 
     async def send_notification(self, event):
         notification_data = event['notification']
         # Send notification data to the WebSocket if it's unread
+        
+        self.logger.debug(f"Sent notification start: {notification_data}")
         if not notification_data['is_read']:
             await self.send(text_data=json.dumps({
                 'type': 'notification',
                 'notification': notification_data
             }))
+            self.logger.debug(f"Sent notification if not is_read: {notification_data}")
+            
 
     async def mark_notification_as_read(self, notification_id):
         try:
@@ -51,12 +62,17 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             pass
 
     async def send_unread_notifications(self):
-        from .models import Notification
-        unread_notifications = await Notification.objects.filter(user=self.user, is_read = False)
-        for notification in unread_notifications:
-            await self.send_notification({'notification': {
-                'id': notification.id,
-                'message': notification.message,
-                'is_read': notification.is_read,
-                'timestamp': notification.timestamp,
-            }})
+        try:
+            from .models import Notification
+            unread_notifications = await Notification.objects.filter(user=self.user, is_read = False)
+            for notification in unread_notifications:
+                self.logger.debug(f"Notification is: {notification}")
+                await self.send_notification({'notification': {
+                    'id': notification.id,
+                    'message': notification.message,
+                    'is_read': notification.is_read,
+                    'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
+                }})
+                self.logger.debug(f"Notification is sent {notification}")
+        except Notification.DoesNotExist:
+            self.logger.debug("Notification Does Not Exist")

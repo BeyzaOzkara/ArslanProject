@@ -199,11 +199,21 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'error.log',
         },
+        'file2': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
     },
     'loggers': {
         'django': {
             'handlers': ['file'],
             'level': 'ERROR',
+            'propagate': True,
+        },
+        'ArslanTakipApp': {  # Replace 'yourapp' with the name of your Django app
+            'handlers': ['file2'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
