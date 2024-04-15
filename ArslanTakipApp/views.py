@@ -531,7 +531,7 @@ def qrKalite_deneme(request):
                     'subject': notification.subject,
                     'message': notification.message,
                     'is_read': notification.is_read,
-                    'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
+                    'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
                 },
             }
         )

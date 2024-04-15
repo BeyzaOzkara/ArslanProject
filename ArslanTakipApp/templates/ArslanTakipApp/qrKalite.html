@@ -42,8 +42,10 @@
             notificationElement.href = `/notif/${notification.id}`;
             notificationElement.innerHTML = `
                 <div class="d-flex justify-content-between">
-                    <i class="fas fa-file mr-2"></i>
-                    <div>${notification.subject}</div>
+                    <div>
+                        <i class="fas fa-file mr-2"></i>
+                        ${notification.subject}
+                    </div>
                     <small>${notification.timestamp}</small>
                 </div>
                 <div>${notification.message}</div>
