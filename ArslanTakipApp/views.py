@@ -1247,6 +1247,12 @@ def yuda_kaydet(request):
                     UploadedBy = y.ProjeYoneticisi,
                     Note = "",
                 )
+            
+            for user in User.objects.exclude(id=request.user.id):
+                Notification.objects.create(
+                    user=user,
+                    message=f'Yeni bir YUDA ({y.YudaNo}) eklendi.',
+                )
 
             # Trigger a notification when a new blog is added to YUDA
             # channel_layer = get_channel_layer()

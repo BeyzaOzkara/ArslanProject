@@ -28,30 +28,55 @@
         console.log("close")
     };
 
-    socket.onmessage = function(event) { //düzenlenecek
+    const notificationsDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+
+    socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log("DATA: ", data);
-        document.getElementById('de').innerHTML = data.message;
+        if (data.type === 'notification') {
+            const notification = data.notification;
+            const notificationElement = document.createElement('a');
+            notificationElement.classList.add('dropdown-item');
+            notificationElement.href = '#'; // Add the link if needed
+            notificationElement.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <div>${notification.message}</div>
+                    <small>${notification.timestamp}</small>
+                </div>
+                <div>${notification.message}</div>
+            `;
+            notificationList.appendChild(notificationElement);
 
-        if (data.type != "connection_established") {
-            const notificationList = document.getElementById('notification-list');
-            const nCount = document.getElementById('notification-count');
-
-            // // Update notification count
-            if (nCount.innerText == "") {nCount.innerText = 0;};
-            nCount.innerText = parseInt(nCount.innerText) + 1; //data.message;
-
-            // Add new notification to the list
-            const newNotification = document.createElement('a');
-            newNotification.classList.add('dropdown-item');
-            newNotification.href = '#';
-            newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${data.message}<span class="float-right text-muted text-sm">3 dk</span>`;
-            notificationList.insertBefore(newNotification, data.firstChild);
+            // Update notification count
+            notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
         }
-        
     };
 
-    function markAsRead(notificationId) {
+    // socket.onmessage = function(event) { //düzenlenecek
+    //     const data = JSON.parse(event.data);
+    //     console.log("DATA: ", data);
+    //     document.getElementById('de').innerHTML = data.message;
+
+    //     if (data.type != "connection_established") {
+    //         const notificationList = document.getElementById('notification-list');
+    //         const nCount = document.getElementById('notification-count');
+
+    //         // // Update notification count
+    //         if (nCount.innerText == "") {nCount.innerText = 0;};
+    //         nCount.innerText = parseInt(nCount.innerText) + 1; //data.message;
+
+    //         // Add new notification to the list
+    //         const newNotification = document.createElement('a');
+    //         newNotification.classList.add('dropdown-item');
+    //         newNotification.href = '#';
+    //         newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${data.message}<span class="float-right text-muted text-sm">3 dk</span>`;
+    //         notificationList.insertBefore(newNotification, data.firstChild);
+    //     }
+        
+    // };
+
+    function markAsRead(notificationId) { //onclick markAsRead
         const message = {
             type: 'mark_as_read',
             notification_id: notificationId,
@@ -61,9 +86,6 @@
 
 
     function sendDeneme() {
-        // socket.send(JSON.stringify({
-        //     'message': '4'
-        // }));
         
         $.ajax({
             url: 'deneme',
