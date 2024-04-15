@@ -566,7 +566,7 @@ def notif(request, id):
     if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
         yuda = YudaForm.objects.get(YudaNo = d)
         yId = yuda.id
-        return HttpResponseRedirect(f"/yuda/{yId}")
+        return HttpResponseRedirect(f"/yudaDetail/{yId}")
 
 
 class qrKaliteView(generic.TemplateView):
