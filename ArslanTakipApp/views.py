@@ -515,10 +515,24 @@ def qrKalite_deneme(request):
     message = "Yuda Kaydet"
 
     try: 
-        Notification.objects.create(
+        notification = Notification.objects.create(
             user=user,
             message=f'Yeni bir YUDA (deneme) eklendi.',
             subject="Yeni YUDA"
+        )
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'notifications_{request.user.id}',
+            {
+                'type': 'send_notification',
+                'notification': {
+                    'id': notification.id,
+                    'subject': notification.subject,
+                    'message': notification.message,
+                    'is_read': notification.is_read,
+                    'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
+                },
+            }
         )
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
