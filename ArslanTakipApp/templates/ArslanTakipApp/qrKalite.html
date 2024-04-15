@@ -39,7 +39,7 @@
             const notification = data.notification;
             const notificationElement = document.createElement('a');
             notificationElement.classList.add('dropdown-item');
-            notificationElement.href = `/notif/${notification}/`;
+            notificationElement.href = `/notif/${notification.id}/`;
             // notificationElement.href = '#'; Add the link if needed
             notificationElement.innerHTML = `
                 <div class="d-flex justify-content-between">

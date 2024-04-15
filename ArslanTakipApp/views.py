@@ -558,9 +558,10 @@ def qrKalite_deneme(request):
 
     # return response
 
-def notif(request, noti):
-    s = noti.subject
-    d = noti.message
+def notif(request, id):
+    n = Notification.objects.filter(id = id)
+    s = n.subject
+    d = n.message
     d = d[d.find("(")+1:d.find(")")]
     if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
         yuda = YudaForm.objects.filter(YudaNo = d)
