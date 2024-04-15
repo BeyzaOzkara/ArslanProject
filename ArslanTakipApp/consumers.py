@@ -65,17 +65,20 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         try:
             self.logger.debug(f"In the send_unread_notifications")
             from .models import Notification
-            self.logger.debug(f"In the send_unread_notifications imported model Notification {type(self.user.id)}")
-            unread_notifications = await Notification.objects.filter(user_id=int(self.user.id), is_read = False)
-            self.logger.debug(f"In the send_unread_notifications filtered by user")
-            for notification in unread_notifications:
-                self.logger.debug(f"Notification is: {notification}")
-                await self.send_notification({'notification': {
-                    'id': notification.id,
-                    'message': notification.message,
-                    'is_read': notification.is_read,
-                    'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
-                }})
-                self.logger.debug(f"Notification is sent {notification}")
+            self.logger.debug(f"In the send_unread_notifications imported model Notification {self.user.id}")
+            try:
+                unread_notifications = await Notification.objects.filter(user_id=self.user.id, is_read = False)
+                self.logger.debug(f"In the send_unread_notifications filtered by user")
+                for notification in unread_notifications:
+                    self.logger.debug(f"Notification is: {notification}")
+                    await self.send_notification({'notification': {
+                        'id': notification.id,
+                        'message': notification.message,
+                        'is_read': notification.is_read,
+                        'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
+                    }})
+                    self.logger.debug(f"Notification is sent {notification}")
+            except Exception as e:
+                self.logger.debug(f"Error fetching unread notifications: {e}")
         except Notification.DoesNotExist:
             self.logger.debug("Notification Does Not Exist")
