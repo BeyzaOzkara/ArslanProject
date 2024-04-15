@@ -58,10 +58,14 @@
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
 
+            notificationElement.addEventListener('click', function() {
+                markNotificationAsRead(notification.id);
+            });
+
             const maxNotifications = 5; // Change this to your desired limit
             if (notificationList.children.length > maxNotifications) {
                 notificationList.style.overflowY = 'auto'; // Enable vertical scrolling
-                notificationList.style.maxHeight = '350px'; // Set a max height for the scrollable area
+                notificationList.style.maxHeight = '320px'; // Set a max height for the scrollable area
             }
         }
     };
@@ -89,13 +93,13 @@
         
     // };
 
-    function markAsRead(notificationId) { //onclick markAsRead
-        const message = {
+    function markNotificationAsRead(notificationId) {
+        const data = {
             type: 'mark_as_read',
-            notification_id: notificationId,
+            notification_id: notificationId
         };
-        socket.send(JSON.stringify(message));
-    } //markAsRead(123);
+        socket.send(JSON.stringify(data));
+    };
 
 
     function sendDeneme() {
