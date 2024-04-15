@@ -515,21 +515,6 @@ def qrKalite_deneme(request):
     message = "Yuda Kaydet"
 
     try: 
-        # Notification.objects.create(user=user, message=message)
-
-        # channel_layer = get_channel_layer()
-        # async_to_sync(channel_layer.group_send)(
-        #     f'notifications_{user.id}',
-        #     {
-        #         'type': 'send_notification',
-        #         'notification': {
-        #             'message': message,
-        #             'is_read': False,
-        #             'timestamp': datetime.datetime.now()
-        #         }
-        #     }
-        # )
-
         Notification.objects.create(
             user=user,
             message=f'Yeni bir YUDA (deneme) eklendi.',
@@ -1206,6 +1191,7 @@ def yuda_kaydet(request):
                 'Paketleme Bolumu',
                 'Yurt Disi Satis Bolumu',
                 'Yurt Ici Satis Bolumu',
+                'Proje Bolumu',
             ]
 
             group_mapping = {
@@ -1322,7 +1308,7 @@ def yudas_list(request):
         o['Tarih'] = format_date_time(o['Tarih'])
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
-        for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda']]:
+        for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:
             yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
             if yuda_onay:
                 if yuda_onay.OnayDurumu is True:

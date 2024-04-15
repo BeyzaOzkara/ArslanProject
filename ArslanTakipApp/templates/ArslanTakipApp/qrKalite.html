@@ -51,6 +51,7 @@
             notificationList.appendChild(notificationElement);
 
             // Update notification count
+            if (notificationCount.innerText == "") {nCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
         }
     };
