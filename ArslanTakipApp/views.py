@@ -518,6 +518,7 @@ def qrKalite_deneme(request):
         Notification.objects.create(
             user=user,
             message=f'Yeni bir YUDA (deneme) eklendi.',
+            subject="Yeni YUDA"
         )
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
@@ -1243,6 +1244,7 @@ def yuda_kaydet(request):
                 Notification.objects.create(
                     user=user,
                     message=f'Yeni bir YUDA ({y.YudaNo}) eklendi.',
+                    subject="Yeni YUDA"
                 )
 
             # Trigger a notification when a new blog is added to YUDA
