@@ -15,7 +15,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             'type': 'connection_established',
             'message': str(self.user) + ' ' + str(self.user.id),
         }))
-        # await self.send_unread_notifications()
+        await self.send_unread_notifications()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
