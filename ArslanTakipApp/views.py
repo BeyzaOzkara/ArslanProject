@@ -518,7 +518,7 @@ def qrKalite_deneme(request):
     try: 
         notification = Notification.objects.create(
             user=user,
-            message=f'Beyza Özkara bir YUDA (24-092-18) ekledi.',
+            message=f'Beyza Özkara^Yeni bir YUDA (24-092-18) ekledi.',
             subject="Yeni YUDA"
         )
         channel_layer = get_channel_layer()
@@ -1267,8 +1267,8 @@ def yuda_kaydet(request):
             for user in User.objects.exclude(id=request.user.id):
                 notification = Notification.objects.create(
                     user=user,
-                    message=f'{acanKisi} bir YUDA ({y.YudaNo}) ekledi.',
-                    subject="Yeni YUDA"
+                    message=f'{acanKisi}^Yeni bir YUDA ({y.YudaNo}) ekledi.',
+                    subject=f"Yeni YUDA"
                 )
             
                 channel_layer = get_channel_layer()
