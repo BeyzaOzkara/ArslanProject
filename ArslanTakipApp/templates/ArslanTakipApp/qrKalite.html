@@ -33,7 +33,9 @@
     const notificationCount = document.getElementById('notification-count');
 
     socket.onmessage = function(event) {
+        console.log(event);
         const data = JSON.parse(event.data);
+        console.log(data);
         if (data.type === 'notification') {
             const notification = data.notification;
             const notificationElement = document.createElement('a');
