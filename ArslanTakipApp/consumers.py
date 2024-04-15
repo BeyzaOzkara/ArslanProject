@@ -33,11 +33,14 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message_type = data_json.get('type')
-
+        self.logger.debug(f"Received message")
         if message_type == 'mark_as_read':
             notification_id = data_json.get('notification_id')
             self.logger.debug(f"Received message with type mark_as_read")
             await self.mark_notification_as_read(notification_id)
+        elif message_type == 'notification':
+            self.logger.debug(f"Received message with type notification")
+            await self.send_unread_notifications()
 
     async def send_notification(self, event):
         notification_data = event['notification']
@@ -50,7 +53,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             }))
             self.logger.debug(f"Sent notification if not is_read: {notification_data['id']}")
             
-
     async def mark_notification_as_read(self, notification_id):
         try:
             from .models import Notification
