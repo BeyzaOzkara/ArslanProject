@@ -1,7 +1,8 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
 import json
 import logging
-from asgiref.sync import sync_to_async
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     logger = logging.getLogger(__name__)
@@ -65,13 +66,15 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def send_unread_notifications(self):
         try:
             from .models import Notification
-            async def fetch_unread_notifications():
+
+            @database_sync_to_async
+            def fetch_unread_notifications():
                 self.logger.debug(f"In the fetch_unread_notifications")
-                return await sync_to_async(Notification.objects.filter)(
-                    user_id=self.user.id, is_read=False
-                )
-            unread_notifications = await fetch_unread_notifications()
-            unread_notifications_list = list(unread_notifications)
+                return list(Notification.objects.filter(user_id=self.user.id, is_read=False))
+            
+            unread_notifications_list = await fetch_unread_notifications()
+            self.logger.debug(f"Under the fetch_unread_notifications")
+            # unread_notifications_list = list(unread_notifications)
             self.logger.debug(f"In the send_unread_notifications filtered by user")
             if unread_notifications_list:
                 self.logger.debug(f"notifications: {unread_notifications_list}")
