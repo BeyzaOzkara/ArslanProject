@@ -1,3 +1,4 @@
+import re
 import base64, binascii, zlib
 import datetime
 import concurrent.futures
@@ -556,6 +557,16 @@ def qrKalite_deneme(request):
     #     response.status_code = 500 #server error
 
     # return response
+
+def notif(request, noti):
+    s = noti.subject
+    d = noti.message
+    d = d[d.find("(")+1:d.find(")")]
+    if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
+        yuda = YudaForm.objects.filter(YudaNo = d)
+        id = yuda.id
+        return HttpResponseRedirect(f"/yuda/{id}")
+
 
 class qrKaliteView(generic.TemplateView):
     template_name = 'ArslanTakipApp/qrKalite.html'
@@ -1255,10 +1266,25 @@ def yuda_kaydet(request):
                 )
             
             for user in User.objects.exclude(id=request.user.id):
-                Notification.objects.create(
+                notification = Notification.objects.create(
                     user=user,
                     message=f'Yeni bir YUDA ({y.YudaNo}) eklendi.',
                     subject="Yeni YUDA"
+                )
+            
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{request.user.id}',
+                    {
+                        'type': 'send_notification',
+                        'notification': {
+                            'id': notification.id,
+                            'subject': notification.subject,
+                            'message': notification.message,
+                            'is_read': notification.is_read,
+                            'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
+                        },
+                    }
                 )
 
             # Trigger a notification when a new blog is added to YUDA
