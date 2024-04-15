@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import logging
+from asgiref.sync import sync_to_async
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     logger = logging.getLogger(__name__)
@@ -64,19 +65,16 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def send_unread_notifications(self):
         try:
             from .models import Notification
-            try:
-                unread_notifications = Notification.objects.filter(user_id=self.user.id, is_read = False)
-                self.logger.debug(f"In the send_unread_notifications filtered by user")
-                for notification in unread_notifications:
-                    self.logger.debug(f"Notification is: {notification}")
-                    await self.send_notification({'notification': {
-                        'id': notification.id,
-                        'message': notification.message,
-                        'is_read': notification.is_read,
-                        'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
-                    }})
-                    self.logger.debug(f"Notification is sent {notification}")
-            except Exception as e:
-                self.logger.debug(f"Error fetching unread notifications: {e}")
-        except Notification.DoesNotExist:
-            self.logger.debug("Notification Does Not Exist")
+            unread_notifications = await sync_to_async(Notification.objects.filter)(user_id=self.user.id, is_read = False)
+            self.logger.debug(f"In the send_unread_notifications filtered by user")
+            for notification in unread_notifications:
+                self.logger.debug(f"Notification is: {notification}")
+                await self.send_notification({'notification': {
+                    'id': notification.id,
+                    'message': notification.message,
+                    'is_read': notification.is_read,
+                    'timestamp': notification.timestamp.strftime('%d-%m-%Y %H:%M'),
+                }})
+                self.logger.debug(f"Notification is sent {notification}")
+        except Exception as e:
+            self.logger.debug(f"Error fetching unread notifications: {e}")
