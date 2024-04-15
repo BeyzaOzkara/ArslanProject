@@ -559,7 +559,7 @@ def qrKalite_deneme(request):
     # return response
 
 def notif(request, id):
-    n = Notification.objects.filter(id = id)
+    n = Notification.objects.get(id = id)
     s = n.subject
     d = n.message
     d = d[d.find("(")+1:d.find(")")]
