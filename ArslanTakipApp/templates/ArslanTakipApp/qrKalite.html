@@ -33,7 +33,6 @@
     const notificationCount = document.getElementById('notification-count');
 
     socket.onmessage = function(event) {
-        console.log(event);
         const data = JSON.parse(event.data);
         console.log(data);
         if (data.type === 'notification') {
@@ -51,7 +50,7 @@
             notificationList.appendChild(notificationElement);
 
             // Update notification count
-            if (notificationCount.innerText == "") {nCount.innerText = 0;};
+            if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
         }
     };
