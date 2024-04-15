@@ -518,7 +518,7 @@ def qrKalite_deneme(request):
     try: 
         notification = Notification.objects.create(
             user=user,
-            message=f'Yeni bir YUDA (deneme) eklendi.',
+            message=f'Beyza Özkara bir YUDA (24-092-18) ekledi.',
             subject="Yeni YUDA"
         )
         channel_layer = get_channel_layer()
@@ -561,13 +561,10 @@ def qrKalite_deneme(request):
 def notif(request, id):
     n = Notification.objects.get(id = id)
     s = n.subject
-    d = n.message
-    d = d[d.find("(")+1:d.find(")")]
     if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
-        yuda = YudaForm.objects.get(YudaNo = d)
-        yId = yuda.id
+        d = n.message[n.message.find("(")+1:n.message.find(")")]
+        yId = YudaForm.objects.get(YudaNo = d).id
         return HttpResponseRedirect(f"/yudaDetail/{yId}")
-
 
 class qrKaliteView(generic.TemplateView):
     template_name = 'ArslanTakipApp/qrKalite.html'
@@ -1266,10 +1263,11 @@ def yuda_kaydet(request):
                     Note = "",
                 )
             
+            acanKisi = get_user_full_name(request.user.id)
             for user in User.objects.exclude(id=request.user.id):
                 notification = Notification.objects.create(
                     user=user,
-                    message=f'Yeni bir YUDA ({y.YudaNo}) eklendi.',
+                    message=f'{acanKisi} bir YUDA ({y.YudaNo}) ekledi.',
                     subject="Yeni YUDA"
                 )
             
