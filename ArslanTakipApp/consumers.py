@@ -63,8 +63,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def send_unread_notifications(self):
         try:
+            self.logger.debug(f"In the send_unread_notifications")
             from .models import Notification
-            unread_notifications = await Notification.objects.filter(user=self.user, is_read = False)
+            self.logger.debug(f"In the send_unread_notifications imported model Notification")
+            unread_notifications = await Notification.objects.filter(user_id=self.user.id, is_read = False)
+            self.logger.debug(f"In the send_unread_notifications filtered by user")
             for notification in unread_notifications:
                 self.logger.debug(f"Notification is: {notification}")
                 await self.send_notification({'notification': {
