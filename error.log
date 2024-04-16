@@ -11622,3 +11622,109 @@ LINE 1: ...lindi" IS NULL AND "ArslanTakipApp_yudaform"."id" IN (SELECT...
 HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
 
 [35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Dosya%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%22logo%22%7D%5D%7D 500 [0.13, 127.0.0.1:65089][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.09, 127.0.0.1:62427][0m
+Internal Server Error: /qr/deneme
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 520, in qrKalite_deneme
+    allowed_groups = list(y.groups.all())
+                          ^^^^^^^^
+AttributeError: 'YudaForm' object has no attribute 'groups'
+[35;1mHTTP GET /qr/deneme 500 [0.12, 127.0.0.1:55800][0m
+Internal Server Error: /qr/deneme
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 524, in qrKalite_deneme
+    allowed_groups = [perm.group for perm in object_perms]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 524, in <listcomp>
+    allowed_groups = [perm.group for perm in object_perms]
+                      ^^^^^^^^^^
+AttributeError: 'UserObjectPermission' object has no attribute 'group'
+[35;1mHTTP GET /qr/deneme 500 [0.08, 127.0.0.1:54462][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.13, 127.0.0.1:57047][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.13, 127.0.0.1:51237][0m
+Internal Server Error: /qr/deneme
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 525, in qrKalite_deneme
+    allowed_groups = [perm.group for perm in object_perms]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 525, in <listcomp>
+    allowed_groups = [perm.group for perm in object_perms]
+                      ^^^^^^^^^^
+AttributeError: 'UserObjectPermission' object has no attribute 'group'
+[35;1mHTTP GET /qr/deneme 500 [0.09, 127.0.0.1:51127][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.14, 127.0.0.1:58150][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.15, 127.0.0.1:64496][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.28, 127.0.0.1:64589][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.22, 127.0.0.1:55591][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.33, 127.0.0.1:54803][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.37, 127.0.0.1:55352][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.32, 127.0.0.1:49655][0m
+Internal Server Error: /qr/deneme
+[35;1mHTTP GET /qr/deneme 500 [4.40, 127.0.0.1:57354][0m

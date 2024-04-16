@@ -25,6 +25,7 @@ from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
+from guardian.models import UserObjectPermission, GroupObjectPermission
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
 from django.db import transaction 
 from channels.layers import get_channel_layer
@@ -514,33 +515,47 @@ def qrKalite(request):
 def qrKalite_deneme(request):
     user = request.user
     message = "Yuda Kaydet"
-    y = YudaForm.objects.get(id=102)
-    # Get the groups that the Yuda object has given permissions to
-    allowed_groups = list(y.groups.all())
-    print(allowed_groups)
+    y = YudaForm.objects.get(id=107)
+
+    # object_perms = GroupObjectPermission.objects.filter(object_pk=y.id, content_type__model='yudaform', permission__codename='gorme_yuda')
+    # allowed_groups = list(set([perm.group for perm in object_perms]))
+    # print(allowed_groups)
+
+    # groups_with_perms = get_groups_with_perms(y, attach_perms=True)
+    # allowed_groups = [group for group, perms in groups_with_perms.items() if 'gorme_yuda' in perms]
+
+    # allowed_users = []
+    # for group in allowed_groups:
+    #     group_users = group.user_set.all()  # Assuming 'user_set' is the related manager for users in a group
+    #     allowed_users.extend(group_users)
+
+    allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
     try: 
-        notification = Notification.objects.create(
-            user=user,
-            message=f'Beyza Özkara^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
-            where_id=102,
-            subject="Yeni YUDA"
-        )
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f'notifications_{request.user.id}',
-            {
-                'type': 'send_notification',
-                'notification': {
-                    'id': notification.id,
-                    'subject': notification.subject,
-                    'message': notification.message,
-                    'where_id': notification.where_id,
-                    'is_read': notification.is_read,
-                    'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
-                },
-            }
-        )
+        # for u in allowed_users:
+        for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
+            print(u)
+            # notification = Notification.objects.create(
+            #     user=u,
+            #     message=f'Beyza Özkara^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+            #     where_id=102,
+            #     subject="Yeni YUDA"
+            # )
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     f'notifications_{request.user.id}',
+            #     {
+            #         'type': 'send_notification',
+            #         'notification': {
+            #             'id': notification.id,
+            #             'subject': notification.subject,
+            #             'message': notification.message,
+            #             'where_id': notification.where_id,
+            #             'is_read': notification.is_read,
+            #             'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
+            #         },
+            #     }
+            # )
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
         response = JsonResponse({'error': str(e)})
@@ -1251,10 +1266,13 @@ def yuda_kaydet(request):
                     Note = "",
                 )
             
+            # for user in User.objects.exclude(id=request.user.id):
             acanKisi = get_user_full_name(request.user.id)
-            for user in User.objects.exclude(id=request.user.id):
+            allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
+
+            for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
                 notification = Notification.objects.create(
-                    user=user,
+                    user=u,
                     message=f'{acanKisi}^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
                     subject=f"Yeni YUDA",
                     where_id=y.id,
@@ -1676,9 +1694,11 @@ def yudaDetailComment(request):
                 )
 
             acanKisi = get_user_full_name(request.user.id)
-            for user in User.objects.exclude(id=request.user.id):
+            allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
+
+            for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
                 notification = Notification.objects.create(
-                    user=user,
+                    user=u,
                     message=f'{acanKisi}^{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
                     subject=f"Yeni YUDA Yorum",
                     where_id=y.id,
