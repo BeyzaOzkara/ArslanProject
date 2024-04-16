@@ -565,10 +565,10 @@ def notif(request, id):
     n = Notification.objects.get(id = id)
     s = n.subject
     if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
-        yId = YudaForm.objects.get(id=n.where_id)
+        # yId = YudaForm.objects.get(id=n.where_id).id
         # d = n.message[n.message.find("(")+1:n.message.find(")")]
         # yId = YudaForm.objects.get(YudaNo = d).id
-        return HttpResponseRedirect(f"/yudaDetail/{yId}")
+        return HttpResponseRedirect(f"/yudaDetail/{n.where_id}")
 
 class qrKaliteView(generic.TemplateView):
     template_name = 'ArslanTakipApp/qrKalite.html'
