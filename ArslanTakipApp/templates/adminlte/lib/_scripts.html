@@ -13,4 +13,65 @@
 <script src="{% static 'admin-lte/dist/js/adminlte.min.js' %}"></script>
 <script src="{% static 'admin-lte/dist/js/demo.js' %}"></script>
 
+<script>
+    const socket = new WebSocket('ws://arslan/ws/notifications/');
+
+    socket.onopen = function(e) {
+        console.log("open");
+    }
+
+    socket.onclose = function(e) {
+        console.log("close")
+    };
+
+    const notificationsDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.type === 'notification') {
+            const notification = data.notification;
+            const str = notification.message.split("^");
+            const notificationElement = document.createElement('a');
+            notificationElement.classList.add('dropdown-item');
+            notificationElement.href = `/notif/${notification.id}`;
+            notificationElement.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <i class="fas fa-file mr-2"></i>
+                        ${str[0]}
+                    </div>
+                    <small>${notification.timestamp}</small>
+                </div>
+                <div>${str[1]}</div>
+                <div class="dropdown-divider"></div>
+            `;
+            notificationList.appendChild(notificationElement);
+
+            // Update notification count
+            if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
+            notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
+
+            notificationElement.addEventListener('click', function() {
+                markNotificationAsRead(notification.id);
+            });
+
+            const maxNotifications = 5; // Change this to your desired limit
+            if (notificationList.children.length > maxNotifications) {
+                notificationList.style.overflowY = 'auto'; // Enable vertical scrolling
+                notificationList.style.maxHeight = '320px'; // Set a max height for the scrollable area
+            }
+        }
+    };
+
+    function markNotificationAsRead(notificationId) {
+        const data = {
+            type: 'mark_as_read',
+            notification_id: notificationId
+        };
+        socket.send(JSON.stringify(data));
+    };
+</script>
+
 {% endblock %}

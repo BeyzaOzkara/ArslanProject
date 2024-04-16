@@ -18,7 +18,6 @@
 {% include 'adminlte/lib/_scripts.html' %}
 <script>
     const socket = new WebSocket('ws://arslan/ws/notifications/');
-    console.log(socket);
 
     socket.onopen = function(e) {
         console.log("open");
@@ -34,7 +33,6 @@
 
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log(data);
         if (data.type === 'notification') {
             const notification = data.notification;
             const str = notification.message.split("^");
@@ -69,29 +67,6 @@
             }
         }
     };
-
-    // socket.onmessage = function(event) { //düzenlenecek
-    //     const data = JSON.parse(event.data);
-    //     console.log("DATA: ", data);
-    //     document.getElementById('de').innerHTML = data.message;
-
-    //     if (data.type != "connection_established") {
-    //         const notificationList = document.getElementById('notification-list');
-    //         const nCount = document.getElementById('notification-count');
-
-    //         // // Update notification count
-    //         if (nCount.innerText == "") {nCount.innerText = 0;};
-    //         nCount.innerText = parseInt(nCount.innerText) + 1; //data.message;
-
-    //         // Add new notification to the list
-    //         const newNotification = document.createElement('a');
-    //         newNotification.classList.add('dropdown-item');
-    //         newNotification.href = '#';
-    //         newNotification.innerHTML = `<i class="fas fa-envelope mr-2"></i> ${data.message}<span class="float-right text-muted text-sm">3 dk</span>`;
-    //         notificationList.insertBefore(newNotification, data.firstChild);
-    //     }
-        
-    // };
 
     function markNotificationAsRead(notificationId) {
         const data = {
