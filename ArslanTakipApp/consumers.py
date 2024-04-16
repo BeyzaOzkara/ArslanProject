@@ -33,7 +33,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message_type = data_json.get('type')
-        self.logger.debug(f"Received message")
         if message_type == 'mark_as_read':
             notification_id = data_json.get('notification_id')
             self.logger.debug(f"Received message with type mark_as_read")
@@ -57,11 +56,14 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         try:
             from .models import Notification
             @database_sync_to_async
-            def get_noti():
+            def get_notification(notification_id):
+                self.logger.debug(f"Get notification in mark_As_Read")
                 return Notification.objects.get(id=notification_id)
-            notification = await get_noti()
+
+            notification = await get_notification(notification_id)
+            self.logger.debug(f"After get notif in mark_As_Read")
             if notification.user == self.user and not notification.is_read:
-                notification.is_read =True
+                notification.is_read = True
                 await notification.save()
         except Exception as e:
             self.logger.debug(f"Error mark notification as read: {e}")
