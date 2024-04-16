@@ -58,13 +58,13 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             @database_sync_to_async
             def get_notification(notification_id):
                 self.logger.debug(f"Get notification in mark_As_Read")
-                return Notification.objects.get(id=notification_id)
-
-            notification = await get_notification(notification_id)
+                notification = Notification.objects.get(id=notification_id)
+                if notification.user == self.user and not notification.is_read:
+                    notification.is_read = True
+                    notification.save()
+                return True
+            await get_notification(notification_id)
             self.logger.debug(f"After get notif in mark_As_Read")
-            if notification.user == self.user and not notification.is_read:
-                notification.is_read = True
-                await database_sync_to_async(notification.save)()
         except Exception as e:
             self.logger.debug(f"Error mark notification as read: {e}")
 
