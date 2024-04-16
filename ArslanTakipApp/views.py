@@ -515,6 +515,9 @@ def qrKalite_deneme(request):
     user = request.user
     message = "Yuda Kaydet"
     y = YudaForm.objects.get(id=102)
+    # Get the groups that the Yuda object has given permissions to
+    allowed_groups = list(y.groups.all())
+    print(allowed_groups)
 
     try: 
         notification = Notification.objects.create(
@@ -544,22 +547,6 @@ def qrKalite_deneme(request):
         response.status_code = 500 #server error
 
     return response
-
-    # try:
-    #     channel_layer = get_channel_layer()
-    #     channel_layer.group_send(
-    #         'notifications_group',  # Name of the WebSocket group for notifications
-    #         {
-    #             'type': 'send_notification',
-    #             'message': 'QR Page!'  # Notification message
-    #         }
-    #     )
-    #     response = JsonResponse({'message': "gitti"})
-    # except Exception as e:
-    #     response = JsonResponse({'error': str(e)})
-    #     response.status_code = 500 #server error
-
-    # return response
 
 def notif(request, id):
     n = Notification.objects.get(id = id)
@@ -1289,15 +1276,6 @@ def yuda_kaydet(request):
                     }
                 )
 
-            # Trigger a notification when a new blog is added to YUDA
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     'notifications_group',  # Name of the WebSocket group for notifications
-            #     {
-            #         'type': 'send_notification',
-            #         'message': 'New blog added to YUDA!'  # Notification message
-            #     }
-            # )
             response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
