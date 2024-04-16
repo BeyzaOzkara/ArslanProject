@@ -16,34 +16,8 @@
   {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" href="{% static 'ArslanTakipApp/icons.css' %}">
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
   <style>
-    #filterPanelOverlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-        z-index: 999; /* Ensure it overlays other content */
-    }
-
-    #filterPanel {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    }
-
-    #filterPanel input[type="text"] {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
     #applyFilter {
         display: block;
         width: 100%;
@@ -64,29 +38,86 @@
             <i class="fas fa-plus"></i></button>
           </a>
       </div>
-      <div id="filterPanelOverlay">
-        <div id="filterPanel">
-            <!-- Filter options -->
-            <label for="yudaNoFilter">Yuda No: </label>
-            <input type="text" id="yudaNoFilter" name="yudaNoFilter" class="form-control mb-2">
-            <label for="musteriFirmaFilter">Müşteri Firma: </label>
-            <input type="text" id="musteriFirmaFilter" name="musteriFirmaFilter" class="form-control mb-2">
-            <label for="musteriTemsilcisiSelect">Müşteri Temsilcisi: </label>
-            <select class="form-control mb-2" id="musteriTemsilcisiSelect" name="musteriTemsilcisiSelect" data-placeholder="Seçim Yapınız"></select>
-            <div class="form-group">
-              <label for="bolumFilter">Bölüm: </label>
-              <select class="select2bs4 form-control mb-2" multiple="multiple" id="bolumFilter" name="bolumFilter" data-placeholder="Seçim Yapınız" style="width: 100%;">
-                <option></option>
-                <option value="Boya">Boya</option>
-                <option value="Eloksal">Eloksal</option>
-                <option value="Mekanik Islem">Mekanik İşlem</option>
-              </select>
+      <div class="modal fade" id="filterPanelModal" tabindex="-1" aria-labelledby="searchModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Filtre</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
-            <label for="dosyaFilter">Dosya Adı: </label>
-            <input type="text" id="dosyaFilter" name="dosyaFilter" class="form-control mb-2">
-            <button id="applyFilter" class="btn btn-success">Filtre Uygula</button>
+            <div class="modal-body" id="filterPan">
+                <!-- Filter options -->
+                <div class="row">
+                  <div class="form-group col-lg-6">
+                    <label for="yudaNoFilter">Yuda No: </label>
+                    <input type="text" id="yudaNoFilter" name="yudaNoFilter" class="form-control mb-2">
+                  </div>
+                  <div class="form-group col-lg-6">
+                    <label for="musteriFirmaFilter">Müşteri Firma: </label>
+                    <input type="text" id="musteriFirmaFilter" name="musteriFirmaFilter" class="form-control mb-2">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-lg-6">
+                    <label for="musteriTemsilcisiSelect">Müşteri Temsilcisi: </label>
+                    <select class="form-control mb-2" id="musteriTemsilcisiSelect" name="musteriTemsilcisiSelect" data-placeholder="Seçim Yapınız"></select>
+                  </div>
+                  <div class="form-group col-lg-6">
+                    <label for="bolumFilter">Bölüm: </label>
+                    <select class="select2bs4 form-control mb-2" multiple="multiple" id="bolumFilter" name="bolumFilter" data-placeholder="Seçim Yapınız" style="width: 100%;">
+                      <option></option>
+                      <option value="Boya">Boya</option>
+                      <option value="Eloksal">Eloksal</option>
+                      <option value="Mekanik Islem">Mekanik İşlem</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-lg-6">
+                    <label for="dosyaFilter">Dosya Adı: </label>
+                    <input type="text" id="dosyaFilter" name="dosyaFilter" class="form-control mb-2">
+                  </div>
+                  <div class="form-group col-lg-6">
+                    <label for="cizimFilter">Çizim No: </label>
+                    <input type="text" id="cizimFilter" name="cizimFilter" class="form-control mb-2">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-lg-6 mb-2">
+                    <label for="cizimFilter">Tarih: </label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="far fa-calendar-alt"></i>
+                        </span>
+                      </div>
+                      <input type="text" class="form-control float-right" name="tarihFilter" data-field="Tarih" id="tarihFilter">
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-6 mb-2">
+                    <label for="cizimFilter">Son Yorum: </label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="far fa-calendar-alt"></i>
+                        </span>
+                      </div>
+                      <input type="text" class="form-control float-right" name="guncelTarihFilter" data-field="GüncelTarih" id="guncelTarihFilter">
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="btnTemizle" class="btn btn-secondary">Temizle</button>
+              <button type="button" id="applyFilter" class="btn btn-primary">Filtre Uygula</button>
+            </div>
+
+          </div>
         </div>
-    </div>
+
+      </div>
     </div>
     <div class="card-body">
         <table class="table table-striped projects">
@@ -151,9 +182,24 @@
     let filterList = [];
     const tableBody = $('#yudaTBody');
 
-  $(document).ready(function() {
     $('#filterButton').click(function() {
-        $('#filterPanelOverlay').toggle();
+        $('#filterPanelModal').modal('show');
+    });
+
+    var tarihFilterList = {};
+    var guncelTarihFilterList = {};
+    $('#tarihFilter').on('apply.daterangepicker', function(ev, picker) {
+      var start = picker.startDate;
+      var end = picker.endDate;
+      tarihFilterList ={ field: "Tarih", type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')};
+      $( "#tarihFilter" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
+    });
+
+    $('#guncelTarihFilter').on('apply.daterangepicker', function(ev, picker) {
+      var start = picker.startDate;
+      var end = picker.endDate;
+      guncelTarihFilterList ={ field: "GüncelTarih", type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')};
+      $( "#guncelTarihFilter" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
     });
 
     $('#applyFilter').click(function() {
@@ -162,7 +208,9 @@
         const bolumFilter = $('#bolumFilter').val();
         const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
         const dosyaFilter = $('#dosyaFilter').val();
-        console.log(dosyaFilter);
+        const cizimFilter = $('#cizimFilter').val();
+        const tarihFilter = $('#tarihFilter').val();
+        const guncelTarihFilter = $('#guncelTarihFilter').val();
         filterList = [];
 
         if (yudaNoFilter != "") {
@@ -179,24 +227,73 @@
             filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
           }
         };
-        console.log(musteriTemsilcisiSelect)
         if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
           filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
         };
         if (dosyaFilter != "") {
           filterList.push({ field: 'Dosya', type:'like', value: dosyaFilter });
         };
+        if (cizimFilter != "") {
+          filterList.push({ field: 'CizimNo', type:'like', value: cizimFilter });
+        };
+        if (tarihFilter != "") {
+          filterList.push(tarihFilterList);
+        }
+        if (guncelTarihFilter != "") {
+          filterList.push(guncelTarihFilterList);
+        }
         
         loadPage(1);
 
-        // Hide the filter panel after applying filter
-        $('#filterPanelOverlay').hide();
+        $('#filterPanelModal').modal('hide');
+    });
+
+    document.getElementById('btnTemizle').addEventListener('click', () => {
+      $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #cizimFilter, #dosyaFilter, #tarihFilter').val("");
+      $('#bolumFilter').val([]).trigger('change');
     });
   
     $('.select2bs4').select2({
       theme: 'bootstrap4',
       allowClear: true
     });
+
+  $('#tarihFilter, #guncelTarihFilter').daterangepicker({
+    "locale": {
+      "format": "DD-MM-YYYY",
+      "separator": " | ",
+      "applyLabel": "Uygula",
+      "cancelLabel": "İptal Et",
+      "fromLabel": "From",
+      "toLabel": "To",
+      "customRangeLabel": "Custom",
+      "weekLabel": "H",
+      "daysOfWeek": [
+          "Pa",
+          "Pt",
+          "Sa",
+          "Ça",
+          "Pe",
+          "Cu",
+          "Ct"
+      ],
+      "monthNames": [
+          "Ocak",
+          "Şubat",
+          "Mart",
+          "Nisan",
+          "Mayıs",
+          "Haziran",
+          "Temmuz",
+          "Ağustos",
+          "Eylül",
+          "Ekim",
+          "Kasım",
+          "Aralık"
+      ],
+      "firstDay": 1,
+      
+    },"autoUpdateInput": false,
   });
 
   function getTemsilci(data){
@@ -396,5 +493,6 @@
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
 <script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
-
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
 {% endblock %}

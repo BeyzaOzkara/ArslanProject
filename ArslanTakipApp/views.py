@@ -1337,9 +1337,16 @@ def yudas_list(request):
             elif i['field'] == 'Dosya':
                 file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
                 q['id__in'] = list(file_ids)
+            elif i['field'] == 'Tarih' or i['field'] == 'GüncelTarih': #type = start date, value=finish date
+                print("burda")
+                if i['type'] != i['value']:
+                    q[i['field'] + "__gte"] = i['type']
+                    q[i['field'] + "__lt"] = i['value'] + ' 23:59:59'
+                else:
+                    q[i['field'] + "__startswith"] = i['value']
             else:
                 q = filter_method(i, q)
-    
+    print(q)
     filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
     yudaList = list(filtered_yudas.values()[offset:limit])
     

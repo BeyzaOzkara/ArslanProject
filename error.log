@@ -11786,3 +11786,471 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute 'strftime'
 [35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D 500 [0.10, 127.0.0.1:64853][0m
+Internal Server Error: /kalip/liste
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 258, in kalip_liste
+    c['SonTeniferTarih'] = format_date_time_s(c['SonTeniferTarih'])
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 87, in format_date_time_s
+    return date.strftime("%d-%m-%y %H:%M:%S")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: format %y requires year >= 1900 on Windows
+[35;1mHTTP GET /kalip/liste?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:30%7D 500 [0.28, 127.0.0.1:53306][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1100, in kalipfirini_meydan
+    loc_id = loc.get(locationName__contains = "MEYDAN").id
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D 500 [0.07, 127.0.0.1:53305][0m
+Internal Server Error: /siparis/child/BÝLLET TALAÞI
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 812, in siparis_child
+    k = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.DiesLocation.DoesNotExist: DiesLocation matching query does not exist.
+[35;1mHTTP GET /siparis/child/B%C4%B0LLET%20TALA%C5%9EI 500 [0.48, 127.0.0.1:51051][0m
+Internal Server Error: /siparis/child/BÝLLET TALAÞI
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 812, in siparis_child
+    k = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.DiesLocation.DoesNotExist: DiesLocation matching query does not exist.
+[35;1mHTTP GET /siparis/child/B%C4%B0LLET%20TALA%C5%9EI 500 [0.26, 127.0.0.1:62257][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1341, in yudas_list
+    q[['field'] + "__gte"] = ['type']
+      ~~~~~~~~~~^~~~~~~~~
+TypeError: can only concatenate list (not "str") to list
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.11, 127.0.0.1:51347][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1341, in yudas_list
+    q[['field'] + "__gte"] = ['type']
+      ~~~~~~~~~~^~~~~~~~~
+TypeError: can only concatenate list (not "str") to list
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-16%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.09, 127.0.0.1:57120][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1346, in yudas_list
+    filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1534, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1565, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1480, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1307, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\lookups.py", line 27, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\lookups.py", line 85, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\fields\__init__.py", line 1585, in get_prep_value
+    value = super().get_prep_value(value)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\fields\__init__.py", line 1464, in get_prep_value
+    return self.to_python(value)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\fields\__init__.py", line 1546, in to_python
+    parsed = parse_datetime(value)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\utils\dateparse.py", line 114, in parse_datetime
+    return datetime.datetime.fromisoformat(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: fromisoformat: argument must be str
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-16%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.13, 127.0.0.1:57932][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1343, in yudas_list
+    q["Tarih__lt"] = i['value'] + datetime.timedelta(days=1)
+                     ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "datetime.timedelta") to str
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.12, 127.0.0.1:57487][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1343, in yudas_list
+    q["Tarih__lt"] = i['value'] + datetime.timedelta(days=1)
+                     ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "datetime.timedelta") to str
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A150%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.10, 127.0.0.1:57487][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1343, in yudas_list
+    q["Tarih__lt"] = (i['value'] + datetime.timedelta(days=1))
+                      ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "datetime.timedelta") to str
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.10, 127.0.0.1:63224][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1343, in yudas_list
+    print(i['value'] + datetime.timedelta(days=1))
+          ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "datetime.timedelta") to str
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.11, 127.0.0.1:60586][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1343, in yudas_list
+    end = datetime.strptime(i['value'], '%Y-%m-%d')
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'datetime' has no attribute 'strptime'
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.09, 127.0.0.1:60501][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1343, in yudas_list
+    end = datetime.strptime(i['value'], '%Y-%m-%d')
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'datetime' has no attribute 'strptime'
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.12, 127.0.0.1:57542][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1342, in yudas_list
+    end = i['value'].strptime('%Y-%m-%d')
+          ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'strptime'
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Tarih%22%2C%22type%22%3A%222024-04-15%22%2C%22value%22%3A%222024-04-16%22%7D%5D%7D 500 [0.11, 127.0.0.1:55299][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1329, in yudas_list
+    if i['field'] == 'Bolum':
+       ~^^^^^^^^^
+KeyError: 'field'
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%7D%5D%7D 500 [0.11, 127.0.0.1:50606][0m
+Internal Server Error: /yudas/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1329, in yudas_list
+    if i['field'] == 'Bolum':
+       ~^^^^^^^^^
+KeyError: 'field'
+[35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%7D%5D%7D 500 [0.11, 127.0.0.1:59909][0m
