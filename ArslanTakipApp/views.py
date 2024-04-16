@@ -514,11 +514,13 @@ def qrKalite(request):
 def qrKalite_deneme(request):
     user = request.user
     message = "Yuda Kaydet"
+    y = YudaForm.objects.get(id=102)
 
     try: 
         notification = Notification.objects.create(
             user=user,
-            message=f'Beyza Özkara^Yeni bir YUDA (24-092-18) ekledi.',
+            message=f'Beyza Özkara^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+            where_id=102,
             subject="Yeni YUDA"
         )
         channel_layer = get_channel_layer()
@@ -530,6 +532,7 @@ def qrKalite_deneme(request):
                     'id': notification.id,
                     'subject': notification.subject,
                     'message': notification.message,
+                    'where_id': notification.where_id,
                     'is_read': notification.is_read,
                     'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
                 },
@@ -562,8 +565,9 @@ def notif(request, id):
     n = Notification.objects.get(id = id)
     s = n.subject
     if s == "Yeni YUDA" or s == "Yeni YUDA Yorum":
-        d = n.message[n.message.find("(")+1:n.message.find(")")]
-        yId = YudaForm.objects.get(YudaNo = d).id
+        yId = YudaForm.objects.get(id=n.where_id)
+        # d = n.message[n.message.find("(")+1:n.message.find(")")]
+        # yId = YudaForm.objects.get(YudaNo = d).id
         return HttpResponseRedirect(f"/yudaDetail/{yId}")
 
 class qrKaliteView(generic.TemplateView):
@@ -1267,8 +1271,9 @@ def yuda_kaydet(request):
             for user in User.objects.exclude(id=request.user.id):
                 notification = Notification.objects.create(
                     user=user,
-                    message=f'{acanKisi}^Yeni bir YUDA ({y.YudaNo}) ekledi.',
-                    subject=f"Yeni YUDA"
+                    message=f'{acanKisi}^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+                    subject=f"Yeni YUDA",
+                    where_id=y.id,
                 )
             
                 channel_layer = get_channel_layer()
@@ -1280,6 +1285,7 @@ def yuda_kaydet(request):
                             'id': notification.id,
                             'subject': notification.subject,
                             'message': notification.message,
+                            'where_id': notification.where_id,
                             'is_read': notification.is_read,
                             'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
                         },
@@ -1692,6 +1698,31 @@ def yudaDetailComment(request):
                     FileSize = file.size,
                     UploadedBy = c.Kullanici,
                     Note = "",
+                )
+
+            acanKisi = get_user_full_name(request.user.id)
+            for user in User.objects.exclude(id=request.user.id):
+                notification = Notification.objects.create(
+                    user=user,
+                    message=f'{acanKisi}^{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
+                    subject=f"Yeni YUDA Yorum",
+                    where_id=y.id,
+                )
+            
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{request.user.id}',
+                    {
+                        'type': 'send_notification',
+                        'notification': {
+                            'id': notification.id,
+                            'subject': notification.subject,
+                            'message': notification.message,
+                            'where_id': notification.where_id,
+                            'is_read': notification.is_read,
+                            'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
+                        },
+                    }
                 )
             
             response = JsonResponse({'message': 'Kayıt başarılı'})
