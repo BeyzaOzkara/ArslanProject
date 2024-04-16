@@ -44,7 +44,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def send_notification(self, event):
         notification_data = event['notification']
         # Send notification data to the WebSocket if it's unread
-        self.logger.debug(f"Sent notification start: {notification_data['id']}")
         if not notification_data['is_read']:
             await self.send(text_data=json.dumps({
                 'type': 'notification',
@@ -57,14 +56,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             from .models import Notification
             @database_sync_to_async
             def get_notification(notification_id):
-                self.logger.debug(f"Get notification in mark_As_Read")
                 notification = Notification.objects.get(id=notification_id)
                 if notification.user == self.user and not notification.is_read:
                     notification.is_read = True
                     notification.save()
                 return True
             await get_notification(notification_id)
-            self.logger.debug(f"After get notif in mark_As_Read")
         except Exception as e:
             self.logger.debug(f"Error mark notification as read: {e}")
 
@@ -73,7 +70,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             from .models import Notification
             @database_sync_to_async
             def fetch_unread_notifications():
-                return list(Notification.objects.filter(user_id=self.user.id, is_read=False))
+                return list(Notification.objects.filter(user_id=self.user.id, is_read=False).order_by("timestamp"))
             
             unread_notifications_list = await fetch_unread_notifications()
             for notification in unread_notifications_list:
