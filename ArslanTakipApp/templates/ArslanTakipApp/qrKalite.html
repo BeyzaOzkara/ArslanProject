@@ -40,7 +40,7 @@
             const str = notification.message.split("^");
             const notificationElement = document.createElement('a');
             notificationElement.classList.add('dropdown-item');
-            notificationElement.href = `/yudaDetail/${notification.where_id}`;
+            notificationElement.href = `/notif/${notification.id}`;
             notificationElement.innerHTML = `
                 <div class="d-flex justify-content-between">
                     <div>
