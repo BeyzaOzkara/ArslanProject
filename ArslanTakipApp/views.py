@@ -1345,7 +1345,9 @@ def yudas_list(request):
     
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
-        o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+        if o['GüncelTarih'] != None:
+            o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+        else: o['GüncelTarih'] = ""
         # o['MusteriFirmaAdi'] = o['MusteriFirmaAdi'][:15]
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
