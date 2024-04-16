@@ -84,10 +84,10 @@ def get_user_full_name(user_id):
     return f"{user.first_name} {user.last_name}"
 
 def format_date_time_s(date):
-    return date.strftime("%d-%m-%Y %H:%M:%S")
+    return date.strftime("%d-%m-%y %H:%M:%S")
 
 def format_date_time(date):
-    return date.strftime("%d-%m-%Y %H:%M")
+    return date.strftime("%d-%m-%y %H:%M")
 
 def format_date(date):
     return date.strftime("%d-%m-%Y")
@@ -1322,7 +1322,6 @@ def yudas_list(request):
     temsilciler = User.objects.filter(Q(groups__name = "Yurt Ici Satis Bolumu") | Q(groups__name = "Yurt Disi Satis Bolumu"))
     temsilci_data = [{'id': user.id, 'full_name': get_user_full_name(user.id)} for user in temsilciler]
 
-    #y = YudaForm.objects.all()
     y = get_objects_for_user(request.user, "gorme_yuda", YudaForm.objects.all()) #user görme yetkisinin olduğu yudaları görsün
 
     if len(filter_list) > 0:
@@ -1346,6 +1345,8 @@ def yudas_list(request):
     
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
+        o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+        # o['MusteriFirmaAdi'] = o['MusteriFirmaAdi'][:15]
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
         for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:

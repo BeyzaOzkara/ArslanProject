@@ -95,20 +95,26 @@
                     <th style="width: 1%">
                         #
                     </th>
-                    <th style="width: 15%">
-                        YUDA NO
+                    <th style="width: 7%">
+                        YUDA
                     </th>
-                    <th style="width: 15%;">
+                    <th style="width: 11%;">
                         Müşteri Firma
                     </th>
-                    <th style="width: 12%;">
+                    <th style="width: 8%;">
+                        Çizim No
+                    </th>
+                    <th style="width: 10%;">
                         Müşteri Temsilcisi
                     </th>
-                    <th style="width: 39%;">
+                    <th style="width: 38%;">
                         Onay
                     </th>
                     <th style="width: 8%" class="text-center">
                         Durum
+                    </th>
+                    <th style="width: 7%">
+                        Son Yorum
                     </th>
                     <th style="width: 10%">
                     </th>
@@ -212,16 +218,19 @@
               #
           </td>
           <td>
-              <a href="yudaDetail/${item.id}" style="color: black">
+              <a href="yudaDetail/${item.id}" style="color: black;">
                   ${item.YudaNo}
               </a>
               <br/>
               <small>
-                  ${item.Tarih} tarihinde oluşturuldu
+                  ${item.Tarih}
               </small>
           </td>
           <td>
               <a>${item.MusteriFirmaAdi}</a>
+          </td>
+          <td>
+              <a>${item.CizimNo}</a>
           </td>
           <td>
               <a>${item.MusteriTemsilcisi}</a>
@@ -252,6 +261,9 @@
             }
             html1 +=
             `
+          </td>
+          <td>
+              <a>${item.GüncelTarih}</a>
           </td>
           <td class="project-actions text-right">
               <a class="btn btn-primary btn-sm" href="yudaDetail/${item.id}">

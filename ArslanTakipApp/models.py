@@ -229,7 +229,7 @@ class YudaForm(models.Model):
     YudaAcanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_acankisi", blank=True, null =True)
     Tarih = models.DateTimeField(null=True, blank=True)
     RevTarih = models.DateTimeField(null=True, blank=True) #düzenleme yapıldığındaki tarih
-    GüncelTarih = models.DateTimeField(auto_now=True, null=True, blank=True) #her yeni yorumda güncellensin
+    GüncelTarih = models.DateTimeField(null=True, blank=True) #her yeni yorumda güncellensin
     MusteriFirmaAdi = models.CharField(null=True, blank=True)
     SonKullaniciFirma = models.CharField(null=True, blank=True)
     KullanımAlani = models.CharField(null=True, blank=True)
