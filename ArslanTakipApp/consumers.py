@@ -70,7 +70,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             from .models import Notification
             @database_sync_to_async
             def fetch_unread_notifications():
-                return list(Notification.objects.filter(user_id=self.user.id, is_read=False).order_by("timestamp"))
+                return list(Notification.objects.filter(user_id=self.user.id, is_read=False).order_by("-timestamp"))
             
             unread_notifications_list = await fetch_unread_notifications()
             for notification in unread_notifications_list:
