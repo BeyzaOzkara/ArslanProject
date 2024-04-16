@@ -64,7 +64,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             self.logger.debug(f"After get notif in mark_As_Read")
             if notification.user == self.user and not notification.is_read:
                 notification.is_read = True
-                await notification.save()
+                await database_sync_to_async(notification.save)()
         except Exception as e:
             self.logger.debug(f"Error mark notification as read: {e}")
 
