@@ -28,6 +28,10 @@
     const notificationList = document.getElementById('notification-list');
     const notificationCount = document.getElementById('notification-count');
 
+    let currentColorIndex = 0;
+    const colors = ['badge-color-1', 'badge-color-2', 'badge-color-3']; // Define the colors to cycle through
+
+
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         if (data.type === 'notification') {
@@ -52,6 +56,10 @@
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
+
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+            notificationCount.classList.remove(...colors); // Remove all color classes
+            notificationCount.classList.add(colors[currentColorIndex]); // Add new color class
 
             notificationElement.addEventListener('click', function() {
                 markNotificationAsRead(notification.id);
