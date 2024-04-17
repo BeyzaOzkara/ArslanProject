@@ -1988,7 +1988,7 @@ def yudachange(request, yId):
     return response
 
 def all_notifications_view(request):
-    notifications = list(Notification.objects.filter(user=request.user).order_by('-timestamp'))
+    notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
     for n in notifications:
         msg = n["message"].split()
         n["Kisi"] = msg[0]
