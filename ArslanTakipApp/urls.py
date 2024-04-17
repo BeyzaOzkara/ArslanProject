@@ -58,6 +58,7 @@ urlpatterns = [
     path('yudaDetail/<str:yId>', views.yudaDetail, name='yudaDetail'),
     path('yudaDetail2/<str:yId>', views.yudaDetail2, name='yudaDetail2'),
     path('yudaDetailComment', views.yudaDetailComment),
+    path('yudaDCDelete/<str:cId>', views.yudaDCDelete),
     path('yudaDetailAnket', views.yudaDetailAnket),
     path('yudaDetailSvg', views.yudaDetailSvg),
     path('yudaDelete/<str:yId>', views.yudaDelete, name='yudaDelete'),

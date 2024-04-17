@@ -1338,7 +1338,6 @@ def yudas_list(request):
                 file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
                 q['id__in'] = list(file_ids)
             elif i['field'] == 'Tarih' or i['field'] == 'GüncelTarih': #type = start date, value=finish date
-                print("burda")
                 if i['type'] != i['value']:
                     q[i['field'] + "__gte"] = i['type']
                     q[i['field'] + "__lt"] = i['value'] + ' 23:59:59'
@@ -1739,6 +1738,18 @@ def yudaDetailComment(request):
             response.status_code = 500 #server error
     return response
 
+def yudaDCDelete(request, cId):
+    try:
+        print(cId)
+        comment = Comment.objects.get(id = cId)
+        comment.Silindi = True
+        comment.save()
+        response = JsonResponse({'message': 'Yorum başarıyla silindi.'})
+    except Exception as e:
+        response = JsonResponse({'error': str(e)})
+        response.status_code = 500 #server error
+    return response
+
 def yudaDetailAnket(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     yudaId = params.get("yId")
@@ -1859,12 +1870,11 @@ def yudaDetailSvg(request, path):
     return data
 
 def yudaDelete(request, yId):
-    users = User.objects.values()
     yuda = YudaForm.objects.get(id = yId)
     yuda.Silindi = True
+    yuda.Silindi_by = request.user
     yuda.save()
     return HttpResponseRedirect("/yudas")
-
 
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)

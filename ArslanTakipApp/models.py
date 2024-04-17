@@ -254,6 +254,7 @@ class YudaForm(models.Model):
     Paketleme = models.CharField(null=True, blank=True)
     PaketlemeAciklama = models.CharField(null=True, blank=True)
     Silindi = models.BooleanField(null=True)
+    Silindi_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null =True)
 
     def __str__(self):
         return self.YudaNo
@@ -337,6 +338,7 @@ class Comment(models.Model):
     Tarih = models.DateTimeField(auto_now=True, null=True, blank=True)
     Aciklama = models.CharField(null=True, blank=True)
     ReplyTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    Silindi = models.BooleanField(null=True, blank=True)
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
