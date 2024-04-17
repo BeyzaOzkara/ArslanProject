@@ -532,6 +532,7 @@
     const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
         const replyForm = replyElement.find(`#replyComment${reply.id}`);
         replyForm.collapse('toggle');
+        $(`#yorumText${reply.id}`).summernote("code", "");
         const sendButton = replyElement.find(`#gonder${reply.id}`);
         sendButton.text('Gönder');
     });
@@ -604,6 +605,7 @@
     const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
         const replyForm = commentElement.find(`#replyComment${comment.id}`);
         replyForm.collapse('toggle');
+        $(`#yorumText${comment.id}`).summernote("code", "");
         const sendButton = commentElement.find(`#gonder${comment.id}`);
         sendButton.text('Gönder');
     });

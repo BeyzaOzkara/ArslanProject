@@ -18,9 +18,8 @@
 
 {% block content %}
     <h1>Bildirimler</h1>
-    <ul>
         {% for notification in notifications %}
-        <div class="callout callout-info">
+        <div class="callout callout-info col-lg-6">
             <div class="d-flex justify-content-between">
                 <div>
                     <i class="fas fa-file mr-2"></i>
@@ -31,5 +30,4 @@
             <div>{{ notification.message }}</div>
         </div>
         {% endfor %}
-    </ul>
 {% endblock %}
