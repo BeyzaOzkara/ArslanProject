@@ -20,6 +20,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import ListView
 from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification
 from django.template import loader
 import json
@@ -1985,6 +1986,14 @@ def yudachange(request, yId):
     
     response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
     return response
+
+def all_notifications_view(request):
+    # Fetch all notifications
+    notifications = Notification.objects.all()
+
+    # Pass the notifications to the template
+    context = {'notifications': notifications}
+    return render(request, 'notifications/notification_list.html', context)
 
 # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla 
 """ for field in changeYuda._meta.fields:

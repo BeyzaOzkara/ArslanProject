@@ -66,4 +66,5 @@ urlpatterns = [
     path('yudaEdit/<str:yId>', views.yudaEdit),
     path('yudachange/<str:yId>', views.yudachange),
     path('notif/<str:id>', views.notif),
+    path('notifications/', views.all_notifications_view)
 ]
