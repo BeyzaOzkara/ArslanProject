@@ -21,8 +21,14 @@
     <ul>
         {% for notification in notifications %}
         <div class="callout callout-info">
-            <h5>{{ notification.timestamp }}</h5>
-            <p>{{ notification.message }}</p>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <i class="fas fa-file mr-2"></i>
+                    deneme
+                </div>
+                <small>{{ notification.timestamp }}</small>
+            </div>
+            <div>{{ notification.message }}</div>
         </div>
         {% endfor %}
     </ul>
