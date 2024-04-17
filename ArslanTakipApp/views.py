@@ -1989,7 +1989,7 @@ def yudachange(request, yId):
 
 def all_notifications_view(request):
     # Fetch all notifications
-    notifications = Notification.objects.all()
+    notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')
 
     # Pass the notifications to the template
     context = {'notifications': notifications}
