@@ -222,6 +222,7 @@
 
 {% block extra_js %}
 <script>
+  let userID = "{{user.id}}";
   var data = JSON.parse('{{ yuda_json|escapejs }}');
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
@@ -539,18 +540,21 @@
           </form>`);
 
     const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        editComment(comment.id);
+        editComment(reply.id);
     });
     const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
-        deleteComment(comment.id);
+        deleteComment(reply.id);
     });
-    replyElement.append(replyButton, replyFormCollapse, deleteButton);
+
+    replyElement.append(replyButton, replyFormCollapse);
+    if (reply.Kullanici_id == userID) {
+      replyElement.append(deleteButton); // edit eklenecek
+    };
 
     if (reply.replies.length > 0) {
         const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
         replyElement.append(nestedRepliesContainer);
     }
-
 
     return replyElement;
 }
@@ -608,7 +612,11 @@
     const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
         deleteComment(comment.id);
     });
-    commentElement.append(replyButton, replyFormCollapse,deleteButton);
+    
+    commentElement.append(replyButton, replyFormCollapse);
+    if (comment.Kullanici_id == userID) {
+      commentElement.append(deleteButton); // edit eklenecek
+    };
 
     if (comment.replies.length > 0) {
         const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
