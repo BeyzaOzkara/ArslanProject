@@ -1989,6 +1989,11 @@ def yudachange(request, yId):
 
 def all_notifications_view(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')
+    for n in notifications:
+        msg = n["message"].split()
+        n["Kisi"] = msg[0]
+        n["message"] = msg[1]
+        n["timestamp"] = n["timestamp"].strftime('%d-%m-%y %H:%M')
 
     context = {'notifications': notifications}
     return render(request, 'notifications/notification_list.html', context)
