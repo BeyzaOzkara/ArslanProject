@@ -228,6 +228,27 @@
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var selectedFiles = [];
 
+  
+  $(function () {
+    // Summernote
+    $('.textarea').summernote({
+      disableResizeEditor: true,
+      height:200,
+      toolbar: [
+        //['misc', ['undo', 'redo']],
+        ['style', ['bold', 'italic', 'underline']],
+        ['font', ['superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table'],
+        ['custom', ['specialchars']],
+      ]
+    });
+    
+  });
+
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
 
@@ -536,11 +557,15 @@
                 </div>
                 <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${reply.id})"></i>
               </div>
-              <button type="button" class="btn btn-default" onclick="handleReply(${reply.id})">Gönder</button>
+              <button type="button" class="btn btn-default" id="gonder${reply.id}" onclick="handleReply(${reply.id})">Gönder</button>
           </form>`);
 
     const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        editComment(reply.id);
+        const replyForm = replyElement.find(`#replyComment${reply.id}`);
+        replyForm.collapse('toggle');
+        $(`#yorumText${reply.id}`).summernote("code", reply.Aciklama);
+        const sendButton = replyElement.find(`#gonder${reply.id}`);
+        sendButton.text('Düzenle'); // Change button text to indicate editing
     });
     const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
         deleteComment(reply.id);
@@ -548,7 +573,7 @@
 
     replyElement.append(replyButton, replyFormCollapse);
     if (reply.Kullanici_id == userID) {
-      replyElement.append(deleteButton); // edit eklenecek
+      replyElement.append(editButton, deleteButton); // edit eklenecek
     };
 
     if (reply.replies.length > 0) {
@@ -578,6 +603,8 @@
         const replyForm = commentElement.find(`#replyComment${comment.id}`);
         replyForm.collapse('toggle');
     });
+    
+    commentElement.append(replyButton);
 
     const replyFormCollapse = $(`<div class="collapse" id="replyComment${comment.id}"></div>`).html(` 
           <form>
@@ -603,20 +630,25 @@
                 </div>
                 <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
               </div>
-              <button type="button" class="btn btn-default" onclick="handleReply(${comment.id})">Gönder</button>
+              <button type="button" class="btn btn-default" id="gonder${comment.id}" onclick="handleReply(${comment.id})">Gönder</button>
           </form>`);
         
     const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        editComment(comment.id);
+        const replyForm = commentElement.find(`#replyComment${comment.id}`);
+        replyForm.collapse('toggle');
+        $(`#yorumText${comment.id}`).summernote("code", comment.Aciklama);
+        const sendButton = commentElement.find(`#gonder${comment.id}`);
+        sendButton.text('Düzenle'); // Change button text to indicate editing
+
     });
     const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
         deleteComment(comment.id);
     });
     
-    commentElement.append(replyButton, replyFormCollapse);
     if (comment.Kullanici_id == userID) {
-      commentElement.append(deleteButton); // edit eklenecek
+      commentElement.append(editButton, deleteButton); // edit eklenecek
     };
+    commentElement.append(replyFormCollapse);
 
     if (comment.replies.length > 0) {
         const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
@@ -657,7 +689,14 @@
 
   function handleReply(commentId) {
     console.log('Reply clicked for comment ID:', commentId);
-    yorumPaylas(commentId);
+    console.log($(`#gonder${commentId}`).text())
+
+    if ($(`#gonder${commentId}`).text() == 'Düzenle') {
+      editComment(commentId);
+    }
+    else {
+      yorumPaylas(commentId);
+    }
   };
  
   function DosyaEkle(a="") {
@@ -733,6 +772,31 @@
       updateFileList(cId);
   };
 
+  function editComment(commentId) {
+    const editData = new FormData();
+    var textareaValue = $(`#yorumText${commentId}`).summernote('code');
+    editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    editData.append("commentId", commentId);
+    editData.append("commentText", textareaValue);
+    console.log(editData);
+
+    $.ajax({
+      url: '/yudaDCEdit',
+      type: 'POST',
+      data: editData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        alert(response.message);
+        window.location.reload();
+      },
+      error: function(response) {
+        console.log(response.error);
+        alert('Yorum düzenlenemedi.');
+      }
+    });
+  }
+
   function yorumPaylas(yId=""){
     var yorumData = new FormData();
     var textareaValue = $(`#yorumText${yId}`).summernote('code');
@@ -769,27 +833,6 @@
 
   LoadDetail();
   LoadComments(comments);
-
-  $(function () {
-    // Summernote
-    $('.textarea').summernote({
-      disableResizeEditor: true,
-      height:200,
-      toolbar: [
-        //['misc', ['undo', 'redo']],
-        ['style', ['bold', 'italic', 'underline']],
-        ['font', ['superscript', 'subscript']],
-        ['fontsize', ['fontsize']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['height', ['height']],
-        ['table'],
-        ['custom', ['specialchars']],
-      ]
-    });
-    
-  });
-  
 
   var anketSecimi  = "";
   // Use event delegation for dynamically added elements

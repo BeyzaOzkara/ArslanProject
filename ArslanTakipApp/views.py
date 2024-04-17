@@ -1738,6 +1738,20 @@ def yudaDetailComment(request):
             response.status_code = 500 #server error
     return response
 
+def yudaDCEdit(request):
+    if request.method == 'POST':
+        req = request.POST
+        try:
+            c = Comment.objects.get(id=req["commentId"])
+            c.Aciklama = req["commentText"]
+            c.save()
+            #dosyalar için olan bölüm de eklenecek
+            response = JsonResponse({'message': 'Kayıt başarılı'})
+        except Exception as e:
+            response = JsonResponse({'error': str(e)})
+            response.status_code = 500 #server error
+        return response
+
 def yudaDCDelete(request, cId):
     try:
         print(cId)

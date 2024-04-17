@@ -12398,3 +12398,17 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^
 TypeError: yudaDCDelete() got an unexpected keyword argument 'id'
 [35;1mHTTP GET /yudaDCDelete/102 500 [0.05, 127.0.0.1:53755][0m
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [4.12, 127.0.0.1:49204][0m
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [4.11, 127.0.0.1:58706][0m
+Internal Server Error: /yudaDetailComment
+Internal Server Error: /yudaDetailComment
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [4.12, 127.0.0.1:64280][0m
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [4.14, 127.0.0.1:64280][0m
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [4.13, 127.0.0.1:64280][0m
+Internal Server Error: /yudaDetailComment
+[35;1mHTTP POST /yudaDetailComment 500 [4.11, 127.0.0.1:57417][0m
