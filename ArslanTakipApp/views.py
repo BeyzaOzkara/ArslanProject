@@ -511,6 +511,11 @@ def qrKalite(request):
             "no": "denemee"
         }
 
+    # location = Location.objects.all()
+    # group = Group.objects.get(name="KalipTamYetki")
+    # for l in location:
+    #     assign_perm("dg_view_location", group, l)
+    
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 def qrKalite_deneme(request):
@@ -1453,6 +1458,9 @@ def process_yuzey(json_data, keys, key_names):
         for key in keys:
             if 'Boy' in key_names[key]:
                 details.append(f"{key_names[key]}: {data[key]} mm")
+            elif key == 'BoyaKalinlik':
+                if 'BoyaKalinlik' in data:
+                    details.append(f"{key_names[key]}: {data[key]}")
             else:
                 details.append(f"{key_names[key]}: {data[key]}")
         processed_data.append(", ".join(details))
@@ -1471,6 +1479,7 @@ def format_yuda_details(yList):
         for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
             if i[key]:
                 json_data = json.loads(i[key])
+                print(json_data)
                 if key == 'AlasimKondusyon':
                     i[key] = process_alasim(json_data)
                 elif key == 'YuzeyPres':
@@ -2003,7 +2012,7 @@ def all_notifications_view(request):
         elif n['subject'] == "Yeni YUDA Yorum":
             c = Comment.objects.filter(Kullanici_id=n['made_by'], FormModel='YudaForm', FormModelId=n['where_id']).latest('Tarih')
             cleaned_message = re.sub(r'<p>\s*<br>\s*</p>', '', c.Aciklama)
-            n['message']=cleaned_message
+            n['comment']=cleaned_message
             ycommentNoti.append(n)
 
     context = {'notifications': notifications, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
