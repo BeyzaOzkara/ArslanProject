@@ -30,10 +30,10 @@
 <div class="container-fluid">
 <div class="card">
     <div class="card-header">
-      <h3 class="card-title" style="font-weight: bold;">YENİ ÜRÜN DEVREYE ALMA FORMLARI</h3>
+      <h3 class="card-title" style="font-weight: bold;">SİLİNMİŞ YENİ ÜRÜN DEVREYE ALMA FORMLARI</h3>
       <div class="card-tools">
-          <a class="btn btn-tool" data-toggle="tooltip" title="Silinenler" href="deletedYudas">
-            <i class="fas fa-trash"></i></button></a>
+          <a class="btn btn-tool" data-toggle="tooltip" title="YUDA Listesi" href="yudas">
+            <i class="fas fa-file"></i></button></a>
           <a class="btn btn-tool" data-toggle="tooltip" title="Filtrele" id="filterButton">
             <i class="fas fa-filter"></i></button></a>
           <a class="btn btn-tool" data-toggle="tooltip" title="Ekle" href="yuda">
@@ -147,7 +147,7 @@
                         Durum
                     </th>
                     <th style="width: 7%">
-                        Son Yorum
+                        Silinme Tarihi
                     </th>
                     <th style="width: 10%">
                     </th>
@@ -306,6 +306,23 @@
     });
   }
 
+  function  deleteCancel(id) {
+    let con = confirm("Geri Almak İstediğinize Emin Misiniz?");
+    if (con == true){
+        $.ajax({
+        url: 'yudaDeleteCancel/'+id,
+        type: 'GET',
+        success: function (response) {
+            alert(response.message);
+            window.location.replace("/yudaDetail/"+id);
+        },
+        error: function (error) {
+          alert('YUDA kurtarılamadı. '+error);
+        }
+      });
+    }
+  }
+
   function getProjects(pData){
     var data = pData.data;
 
@@ -369,12 +386,8 @@
                   <i class="fas fa-eye">
                   </i>
               </a>
-                  <a class="btn btn-info btn-sm" href="yudaEdit/${item.id}">
-                      <i class="fas fa-pencil-alt">
-                      </i>
-                  </a>
-                  <a class="btn btn-info btn-sm" href="yudaDelete/${item.id}">
-                      <i class="fas fa-trash">
+                  <a class="btn btn-info btn-sm" onclick="deleteCancel(${item.id})">
+                      <i class="fas fa-reply" data-toggle="tooltip" title="Geri Al" >
                       </i>
                   </a>
           </td>
@@ -465,7 +478,7 @@
         filter: filterList,
       };
       $.ajax({
-          url: `yudas/list`,
+          url: `deletedYudas/list`,
           method: 'GET',
           data: { params: JSON.stringify(params)},
           dataType: 'json',

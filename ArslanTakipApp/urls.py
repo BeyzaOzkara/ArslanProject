@@ -25,6 +25,8 @@ urlpatterns = [
     path('password-change/', views.PasswordChangeView.as_view(template_name='registration/password_change_form.html'), name='password_change'),
     path('password-change/done/', views.password_success, name='password_success'),
     path('register/', RegisterView.as_view(), name= "register"),
+    path('notif/<str:id>', views.notif),
+    path('notifications/', views.all_notifications_view),
     path('location/', views.location, name="location"),
     path('location/list/', views.location_list),
     path('location/kalip', views.location_kalip),
@@ -65,6 +67,7 @@ urlpatterns = [
     path('yudaDelete/<str:yId>', views.yudaDelete, name='yudaDelete'),
     path('yudaEdit/<str:yId>', views.yudaEdit),
     path('yudachange/<str:yId>', views.yudachange),
-    path('notif/<str:id>', views.notif),
-    path('notifications/', views.all_notifications_view)
+    path('deletedYudas', login_required(views.DeletedYudasView.as_view()), name='deletedYudas'),
+    path('deletedYudas/list', views.deletedYudas_list),
+    path('yudaDeleteCancel/<str:yId>', views.yudaDeleteCancel),
 ]

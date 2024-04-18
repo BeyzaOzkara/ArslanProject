@@ -1996,6 +1996,94 @@ def yudachange(request, yId):
     response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
     return response
 
+class DeletedYudasView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/deletedYudas.html'
+
+def deletedYudas_list(request):
+    print("delete")
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    for i in params:
+        value = params[i]
+        print("Key and Value pair are ({}) = ({})".format(i, value))
+
+    size = params.get("size", 7)  # Default size to 7
+    page = params.get("page", 1)  # Default page to 1
+    offset, limit = calculate_pagination(page, size)
+    filter_list = params.get("filter", [])
+    q = {}
+
+    temsilciler = User.objects.filter(Q(groups__name = "Yurt Ici Satis Bolumu") | Q(groups__name = "Yurt Disi Satis Bolumu"))
+    temsilci_data = [{'id': user.id, 'full_name': get_user_full_name(user.id)} for user in temsilciler]
+
+    y = get_objects_for_user(request.user, "gorme_yuda", YudaForm.objects.filter(Silindi=True, Silindi_by=request.user)) #user görme yetkisinin olduğu yudaları görsün
+
+    if len(filter_list) > 0:
+        for i in filter_list:
+            if i['field'] == 'Bolum':
+                for bolum in i['value']:
+                    if bolum == 'Boya':
+                        q['YuzeyBoya__gt'] = ""
+                    elif bolum == 'Eloksal':
+                        q['YuzeyEloksal__gt'] = ""
+                    elif bolum == 'Mekanik Islem':
+                        q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
+            elif i['field'] == 'Dosya':
+                file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
+                q['id__in'] = list(file_ids)
+            elif i['field'] == 'Tarih' or i['field'] == 'GüncelTarih': #type = start date, value=finish date
+                if i['type'] != i['value']:
+                    q[i['field'] + "__gte"] = i['type']
+                    q[i['field'] + "__lt"] = i['value'] + ' 23:59:59'
+                else:
+                    q[i['field'] + "__startswith"] = i['value']
+            else:
+                q = filter_method(i, q)
+
+    filtered_yudas = y.filter(**q).order_by("-Tarih", "-YudaNo")
+    yudaList = list(filtered_yudas.values()[offset:limit])
+    
+    for o in yudaList:
+        o['Tarih'] = format_date_time(o['Tarih'])
+        if o['GüncelTarih'] != None:
+            o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+        else: o['GüncelTarih'] = ""
+        o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
+        o['durumlar'] = {}
+        for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:
+            yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
+            if yuda_onay:
+                if yuda_onay.OnayDurumu is True:
+                    o['durumlar'][group] = 'success'
+                elif yuda_onay.OnayDurumu is False:
+                    o['durumlar'][group] = 'danger'
+            else: o['durumlar'][group] = 'warning'
+    print(yudaList)
+        
+    yudas_count = filtered_yudas.count()
+    last_page = math.ceil(yudas_count / size)
+    response_data = {
+        'last_page' : last_page,
+        'data' : yudaList,
+        'temsil': temsilci_data
+    }
+    data = json.dumps(response_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+def yudaDeleteCancel(request, yId):
+    print("deleteee")
+    try:
+        yuda = YudaForm.objects.get(id=yId)
+        yuda.RevTarih = datetime.datetime.now()
+        yuda.Silindi = False
+        yuda.Silindi_by = None
+        yuda.save()
+        response = JsonResponse({'message': 'YUDA başarıyla kurtarıldı.\nDetay sayfasına yönlendiriliyorsunuz.'})
+    except Exception as e:
+        response = JsonResponse({'error': str(e)})
+        response.status_code = 500 #server error
+
+    return response
+
 def all_notifications_view(request):
     notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
     yudaNoti = []
