@@ -2070,11 +2070,10 @@ def deletedYudas_list(request):
     return HttpResponse(data)
 
 def yudaDeleteCancel(request, yId):
-    print("deleteee")
     try:
         yuda = YudaForm.objects.get(id=yId)
         yuda.RevTarih = datetime.datetime.now()
-        yuda.Silindi = False
+        yuda.Silindi = None
         yuda.Silindi_by = None
         yuda.save()
         response = JsonResponse({'message': 'YUDA başarıyla kurtarıldı.\nDetay sayfasına yönlendiriliyorsunuz.'})
