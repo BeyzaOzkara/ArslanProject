@@ -13,6 +13,12 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
+  <style>
+    .callout.callout-info {
+        border-width: 40px; /* Adjust the size as needed */
+        border-color: #17a2b8; /* Change the color if necessary */
+    }
+  </style>
 
 {% endblock %}
 
@@ -20,12 +26,18 @@
     <h1 class="pl-4">Bildirimler</h1>
     <hr>
     <div class="container-fluid">
+    <div class="row px-4">
+      <div class="col alert alert-info">
+        <h5><i class="icon fas fa-info"></i> Info!</h5>
+        Info preview.
+      </div>
+    </div>
       <div class="row row-cols-2">
         {% for notification in notifications %}
-        <div class="col pl-4 pr-4">
+        <div class="col px-4">
             <div class="callout callout-info">
                 <div class="d-flex justify-content-between">
-                    <div>
+                    <div style="font-weight: bold;">
                         <i class="fas fa-file mr-2"></i>
                         {{ notification.Kisi }}
                     </div>

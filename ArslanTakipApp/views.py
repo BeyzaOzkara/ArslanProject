@@ -1990,10 +1990,16 @@ def yudachange(request, yId):
 def all_notifications_view(request):
     notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
     for n in notifications:
-        msg = n["message"].split("^")
-        n["Kisi"] = msg[0]
-        n["message"] = msg[1]
-        n["timestamp"] = n["timestamp"].strftime('%d-%m-%y %H:%M')
+        msg = n['message'].split("^")
+        n['Kisi'] = msg[0]
+        n['message'] = msg[1]
+        if n['subject'] == "Yeni YUDA":
+            y = YudaForm.objects.get(id = n['where_id'])
+            n['message'] = y.MusteriFirmaAdi + msg[1].split("..")[1]
+        elif n['subject'] == "Yeni YUDA Yorum":
+            c = Comment.objects.filter(Kullanici_id=n['made_by'], FormModel='YudaForm', FormModelId=n['where_id']).latest('Tarih')
+            print(c)
+        n['timestamp'] = n['timestamp'].strftime('%d-%m-%y %H:%M')
 
     context = {'notifications': notifications}
     return render(request, 'notifications/notification_list.html', context)
