@@ -18,7 +18,7 @@
 
 {% block content %}
     <h1>Bildirimler</h1>
-    <div class="row col-md-12 mr-10 ml-10">
+    <!-- <div class="row col-md-12 mr-10 ml-10">
         {% for notification in notifications %}
         <div class="callout callout-info col-md-6">
             <div class="d-flex justify-content-between">
@@ -31,5 +31,29 @@
             <div>{{ notification.message }}</div>
         </div>
         {% endfor %}
+    </div> -->
+    <div class="row">
+      {% for notification in notifications %}
+      {% if forloop.counter0|divisibleby:2 %}
+      </div>
+      <div class="row">
+      {% endif %}
+      <div class="col-md-6">
+          <div class="callout callout-info">
+              <div class="d-flex justify-content-between">
+                  <div>
+                      <i class="fas fa-file mr-2"></i>
+                      {{ notification.Kisi }}
+                  </div>
+                  <a>{{ notification.timestamp }}</a>
+              </div>
+              <div>{{ notification.message }}</div>
+          </div>
+      </div>
+      {% endfor %}
     </div>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
 {% endblock %}
