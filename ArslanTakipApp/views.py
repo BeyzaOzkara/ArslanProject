@@ -1989,19 +1989,25 @@ def yudachange(request, yId):
 
 def all_notifications_view(request):
     notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
+    yudaNoti = []
+    ycommentNoti = []
     for n in notifications:
         msg = n['message'].split("^")
         n['Kisi'] = msg[0]
         n['message'] = msg[1]
+        n['timestamp'] = n['timestamp'].strftime('%d-%m-%y %H:%M')
         if n['subject'] == "Yeni YUDA":
             y = YudaForm.objects.get(id = n['where_id'])
             n['message'] = y.MusteriFirmaAdi + msg[1].split("..")[1]
+            yudaNoti.append(n)
         elif n['subject'] == "Yeni YUDA Yorum":
             c = Comment.objects.filter(Kullanici_id=n['made_by'], FormModel='YudaForm', FormModelId=n['where_id']).latest('Tarih')
-            print(c)
-        n['timestamp'] = n['timestamp'].strftime('%d-%m-%y %H:%M')
-
-    context = {'notifications': notifications}
+            n['message']=c.Aciklama
+            ycommentNoti.append(n)
+    print(type(yudaNoti))
+    print(type(notifications))
+    print(ycommentNoti)
+    context = {'notifications': notifications, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
     return render(request, 'notifications/notification_list.html', context)
 
 # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla 
@@ -2016,7 +2022,7 @@ def getFiles(ref, mId):
 
 def getParentComments(ref, mId):
     allComments = Comment.objects.all()
-    filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId) & Q(ReplyTo__isnull = True)).values()
+    filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId) & Q(ReplyTo__isnull = True) & Q(Silindi= False)).values()
     
     return filteredComments
 

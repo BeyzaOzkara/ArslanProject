@@ -26,27 +26,44 @@
     <h1 class="pl-4">Bildirimler</h1>
     <hr>
     <div class="container-fluid">
-    <div class="row px-4">
-      <div class="col alert alert-info">
-        <h5><i class="icon fas fa-info"></i> Info!</h5>
-        Info preview.
+      <div class="row px-4">
+        <div class="col alert alert-info">
+          <h5><i class="icon fas fa-info"></i> Info!</h5>
+          Info preview.
+        </div>
       </div>
-    </div>
+
       <div class="row row-cols-2">
-        {% for notification in notifications %}
+        {% for yuda in yudas %}
         <div class="col px-4">
             <div class="callout callout-info">
                 <div class="d-flex justify-content-between">
                     <div style="font-weight: bold;">
                         <i class="fas fa-file mr-2"></i>
-                        {{ notification.Kisi }}
+                        {{ yuda.Kisi }}
                     </div>
-                    <a>{{ notification.timestamp }}</a>
+                    <a>{{ yuda.timestamp }}</a>
                 </div>
-                <div>{{ notification.message }}</div>
+                <div>{{ yuda.message }}</div>
             </div>
         </div>
         {% endfor %}
+
+        {% for ycomment in ycomments %}
+        <div class="col px-4">
+            <div class="callout callout-info">
+                <div class="d-flex justify-content-between">
+                    <div style="font-weight: bold;">
+                        <i class="fas fa-file mr-2"></i>
+                        {{ ycomment.Kisi }}
+                    </div>
+                    <a>{{ ycomment.timestamp }}</a>
+                </div>
+                <div>{{ ycomment.message }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        
       </div>
     </div>
 {% endblock %}
