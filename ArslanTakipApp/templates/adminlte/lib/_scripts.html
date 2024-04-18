@@ -62,6 +62,13 @@
                 notificationList.style.overflowY = 'auto'; // Enable vertical scrolling
                 notificationList.style.maxHeight = '320px'; // Set a max height for the scrollable area
             }
+
+            Notification.requestPermission()
+            .then(() => {
+                const noti = new Notification("Deneme", {
+                    body: str[1],
+                })
+            })
         }
     };
 
