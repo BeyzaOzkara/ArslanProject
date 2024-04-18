@@ -65,7 +65,7 @@
 
             Notification.requestPermission()
             .then(() => {
-                const noti = new Notification("Deneme", {
+                const noti = new Notification(notification.subject, {
                     body: str[1],
                 })
             })
