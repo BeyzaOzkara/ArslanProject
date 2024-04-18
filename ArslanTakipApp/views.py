@@ -1690,7 +1690,7 @@ def yudaDetailComment(request):
             c.save()
 
             y = YudaForm.objects.get(id=req['formID'])
-            y.GuncelTarih = datetime.datetime.now()
+            y.GüncelTarih = datetime.datetime.now()
             y.save()
 
             for file in request.FILES.getlist('yfiles'):
