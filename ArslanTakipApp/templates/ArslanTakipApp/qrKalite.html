@@ -19,16 +19,12 @@
 <script>
 
     function sendDeneme() {
-        $.ajax({
-            url: 'deneme',
-            method: 'GET',
-            success: function(response){
-                console.log("Cevap: " + response.message);
-            },
-            error: function (error) {
-            console.error('Error :', error);
-            }
-        });
+        Notification.requestPermission()
+            .then(() => {
+                const noti = new Notification("Deneme", {
+                    body: "Deneme 1 2 Deneme",
+                })
+            })
     };
 
 </script>

@@ -2002,11 +2002,10 @@ def all_notifications_view(request):
             yudaNoti.append(n)
         elif n['subject'] == "Yeni YUDA Yorum":
             c = Comment.objects.filter(Kullanici_id=n['made_by'], FormModel='YudaForm', FormModelId=n['where_id']).latest('Tarih')
-            n['message']=c.Aciklama
+            cleaned_message = re.sub(r'<p>\s*<br>\s*</p>', '', c.Aciklama)
+            n['message']=cleaned_message
             ycommentNoti.append(n)
-    print(type(yudaNoti))
-    print(type(notifications))
-    print(ycommentNoti)
+
     context = {'notifications': notifications, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
     return render(request, 'notifications/notification_list.html', context)
 

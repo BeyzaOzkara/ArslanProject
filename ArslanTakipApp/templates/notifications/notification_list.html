@@ -33,41 +33,57 @@
         </div>
       </div>
 
-      <div class="row row-cols-2">
-        {% for yuda in yudas %}
-        <div class="col px-4">
-            <div class="callout callout-info">
-                <div class="d-flex justify-content-between">
-                    <div style="font-weight: bold;">
-                        <i class="fas fa-file mr-2"></i>
-                        {{ yuda.Kisi }}
+      <div class="row">
+        <div class="col-md-6">
+            <h2 class="pl-4">Yeni YUDA</h2>
+            <div class="row row-cols-2">
+                {% for yuda in yudas %}
+                <div class="col px-4">
+                    <div class="callout callout-info">
+                        <div class="d-flex justify-content-between">
+                            <div style="font-weight: bold;">
+                                <i class="fas fa-file mr-2"></i>
+                                {{ yuda.Kisi }}
+                            </div>
+                            <a>{{ yuda.timestamp }}</a>
+                        </div>
+                        <div>{{ yuda.message }}</div>
                     </div>
-                    <a>{{ yuda.timestamp }}</a>
                 </div>
-                <div>{{ yuda.message }}</div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
-
-        {% for ycomment in ycomments %}
-        <div class="col px-4">
-            <div class="callout callout-info">
-                <div class="d-flex justify-content-between">
-                    <div style="font-weight: bold;">
-                        <i class="fas fa-file mr-2"></i>
-                        {{ ycomment.Kisi }}
+        <div class="col-md-6">
+            <h2 class="pl-4">Yorumlar</h2>
+            <div class="row">
+                {% for ycomment in ycomments %}
+                <div class="col px-4">
+                    <div class="callout callout-info">
+                        <div class="d-flex justify-content-between">
+                            <div style="font-weight: bold;">
+                                <i class="fas fa-file mr-2"></i>
+                                {{ ycomment.Kisi }}
+                            </div>
+                            <a>{{ ycomment.timestamp }}</a>
+                        </div>
+                        <div class="notiMessage">{{ ycomment.message }}</div>
                     </div>
-                    <a>{{ ycomment.timestamp }}</a>
                 </div>
-                <div>{{ ycomment.message }}</div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
-        
-      </div>
+    </div>
     </div>
 {% endblock %}
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+
+<script>
+  var notiMessages = document.getElementsByClassName('notiMessage');
+    for (var i = 0; i < notiMessages.length; i++) {
+        notiMessages[i].innerHTML = notiMessages[i].textContent;
+    }
+</script>
+
 {% endblock %}
