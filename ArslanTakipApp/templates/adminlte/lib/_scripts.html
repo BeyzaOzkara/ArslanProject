@@ -36,28 +36,16 @@
             const notificationElement = document.createElement('a');
             notificationElement.classList.add('dropdown-item');
             notificationElement.href = `/notif/${notification.id}`;
-            // notificationElement.innerHTML = `
-            //     <div class="d-flex justify-content-between">
-            //         <div>
-            //             <i class="fas fa-file mr-2"></i>
-            //             ${str[0]}
-            //         </div>
-            //         <small>${notification.timestamp}</small>
-            //     </div>
-            //     <div>${str[1]}</div>
-            //     <div class="dropdown-divider"></div>
-            // `;
             notificationElement.innerHTML = `
-                <div class="callout callout-info">
-                    <div class="d-flex justify-content-between">
-                        <div style="font-weight: bold;">
-                            <i class="fas fa-file mr-2"></i>
-                            ${str[0]}
-                        </div>
-                        <a>${notification.timestamp}</a>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <i class="fas fa-file mr-2"></i>
+                        ${str[0]}
                     </div>
-                    <div class="notiMessage">${str[1]}</div>
+                    <small>${notification.timestamp}</small>
                 </div>
+                <div>${str[1]}</div>
+                <div class="dropdown-divider"></div>
             `;
             notificationList.appendChild(notificationElement);
 
