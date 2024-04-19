@@ -79,8 +79,8 @@
             // Add border color class based on is_marked attribute
             const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
             notificationItem.innerHTML = `
-                <div class="col-md-1 notification-border" style="color:${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
-                    
+                <div class="col-md-1 notification-border" onclick="markAsMarked(${notification.id})">
+                    <span style="color:${notificationBorderClass}; width:20px"></span>
                 </div>
                 ${notificationContent.outerHTML}
             `;
