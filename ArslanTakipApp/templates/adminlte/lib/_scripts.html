@@ -55,33 +55,55 @@
             // `;
             // notificationList.appendChild(notificationElement);
 
+            // const notificationItem = document.createElement('div');
+            // notificationItem.classList.add('notification-item');
+            // notificationItem.classList.add('w-100');
+
+            // // Create notification content div
+            // const notificationContent = document.createElement('div');
+            // notificationContent.classList.add('notification-content');
+            // notificationContent.classList.add('col');
+            // notificationContent.innerHTML = `
+            //     <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
+            //         <div>
+            //             <i class="fas fa-file mr-2"></i>
+            //             ${str[0]}
+            //         </div>
+            //         <small>${notification.timestamp}</small>
+            //     </div>
+            //     <div>${str[1]}</div>
+            //     <div class="dropdown-divider"></div>
+            // `;
+
+            // // Add border color class based on is_marked attribute
+            // const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
+            // notificationItem.innerHTML = `
+            //     <div class="notification-border col" style="width:30px;" onclick="markAsMarked(${notification.id})">
+            //         <span style="color:${notificationBorderClass}; width:20px; background-color:${notificationBorderClass};">.</span>
+            //     </div>
+            //     ${notificationContent.outerHTML}
+            // `;
+
+            // notificationList.appendChild(notificationItem);
+
             const notificationItem = document.createElement('div');
             notificationItem.classList.add('notification-item');
-            notificationItem.classList.add('w-100');
-
-            // Create notification content div
-            const notificationContent = document.createElement('div');
-            notificationContent.classList.add('notification-content');
-            notificationContent.classList.add('col');
-            notificationContent.innerHTML = `
-                <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
-                    <div>
-                        <i class="fas fa-file mr-2"></i>
-                        ${str[0]}
-                    </div>
-                    <small>${notification.timestamp}</small>
-                </div>
-                <div>${str[1]}</div>
-                <div class="dropdown-divider"></div>
-            `;
 
             // Add border color class based on is_marked attribute
-            const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
+            const notificationBorderClass = notification.is_marked ? 'blue' : '';
             notificationItem.innerHTML = `
-                <div class="notification-border col" style="width:30px;" onclick="markAsMarked(${notification.id})">
-                    <span style="color:${notificationBorderClass}; width:20px; background-color:${notificationBorderClass};">.</span>
+                <div class="notification-border ${notificationBorderClass}" onclick="markAsMarked(${notification.id})"></div>
+                <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <i class="fas fa-file mr-2"></i>
+                            ${str[0]}
+                        </div>
+                        <small>${notification.timestamp}</small>
+                    </div>
+                    <div>${str[1]}</div>
+                    <div class="dropdown-divider"></div>
                 </div>
-                ${notificationContent.outerHTML}
             `;
 
             notificationList.appendChild(notificationItem);

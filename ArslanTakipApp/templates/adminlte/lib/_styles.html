@@ -24,7 +24,20 @@
 
     /* Style for the notification item */
     .notification-item {
-        margin-bottom: 10px; /* Adjust margin as needed */
+        display: flex;
+        align-items: center;
+        padding: 10px; /* Adjust padding as needed */
+    }
+
+    .notification-border {
+        flex: 0 0 auto;
+        width: 10px; /* Width of the border */
+        height: 100%;
+    }
+
+    .notification-content {
+        flex: 1;
+        padding-left: 10px; /* Adjust padding as needed */
     }
 </style>
 {% endblock %}
