@@ -111,7 +111,7 @@
             notificationList.appendChild(notificationItem);
 
 
-            var nc = $(`#nc${notification.id}`).height();
+            var nc = document.getElementById(`nc${notification.id}`).clientHeight;
             console.log(nc)
             $(`#nb${notification.id}`).css("height", nc);
 
