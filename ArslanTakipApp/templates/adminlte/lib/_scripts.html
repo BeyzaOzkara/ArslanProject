@@ -111,11 +111,12 @@
             notificationList.appendChild(notificationItem);
 
 
-            var nc = document.getElementById(`nc${notification.id}`)
-            var nch = nc.clientHeight;
+            var nc = window.getComputedStyle(document.querySelector(`#nc${notification.id}`))//document.getElementById(`nc${notification.id}`)
+            // var nch = nc.clientHeight;
+            
             console.log(nc);
-            console.log(nch);
-            $(`#nb${notification.id}`).css("height", nch);
+            // console.log(nch);
+            $(`#nb${notification.id}`).css("height", nc);
 
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
