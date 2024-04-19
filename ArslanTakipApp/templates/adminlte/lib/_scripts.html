@@ -37,15 +37,19 @@
             notificationElement.classList.add('dropdown-item');
             notificationElement.href = `/notif/${notification.id}`;
             notificationElement.innerHTML = `
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <i class="fas fa-file mr-2"></i>
-                        ${str[0]}
+                <div class="notification-item">
+                    <div class="notification-border">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <i class="fas fa-file mr-2"></i>
+                                ${str[0]}
+                            </div>
+                            <small>${notification.timestamp}</small>
+                        </div>
+                        <div>${str[1]}</div>
+                        <div class="dropdown-divider"></div>
                     </div>
-                    <small>${notification.timestamp}</small>
                 </div>
-                <div>${str[1]}</div>
-                <div class="dropdown-divider"></div>
             `;
             notificationList.appendChild(notificationElement);
 
@@ -83,7 +87,6 @@
     $('#notification-read-all').on('click', (e) => {
         let readAll = confirm("Tüm Bildirimleri Okundu İşaretlemek İstediğinizden Emin Misiniz?");
         if (readAll == true){
-            console.log("deneme");
             $.ajax({
                 url: '/notifReadAll',
                 type: 'GET',
