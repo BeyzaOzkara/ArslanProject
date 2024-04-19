@@ -77,7 +77,7 @@
             const notificationBorderClass = notification.is_marked ? 'blue' : '';
             notificationItem.innerHTML = `
                 <div class="notification-border ${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
-                    
+                    <span></span>
                 </div>
                 ${notificationContent.outerHTML}
             `;
