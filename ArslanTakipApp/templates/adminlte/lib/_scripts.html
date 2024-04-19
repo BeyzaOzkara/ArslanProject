@@ -38,7 +38,7 @@
             notificationElement.href = `/notif/${notification.id}`;
             let notifBorder = `
                 <div class="notification-item">
-                    <div class="notification-border ${notification.is_marked ? 'blue' : ''}" onclick="markAsMarked(${notification.id})">
+                    <div class="notification-border ${notification.is_marked ? 'blue' : ''}">
             `;
             notificationElement.innerHTML = `
                 ${notifBorder}
