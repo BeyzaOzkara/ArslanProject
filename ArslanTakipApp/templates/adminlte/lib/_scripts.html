@@ -112,11 +112,11 @@
 
 
             var nc = window.getComputedStyle(document.querySelector(`#nc${notification.id}`))//document.getElementById(`nc${notification.id}`)
-            // var nch = nc.clientHeight;
+            var nch = nc.height; //nc.clientHeight;
             
             console.log(nc);
-            // console.log(nch);
-            $(`#nb${notification.id}`).css("height", nc);
+            console.log(nch);
+            $(`#nb${notification.id}`).css("height", nch);
 
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
