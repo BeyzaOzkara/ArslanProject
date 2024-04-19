@@ -33,69 +33,17 @@
         if (data.type === 'notification') {
             const notification = data.notification;
             const str = notification.message.split("^");
-            // const notificationElement = document.createElement('a');
-            // notificationElement.classList.add('dropdown-item');
-            // notificationElement.href = `/notif/${notification.id}`;
-            // let notifBorder = `
-            //     <div class="notification-item">
-            //         <div class="notification-border ${notification.is_marked ? 'blue' : ''}">
-            //         </div>`;
-            // notificationElement.innerHTML = `
-            //     ${notifBorder}
-            //         <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
-            //                 <div>
-            //                     <i class="fas fa-file mr-2"></i>
-            //                     ${str[0]}
-            //                 </div>
-            //                 <small>${notification.timestamp}</small>
-            //             </div>
-            //             <div>${str[1]}</div>
-            //             <div class="dropdown-divider"></div>
-            //     </div>
-            // `;
-            // notificationList.appendChild(notificationElement);
-
-            // const notificationItem = document.createElement('div');
-            // notificationItem.classList.add('notification-item');
-            // notificationItem.classList.add('w-100');
-
-            // // Create notification content div
-            // const notificationContent = document.createElement('div');
-            // notificationContent.classList.add('notification-content');
-            // notificationContent.classList.add('col');
-            // notificationContent.innerHTML = `
-            //     <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
-            //         <div>
-            //             <i class="fas fa-file mr-2"></i>
-            //             ${str[0]}
-            //         </div>
-            //         <small>${notification.timestamp}</small>
-            //     </div>
-            //     <div>${str[1]}</div>
-            //     <div class="dropdown-divider"></div>
-            // `;
-
-            // // Add border color class based on is_marked attribute
-            // const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
-            // notificationItem.innerHTML = `
-            //     <div class="notification-border col" style="width:30px;" onclick="markAsMarked(${notification.id})">
-            //         <span style="color:${notificationBorderClass}; width:20px; background-color:${notificationBorderClass};">.</span>
-            //     </div>
-            //     ${notificationContent.outerHTML}
-            // `;
-
-            // notificationList.appendChild(notificationItem);
 
             const notificationItem = document.createElement('div');
-            notificationItem.classList.add('notification-item');
-            notificationItem.classList.add('w-100');
+            notificationItem.classList.add('notification-item', 'w-100');
 
             // Add border color class based on is_marked attribute
             const notificationBorderClass = notification.is_marked ? 'blue' : '';
             notificationItem.innerHTML = `
-                <div class="notification-border ${notificationBorderClass}" id="nb${notification.id}" onclick="markAsMarked(${notification.id})">
+                <div class="notification-border ${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
+                    <span style="opacity: 0;">&nbsp;</span>
                 </div>
-                <div class="notification-content" id="nc${notification.id}" onclick="markNotificationAsRead(${notification.id})">
+                <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
                     <div class="d-flex justify-content-between">
                         <div>
                             <i class="fas fa-file mr-2"></i>
@@ -110,13 +58,6 @@
 
             notificationList.appendChild(notificationItem);
 
-
-            var nc = window.getComputedStyle(document.querySelector(`#nc${notification.id}`))//document.getElementById(`nc${notification.id}`)
-            var nch = nc.height; //nc.clientHeight;
-            
-            console.log(nc);
-            console.log(nch);
-            $(`#nb${notification.id}`).css("height", nch);
 
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
