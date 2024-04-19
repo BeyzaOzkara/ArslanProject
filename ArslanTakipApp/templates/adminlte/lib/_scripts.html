@@ -63,10 +63,6 @@
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
 
-            // notificationElement.addEventListener('click', function() {
-            //     markNotificationAsRead(notification.id);
-            // });
-
             const maxNotifications = 5; // Change this to your desired limit
             if (notificationList.children.length > maxNotifications) {
                 notificationList.style.overflowY = 'auto'; // Enable vertical scrolling
@@ -83,19 +79,21 @@
     };
 
     function markNotificationAsRead(notificationId) {
-        const data = {
-            type: 'mark_as_read',
-            notification_id: notificationId
-        };
-        socket.send(JSON.stringify(data));
+        console.log("as read"+notificationId);
+        // const data = {
+        //     type: 'mark_as_read',
+        //     notification_id: notificationId
+        // };
+        // socket.send(JSON.stringify(data));
     };
 
     function markAsMarked(nId) {
-        const data = {
-            type: 'mark_as_marked',
-            notification_id: nId,
-        };
-        socket.send(JSON.stringify(data));
+        console.log("as marked"+notificationId);
+        // const data = {
+        //     type: 'mark_as_marked',
+        //     notification_id: nId,
+        // };
+        // socket.send(JSON.stringify(data));
 
     }
 
