@@ -33,27 +33,56 @@
         if (data.type === 'notification') {
             const notification = data.notification;
             const str = notification.message.split("^");
-            const notificationElement = document.createElement('a');
-            notificationElement.classList.add('dropdown-item');
-            notificationElement.href = `/notif/${notification.id}`;
-            let notifBorder = `
-                <div class="notification-item">
-                    <div class="notification-border ${notification.is_marked ? 'blue' : ''}">
-                    </div>`;
-            notificationElement.innerHTML = `
-                ${notifBorder}
-                    <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
-                            <div>
-                                <i class="fas fa-file mr-2"></i>
-                                ${str[0]}
-                            </div>
-                            <small>${notification.timestamp}</small>
-                        </div>
-                        <div>${str[1]}</div>
-                        <div class="dropdown-divider"></div>
+            // const notificationElement = document.createElement('a');
+            // notificationElement.classList.add('dropdown-item');
+            // notificationElement.href = `/notif/${notification.id}`;
+            // let notifBorder = `
+            //     <div class="notification-item">
+            //         <div class="notification-border ${notification.is_marked ? 'blue' : ''}">
+            //         </div>`;
+            // notificationElement.innerHTML = `
+            //     ${notifBorder}
+            //         <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
+            //                 <div>
+            //                     <i class="fas fa-file mr-2"></i>
+            //                     ${str[0]}
+            //                 </div>
+            //                 <small>${notification.timestamp}</small>
+            //             </div>
+            //             <div>${str[1]}</div>
+            //             <div class="dropdown-divider"></div>
+            //     </div>
+            // `;
+            // notificationList.appendChild(notificationElement);
+            // Create notification item wrapper
+            const notificationItem = document.createElement('div');
+            notificationItem.classList.add('notification-item');
+
+            // Create notification content div
+            const notificationContent = document.createElement('div');
+            notificationContent.classList.add('notification-content');
+            notificationContent.innerHTML = `
+                <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
+                    <div>
+                        <i class="fas fa-file mr-2"></i>
+                        ${str[0]}
+                    </div>
+                    <small>${notification.timestamp}</small>
+                </div>
+                <div>${str[1]}</div>
+                <div class="dropdown-divider"></div>
+            `;
+
+            // Add border color class based on is_marked attribute
+            const notificationBorderClass = notification.is_marked ? 'blue' : '';
+            notificationItem.innerHTML = `
+                <div class="notification-border ${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
+                    ${notificationContent.outerHTML}
                 </div>
             `;
-            notificationList.appendChild(notificationElement);
+
+            notificationList.appendChild(notificationItem);
+
 
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
