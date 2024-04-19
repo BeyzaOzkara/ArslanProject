@@ -108,9 +108,9 @@
                 </div>
             `;
 
-            var nc = $(`#nc${notification.id}`).height();
+            var nc = $(`#nc${notification.id}`);
             console.log(nc)
-            $(`nb${notification.id}`).css("height", nc);
+            console.log($(`nb${notification.id}`)) //.css("height", nc);
 
             notificationList.appendChild(notificationItem);
 
