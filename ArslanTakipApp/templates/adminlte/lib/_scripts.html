@@ -36,39 +36,30 @@
             const notificationElement = document.createElement('a');
             notificationElement.classList.add('dropdown-item');
             notificationElement.href = `/notif/${notification.id}`;
+            let notifBorder = `
+                <div class="notification-item">
+                    <div class="notification-border" onclick="markAsMarked(${notification.id})">
+                    `;
             if (notification.is_marked) {
-                notificationElement.classList.add('notification-border-blue');
-            } else {
-                notificationElement.classList.add('notification-border');
+                notifBorder = `
+                <div class="notification-item">
+                    <div class="notification-border blue" onclick="markAsMarked(${notification.id})">
+                    `;
             }
             notificationElement.innerHTML = `
-                <div class="notification-item" onclick="markAsMarked(${notification.id})">
+                ${notifBorder}
                     <div class="d-flex justify-content-between">
-                        <div>
-                            <i class="fas fa-file mr-2"></i>
-                            ${str[0]}
+                            <div>
+                                <i class="fas fa-file mr-2"></i>
+                                ${str[0]}
+                            </div>
+                            <small>${notification.timestamp}</small>
                         </div>
-                        <small>${notification.timestamp}</small>
+                        <div>${str[1]}</div>
+                        <div class="dropdown-divider"></div>
                     </div>
-                    <div>${str[1]}</div>
-                    <div class="dropdown-divider"></div>
                 </div>
             `;
-            // notificationElement.innerHTML = `
-            //     <div class="notification-item">
-            //         <div class="notification-border" onclick="markAsMarked(${notification.id})">
-            //             <div class="d-flex justify-content-between">
-            //                 <div>
-            //                     <i class="fas fa-file mr-2"></i>
-            //                     ${str[0]}
-            //                 </div>
-            //                 <small>${notification.timestamp}</small>
-            //             </div>
-            //             <div>${str[1]}</div>
-            //             <div class="dropdown-divider"></div>
-            //         </div>
-            //     </div>
-            // `;
             notificationList.appendChild(notificationElement);
 
             // Update notification count
