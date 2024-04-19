@@ -38,17 +38,11 @@
             notificationElement.href = `/notif/${notification.id}`;
             let notifBorder = `
                 <div class="notification-item">
-                    <div class="notification-border" onclick="markAsMarked(${notification.id})">
-                    `;
-            if (notification.is_marked) {
-                notifBorder = `
-                <div class="notification-item">
-                    <div class="notification-border blue" onclick="markAsMarked(${notification.id})">
-                    `;
-            }
+                    <div class="notification-border ${notification.is_marked ? 'blue' : ''}" onclick="markAsMarked(${notification.id})">
+            `;
             notificationElement.innerHTML = `
                 ${notifBorder}
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
                             <div>
                                 <i class="fas fa-file mr-2"></i>
                                 ${str[0]}
@@ -66,9 +60,9 @@
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
             notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
 
-            notificationElement.addEventListener('click', function() {
-                markNotificationAsRead(notification.id);
-            });
+            // notificationElement.addEventListener('click', function() {
+            //     markNotificationAsRead(notification.id);
+            // });
 
             const maxNotifications = 5; // Change this to your desired limit
             if (notificationList.children.length > maxNotifications) {
@@ -96,7 +90,7 @@
     function markAsMarked(nId) {
         const data = {
             type: 'mark_as_marked',
-            notification_id: notificationId,
+            notification_id: nId,
         };
         socket.send(JSON.stringify(data));
 
