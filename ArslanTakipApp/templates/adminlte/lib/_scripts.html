@@ -39,8 +39,6 @@
             let notifBorder = `
                 <div class="notification-item">
                     <div class="notification-border ${notification.is_marked ? 'blue' : ''}" onclick="markAsMarked(${notification.id})">
-                        
-                    </div>
             `;
             notificationElement.innerHTML = `
                 ${notifBorder}
@@ -53,6 +51,7 @@
                         </div>
                         <div>${str[1]}</div>
                         <div class="dropdown-divider"></div>
+                    </div>
                 </div>
             `;
             notificationList.appendChild(notificationElement);
