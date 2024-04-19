@@ -20,7 +20,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             'type': 'connection_established',
             'message': str(self.user) + ' ' + str(self.user.id),
         }))
-        self.logger.debug(f"WebSocket connected for user {self.user.id}")
         await self.send_unread_notifications()
 
     async def disconnect(self, close_code):
@@ -28,17 +27,17 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        self.logger.debug(f"WebSocket disconnected for user {self.user.id}")
 
     async def receive(self, text_data):
         data_json = json.loads(text_data)
         message_type = data_json.get('type')
         if message_type == 'mark_as_read':
             notification_id = data_json.get('notification_id')
-            self.logger.debug(f"Received message with type mark_as_read")
             await self.mark_notification_as_read(notification_id)
+        if message_type == 'mark_as_marked':
+            notification_id = data_json.get('notification_id')
+            await self.mark_notification_as_marked(notification_id)
         elif message_type == 'notification':
-            self.logger.debug(f"Received message with type notification")
             await self.send_unread_notifications()
 
     async def send_notification(self, event):
@@ -49,7 +48,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'type': 'notification',
                 'notification': notification_data
             }))
-            self.logger.debug(f"Sent notification if not is_read: {notification_data['id']}")
             
     async def mark_notification_as_read(self, notification_id):
         try:
@@ -64,6 +62,20 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await get_notification(notification_id)
         except Exception as e:
             self.logger.debug(f"Error mark notification as read: {e}")
+
+    async def mark_notification_as_marked(self, notification_id):
+        try:
+            from .models import Notification
+            @database_sync_to_async
+            def get_notification(notification_id):
+                notification = Notification.objects.get(id=notification_id)
+                if notification.user == self.user and not notification.is_marked:
+                    notification.is_marked = True
+                    notification.save()
+                return True
+            await get_notification(notification_id)
+        except Exception as e:
+            self.logger.debug(f"Error mark notification as marked: {e}")
 
     async def send_unread_notifications(self):
         try:
