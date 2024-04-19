@@ -94,7 +94,6 @@
             const notificationBorderClass = notification.is_marked ? 'blue' : '';
             notificationItem.innerHTML = `
                 <div class="notification-border ${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
-                    <span style="color:${notificationBorderClass};background-color:${notificationBorderClass};">.</span> 
                 </div>
                 <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
                     <div class="d-flex justify-content-between">
