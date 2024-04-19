@@ -62,6 +62,7 @@
             // Create notification content div
             const notificationContent = document.createElement('div');
             notificationContent.classList.add('notification-content');
+            notificationContent.classList.add('col');
             notificationContent.innerHTML = `
                 <div class="d-flex justify-content-between" onclick="markNotificationAsRead(${notification.id})">
                     <div>
@@ -77,7 +78,7 @@
             // Add border color class based on is_marked attribute
             const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
             notificationItem.innerHTML = `
-                <div class="notification-border" style="width:30px;" onclick="markAsMarked(${notification.id})">
+                <div class="notification-border col" style="width:30px;" onclick="markAsMarked(${notification.id})">
                     <span style="color:${notificationBorderClass}; width:20px; background-color:${notificationBorderClass};">.</span>
                 </div>
                 ${notificationContent.outerHTML}
