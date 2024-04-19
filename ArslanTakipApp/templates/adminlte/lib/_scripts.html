@@ -111,9 +111,9 @@
             notificationList.appendChild(notificationItem);
 
 
-            var nc = $(`#nc${notification.id}`);
+            var nc = $(`#nc${notification.id}`).height();
             console.log(nc)
-            console.log($(`nb${notification.id}`)) //.css("height", nc);
+            $(`#nb${notification.id}`).css("height", nc);
 
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
