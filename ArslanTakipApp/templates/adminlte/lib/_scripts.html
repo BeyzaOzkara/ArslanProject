@@ -108,12 +108,12 @@
                 </div>
             `;
 
+            notificationList.appendChild(notificationItem);
+
+
             var nc = $(`#nc${notification.id}`);
             console.log(nc)
             console.log($(`nb${notification.id}`)) //.css("height", nc);
-
-            notificationList.appendChild(notificationItem);
-
 
             // Update notification count
             if (notificationCount.innerText == "") {notificationCount.innerText = 0;};
