@@ -79,21 +79,19 @@
     };
 
     function markNotificationAsRead(notificationId) {
-        console.log("as read"+notificationId);
-        // const data = {
-        //     type: 'mark_as_read',
-        //     notification_id: notificationId
-        // };
-        // socket.send(JSON.stringify(data));
+        const data = {
+            type: 'mark_as_read',
+            notification_id: notificationId
+        };
+        socket.send(JSON.stringify(data));
     };
 
     function markAsMarked(nId) {
-        console.log("as marked"+nId);
-        // const data = {
-        //     type: 'mark_as_marked',
-        //     notification_id: nId,
-        // };
-        // socket.send(JSON.stringify(data));
+        const data = {
+            type: 'mark_as_marked',
+            notification_id: nId,
+        };
+        socket.send(JSON.stringify(data));
 
     }
 
