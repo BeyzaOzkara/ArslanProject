@@ -2105,6 +2105,17 @@ def all_notifications_view(request):
     context = {'notifications': notifications, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
     return render(request, 'notifications/notification_list.html', context)
 
+def notifReadAll(request):
+    try:
+        notifications = Notification.objects.filter(user=request.user)
+        notifications.update(is_read=True)
+        response = JsonResponse({'message': 'Tümü okundu işaretlendi.'})
+    except Exception as e:
+        response = JsonResponse({'error': str(e)})
+
+    return response
+
+
 # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla 
 """ for field in changeYuda._meta.fields:
     print(f"{field.name}: {getattr(changeYuda, field.name)}") """

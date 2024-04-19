@@ -12913,3 +12913,5 @@ Traceback (most recent call last):
     raise ValueError(
 ValueError: The view ArslanTakipApp.views.yudaDeleteCancel didn't return an HttpResponse object. It returned None instead.
 [35;1mHTTP GET /yudaDeleteCancel/164 500 [0.05, 127.0.0.1:56761][0m
+Internal Server Error: /notifReadAll
+[35;1mHTTP GET /notifReadAll 500 [0.03, 127.0.0.1:59445][0m

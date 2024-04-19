@@ -80,6 +80,25 @@
         socket.send(JSON.stringify(data));
     };
 
+    $('#notification-read-all').on('click', (e) => {
+        let readAll = confirm("Tüm Bildirimleri Okundu İşaretlemek İstediğinizden Emin Misiniz?");
+        if (readAll == true){
+            console.log("deneme");
+            $.ajax({
+                url: '/notifReadAll',
+                type: 'GET',
+                success: function (response) {
+                    alert(response.message);
+                },
+                error: function (response) {
+                    alert('Tümü Okundu İşaretlenemedi. '+response.error);
+                }
+            });
+        }
+    });
+
+
+
 </script>
 
 {% endblock %}

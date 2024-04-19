@@ -27,6 +27,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name= "register"),
     path('notif/<str:id>', views.notif),
     path('notifications/', views.all_notifications_view),
+    path('notifReadAll', views.notifReadAll),
     path('location/', views.location, name="location"),
     path('location/list/', views.location_list),
     path('location/kalip', views.location_kalip),
