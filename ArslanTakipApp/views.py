@@ -524,7 +524,7 @@ def qrKalite_deneme(request):
     y = YudaForm.objects.get(id=107)
 
     for n in Notification.objects.all():
-        n.new_made_by = n.made_by
+        n.new_made_by = User.objects.get(id = n.made_by)
         n.save()
 
     # object_perms = GroupObjectPermission.objects.filter(object_pk=y.id, content_type__model='yudaform', permission__codename='gorme_yuda')
