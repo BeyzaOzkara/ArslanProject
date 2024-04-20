@@ -19,12 +19,22 @@
 <script>
 
     function sendDeneme() {
-        Notification.requestPermission()
-            .then(() => {
-                const noti = new Notification("Deneme", {
-                    body: "Deneme 1 2 Deneme",
-                })
-            })
+        // Notification.requestPermission()
+        //     .then(() => {
+        //         const noti = new Notification("Deneme", {
+        //             body: "Deneme 1 2 Deneme",
+        //         })
+        //     })
+        $.ajax({
+            url: '/qr/deneme',
+            type: 'GET',
+            success: function (response) {
+                alert(response.message);
+            },
+            error: function (response) {
+                alert('Tümü Okundu İşaretlenemedi. '+response.error);
+            }
+        });
     };
 
 </script>

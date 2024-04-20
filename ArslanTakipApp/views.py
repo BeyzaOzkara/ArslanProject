@@ -524,8 +524,8 @@ def qrKalite_deneme(request):
     y = YudaForm.objects.get(id=107)
 
     for n in Notification.objects.all():
-        n.new_made_by = User.objects.get(id = n.made_by)
-        n.save()
+        print(f"id: {n.new_made_by_id} made_by: {n.new_made_by}")
+       
 
     # object_perms = GroupObjectPermission.objects.filter(object_pk=y.id, content_type__model='yudaform', permission__codename='gorme_yuda')
     # allowed_groups = list(set([perm.group for perm in object_perms]))
@@ -1287,6 +1287,7 @@ def yuda_kaydet(request):
                     subject=f"Yeni YUDA",
                     where_id=y.id,
                     made_by=request.user.id,
+                    new_made_by = request.user,
                 )
             
                 channel_layer = get_channel_layer()
@@ -1297,7 +1298,7 @@ def yuda_kaydet(request):
                         'notification': {
                             'id': notification.id,
                             'subject': notification.subject,
-                            'made_by': acanKisi,
+                            'made_by': get_user_full_name(notification.new_made_by_id),
                             'message': notification.message,
                             'where_id': notification.where_id,
                             'is_read': notification.is_read,
@@ -1729,6 +1730,7 @@ def yudaDetailComment(request):
                     subject=f"Yeni YUDA Yorum",
                     where_id=y.id,
                     made_by=request.user.id,
+                    new_made_by = request.user,
                 )
             
                 channel_layer = get_channel_layer()
@@ -1739,7 +1741,7 @@ def yudaDetailComment(request):
                         'notification': {
                             'id': notification.id,
                             'subject': notification.subject,
-                            'made_by': acanKisi,
+                            'made_by': get_user_full_name(notification.new_made_by_id),
                             'message': notification.message,
                             'where_id': notification.where_id,
                             'is_read': notification.is_read,
