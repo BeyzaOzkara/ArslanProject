@@ -40,10 +40,10 @@
                 {% for yuda in yudas %}
                 <div class="col px-4">
                   <div class="notification-item w-100">
-                    <div class="notification-border" style="background-color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ yuda.id }})">
+                    <div class="notification-border" id="nb"+{{ yuda.id}} style="background-color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ yuda.id }})">
                       <span style="opacity: 0;">&nbsp;</span>
                     </div>
-                    <div class="notification-content" onclick="markNotificationAsRead({{ yuda.id }})">
+                    <div class="notification-content"id="nc"+{{ yuda.id}} onclick="markNotificationAsRead({{ yuda.id }})">
                         <div class="d-flex justify-content-between">
                             <div>
                                 <i class="fas fa-file mr-2"></i>
@@ -65,10 +65,10 @@
                 {% for ycomment in ycomments %}
                 <div class="col px-4">
                   <div class="notification-item w-100">
-                    <div class="notification-border" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }}, this)">
+                    <div class="notification-border" id="nb"+{{ ycomment.id}} style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }})">
                       <span style="opacity: 0;">&nbsp;</span>
                     </div>
-                    <div class="notification-content" onclick="markNotificationAsRead({{ ycomment.id }})">
+                    <div class="notification-content" id="nc"+{{ ycomment.id}} onclick="markNotificationAsRead({{ ycomment.id }})">
                         <div class="d-flex justify-content-between">
                             <div>
                                 <i class="fas fa-file mr-2"></i>
@@ -108,15 +108,19 @@
         socket.send(JSON.stringify(data));
     };
 
-    function markAsMarked(notificationId, el) {
-      console.log(el)
-      $(el).removeClass('blue');
-      $(el).addClass('blue');
-        const data = {
-            type: 'mark_as_marked',
-            notification_id: notificationId,
-        };
-        socket.send(JSON.stringify(data));
+    function markAsMarked(notificationId) {
+      //if class has blue remove if it doesn't have add
+      if ($(`#nb${notificationId}`).hasClass('blue')) {
+        $(`#nb${notificationId}`).removeClass('blue');
+      }
+      else {
+        $(`#nb${notificationId}`).addClass('blue');
+      }
+      const data = {
+          type: 'mark_as_marked',
+          notification_id: notificationId,
+      };
+      socket.send(JSON.stringify(data));
 
     }
 
