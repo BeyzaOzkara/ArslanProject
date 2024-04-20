@@ -110,8 +110,13 @@
 
     function markAsMarked(notificationId) {
       //if class has blue remove if it doesn't have add
-      var notificationBorder = $(`#nb${notificationId}`);
-      notificationBorder.toggleClass('blue', !notificationBorder.hasClass('blue'));
+      var isCurrentlyBlue = notificationBorder.css('background-color') === 'rgb(0, 0, 255)'; // Checking if the color is blue
+
+      if (isCurrentlyBlue) {
+          notificationBorder.css('background-color', '#e0e0e0'); // Set to grey if it's currently blue
+      } else {
+          notificationBorder.css('background-color', 'blue'); // Set to blue if it's not
+      }
 
       const data = {
           type: 'mark_as_marked',
