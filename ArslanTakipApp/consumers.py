@@ -42,7 +42,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def send_notification(self, event):
         notification_data = event['notification']
-        self.logger.debug(f"notification: {notification_data}")
         # Send notification data to the WebSocket if it's unread
         if not notification_data['is_read']:
             await self.send(text_data=json.dumps({
