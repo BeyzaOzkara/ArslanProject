@@ -89,6 +89,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 await self.send_notification({'notification': {
                     'id': notification.id,
                     'message': notification.message,
+                    'made_by': notification.made_by,
                     'subject': notification.subject,
                     'is_read': notification.is_read,
                     'is_marked': notification.is_marked,

@@ -343,6 +343,7 @@ class Comment(models.Model):
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     made_by = models.CharField(null=True, blank=True)
+    new_made_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_notifications', null=True)
     message = models.CharField(max_length=255)
     subject = models.CharField(max_length=255, null=True)
     where_id = models.IntegerField(null=True, blank=True)
