@@ -64,21 +64,29 @@
             <div class="row row-cols-2">
                 {% for ycomment in ycomments %}
                 <div class="col px-4">
-                  <div class="notification-item w-100">
-                    <div class="notification-border" id="nb{{ ycomment.id}}" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycomment.id }})">
-                      <span style="opacity: 0;">&nbsp;</span>
-                    </div>
-                    <div class="notification-content" id="nc{{ ycomment.id}}" onclick="markNotificationAsRead({{ ycomment.id }})">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <i class="fas fa-file mr-2"></i>
-                                {{ ycomment.Kisi }}
-                            </div>
-                            <small>{{ ycomment.timestamp }}</small>
+                  <div class="card">
+                    <div class="card-header">
+                      <div class="d-flex justify-content-between">
+                        <div>
+                            <i class="fas fa-file mr-2"></i>
+                            {{ ycomment.Kisi }}
                         </div>
-                        <div class="notiMessage">{{ ycomment.comment }}</div>
-                        <div class="dropdown-divider"></div>
+                        <small>{{ ycomment.timestamp }}</small>
+                      </div>
                     </div>
+                    <div class="card-body">
+                      <div class="notification-item w-100">
+                        <div class="notification-border" id="nb{{ ycomment.id}}" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycomment.id }})">
+                          <span style="opacity: 0;">&nbsp;</span>
+                        </div>
+                        <div class="notification-content" id="nc{{ ycomment.id}}" onclick="markNotificationAsRead({{ ycomment.id }})">
+                            
+                            <div class="notiMessage">{{ ycomment.comment }}</div>
+                            <div class="dropdown-divider"></div>
+                        </div>
+                      </div>
+                    </div>
+                    
                   </div>
                 </div>
                 {% endfor %}
