@@ -39,16 +39,22 @@
             <div class="row row-cols-2">
                 {% for yuda in yudas %}
                 <div class="col px-4">
-                    <div class="callout callout-info">
+                  <div class="notification-item w-100">
+                    <div class="notification-border" style="background-color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ yuda.id }})">
+                      <span style="opacity: 0;">&nbsp;</span>
+                    </div>
+                    <div class="notification-content" onclick="markNotificationAsRead({{ yuda.id }})">
                         <div class="d-flex justify-content-between">
-                            <div style="font-weight: bold;">
+                            <div>
                                 <i class="fas fa-file mr-2"></i>
                                 {{ yuda.Kisi }}
                             </div>
-                            <a>{{ yuda.timestamp }}</a>
+                            <small>{{ yuda.timestamp }}</small>
                         </div>
-                        <div>{{ yuda.message }}</div>
+                        <div class="notiMessage">{{ yuda.message }}</div>
+                        <div class="dropdown-divider"></div>
                     </div>
+                  </div>
                 </div>
                 {% endfor %}
             </div>
@@ -59,7 +65,7 @@
                 {% for ycomment in ycomments %}
                 <div class="col px-4">
                   <div class="notification-item w-100">
-                    <div class="notification-border" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }})">
+                    <div class="notification-border" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }})">
                       <span style="opacity: 0;">&nbsp;</span>
                     </div>
                     <div class="notification-content" onclick="markNotificationAsRead({{ ycomment.id }})">
@@ -74,7 +80,6 @@
                         <div class="dropdown-divider"></div>
                     </div>
                   </div>
-                    
                 </div>
                 {% endfor %}
             </div>
@@ -87,16 +92,7 @@
 {% include 'adminlte/lib/_scripts.html' %}
 
 <script>
-  // <div class="callout callout-info">
-  //   <div class="d-flex justify-content-between">
-  //       <div style="font-weight: bold;">
-  //           <i class="fas fa-file mr-2"></i>
-  //           {{ ycomment.Kisi }}
-  //       </div>
-  //       <a>{{ ycomment.timestamp }}</a>
-  //   </div>
-  //   <div class="notiMessage">{{ ycomment.comment }}</div>
-  // </div>
+
   var notiMessages = document.getElementsByClassName('notiMessage');
   for (var i = 0; i < notiMessages.length; i++) {
       notiMessages[i].innerHTML = notiMessages[i].textContent;
