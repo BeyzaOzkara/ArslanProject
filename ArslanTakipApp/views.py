@@ -1279,10 +1279,10 @@ def yuda_kaydet(request):
             for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
                 notification = Notification.objects.create(
                     user=u,
-                    message=f'{acanKisi}^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+                    message=f'{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
                     subject=f"Yeni YUDA",
                     where_id=y.id,
-                    made_by=request.user,
+                    made_by=request.user.id,
                 )
             
                 channel_layer = get_channel_layer()
@@ -1293,6 +1293,7 @@ def yuda_kaydet(request):
                         'notification': {
                             'id': notification.id,
                             'subject': notification.subject,
+                            'made_by': acanKisi,
                             'message': notification.message,
                             'where_id': notification.where_id,
                             'is_read': notification.is_read,
@@ -1720,10 +1721,10 @@ def yudaDetailComment(request):
             for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
                 notification = Notification.objects.create(
                     user=u,
-                    message=f'{acanKisi}^{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
+                    message=f'{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
                     subject=f"Yeni YUDA Yorum",
                     where_id=y.id,
-                    made_by=request.user,
+                    made_by=request.user.id,
                 )
             
                 channel_layer = get_channel_layer()
@@ -1734,6 +1735,7 @@ def yudaDetailComment(request):
                         'notification': {
                             'id': notification.id,
                             'subject': notification.subject,
+                            'made_by': acanKisi,
                             'message': notification.message,
                             'where_id': notification.where_id,
                             'is_read': notification.is_read,

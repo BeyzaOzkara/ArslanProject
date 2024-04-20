@@ -32,29 +32,53 @@
         const data = JSON.parse(event.data);
         if (data.type === 'notification') {
             const notification = data.notification;
-            const str = notification.message.split("^");
+            const msg = notification.message;
+            const made_by = notification.made_by;
 
             const notificationItem = document.createElement('div');
             notificationItem.classList.add('notification-item', 'w-100');
 
-            // Add border color class based on is_marked attribute
-            const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
+            const nBorderColor = notification.is_marked ? 'blue' : '#e0e0e0';
             notificationItem.innerHTML = `
-                <div class="notification-border" style="background-color: ${notificationBorderClass}; color: ${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
+                <div class="notification-border" style="background-color: ${nBorderColor}; color: ${nBorderColor}" onclick="markAsMarked(${notification.id})">
                     <span style="opacity: 0;">&nbsp;</span>
                 </div>
                 <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
                     <div class="d-flex justify-content-between">
                         <div>
                             <i class="fas fa-file mr-2"></i>
-                            ${str[0]}
+                            ${made_by}
                         </div>
                         <small>${notification.timestamp}</small>
                     </div>
-                    <div>${str[1]}</div>
+                    <div>${msg}</div>
                     <div class="dropdown-divider"></div>
                 </div>
             `;
+
+            // const str = notification.message.split("^");
+
+            // const notificationItem = document.createElement('div');
+            // notificationItem.classList.add('notification-item', 'w-100');
+
+            // // Add border color class based on is_marked attribute
+            // const notificationBorderClass = notification.is_marked ? 'blue' : '#e0e0e0';
+            // notificationItem.innerHTML = `
+            //     <div class="notification-border" style="background-color: ${notificationBorderClass}; color: ${notificationBorderClass}" onclick="markAsMarked(${notification.id})">
+            //         <span style="opacity: 0;">&nbsp;</span>
+            //     </div>
+            //     <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
+            //         <div class="d-flex justify-content-between">
+            //             <div>
+            //                 <i class="fas fa-file mr-2"></i>
+            //                 ${str[0]}
+            //             </div>
+            //             <small>${notification.timestamp}</small>
+            //         </div>
+            //         <div>${str[1]}</div>
+            //         <div class="dropdown-divider"></div>
+            //     </div>
+            // `;
 
             notificationList.appendChild(notificationItem);
 
