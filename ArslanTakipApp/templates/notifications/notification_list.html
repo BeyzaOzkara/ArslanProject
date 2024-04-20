@@ -109,6 +109,8 @@
     };
 
     function markAsMarked(notificationId) {
+      console.log($(`#nb${notificationId}`));
+      console.log($(`#nb${notificationId}`).hasClass('blue'));
       //if class has blue remove if it doesn't have add
       if ($(`#nb${notificationId}`).hasClass('blue')) {
         $(`#nb${notificationId}`).removeClass('blue');
