@@ -2112,7 +2112,8 @@ def all_notifications_view(request):
             n['comment']=cleaned_message
             ycommentNoti.append(n)
 
-    context = {'notifications': notifications, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
+    data = json.dumps(notifications, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    context = {'notifications': data, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
     return render(request, 'notifications/notification_list.html', context)
 
 def notifReadAll(request):
