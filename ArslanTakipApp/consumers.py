@@ -68,7 +68,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             from .models import Notification
             @database_sync_to_async
             def get_notification(notification_id):
+                self.logger.debug(f"mark notification as marked id: {notification_id}")
                 notification = Notification.objects.get(id=notification_id)
+                self.logger.debug(f"mark notification as marked: {notification}")
                 if notification.user == self.user and not notification.is_marked:
                     notification.is_marked = True
                     notification.save()

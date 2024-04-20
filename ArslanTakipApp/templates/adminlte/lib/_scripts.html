@@ -86,10 +86,10 @@
         socket.send(JSON.stringify(data));
     };
 
-    function markAsMarked(nId) {
+    function markAsMarked(notificationId) {
         const data = {
             type: 'mark_as_marked',
-            notification_id: nId,
+            notification_id: notificationId,
         };
         socket.send(JSON.stringify(data));
 
