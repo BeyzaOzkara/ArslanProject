@@ -1,0 +1,383 @@
+{% extends 'adminlte/base.html' %}
+
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
+  <style>
+
+    .content-wrapper {
+      overflow: hidden;
+    }
+
+    .info-box {
+      text-align: left !important;
+      padding-right: 0%;
+      padding-left: 0%;
+    }
+
+    #tableMeydan {
+      max-height: 100%;
+      overflow: auto;
+    }
+
+    .timer {
+      float: right;
+      width: 11vh;
+      height: 11vh;
+    }
+
+
+  </style>
+
+{% endblock %}
+
+{% block content %}
+
+  <div class="row cards-row" id="cardsRow">
+
+  </div>
+
+  <div class="row tabulator-row">
+    <div class="col-md-12">
+      <div class="card h-100 overflow-auto" >
+        <div class="card-body">
+          <div id="tableMeydan"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="kalipModal" tabindex="-1" aria-labelledby="kalipModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="col-lg-10">
+            <h5 class="modal-title">Fırına Ekle</h5>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="container" style="text-align: center;">
+            <form action="" method="post" id="ekleForm">
+            {% csrf_token %}
+            
+              <input type="text" class="form-control-lg" name="kalipNo" value="" readonly id="kalipNo" style="margin-bottom: 2%; text-align: center;">
+              → →
+              <input type="text" class="form-control-lg" name="firinNo" value="" readonly id="firinNo" style="margin-bottom: 2%; text-align: center;">
+
+            </form>
+              <div class="row goz" id="rowGoz">
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnFirinaEkle" class="btn btn-primary">Ekle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+  function alignModal() {
+    var modalDialog = $(this).find(".modal-dialog");
+    modalDialog.css("margin-top", Math.max(0, 
+    ($(window).height() - modalDialog.height()) / 2));
+  };
+
+  const rowBody = $('#cardsRow');
+  const rowGozBody = $('#rowGoz');
+ 
+  const renderData = (data) => {   
+    const cardList = [];
+    document.getElementsByClassName("content-wrapper")[0].id = "contentw";
+    var el = document.getElementById("contentw").style.minHeight.slice(0, -2);
+    var header = $(".content-header").height();
+    var footer = $(".main-footer").height();
+    var eksi = el - header -footer;
+    let oneThirdHeight = Math.max(0, (eksi) / 3);
+    let halfHeight = Math.max(0, (eksi) / 2)-5;
+
+    //kaç fırın gözü var ona göre cardlar oluşturulacak.
+    let gozCount = data[data.length-1]['gozCount'];
+    console.log(gozCount);
+    const data2 = data.slice(0, (data.length-1));
+    //gozCount a göre card oluştur içine infoboxları ekle ve rowa appendle
+    rowBody.empty();
+    rowGozBody.empty();
+    const flexBasis = `${100 / gozCount}%`;
+    console.log(flexBasis)
+    
+    for (j=1; j<=gozCount; j++){
+      const card = $(`<div class="card-container"></div>`).html(`
+        <div class="card h-100 bg-gradient-info text-white" style="text-align: center; flex-basis: ${flexBasis};">
+          <div class="card-body ${j} goz align-items-center" id="cardBody${j}">
+          </div>
+        </div>
+      `);
+      rowBody.append(card);
+      cardList.push( $('#cardBody'+j));
+      const gozCard = $('<div class="card-container">').html(`
+        <div class="card bg-info text-white">
+          <label for="check${j}">
+            <div class="card-body">
+              <input class="check-input" type="radio" name="foo" id="check${j}" value="${j}. GÖZ" aria-label="...">  GÖZ ${j}</div>
+          </label>
+        </div>
+      `);
+      rowGozBody.append(gozCard);
+    };
+
+    cardList.forEach(function(item, index){
+      item.empty();
+      const header = $('<h2 class="text-center"></h3>').html(`${index+1}. GÖZ`);
+      item.append(header);
+    });
+
+    $('input[type=radio][name=foo]').change(function() {
+      var firin = document.getElementById('firinNo');
+      firin.value = this.value;
+    });
+
+    data2.forEach(item => { // Verileri render et...
+      let locationName = item.kalipVaris__locationName;
+      let hZamani = item.hareketTarihi;
+      let count = 1;
+      for (i=1; i<=gozCount; i++) {
+        if(locationName.indexOf(i) !== -1){
+          cardBody = cardList[i-1];
+          let gozName = i + ". GÖZ";
+          let profilNo ="";
+          let yanNo = "";
+          if (item.kalipNo.indexOf("-") != -1){
+            profilNo = (item.kalipNo).substring(0, item.kalipNo.indexOf("-"));
+            yanNo = (item.kalipNo).slice(item.kalipNo.indexOf("-")+1);
+          }
+          else {
+            profilNo = item.kalipNo;
+            yanNo = "";
+          }
+          const box = $('<div class="info-box border-0" style="width: 100%; color: black; overflow: hidden;"></div>').html(`
+          <div class="info-box-content">
+            <div class="row">
+                <div class="container col-lg-6">
+                  <span class="info-box-number" style="font-size: 3.7vh; text-align:center;">${profilNo}</span>
+                  <span class="info-box-number" style="font-size: 3.7vh; text-align:center;">${yanNo}</span>
+                </div>
+                <div class="container col-lg-6" style= "margin-top:auto; margin-bottom:auto;">
+                  <div class="timer" data-hareket-zamani="${item.hareketTarihi}"></div>
+                </div>
+            </div>
+            </div><!-- /.info-box-content -->
+          `);
+          cardBody.append(box);
+          count += 1;
+          break;
+        }
+      };
+      
+      const FULL_DASH_ARRAY = 283;
+      const WARNING_THRESHOLD = 3600; // 1 hour
+      const ALERT_THRESHOLD = 1800;  // 30 minutes
+
+      const TIME_LIMIT = 86400;
+      let timerInterval = null;
+
+      document.querySelectorAll(".timer").forEach(function(item){
+        let hareketZamani = item.getAttribute('data-hareket-zamani');
+        let hareketDate = new Date(hareketZamani);
+        let currentDate = new Date();
+        let differenceInMilliseconds = currentDate - hareketDate;
+        let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
+        let timePassedForThisTimer = differenceInSeconds;
+        let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
+        item.innerHTML = `
+          <div class="base-timer">
+            <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Tam daire (yeşil) -->
+              <circle cx="50" cy="50" stroke = "#800" stroke-width="4" r="45" fill="grey" />
+              <!-- Yarım daire (gri) -->
+              <path id="halfCircle" class="halfC"
+              d="M 50 5 
+                L 50 50 
+                L 50 50 
+                A 45 45 0 0 0 50 5  
+                Z" fill="green" fill-opacity= "0">
+                <animate
+                  attributeType="XML"
+                  attributeName="fill"
+                  values="#26822a;#1ea624;#26822a;#26822a"
+                  dur="0.8s"
+                  repeatCount="indefinite"/>
+              </path>
+              </circle>
+              <circle id="warn" class="warnC" cx="50" cy="50" r="45" fill= "red" fill-opacity= "0"> 
+              <animate
+                  attributeType="XML"
+                  attributeName="fill"
+                  values="#800;#f00;#800;#800"
+                  dur="0.8s"
+                  repeatCount="indefinite"/>
+              </circle>
+              <text class = "base-timer__label" x="9" y="61" font-size="3.8vh" fill="white">00:00</text>
+          </svg>
+          </div>
+          `;
+          myTimer(item);
+      })
+
+    var timeSet = 24;
+
+    function myTimer(item) {
+      let timerInterval = setInterval(() => {
+        let hareketZamani = item.getAttribute('data-hareket-zamani');
+        let hareketDate = new Date(hareketZamani);
+        let currentDate = new Date();
+        let differenceInMilliseconds = currentDate - hareketDate;
+        let differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
+        let timePassedForThisTimer = differenceInSeconds;
+        let timeLeftForThisTimer = TIME_LIMIT - timePassedForThisTimer;
+
+        let label = item.querySelector('.base-timer__label');
+
+        var now = new Date().getTime();
+        var countDownDate = hareketDate.getTime() + timeSet * 60 * 60 * 1000;
+        var distance = (countDownDate - now) / 1000; // saniyeye dönüştür
+
+        let angle = 360 * (distance / (timeSet*60*60)); // 24 saat (86400 saniye) için 360 derece dönüş yapacak şekilde ayarlandı
+        const endX = 50 + 45 * Math.cos((angle - 90)*Math.PI/180);
+        const endY = 50 + 45 * Math.sin((angle - 90)*Math.PI/180);
+
+        const largeArcFlag = angle > 180 ? 1 : 0;
+        const sweepFlag = 1; // Saat yönünde hareket etmek için       
+        let halfC = item.querySelector('.halfC');
+        let warnC = item.querySelector('.warnC');
+      
+        if (angle>0) {
+          halfC.setAttribute('fill-opacity', '1');
+          halfC.setAttribute('d', `M 50 5 L 50 50 L ${endX} ${endY} A 45 45 0 ${largeArcFlag} 0 50 5 Z`);
+          label.textContent = new Date(now-hareketDate).toISOString().substring(11, 16);
+        } else {
+          warnC.setAttribute('fill-opacity', '1');
+          label.textContent = new Date(Math.abs(distance) * 1000).toISOString().substring(11, 16);
+        }
+      }, 1000);
+    }
+      
+    });
+
+    $(".modal").on("shown.bs.modal", alignModal);
+
+    $(window).on("resize", function() {
+      $(".modal:visible").each(alignModal);
+    });
+
+    var cardsrow = $(this).find(".row.cards-row");
+    cardsrow.css("height", halfHeight);
+
+    var cards2 = $(this).find(".row.tabulator-row");
+    cards2.css("height", oneThirdHeight);
+    console.log(oneThirdHeight);
+
+    var tableMeydan = new Tabulator("#tableMeydan", {
+      height: (oneThirdHeight-70),
+      layout:"fitColumns",
+      placeholder:"Meydan Kalıp Liste",
+      progressiveLoad:"scroll",
+      paginationMode:"remote",
+      paginationSize:10,
+      filterMode: "remote",
+      ajaxURL:"/kalipfirini/meydan",
+      ajaxURLGenerator:function(url, config, params){
+          return url + "?params=" + encodeURI(JSON.stringify(params));
+      },
+      columns: [
+        {title:"Kalıp No", field:"kalipNo",  headerFilter:"input", cellClick:function(e, cell){
+          let kalip = cell.getData().kalipNo;
+          document.getElementById("kalipNo").value = kalip;
+          
+          //gözlerin kaç tane olacağını burda yaz 
+          $('#kalipModal').modal('show');
+        }},
+      ],
+    });
+
+  };
+
+  const loadPage = () => {
+    $.ajax({
+      url: `/kalipfirini/goz`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        if (data.length !=0){
+          data = JSON.parse(data);
+          console.log(data);
+          renderData(data);
+        }
+      },
+      error: function (data) {
+        alert(data.responseJSON.error);
+      }
+    });
+  };
+  
+  btnFirinaEkle = document.getElementById('btnFirinaEkle');
+  btnFirinaEkle.addEventListener('click', () => {
+    let firinNo = document.getElementById('firinNo').value;
+    if (firinNo != "" ){
+      PostForm();
+      $('#kalipModal').modal('hide');
+    }
+    else {
+      alert("Lütfen göz seçiniz!");
+    }
+  });
+
+  function PostForm (){
+    $.ajax({
+        url: '/kalipfirini/goz',
+        type: 'post',
+        data: $('#ekleForm').serialize(),
+        success: function(data){
+            alert(data.message);
+            loadPage();
+        },
+        error: function (data) {
+          alert(data.responseJSON.error);
+        }
+    });
+    };
+
+
+
+  loadPage();
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+  {% include 'adminlte/lib/_scripts.html' %}
+  <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+{% endblock %}

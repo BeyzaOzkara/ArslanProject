@@ -1028,7 +1028,7 @@ def eksiparis_acil(request):
 #sayfayı açma yetkisi sadece belli kullanıcıların olsun
 class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
     permission_required = "ArslanTakipApp.kalipEkran_view_location"
-    template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
+    template_name = 'ArslanTakipApp/kalipFirinEkrani2.html'
 
 def infoBoxEkle(kalipNo, gonder, gonderId, request):
     k = DiesLocation.objects.get(kalipNo = kalipNo)
