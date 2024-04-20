@@ -65,7 +65,7 @@
                 {% for ycomment in ycomments %}
                 <div class="col px-4">
                   <div class="notification-item w-100">
-                    <div class="notification-border" id="nb"+{{ ycomment.id}} style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }})">
+                    <div class="notification-border" id="nb"+{{ ycomment.id}} style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycomment.id }})">
                       <span style="opacity: 0;">&nbsp;</span>
                     </div>
                     <div class="notification-content" id="nc"+{{ ycomment.id}} onclick="markNotificationAsRead({{ ycomment.id }})">
