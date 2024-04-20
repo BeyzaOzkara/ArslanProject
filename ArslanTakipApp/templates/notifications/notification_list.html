@@ -109,6 +109,7 @@
     };
 
     function markAsMarked(notificationId) {
+      var notificationBorder = $(`#nb${notificationId}`);
       //if class has blue remove if it doesn't have add
       var isCurrentlyBlue = notificationBorder.css('background-color') === 'rgb(0, 0, 255)'; // Checking if the color is blue
 
