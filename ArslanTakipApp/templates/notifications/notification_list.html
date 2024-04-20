@@ -55,19 +55,26 @@
         </div>
         <div class="col-md-6">
             <h2 class="pl-4">Yorumlar</h2>
-            <div class="row row-cols-1">
+            <div class="row row-cols-2">
                 {% for ycomment in ycomments %}
                 <div class="col px-4">
-                    <div class="callout callout-info">
+                  <div class="notification-item w-100">
+                    <div class="notification-border" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }})">
+                      <span style="opacity: 0;">&nbsp;</span>
+                    </div>
+                    <div class="notification-content" onclick="markNotificationAsRead({{ ycomment.id }})">
                         <div class="d-flex justify-content-between">
-                            <div style="font-weight: bold;">
+                            <div>
                                 <i class="fas fa-file mr-2"></i>
                                 {{ ycomment.Kisi }}
                             </div>
-                            <a>{{ ycomment.timestamp }}</a>
+                            <small>{{ ycomment.timestamp }}</small>
                         </div>
-                        <div class="notiMessage">{{ ycomment.comment }}</div>
+                        <div>{{ ycomment.comment }}</div>
+                        <div class="dropdown-divider"></div>
                     </div>
+                  </div>
+                    
                 </div>
                 {% endfor %}
             </div>
@@ -80,10 +87,40 @@
 {% include 'adminlte/lib/_scripts.html' %}
 
 <script>
+  // <div class="callout callout-info">
+  //   <div class="d-flex justify-content-between">
+  //       <div style="font-weight: bold;">
+  //           <i class="fas fa-file mr-2"></i>
+  //           {{ ycomment.Kisi }}
+  //       </div>
+  //       <a>{{ ycomment.timestamp }}</a>
+  //   </div>
+  //   <div class="notiMessage">{{ ycomment.comment }}</div>
+  // </div>
   var notiMessages = document.getElementsByClassName('notiMessage');
-    for (var i = 0; i < notiMessages.length; i++) {
-        notiMessages[i].innerHTML = notiMessages[i].textContent;
+  for (var i = 0; i < notiMessages.length; i++) {
+      notiMessages[i].innerHTML = notiMessages[i].textContent;
+  };
+
+  
+  function markNotificationAsRead(notificationId) {
+        const data = {
+            type: 'mark_as_read',
+            notification_id: notificationId
+        };
+        socket.send(JSON.stringify(data));
+    };
+
+    function markAsMarked(notificationId) {
+        const data = {
+            type: 'mark_as_marked',
+            notification_id: notificationId,
+        };
+        socket.send(JSON.stringify(data));
+
     }
+
+
 </script>
 
 {% endblock %}
