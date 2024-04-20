@@ -109,15 +109,10 @@
     };
 
     function markAsMarked(notificationId) {
-      console.log($(`#nb${notificationId}`));
-      console.log($(`#nb${notificationId}`).hasClass("blue"));
       //if class has blue remove if it doesn't have add
-      if ($(`#nb${notificationId}`).hasClass('blue')) {
-        $(`#nb${notificationId}`).removeClass('blue');
-      }
-      else {
-        $(`#nb${notificationId}`).addClass('blue');
-      }
+      var notificationBorder = $(`#nb${notificationId}`);
+      notificationBorder.toggleClass('blue', !notificationBorder.hasClass('blue'));
+
       const data = {
           type: 'mark_as_marked',
           notification_id: notificationId,
