@@ -65,7 +65,7 @@
                 {% for ycomment in ycomments %}
                 <div class="col px-4">
                   <div class="notification-item w-100">
-                    <div class="notification-border" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }})">
+                    <div class="notification-border" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycommment.id }}, this)">
                       <span style="opacity: 0;">&nbsp;</span>
                     </div>
                     <div class="notification-content" onclick="markNotificationAsRead({{ ycomment.id }})">
@@ -100,6 +100,7 @@
 
   
   function markNotificationAsRead(notificationId) {
+
         const data = {
             type: 'mark_as_read',
             notification_id: notificationId
@@ -107,7 +108,9 @@
         socket.send(JSON.stringify(data));
     };
 
-    function markAsMarked(notificationId) {
+    function markAsMarked(notificationId, el) {
+      $(el).removeClass('blue');
+      $(el).addClass('blue');
         const data = {
             type: 'mark_as_marked',
             notification_id: notificationId,
