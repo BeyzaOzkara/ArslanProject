@@ -92,6 +92,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                     'message': notification.message,
                     'subject': notification.subject,
                     'is_read': notification.is_read,
+                    'is_marked': notification.is_marked,
                     'timestamp': notification.timestamp.strftime('%d-%m %H:%M'),
                 }})
             self.logger.debug(f"Notifications are sent")
