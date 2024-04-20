@@ -13,6 +13,8 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+  
   <style>
     .callout.callout-info {
         border-width: 40px; /* Adjust the size as needed */
@@ -25,6 +27,15 @@
 {% block content %}
     <h1 class="pl-4">Bildirimler</h1>
     <hr>
+    <div class="card">
+      <div class="card-header">
+        <h3>TABULATOR DENEME</h3>
+      </div>
+      <div class="card-body">
+        <div id="tabNoti"></div>
+      </div>
+    </div>
+
     <div class="container-fluid">
       <div class="row px-4">
         <div class="col alert alert-info">
@@ -100,13 +111,14 @@
 {% include 'adminlte/lib/_scripts.html' %}
 
 <script>
+  var data = JSON.parse('{{ notifications|escapejs }}');
+  console.log(data);
 
   var notiMessages = document.getElementsByClassName('notiMessage');
   for (var i = 0; i < notiMessages.length; i++) {
       notiMessages[i].innerHTML = notiMessages[i].textContent;
   };
 
-  
   function markNotificationAsRead(notificationId) {
 
         const data = {
@@ -116,26 +128,45 @@
         socket.send(JSON.stringify(data));
     };
 
-    function markAsMarked(notificationId) {
-      var notificationBorder = $(`#nb${notificationId}`);
-      //if class has blue remove if it doesn't have add
-      var isCurrentlyBlue = notificationBorder.css('background-color') === 'rgb(0, 0, 255)'; // Checking if the color is blue
+  function markAsMarked(notificationId) {
+    var notificationBorder = $(`#nb${notificationId}`);
+    //if class has blue remove if it doesn't have add
+    var isCurrentlyBlue = notificationBorder.css('background-color') === 'rgb(0, 0, 255)'; // Checking if the color is blue
 
-      if (isCurrentlyBlue) {
-          notificationBorder.css('background-color', '#e0e0e0'); // Set to grey if it's currently blue
-      } else {
-          notificationBorder.css('background-color', 'blue'); // Set to blue if it's not
-      }
-
-      const data = {
-          type: 'mark_as_marked',
-          notification_id: notificationId,
-      };
-      socket.send(JSON.stringify(data));
-
+    if (isCurrentlyBlue) {
+        notificationBorder.css('background-color', '#e0e0e0'); // Set to grey if it's currently blue
+    } else {
+        notificationBorder.css('background-color', 'blue'); // Set to blue if it's not
     }
 
+    const data = {
+        type: 'mark_as_marked',
+        notification_id: notificationId,
+    };
+    socket.send(JSON.stringify(data));
+
+  }
+
+
+  var tableNoti = new Tabulator("#tabNoti", {
+    height:"500px",
+    layout:"fitDataFill",
+    placeholder:"Bildirimler",
+    data: data,
+    columns:[
+        {
+            columns:[
+            {title:"Kim", field:"Kisi"},
+            {title:"İçerik", field:"message"},
+            ],
+            
+        },
+    ],
+  });
+
+  
 
 </script>
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 
 {% endblock %}
