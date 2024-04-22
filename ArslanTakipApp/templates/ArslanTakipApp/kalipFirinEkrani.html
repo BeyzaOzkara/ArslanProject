@@ -58,6 +58,47 @@
         cursor: pointer;
     }
 
+    .card-container {
+        flex: 1 0 auto; /* Adjust this value based on the number of items or available space */
+        min-width: 150px;
+        margin: 5px; /* Small margin for spacing between cards */
+    }
+
+    #gozRadioList {
+        display: flex;
+        flex-wrap: wrap; /* Allows cards to wrap to the next line on small screens */
+        justify-content: center; /* Centers cards in the container */
+        padding: 10px;
+    }
+
+    /* Ensure .info-box and other related elements inside .card-container are styled properly */
+    .info-box {
+        text-align: center; /* Centers the text inside the info box */
+        padding: 10px; /* Padding for spacing within the card */
+    }
+
+    .info-box-content {
+        padding: 5px;
+    }
+
+    /* Adjust the styling of your radio inputs if needed */
+    .check-input {
+        cursor: pointer; /* Makes the cursor a pointer when hovering over the input */
+    }
+
+    /* Media queries for additional responsiveness */
+    @media (max-width: 768px) {
+        .card-container {
+            flex: 1 0 100%; /* Each card takes full width on small screens */
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .card-container {
+            flex: 1 0 50%; /* Each card takes half width on medium screens */
+        }
+    }
+
   </style>
 {% endblock %}
 
@@ -107,6 +148,38 @@
     <button id="close-panel-btn">Kapat</button>
     <div id="meydan-kalip-tabulator" class="mt-3"></div>
 </div>
+
+<div class="modal fade" id="kalipModal" data-goz-count="{{ gozData|length }}" tabindex="-1" aria-labelledby="kalipModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="col-lg-10">
+            <h5 class="modal-title">Fırına Ekle</h5>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="container" style="text-align: center;">
+            <form action="" method="post" id="ekleForm">
+            {% csrf_token %}
+            
+              <input type="text" class="form-control-lg" name="kalipNo" value="" readonly id="kalipNo" style="margin-bottom: 2%; text-align: center;">
+              → →
+              <input type="text" class="form-control-lg" name="firinNo" value="" readonly id="firinNo" style="margin-bottom: 2%; text-align: center;">
+
+            </form>
+            <div id="gozRadioList" class="mb-3"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnFirinaEkle" class="btn btn-primary">Ekle</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}
 
@@ -189,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("kalipNo").value = kalip;
             
             //gözlerin kaç tane olacağını burda yaz 
-            $('#kalipModal').modal('show');
+            showKalipModal();
             }},
         ],
     });
@@ -211,7 +284,52 @@ document.addEventListener("DOMContentLoaded", function() {
 
     closeSidePanel();
 
+    function showKalipModal() {
+        var modalElement = document.getElementById('kalipModal');
+        var gozCount = modalElement.getAttribute('data-goz-count');
+        var gozRadioList = document.getElementById('gozRadioList');
+        gozRadioList.innerHTML = '';  // Clear previous options;
+        var flexBasis = `${100 / gozCount}%`;
+
+        for (var j = 1; j <= gozCount; j++) {
+            const gozCard = `
+            <div class="card-container">
+                <div class="card bg-info text-white">
+                <label for="check${j}">
+                    <div class="card-body">
+                    <input class="check-input" type="radio" name="foo" id="check${j}" value="${j}. GÖZ">
+                    <label class="form-check-label" for="check${j}">${j}. GÖZ</label>
+                    </div>
+                </label>
+                </div>
+            </div>
+            `;
+            gozRadioList.innerHTML += gozCard;
+        }
+
+        // Show the modal
+        $('#kalipModal').modal('show');
+
+        // Bind change event to newly created radio inputs
+        $('input[type=radio][name=foo]').change(function() {
+            var firin = document.getElementById('firinNo');
+            firin.value = this.value;
+        });
+        }
 });
+
+btnFirinaEkle = document.getElementById('btnFirinaEkle');
+btnFirinaEkle.addEventListener('click', () => {
+    let firinNo = document.getElementById('firinNo').value;
+    if (firinNo != "" ){
+        PostForm();
+        $('#kalipModal').modal('hide');
+    }
+    else {
+        alert("Lütfen göz seçiniz!");
+    }
+});
+
 
 </script>
 
