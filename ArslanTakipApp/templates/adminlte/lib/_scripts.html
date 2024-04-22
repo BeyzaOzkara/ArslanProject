@@ -40,7 +40,7 @@
 
             const nBorderColor = notification.is_marked ? 'blue' : '#e0e0e0';
             notificationItem.innerHTML = `
-                <div class="notification-border" style="background-color: ${nBorderColor}; color: ${nBorderColor}" onclick="markAsMarked(${notification.id})">
+                <div class="notification-border" id="nnb${notificationId}" style="background-color: ${nBorderColor}; color: ${nBorderColor}" onclick="markAsMarked(${notification.id})">
                     <span style="opacity: 0;">&nbsp;</span>
                 </div>
                 <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
@@ -91,6 +91,16 @@
     };
 
     function markAsMarked(notificationId) {
+        var notificationBorder = $(`#nnb${notificationId}`);
+        //if class has blue remove if it doesn't have add
+        var isCurrentlyBlue = notificationBorder.css('background-color') === 'rgb(0, 0, 255)'; // Checking if the color is blue
+
+        if (isCurrentlyBlue) {
+            notificationBorder.css('background-color', '#e0e0e0'); // Set to grey if it's currently blue
+        } else {
+            notificationBorder.css('background-color', 'blue'); // Set to blue if it's not
+        }
+
         const data = {
             type: 'mark_as_marked',
             notification_id: notificationId,
