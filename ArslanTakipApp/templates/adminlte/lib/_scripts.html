@@ -40,7 +40,7 @@
 
             const nBorderColor = notification.is_marked ? 'blue' : '#e0e0e0';
             notificationItem.innerHTML = `
-                <div class="notification-border" id="nnb${notificationId}" style="background-color: ${nBorderColor}; color: ${nBorderColor}" onclick="markAsMarked(${notification.id})">
+                <div class="notification-border" id="nnb${notification.id}" style="background-color: ${nBorderColor}; color: ${nBorderColor}" onclick="markAsMarked(${notification.id})">
                     <span style="opacity: 0;">&nbsp;</span>
                 </div>
                 <div class="notification-content" onclick="markNotificationAsRead(${notification.id})">
