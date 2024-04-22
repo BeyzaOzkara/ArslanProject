@@ -96,6 +96,7 @@
         };
         socket.send(JSON.stringify(data));
 
+        window.location.href = `/notif/${notificationId}`;
     }
 
     $('#notification-read-all').on('click', (e) => {

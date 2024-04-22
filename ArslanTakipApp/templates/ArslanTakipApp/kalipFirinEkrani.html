@@ -50,9 +50,39 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" id="goz-container"></div>
+<div class="container mt-3">
+    {% for goz in gozData %}
+        <!-- Göz kartı -->
+        <div class="card mb-3">
+            <div class="card-header">
+                {{ goz.locationName }} <!-- Göz ismi -->
+            </div>
+            <div class="card-body">
+                <!-- Kalıplar için grid yapısı -->
+                <div class="row">
+                    {% for kalip in goz.kalıplar %}
+                        <div class="col-md-4 col-sm-6">
+                            <!-- Info box -->
+                            <div class="info-box">
+                                <span class="info-box-icon bg-info">
+                                    <i class="fas fa-cog"></i> <!-- İkon -->
+                                </span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">{{ kalip.kalipNo }}</span>
+                                    <span class="info-box-number">
+                                        {{ kalip.hareketTarihi|date:"SHORT_DATE_FORMAT" }} <!-- Tarih formatı -->
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
 
-<div class="row cards-row" id="cardsRow">
+<!-- <div class="row cards-row" id="cardsRow">
     <div class="card" style="width: 100%; min-width: 800px; height: 100%; min-height: 600px;">
         <div class="card-body" id="gozParent" style="width: 100%; height: 100%; overflow-y: scroll;">
             <div class="d-flex bd-highlight mb-3">
@@ -96,69 +126,69 @@
            
         </div>
     </div>
-</div>
+</div> -->
 {% endblock %}
 
 {% block extra_js %}
 
 <script>
-    const renderData = (data) => {
-        // Her bir göz için bir grup oluşturacak olan obje
-        const gozMap = {};
+    // const renderData = (data) => {
+    //     // Her bir göz için bir grup oluşturacak olan obje
+    //     const gozMap = {};
         
-        // Veri üzerinde dönerek her bir item'ı işle
-        data.forEach(item => {
-            // Eğer item'ın bir 'locationName' değeri varsa işleme al
-            if (item.kalipVaris__locationName) {
-                // Eğer bu göz için bir grup yoksa yeni bir grup oluştur
-                if (!gozMap[item.kalipVaris__locationName]) {
-                    gozMap[item.kalipVaris__locationName] = [];
-                }
-                // Mevcut göz grubuna yeni bir kalıp ekler
-                gozMap[item.kalipVaris__locationName].push(item);
-            }
-        });
+    //     // Veri üzerinde dönerek her bir item'ı işle
+    //     data.forEach(item => {
+    //         // Eğer item'ın bir 'locationName' değeri varsa işleme al
+    //         if (item.kalipVaris__locationName) {
+    //             // Eğer bu göz için bir grup yoksa yeni bir grup oluştur
+    //             if (!gozMap[item.kalipVaris__locationName]) {
+    //                 gozMap[item.kalipVaris__locationName] = [];
+    //             }
+    //             // Mevcut göz grubuna yeni bir kalıp ekler
+    //             gozMap[item.kalipVaris__locationName].push(item);
+    //         }
+    //     });
 
-        // Container elemanını seç
-        const container = document.getElementById('goz-container');
+    //     // Container elemanını seç
+    //     const container = document.getElementById('goz-container');
         
-        // Oluşturulan gruplar üzerinde dön
-        for (const [goz, kalipList] of Object.entries(gozMap)) {
-            // Her göz için bir kart oluştur
-            const gozCard = document.createElement('div');
-            gozCard.className = 'goz-card';
-            gozCard.innerHTML = `<h3>${goz}</h3>`; // Kartın başlığını belirle
+    //     // Oluşturulan gruplar üzerinde dön
+    //     for (const [goz, kalipList] of Object.entries(gozMap)) {
+    //         // Her göz için bir kart oluştur
+    //         const gozCard = document.createElement('div');
+    //         gozCard.className = 'goz-card';
+    //         gozCard.innerHTML = `<h3>${goz}</h3>`; // Kartın başlığını belirle
             
-            // Her kart için kalıpları içeren elemanları oluştur
-            kalipList.forEach(kalip => {
-            const kalipBox = document.createElement('div');
-            kalipBox.className = 'kalip-box';
-            kalipBox.innerText = `Kalıp No: ${kalip.kalipNo}`;
-            gozCard.appendChild(kalipBox); // Her bir kalıp kutusunu kart içine ekle
-            });
+    //         // Her kart için kalıpları içeren elemanları oluştur
+    //         kalipList.forEach(kalip => {
+    //         const kalipBox = document.createElement('div');
+    //         kalipBox.className = 'kalip-box';
+    //         kalipBox.innerText = `Kalıp No: ${kalip.kalipNo}`;
+    //         gozCard.appendChild(kalipBox); // Her bir kalıp kutusunu kart içine ekle
+    //         });
 
-            container.appendChild(gozCard); // Oluşturulan kartı ana konteynere ekle
-        }
-    }
+    //         container.appendChild(gozCard); // Oluşturulan kartı ana konteynere ekle
+    //     }
+    // }
 
-    const loadPage = () => {
-        $.ajax({
-        url: `/kalipfirini/goz`,
-        method: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            if (data.length !=0){
-                data = JSON.parse(data);
-                renderData(data);
-            }
-        },
-        error: function (data) {
-            alert(data.responseJSON.error);
-        }
-        });
-    };
+    // const loadPage = () => {
+    //     $.ajax({
+    //     url: `/kalipfirini/goz`,
+    //     method: 'GET',
+    //     dataType: 'json',
+    //     success: function (data) {
+    //         if (data.length !=0){
+    //             data = JSON.parse(data);
+    //             renderData(data);
+    //         }
+    //     },
+    //     error: function (data) {
+    //         alert(data.responseJSON.error);
+    //     }
+    //     });
+    // };
 
-    loadPage();
+    // loadPage();
 </script>
 
 {% endblock %}

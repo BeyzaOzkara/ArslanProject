@@ -1028,7 +1028,7 @@ def eksiparis_acil(request):
 #sayfayı açma yetkisi sadece belli kullanıcıların olsun
 class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
     permission_required = "ArslanTakipApp.kalipEkran_view_location"
-    template_name = 'ArslanTakipApp/kalipFirinEkrani2.html'
+    template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
 
 def infoBoxEkle(kalipNo, gonder, gonderId, request):
     k = DiesLocation.objects.get(kalipNo = kalipNo)
@@ -1052,45 +1052,54 @@ def kalipfirini_goz(request):
     #şimdilik gözlerin kalıp sınırı yokmuş gibi ama daha sonra bir sınır verilecek
     #HTMLe döndürülecek data kalıp no ve fırında geçirdiği süre ya da fırına atılış zamanı
     #ona bağlı olarak kaç saat olduğu htmlde hesaplanabilir
-    #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati 
-    if not request.user.is_superuser:
-        loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location) #Location.objects.all() 
-        goz_count = loc.filter(locationName__contains = ". GÖZ").count()
+    #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati
+    if request.user.is_superuser:
+        return JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."}, status=403)
 
-        if request.method == "GET":
-            loc_list = list(loc.values())
-            locs = [l['id'] for l in loc_list]
-            gozKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
-            if gozKalip:
-                gozData = list(gozKalip.values('kalipNo', 'hareketTarihi', 'kalipVaris__locationName'))
-                gozData.append({'gozCount': goz_count})
-                data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-            else:
-                gozData = [{'gozCount': goz_count}]
-                data = json.dumps(gozData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-            response = JsonResponse(data, safe=False) #error döndürmedim çünkü fırınların boş olma durumu bir gerçek bir hal
+    loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location)
+    loc_list = list(loc.values('id', 'locationName'))
+
+    gozler = {l['locationName']: [] for l in loc_list}
+    
+    if request.method == "GET":
+        gozKalip = (DiesLocation.objects.filter(kalipVaris__in=loc)
+                    .order_by('kalipVaris__locationName', 'kalipNo')
+                    .select_related('kalipVaris'))
         
-        elif request.method == "POST":
-            kalipNo = request.POST['kalipNo']
-            firinGoz = request.POST['firinNo'][:-5]
-            #firinId = userın yetkisinin olduğu presin kalıp fırını + firingoz
-            #locationName contains firinGoz şeklinde olabilir.
-            gonder = loc.get(locationName__contains = firinGoz)
-            gonderId = gonder.id
-            gozCapacity = Location.objects.get(id = gonderId).capacity
+        # Her göz için kalıpları grupla
+        for kalip in gozKalip:
+            gozler[kalip.kalipVaris.locationName].append({
+                'kalipNo': kalip.kalipNo,
+                'hareketTarihi': kalip.hareketTarihi,
+                'locationName': kalip.kalipVaris.locationName,
+            })
+        
+        try:
+            gozData = [{'gozCount': len(gozler)}] + [
+                {'locationName': k, 'kalıplar': v} for k, v in gozler.items()
+            ]
+            data = json.dumps(gozData, cls=DjangoJSONEncoder)
+            return HttpResponse(data, content_type='application/json')
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    elif request.method == "POST":
+        kalipNo = request.POST['kalipNo']
+        firinGoz = request.POST['firinNo'][:-5]
+        gonder = loc.get(locationName__contains = firinGoz)
+        gonderId = gonder.id
+        gozCapacity = Location.objects.get(id = gonderId).capacity
 
-            if gozCapacity == None:
+        if gozCapacity == None:
+            response = infoBoxEkle(kalipNo, gonder, gonderId, request)
+        else:
+            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
+            if firinKalipSayisi < gozCapacity:
                 response = infoBoxEkle(kalipNo, gonder, gonderId, request)
             else:
-                firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
-                if firinKalipSayisi < gozCapacity:
-                    response = infoBoxEkle(kalipNo, gonder, gonderId, request)
-                else:
-                    response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
-                    response.status_code = 500         
-    else:
-        response = JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."})
-        response.status_code = 403 #forbidden access
+                response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
+                response.status_code = 500         
+
 
     return response
 
