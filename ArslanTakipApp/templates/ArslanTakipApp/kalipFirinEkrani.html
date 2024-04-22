@@ -17,35 +17,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
   <style>
-    /* Ana Container Stili */
-    #goz-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    }
-
-    /* Göz Kartı Stili */
-    .goz-card {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-bottom: 20px;
-    }
-
-    /* Kalıp Kutusu Stili */
-    .kalip-box {
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin: 10px 0;
-    background-color: #f9f9f9;
-    }
-
-    /* Media Queries */
-    @media (max-width: 600px) {
-    #goz-container {
-        flex-direction: column;
-    }
-    }
+ 
   </style>
 {% endblock %}
 
@@ -64,14 +36,26 @@
                         <div class="col-md-4 col-sm-6">
                             <!-- Info box -->
                             <div class="info-box">
-                                <span class="info-box-icon bg-info">
-                                    <i class="fas fa-cog"></i> <!-- İkon -->
-                                </span>
+                                <!-- <span class="info-box-icon bg-info" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                                    
+                                </span> -->
                                 <div class="info-box-content">
-                                    <span class="info-box-text">{{ kalip.kalipNo }}</span>
-                                    <span class="info-box-number">
-                                        {{ kalip.hareketTarihi|date:"SHORT_DATE_FORMAT" }} <!-- Tarih formatı -->
-                                    </span>
+                                    <div class="row">
+                                        <div class="container col-lg-6">
+                                          <span class="info-box-text" style="font-size: 3.7vh; text-align:center;">{{ kalip.kalipNo }}</span>
+                                        </div>
+                                        <div class="container col-lg-6" style= "margin-top:auto; margin-bottom:auto; display: flex; justify-content: center;">
+                                            <div class="timer"  data-hareket-tarihi="{{ kalip.hareketTarihi }}" style="width: 100px; height: 100px;" id="timer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="50" cy="50" stroke="#800" stroke-width="4" r="45" fill="grey" />
+                                                    <path class="halfC" d="M 50 5 L 50 50 A 45 45 0 0 1 95 50 Z" fill="green" fill-opacity="0"></path>
+                                                    <circle class="warnC" cx="50" cy="50" r="45" fill="red" fill-opacity="0"></circle>
+                                                    <!-- Ensure the text is centered within the circle -->
+                                                    <text class="base-timer__label" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="3.8vh" fill="white">00:00</text>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -82,113 +66,47 @@
     {% endfor %}
 </div>
 
-<!-- <div class="row cards-row" id="cardsRow">
-    <div class="card" style="width: 100%; min-width: 800px; height: 100%; min-height: 600px;">
-        <div class="card-body" id="gozParent" style="width: 100%; height: 100%; overflow-y: scroll;">
-            <div class="d-flex bd-highlight mb-3">
-                <div class="card" style="width: 100%; height: 100%;">
-                    <div class="card-body">
-                        <div class="row row-cols-2">
-                                
-                            <div class="col-lg-1">
-                                <h3>1. GÖZ</h3>
-                            </div>
-                            <div class="col-lg-11">
-                                <div class="row">
-                                    <div class="col-lg-4 info-box bg-light">
-                                        <div class="info-box-content">
-                                        <span class="info-box-text text-center text-muted">Estimated budget</span>
-                                        <span class="info-box-number text-center text-muted mb-0">2300</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 info-box bg-light">
-                                        <div class="info-box-content">
-                                        <span class="info-box-text text-center text-muted">Estimated budget</span>
-                                        <span class="info-box-number text-center text-muted mb-0">2300</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 info-box bg-light">
-                                        <div class="info-box-content">
-                                        <span class="info-box-text text-center text-muted">Estimated budget</span>
-                                        <span class="info-box-number text-center text-muted mb-0">2300</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                
-                
-
-            </div>
-           
-        </div>
-    </div>
-</div> -->
 {% endblock %}
 
 {% block extra_js %}
 
 <script>
-    // const renderData = (data) => {
-    //     // Her bir göz için bir grup oluşturacak olan obje
-    //     const gozMap = {};
-        
-    //     // Veri üzerinde dönerek her bir item'ı işle
-    //     data.forEach(item => {
-    //         // Eğer item'ın bir 'locationName' değeri varsa işleme al
-    //         if (item.kalipVaris__locationName) {
-    //             // Eğer bu göz için bir grup yoksa yeni bir grup oluştur
-    //             if (!gozMap[item.kalipVaris__locationName]) {
-    //                 gozMap[item.kalipVaris__locationName] = [];
-    //             }
-    //             // Mevcut göz grubuna yeni bir kalıp ekler
-    //             gozMap[item.kalipVaris__locationName].push(item);
-    //         }
-    //     });
+document.addEventListener("DOMContentLoaded", function() {
+    const TIME_LIMIT = 86400; // 24 hours in seconds, used to determine when to change visual indications
 
-    //     // Container elemanını seç
-    //     const container = document.getElementById('goz-container');
-        
-    //     // Oluşturulan gruplar üzerinde dön
-    //     for (const [goz, kalipList] of Object.entries(gozMap)) {
-    //         // Her göz için bir kart oluştur
-    //         const gozCard = document.createElement('div');
-    //         gozCard.className = 'goz-card';
-    //         gozCard.innerHTML = `<h3>${goz}</h3>`; // Kartın başlığını belirle
-            
-    //         // Her kart için kalıpları içeren elemanları oluştur
-    //         kalipList.forEach(kalip => {
-    //         const kalipBox = document.createElement('div');
-    //         kalipBox.className = 'kalip-box';
-    //         kalipBox.innerText = `Kalıp No: ${kalip.kalipNo}`;
-    //         gozCard.appendChild(kalipBox); // Her bir kalıp kutusunu kart içine ekle
-    //         });
+    document.querySelectorAll(".timer").forEach(function(item) {
+        let hareketZamani = item.getAttribute('data-hareket-tarihi');
+        let hareketDate = new Date(hareketZamani);
+        if (isNaN(hareketDate.getTime())) {
+            console.error("Invalid date:", hareketZamani);
+            return; // Skip further processing for this item if the date is invalid
+        }
 
-    //         container.appendChild(gozCard); // Oluşturulan kartı ana konteynere ekle
-    //     }
-    // }
+        let timerInterval = setInterval(() => {
+            let now = new Date().getTime();
+            let elapsedTime = (now - hareketDate.getTime()) / 1000; // Calculate elapsed time in seconds
 
-    // const loadPage = () => {
-    //     $.ajax({
-    //     url: `/kalipfirini/goz`,
-    //     method: 'GET',
-    //     dataType: 'json',
-    //     success: function (data) {
-    //         if (data.length !=0){
-    //             data = JSON.parse(data);
-    //             renderData(data);
-    //         }
-    //     },
-    //     error: function (data) {
-    //         alert(data.responseJSON.error);
-    //     }
-    //     });
-    // };
+            let hours = Math.floor(elapsedTime / 3600);
+            let minutes = Math.floor((elapsedTime % 3600) / 60);
 
-    // loadPage();
+            let halfC = item.querySelector('.halfC');
+            let warnC = item.querySelector('.warnC');
+            let label = item.querySelector('.base-timer__label');
+
+            if (elapsedTime >= TIME_LIMIT) {
+                // If more than 24 hours have passed
+                warnC.setAttribute('fill-opacity', '1'); // Show warning visual
+                halfC.setAttribute('fill-opacity', '0'); // Optionally, hide the normal state visual
+            } else {
+                // Less than 24 hours have passed
+                halfC.setAttribute('fill-opacity', '1'); // Show normal visual
+                warnC.setAttribute('fill-opacity', '0'); // Hide warning visual
+            }
+
+            label.textContent = `${hours}s ${minutes}d`; // Update the label with the elapsed time
+        }, 1000);
+    });
+});
 </script>
 
 {% endblock %}

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import re
 import base64, binascii, zlib
 import datetime
@@ -38,6 +39,7 @@ import locale
 from .forms import PasswordChangingForm
 from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
+from django.utils.dateformat import DateFormat
 # Create your views here.
 
 
@@ -1117,23 +1119,24 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
         
         loc = get_objects_for_user(self.request.user, "ArslanTakipApp.goz_view_location", klass=Location)
         loc_list = list(loc.values('id', 'locationName'))
-        
         gozler = {l['locationName']: [] for l in loc_list}
+        sorted_gozler_keys = sorted(gozler, key=lambda x: int(re.search(r'\d+', x).group()))
+        gozler = OrderedDict((key, gozler[key]) for key in sorted_gozler_keys)
         
         gozKalip = (DiesLocation.objects.filter(kalipVaris__in=loc)
-                    .order_by('kalipVaris__locationName', 'kalipNo')
+                    .order_by('kalipVaris__locationName')
                     .select_related('kalipVaris'))
         
         for kalip in gozKalip:
+            formatted_date = DateFormat(kalip.hareketTarihi).format('Y-m-d H:i:s')  # Format datetime for JS
             gozler[kalip.kalipVaris.locationName].append({
                 'kalipNo': kalip.kalipNo,
-                'hareketTarihi': kalip.hareketTarihi,
+                'hareketTarihi': formatted_date,
                 'locationName': kalip.kalipVaris.locationName,
             })
-
+            
         gozData = [{'locationName': k, 'kalıplar': v} for k, v in gozler.items()]
         context['gozData'] = gozData
-        print(gozData)
         return context
     
     def post(self, request, *args, **kwargs):
