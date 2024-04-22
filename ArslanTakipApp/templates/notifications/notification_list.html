@@ -113,7 +113,6 @@
 
 <script>
   var data = JSON.parse('{{ notifications|escapejs }}');
-  console.log(data);
 
   var notiMessages = document.getElementsByClassName('notiMessage');
   for (var i = 0; i < notiMessages.length; i++) {
@@ -121,14 +120,13 @@
   };
 
   function markNotificationAsRead(notificationId) {
-    
     window.location.href = `/notif/${notificationId}`;
-        const data = {
-            type: 'mark_as_read',
-            notification_id: notificationId
-        };
-        socket.send(JSON.stringify(data));
+    const data = {
+        type: 'mark_as_read',
+        notification_id: notificationId
     };
+    socket.send(JSON.stringify(data));
+  };
 
   function markAsMarked(notificationId) {
     var notificationBorder = $(`#nb${notificationId}`);
@@ -149,11 +147,6 @@
 
   }
 
-  function link(cell, formatterParams){
-    var nId = cell.getData().id;
-    return "<a href='/notif/"+nId+"'>"+nId+"</a>";
-  }
-
   var tableNoti = new Tabulator("#tabNoti", {
     height:"500px",
     layout:"fitDataFill",
@@ -166,14 +159,10 @@
   });
 
   tableNoti.on("rowClick", (e, row) => {
-      console.log("row clicked");
-      var nId = row.getData().id; // Get the ID from the row data
-      console.log("row  id: " + nId);
-      window.location.href = '/notif/' + nId; // Redirect the user to the notification page
-  })
-
+    var nId = row.getData().id; // Get the ID from the row data
+    window.location.href = '/notif/' + nId; // Redirect the user to the notification page
+  });
   
-
 </script>
 
 {% endblock %}

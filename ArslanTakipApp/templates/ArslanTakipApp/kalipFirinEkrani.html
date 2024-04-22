@@ -17,36 +17,51 @@
   <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
   <style>
- .side-panel {
-    height: 100%;
-    width: 0; /* Start off as closed */
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: #fff;
-    overflow-x: hidden;
-    padding-top: 60px; /* Add some top padding for content */
-    transition: 0.5s; /* Smooth transition for opening and closing */
-  }
+    .side-panel {
+        height: 100%;
+        width: 250px; /* Start off as closed */
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        background-color: #fff;
+        overflow-x: hidden;
+        padding-top: 60px; /* Add some top padding for content */
+        transition: 0.5s; /* Smooth transition for opening and closing */
+    }
 
-  /* Button to close the side panel */
-  #close-panel-btn {
-    position: absolute;
-    top: 20px;
-    left: 25px;
-    font-size: 20px;
-    padding: 0 15px;
-    border: none;
-    background-color: #f44336;
-    color: white;
-    cursor: pointer;
-  }
+    /* Button to open the side panel */
+    #open-panel-btn {
+        position: fixed;
+        top: 50%; /* Center vertically on the page */
+        right: 0;
+        transform: translateY(-50%); /* Align button center to the middle */
+        z-index: 2; /* Ensure button is above other content but below the panel */
+        background-color: #4CAF50; /* Green background color */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: 0.5s; /* Smooth transition for button sliding in and out */
+    }
+
+    /* Button to close the side panel */
+    #close-panel-btn {
+        position: absolute;
+        top: 20px;
+        left: 25px;
+        font-size: 20px;
+        padding: 0 15px;
+        border: none;
+        background-color: #f44336;
+        color: white;
+        cursor: pointer;
+    }
+
   </style>
 {% endblock %}
 
 {% block content %}
-<button id="open-panel-btn">KALIP EKLE</button>
 <div class="container mt-3">
     {% for goz in gozData %}
         <div class="card mb-3">
@@ -87,6 +102,7 @@
     {% endfor %}
 </div>
 
+<button id="open-panel-btn" style="display:none;">KALIP EKLE</button>
 <div id="side-panel" class="side-panel">
     <button id="close-panel-btn">Kapat</button>
     <div id="meydan-kalip-tabulator" class="mt-3"></div>
@@ -180,16 +196,20 @@ document.addEventListener("DOMContentLoaded", function() {
     
     function openSidePanel() {
       document.getElementById("side-panel").style.width = "250px"; // Set the width to open the panel
+      document.getElementById("open-panel-btn").style.display = "none";
     }
 
     // Function to close the side panel
     function closeSidePanel() {
       document.getElementById("side-panel").style.width = "0"; // Set the width to close the panel
+    document.getElementById("open-panel-btn").style.display = "block"; 
     }
 
     // Add click event listener to the close button
     document.getElementById("close-panel-btn").addEventListener("click", closeSidePanel);
     document.getElementById("open-panel-btn").addEventListener("click", openSidePanel);
+
+    closeSidePanel();
 
 });
 
