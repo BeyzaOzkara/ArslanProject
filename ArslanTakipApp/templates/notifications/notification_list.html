@@ -160,9 +160,13 @@
     placeholder:"Bildirimler",
     data: data,
     columns:[
-            {title:"Kim", field:"Kisi", formatter:link},
-            {title:"İçerik", field:"message", formatter:link},
+            {title:"Kim", field:"Kisi"},
+            {title:"İçerik", field:"message"},
     ],
+    rowClick: function(e, row) {
+      var nId = row.getData().id; // Get the ID from the row data
+      window.location.href = '/notif/' + nId; // Redirect the user to the notification page
+    }
   });
 
   
