@@ -87,6 +87,7 @@
             notification_id: notificationId
         };
         socket.send(JSON.stringify(data));
+        window.location.href = `/notif/${notificationId}`;
     };
 
     function markAsMarked(notificationId) {
@@ -96,7 +97,6 @@
         };
         socket.send(JSON.stringify(data));
 
-        window.location.href = `/notif/${notificationId}`;
     }
 
     $('#notification-read-all').on('click', (e) => {

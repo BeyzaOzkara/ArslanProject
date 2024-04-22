@@ -37,6 +37,7 @@ from asgiref.sync import async_to_sync
 import locale
 from .forms import PasswordChangingForm
 from .dxfsvg import dxf_file_area_calculation
+from django.core.exceptions import PermissionDenied
 # Create your views here.
 
 
@@ -1026,83 +1027,117 @@ def eksiparis_acil(request):
 
 
 #sayfayı açma yetkisi sadece belli kullanıcıların olsun
+# class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
+#     permission_required = "ArslanTakipApp.kalipEkran_view_location"
+#     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
+
+# def infoBoxEkle(kalipNo, gonder, gonderId, request):
+#     k = DiesLocation.objects.get(kalipNo = kalipNo)
+#     if k.kalipVaris.id != gonder:
+#         hareket = Hareket()
+#         hareket.kalipKonum_id = k.kalipVaris.id
+#         hareket.kalipVaris_id = gonderId
+#         hareket.kalipNo = kalipNo
+#         hareket.kimTarafindan_id = request.user.id
+#         hareket.save()
+#         #print("Hareket saved")
+#         response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
+#     else:
+#         #print("Hareket not saved")
+#         response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
+#         response.status_code = 500 #server error
+#     return response
+
+# def kalipfirini_goz(request):
+#     #hangi kalıp fırın giriş yapan kullanıcıya göre belirlenecek
+#     #şimdilik gözlerin kalıp sınırı yokmuş gibi ama daha sonra bir sınır verilecek
+#     #HTMLe döndürülecek data kalıp no ve fırında geçirdiği süre ya da fırına atılış zamanı
+#     #ona bağlı olarak kaç saat olduğu htmlde hesaplanabilir
+#     #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati
+#     if request.user.is_superuser:
+#         return JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."}, status=403)
+
+#     loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location)
+#     loc_list = list(loc.values('id', 'locationName'))
+
+#     gozler = {l['locationName']: [] for l in loc_list}
+    
+#     if request.method == "GET":
+#         gozKalip = (DiesLocation.objects.filter(kalipVaris__in=loc)
+#                     .order_by('kalipVaris__locationName', 'kalipNo')
+#                     .select_related('kalipVaris'))
+        
+#         # Her göz için kalıpları grupla
+#         for kalip in gozKalip:
+#             gozler[kalip.kalipVaris.locationName].append({
+#                 'kalipNo': kalip.kalipNo,
+#                 'hareketTarihi': kalip.hareketTarihi,
+#                 'locationName': kalip.kalipVaris.locationName,
+#             })
+        
+#         try:
+#             gozData = [{'gozCount': len(gozler)}] + [
+#                 {'locationName': k, 'kalıplar': v} for k, v in gozler.items()
+#             ]
+#             data = json.dumps(gozData, cls=DjangoJSONEncoder)
+#             return HttpResponse(data, content_type='application/json')
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
+    
+#     elif request.method == "POST":
+#         kalipNo = request.POST['kalipNo']
+#         firinGoz = request.POST['firinNo'][:-5]
+#         gonder = loc.get(locationName__contains = firinGoz)
+#         gonderId = gonder.id
+#         gozCapacity = Location.objects.get(id = gonderId).capacity
+
+#         if gozCapacity == None:
+#             response = infoBoxEkle(kalipNo, gonder, gonderId, request)
+#         else:
+#             firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
+#             if firinKalipSayisi < gozCapacity:
+#                 response = infoBoxEkle(kalipNo, gonder, gonderId, request)
+#             else:
+#                 response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
+#                 response.status_code = 500         
+
+
+#     return response
+
+
 class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
     permission_required = "ArslanTakipApp.kalipEkran_view_location"
     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
 
-def infoBoxEkle(kalipNo, gonder, gonderId, request):
-    k = DiesLocation.objects.get(kalipNo = kalipNo)
-    if k.kalipVaris.id != gonder:
-        hareket = Hareket()
-        hareket.kalipKonum_id = k.kalipVaris.id
-        hareket.kalipVaris_id = gonderId
-        hareket.kalipNo = kalipNo
-        hareket.kimTarafindan_id = request.user.id
-        hareket.save()
-        #print("Hareket saved")
-        response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
-    else:
-        #print("Hareket not saved")
-        response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
-        response.status_code = 500 #server error
-    return response
-
-def kalipfirini_goz(request):
-    #hangi kalıp fırın giriş yapan kullanıcıya göre belirlenecek
-    #şimdilik gözlerin kalıp sınırı yokmuş gibi ama daha sonra bir sınır verilecek
-    #HTMLe döndürülecek data kalıp no ve fırında geçirdiği süre ya da fırına atılış zamanı
-    #ona bağlı olarak kaç saat olduğu htmlde hesaplanabilir
-    #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati
-    if request.user.is_superuser:
-        return JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."}, status=403)
-
-    loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location)
-    loc_list = list(loc.values('id', 'locationName'))
-
-    gozler = {l['locationName']: [] for l in loc_list}
-    
-    if request.method == "GET":
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.request.user.is_superuser:
+            raise PermissionDenied("Superuserların sayfayı kullanımı yasaktır.")
+        
+        loc = get_objects_for_user(self.request.user, "ArslanTakipApp.goz_view_location", klass=Location)
+        loc_list = list(loc.values('id', 'locationName'))
+        
+        gozler = {l['locationName']: [] for l in loc_list}
+        
         gozKalip = (DiesLocation.objects.filter(kalipVaris__in=loc)
                     .order_by('kalipVaris__locationName', 'kalipNo')
                     .select_related('kalipVaris'))
         
-        # Her göz için kalıpları grupla
         for kalip in gozKalip:
             gozler[kalip.kalipVaris.locationName].append({
                 'kalipNo': kalip.kalipNo,
                 'hareketTarihi': kalip.hareketTarihi,
                 'locationName': kalip.kalipVaris.locationName,
             })
-        
-        try:
-            gozData = [{'gozCount': len(gozler)}] + [
-                {'locationName': k, 'kalıplar': v} for k, v in gozler.items()
-            ]
-            data = json.dumps(gozData, cls=DjangoJSONEncoder)
-            return HttpResponse(data, content_type='application/json')
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+
+        gozData = [{'locationName': k, 'kalıplar': v} for k, v in gozler.items()]
+        context['gozData'] = gozData
+        print(gozData)
+        return context
     
-    elif request.method == "POST":
-        kalipNo = request.POST['kalipNo']
-        firinGoz = request.POST['firinNo'][:-5]
-        gonder = loc.get(locationName__contains = firinGoz)
-        gonderId = gonder.id
-        gozCapacity = Location.objects.get(id = gonderId).capacity
-
-        if gozCapacity == None:
-            response = infoBoxEkle(kalipNo, gonder, gonderId, request)
-        else:
-            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
-            if firinKalipSayisi < gozCapacity:
-                response = infoBoxEkle(kalipNo, gonder, gonderId, request)
-            else:
-                response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
-                response.status_code = 500         
-
-
-    return response
-
+    def post(self, request, *args, **kwargs):
+        print("deneme") 
         
 def kalipfirini_meydan(request):
     #giris yapan usera bagli pres meydanlarındaki kalıplar

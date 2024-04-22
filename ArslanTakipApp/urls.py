@@ -50,7 +50,7 @@ urlpatterns = [
     path('eksiparis/acil', views.eksiparis_acil),
     path('kalipfirini/', login_required(views.KalipFirinView.as_view())),
     path('kalipfirini/meydan', views.kalipfirini_meydan),
-    path('kalipfirini/goz', views.kalipfirini_goz),
+#     path('kalipfirini/goz', views.kalipfirini_goz),
     path('baskigecmisi/', login_required(views.BaskiGecmisiView.as_view())),
     path('baskigecmisi/list', views.baskigecmisi_list),
     path('yuda/', login_required(views.YudaView.as_view())),
