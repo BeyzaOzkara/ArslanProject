@@ -46,7 +46,8 @@
                                                     <path class="halfC" d="M 50 5 L 50 50 A 45 45 0 0 1 95 50 Z" fill="green" fill-opacity="0"></path>
                                                     <circle class="warnC" cx="50" cy="50" r="45" fill="red" fill-opacity="0"></circle>
                                                     <!-- Ensure the text is centered within the circle -->
-                                                    <text class="base-timer__label" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="3vh" fill="white">00:00</text>
+                                                    <text class="base-timer__label--hours" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
+                                                    <text class="base-timer__label--minutes" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
                                                 </svg>
                                             </div>
                                         </div>
@@ -59,6 +60,10 @@
             </div>
         </div>
     {% endfor %}
+</div>
+
+<div class="">
+    
 </div>
 
 {% endblock %}
@@ -79,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let timerInterval = setInterval(() => {
             let now = new Date().getTime();
-            let elapsedTime = (now - hareketDate.getTime()) / 1000; // Calculate elapsed time in seconds
+            let elapsedTime = (now - hareketDate.getTime()) / 1000;
             let hours = Math.floor(elapsedTime / 3600);
             let minutes = Math.floor((elapsedTime % 3600) / 60);
             let seconds = Math.floor(elapsedTime % 60);
@@ -91,7 +96,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             let halfC = item.querySelector('.halfC');
             let warnC = item.querySelector('.warnC');
-            let label = item.querySelector('.base-timer__label');
+            // let label = item.querySelector('.base-timer__label');
+            let labelHours = item.querySelector('.base-timer__label--hours');
+            let labelMinutes = item.querySelector('.base-timer__label--minutes');
 
             // Calculate the end angle and points for the SVG arc
             let endAngle = fraction * 2 * Math.PI; // Full circle is 2 * PI radians
@@ -117,7 +124,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             // Set the label to show hours and minutes
-            label.textContent = `${hours}h ${minutes}m`;
+            // label.textContent = `${hours}s ${minutes}d`;
+            labelHours.textContent = `${hours} saat`;
+            labelMinutes.textContent = `${minutes} dk`;
         }, 1000);
     });
 });

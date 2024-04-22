@@ -121,7 +121,8 @@
   };
 
   function markNotificationAsRead(notificationId) {
-
+    
+    window.location.href = `/notif/${notificationId}`;
         const data = {
             type: 'mark_as_read',
             notification_id: notificationId
