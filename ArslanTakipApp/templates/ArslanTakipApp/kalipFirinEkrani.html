@@ -24,34 +24,29 @@
 {% block content %}
 <div class="container mt-3">
     {% for goz in gozData %}
-        <!-- Göz kartı -->
         <div class="card mb-3">
-            <div class="card-header">
-                {{ goz.locationName }} <!-- Göz ismi -->
+            <div class="card-header" style="font-size: 3.7vh; text-align: center; font-weight: bold;">
+                {{ goz.locationName }}
             </div>
             <div class="card-body">
-                <!-- Kalıplar için grid yapısı -->
                 <div class="row">
                     {% for kalip in goz.kalıplar %}
                         <div class="col-md-4 col-sm-6">
                             <!-- Info box -->
                             <div class="info-box">
-                                <!-- <span class="info-box-icon bg-info" style="position: relative; display: flex; align-items: center; justify-content: center;">
-                                    
-                                </span> -->
                                 <div class="info-box-content">
                                     <div class="row">
                                         <div class="container col-lg-6">
                                           <span class="info-box-text" style="font-size: 3.7vh; text-align:center;">{{ kalip.kalipNo }}</span>
                                         </div>
                                         <div class="container col-lg-6" style= "margin-top:auto; margin-bottom:auto; display: flex; justify-content: center;">
-                                            <div class="timer"  data-hareket-tarihi="{{ kalip.hareketTarihi }}" style="width: 100px; height: 100px;" id="timer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                            <div class="timer"  data-hareket-tarihi="{{ kalip.hareketTarihi }}" style="width: 200px; height: 200px;" id="timer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
                                                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                                                     <circle cx="50" cy="50" stroke="#800" stroke-width="4" r="45" fill="grey" />
                                                     <path class="halfC" d="M 50 5 L 50 50 A 45 45 0 0 1 95 50 Z" fill="green" fill-opacity="0"></path>
                                                     <circle class="warnC" cx="50" cy="50" r="45" fill="red" fill-opacity="0"></circle>
                                                     <!-- Ensure the text is centered within the circle -->
-                                                    <text class="base-timer__label" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="3.8vh" fill="white">00:00</text>
+                                                    <text class="base-timer__label" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="3vh" fill="white">00:00</text>
                                                 </svg>
                                             </div>
                                         </div>
@@ -72,26 +67,44 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const TIME_LIMIT = 86400; // 24 hours in seconds, used to determine when to change visual indications
+    const TIME_LIMIT = 86400; // 24 hours in seconds
 
     document.querySelectorAll(".timer").forEach(function(item) {
         let hareketZamani = item.getAttribute('data-hareket-tarihi');
         let hareketDate = new Date(hareketZamani);
         if (isNaN(hareketDate.getTime())) {
             console.error("Invalid date:", hareketZamani);
-            return; // Skip further processing for this item if the date is invalid
+            return;
         }
 
         let timerInterval = setInterval(() => {
             let now = new Date().getTime();
             let elapsedTime = (now - hareketDate.getTime()) / 1000; // Calculate elapsed time in seconds
-
             let hours = Math.floor(elapsedTime / 3600);
             let minutes = Math.floor((elapsedTime % 3600) / 60);
+            let seconds = Math.floor(elapsedTime % 60);
+
+            // Calculate the fraction of the 24-hour period that has passed
+            let fraction = elapsedTime / TIME_LIMIT;
+            // Ensure the fraction does not exceed 1
+            if (fraction > 1) fraction = 1;
 
             let halfC = item.querySelector('.halfC');
             let warnC = item.querySelector('.warnC');
             let label = item.querySelector('.base-timer__label');
+
+            // Calculate the end angle and points for the SVG arc
+            let endAngle = fraction * 2 * Math.PI; // Full circle is 2 * PI radians
+            let endX = 50 + 45 * Math.sin(endAngle);
+            let endY = 50 - 45 * Math.cos(endAngle);
+
+            // Create the path for the SVG arc
+            let largeArcFlag = fraction > 0.5 ? 1 : 0;
+            let pathDescription = `M 50 5 
+                                   A 45 45 0 ${largeArcFlag} 1 ${endX} ${endY}
+                                   L 50 50 Z`;
+            halfC.setAttribute('d', pathDescription);
+            halfC.setAttribute('fill-opacity', '1');
 
             if (elapsedTime >= TIME_LIMIT) {
                 // If more than 24 hours have passed
@@ -103,10 +116,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 warnC.setAttribute('fill-opacity', '0'); // Hide warning visual
             }
 
-            label.textContent = `${hours}s ${minutes}d`; // Update the label with the elapsed time
+            // Set the label to show hours and minutes
+            label.textContent = `${hours}h ${minutes}m`;
         }, 1000);
     });
 });
+
 </script>
 
 {% endblock %}
