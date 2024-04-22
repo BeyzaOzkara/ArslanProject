@@ -163,11 +163,14 @@
             {title:"Kim", field:"Kisi"},
             {title:"İçerik", field:"message"},
     ],
-    rowClick: function(e, row) {
-      var nId = row.getData().id; // Get the ID from the row data
-      window.location.href = '/notif/' + nId; // Redirect the user to the notification page
-    }
   });
+
+  tableNoti.on("rowClick", (e, row) => {
+      console.log("row clicked");
+      var nId = row.getData().id; // Get the ID from the row data
+      console.log("row  id: " + nId);
+      window.location.href = '/notif/' + nId; // Redirect the user to the notification page
+  })
 
   
 
