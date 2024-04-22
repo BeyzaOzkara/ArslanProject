@@ -246,7 +246,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'musteriFirma' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'musteriFirma' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22yudaNo%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%2224-080%22%7D%2C%7B%22field%22%3A%22musteriFirma%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%22%22%7D%5D%7D HTTP/1.1" 500 116209
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -280,7 +280,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'yudaNo' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'yudaNo' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22yudaNo%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%2224-080%22%7D%5D%7D HTTP/1.1" 500 114827
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -314,7 +314,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'yudaNo' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'yudaNo' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22yudaNo%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%2224-080%22%7D%5D%7D HTTP/1.1" 500 114817
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -348,7 +348,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'MusteriFirma' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'MusteriFirma' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22MusteriFirma%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%22av%22%7D%5D%7D HTTP/1.1" 500 114911
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -382,7 +382,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'MusteriFirma' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'MusteriFirma' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22MusteriFirma%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%22av%22%7D%2C%7B%22field%22%3A%22MusteriFirma%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%22AV%22%7D%5D%7D HTTP/1.1" 500 115943
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -1859,7 +1859,7 @@ Traceback (most recent call last):
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\fields\__init__.py", line 2055, in get_prep_value
     raise e.__class__(
-TypeError: Field 'id' expected a number but got {'id': 32, 'Kullanici_id': 1, 'FormModel': 'YudaForm', 'FormModelId': '99', 'Tarih': '25-03-2024', 'Aciklama': '<p>deneme</p>', 'ReplyTo_id': None, 'KullaniciAdi': 'Beyza Özkara', 'cfiles': []}.
+TypeError: Field 'id' expected a number but got {'id': 32, 'Kullanici_id': 1, 'FormModel': 'YudaForm', 'FormModelId': '99', 'Tarih': '25-03-2024', 'Aciklama': '<p>deneme</p>', 'ReplyTo_id': None, 'KullaniciAdi': 'Beyza ï¿½zkara', 'cfiles': []}.
 "GET /yudaDetail/99 HTTP/1.1" 500 149658
 Internal Server Error: /yudaDetail/99
 Traceback (most recent call last):
@@ -1916,7 +1916,7 @@ Traceback (most recent call last):
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\fields\__init__.py", line 2055, in get_prep_value
     raise e.__class__(
-TypeError: Field 'id' expected a number but got {'id': 32, 'Kullanici_id': 1, 'FormModel': 'YudaForm', 'FormModelId': '99', 'Tarih': '25-03-2024', 'Aciklama': '<p>deneme</p>', 'ReplyTo_id': None, 'KullaniciAdi': 'Beyza Özkara', 'cfiles': []}.
+TypeError: Field 'id' expected a number but got {'id': 32, 'Kullanici_id': 1, 'FormModel': 'YudaForm', 'FormModelId': '99', 'Tarih': '25-03-2024', 'Aciklama': '<p>deneme</p>', 'ReplyTo_id': None, 'KullaniciAdi': 'Beyza ï¿½zkara', 'cfiles': []}.
 "GET /yudaDetail/99 HTTP/1.1" 500 149674
 Internal Server Error: /yudaDetail/99
 Traceback (most recent call last):
@@ -3548,7 +3548,7 @@ Traceback (most recent call last):
     data2 = format_yuda_tab(yudaDetails)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1349, in format_yuda_tab
-    al = [{"Baslik": "Alaþým ve Kondüsyon", "Icerik": f"Alasim: {item['Alasim']} Kondüsyon: {item['Kondusyon']}"} for item in json.loads(yuda_details['AlasimKondusyon'])]
+    al = [{"Baslik": "Alaï¿½ï¿½m ve Kondï¿½syon", "Icerik": f"Alasim: {item['Alasim']} Kondï¿½syon: {item['Kondusyon']}"} for item in json.loads(yuda_details['AlasimKondusyon'])]
                                                                                                                                          ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 418, in __getitem__
     raise TypeError(
@@ -4038,7 +4038,7 @@ Traceback (most recent call last):
     formatted_data = format_row(yudaDetails[0])
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1437, in format_row
-    formatted_row = {"Baþlýk": key_mapping[key], "Ýçerik": value}
+    formatted_row = {"Baï¿½lï¿½k": key_mapping[key], "ï¿½ï¿½erik": value}
                                ~~~~~~~~~~~^^^^^
 KeyError: 'YudaAcanKisi_id'
 "GET /yudaDetail/104 HTTP/1.1" 500 87381
@@ -4441,7 +4441,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'groups' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'groups' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Bolum%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%5B%22Boya%20Bolumu%22%5D%7D%5D%7D HTTP/1.1" 500 130377
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -4481,7 +4481,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'groups' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'groups' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Bolum%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%5B%22Mekanik%20Islem%20Bolumu%22%5D%7D%5D%7D HTTP/1.1" 500 130544
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -4659,7 +4659,7 @@ Traceback (most recent call last):
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
     raise FieldError(
-django.core.exceptions.FieldError: Cannot resolve keyword 'YuzeyEloksal=' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, KullanýmAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
+django.core.exceptions.FieldError: Cannot resolve keyword 'YuzeyEloksal=' into field. Choices are: AlasimKondusyon, BirlikteCalisan, CizimNo, DinTolerans, Kullanï¿½mAlani, MATmax, MATmin, MetreAgirlikTalebi, MusteriFirmaAdi, MusteriOdemeVadesi, OnemliOlculer, Paketleme, PaketlemeAciklama, ProfilMiktarBirim, ProfilSip, ProjeYoneticisi, ProjeYoneticisi_id, RevTarih, Silindi, SonKullaniciFirma, TalasliImalat, TalasliImalatAciklama, Tarih, YillikProfilSiparisiMiktar, YudaAcanKisi, YudaAcanKisi_id, YudaNo, YuzeyAhsap, YuzeyBoya, YuzeyEloksal, YuzeyPres, id, yudaonay
 "GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%7B%22field%22%3A%22Bolum%22%2C%22type%22%3A%22like%22%2C%22value%22%3A%5B%22Eloksal%22%5D%7D%5D%7D HTTP/1.1" 500 118923
 Internal Server Error: /yudas/list
 Traceback (most recent call last):
@@ -7153,7 +7153,7 @@ Traceback (most recent call last):
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1489, in yudaDetail
-    fi = yudaFiles.object.get(FileTitle = "Þartname")
+    fi = yudaFiles.object.get(FileTitle = "ï¿½artname")
          ^^^^^^^^^^^^^^^^
 AttributeError: 'QuerySet' object has no attribute 'object'
 "GET /yudaDetail/107 HTTP/1.1" 500 72574
@@ -7166,7 +7166,7 @@ Traceback (most recent call last):
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1489, in yudaDetail
-    fi = yudaFiles.objects.get(FileTitle = "Þartname")
+    fi = yudaFiles.objects.get(FileTitle = "ï¿½artname")
          ^^^^^^^^^^^^^^^^^
 AttributeError: 'QuerySet' object has no attribute 'objects'
 "GET /yudaDetail/107 HTTP/1.1" 500 72582
@@ -7179,7 +7179,7 @@ Traceback (most recent call last):
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1489, in yudaDetail
-    fi = yudaFiles.objects.get(FileTitle = "Þartname")
+    fi = yudaFiles.objects.get(FileTitle = "ï¿½artname")
          ^^^^^^^^^^^^^^^^^
 AttributeError: 'QuerySet' object has no attribute 'objects'
 "GET /yudaDetail/107 HTTP/1.1" 500 72710
@@ -8921,7 +8921,7 @@ Traceback (most recent call last):
     raise exceptions[0]
   File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
     sock.connect(sa)
-ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiï¿½inden baï¿½lantï¿½ kurulamadï¿½
 Internal Server Error: /accounts/password_reset/
 Traceback (most recent call last):
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
@@ -8984,7 +8984,7 @@ Traceback (most recent call last):
     raise exceptions[0]
   File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
     sock.connect(sa)
-ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiï¿½inden baï¿½lantï¿½ kurulamadï¿½
 "POST /accounts/password_reset/ HTTP/1.1" 500 167343
 Internal Server Error: /accounts/password_reset/
 Traceback (most recent call last):
@@ -9048,7 +9048,7 @@ Traceback (most recent call last):
     raise exceptions[0]
   File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
     sock.connect(sa)
-ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiï¿½inden baï¿½lantï¿½ kurulamadï¿½
 "POST /accounts/password_reset/ HTTP/1.1" 500 167344
 Internal Server Error: /accounts/password_reset/
 Traceback (most recent call last):
@@ -11750,7 +11750,7 @@ Traceback (most recent call last):
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1348, in yudas_list
-    o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+    o['Gï¿½ncelTarih'] = format_date_time(o['Gï¿½ncelTarih'])
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 90, in format_date_time
     return date.strftime("%d-%m-%y %H:%M")
@@ -11779,7 +11779,7 @@ Traceback (most recent call last):
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1348, in yudas_list
-    o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+    o['Gï¿½ncelTarih'] = format_date_time(o['Gï¿½ncelTarih'])
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 90, in format_date_time
     return date.strftime("%d-%m-%y %H:%M")
@@ -11843,7 +11843,7 @@ Traceback (most recent call last):
     raise self.model.DoesNotExist(
 ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
 [35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D 500 [0.07, 127.0.0.1:53305][0m
-Internal Server Error: /siparis/child/BÝLLET TALAÞI
+Internal Server Error: /siparis/child/Bï¿½LLET TALAï¿½I
 Traceback (most recent call last):
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
     raise exc_info[1]
@@ -11874,7 +11874,7 @@ Traceback (most recent call last):
     raise self.model.DoesNotExist(
 ArslanTakipApp.models.DiesLocation.DoesNotExist: DiesLocation matching query does not exist.
 [35;1mHTTP GET /siparis/child/B%C4%B0LLET%20TALA%C5%9EI 500 [0.48, 127.0.0.1:51051][0m
-Internal Server Error: /siparis/child/BÝLLET TALAÞI
+Internal Server Error: /siparis/child/Bï¿½LLET TALAï¿½I
 Traceback (most recent call last):
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
     raise exc_info[1]
@@ -13093,7 +13093,7 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\template\base.py", line 703, in __init__
     raise TemplateSyntaxError(
-django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' // göz.kalýp_count' from '12 // göz.kalýp_count'
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' // gï¿½z.kalï¿½p_count' from '12 // gï¿½z.kalï¿½p_count'
 [35;1mHTTP GET /kalipfirini/ 500 [0.11, 127.0.0.1:59110][0m
 Internal Server Error: /kalipfirini/
 Traceback (most recent call last):
@@ -13191,5 +13191,341 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\template\base.py", line 703, in __init__
     raise TemplateSyntaxError(
-django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' // göz.kalýp_count' from '12 // göz.kalýp_count'
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' // gï¿½z.kalï¿½p_count' from '12 // gï¿½z.kalï¿½p_count'
 [35;1mHTTP GET /kalipfirini/ 500 [0.10, 127.0.0.1:59110][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1128, in kalipfirini_meydan
+    params = json.loads(unquote(request.GET.get('params')))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\urllib\parse.py", line 671, in unquote
+    if '%' not in string:
+       ^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[35;1mHTTP GET /kalipfirini/meydan?size=10&page=1 500 [0.06, 127.0.0.1:51608][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1128, in kalipfirini_meydan
+    params = json.loads(unquote(request.GET.get('params')))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\urllib\parse.py", line 671, in unquote
+    if '%' not in string:
+       ^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[35;1mHTTP GET /kalipfirini/meydan?size=10&page=1 500 [0.06, 127.0.0.1:64979][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1128, in kalipfirini_meydan
+    params = json.loads(unquote(request.GET.get('params')))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\urllib\parse.py", line 671, in unquote
+    if '%' not in string:
+       ^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[35;1mHTTP GET /kalipfirini/meydan?size=10&page=1 500 [0.04, 127.0.0.1:64979][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1128, in kalipfirini_meydan
+    params = json.loads(unquote(request.GET.get('params')))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\urllib\parse.py", line 671, in unquote
+    if '%' not in string:
+       ^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[35;1mHTTP GET /kalipfirini/meydan?size=10&page=1 500 [0.04, 127.0.0.1:53802][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1129, in kalipfirini_meydan
+    size = params["size"]
+           ~~~~~~^^^^^^^^
+KeyError: 'size'
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%7D 500 [0.04, 127.0.0.1:53807][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1129, in kalipfirini_meydan
+    size = params["size"]
+           ~~~~~~^^^^^^^^
+KeyError: 'size'
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D%7D 500 [0.04, 127.0.0.1:54334][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1137, in kalipfirini_meydan
+    loc_id = loc.get(locationName__contains = "MEYDAN").id
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D 500 [0.10, 127.0.0.1:54333][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1137, in kalipfirini_meydan
+    loc_id = loc.get(locationName__contains = "MEYDAN").id
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D 500 [0.08, 127.0.0.1:57151][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1137, in kalipfirini_meydan
+    loc_id = loc.get(locationName__contains = "MEYDAN").id
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D 500 [0.10, 127.0.0.1:57151][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1136, in kalipfirini_meydan
+    loc_id = loc.get(locationName__contains = "MEYDAN").id
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:10%7D 500 [0.08, 127.0.0.1:50418][0m
+Internal Server Error: /kalipfirini/meydan
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 1145, in kalipfirini_meydan
+    meydanKalip = DiesLocation.objects.filter(loc_query).order_by('kalipNo')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1534, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1565, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1393, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1565, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1415, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1225, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\query.py", line 1713, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'locationName' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+[35;1mHTTP GET /kalipfirini/meydan?params=%7B%22filter%22:%5B%5D,%22page%22:1,%22size%22:20%7D 500 [0.77, 127.0.0.1:52198][0m

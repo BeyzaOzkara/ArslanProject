@@ -149,6 +149,10 @@
 
   }
 
+  function link(cell, formatterParams){
+    var nId = cell.getData().id;
+    return "<a href='/notif/"+nId+"'>"+nId+"</a>";
+  }
 
   var tableNoti = new Tabulator("#tabNoti", {
     height:"500px",
@@ -156,8 +160,8 @@
     placeholder:"Bildirimler",
     data: data,
     columns:[
-            {title:"Kim", field:"Kisi"},
-            {title:"İçerik", field:"message"},
+            {title:"Kim", field:"Kisi", formatter:link},
+            {title:"İçerik", field:"message", formatter:link},
     ],
   });
 

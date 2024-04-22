@@ -548,27 +548,6 @@ def qrKalite_deneme(request):
         # for u in allowed_users:
         for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
             print(u)
-            # notification = Notification.objects.create(
-            #     user=u,
-            #     message=f'Beyza Özkara^{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
-            #     where_id=102,
-            #     subject="Yeni YUDA"
-            # )
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     f'notifications_{request.user.id}',
-            #     {
-            #         'type': 'send_notification',
-            #         'notification': {
-            #             'id': notification.id,
-            #             'subject': notification.subject,
-            #             'message': notification.message,
-            #             'where_id': notification.where_id,
-            #             'is_read': notification.is_read,
-            #             'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
-            #         },
-            #     }
-            # )
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
         response = JsonResponse({'error': str(e)})
@@ -1143,15 +1122,13 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
         print("deneme") 
         
 def kalipfirini_meydan(request):
-    #giris yapan usera bagli pres meydanlarındaki kalıplar
-    #her pres kalıp fırını için kullanıcı oluştur, pres meydanlarına yetki ver
-
     params = json.loads(unquote(request.GET.get('params')))
     size = params["size"]
     page = params["page"]
+    filter_list = params.get("filter", [])
     offset, limit = calculate_pagination(page, size)
 
-    loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location) #Location.objects.all()
+    loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location)
     
     if not request.user.is_superuser:
         loc_id = loc.get(locationName__contains = "MEYDAN").id
@@ -1160,9 +1137,12 @@ def kalipfirini_meydan(request):
         loc_list = list(loc.values())
         locs = [l['id'] for l in loc_list]
         meydanKalip = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
-    
-    #print(meydanKalip.values('kalipNo'))
-    meydanData = list(meydanKalip.values('kalipNo')[offset:limit])
+
+    q = {}
+    if len(filter_list) > 0:
+        for i in filter_list:
+            q = filter_method(i, q)
+    meydanData = list(meydanKalip.filter(**q).values('kalipNo')[offset:limit])
 
     meydan_count = meydanKalip.count()
     lastData= {'last_page': math.ceil(meydan_count/size), 'data': []}
