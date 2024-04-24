@@ -1021,10 +1021,8 @@ def eksiparis_acil(request):
 #         hareket.kalipNo = kalipNo
 #         hareket.kimTarafindan_id = request.user.id
 #         hareket.save()
-#         #print("Hareket saved")
 #         response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
 #     else:
-#         #print("Hareket not saved")
 #         response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
 #         response.status_code = 500 #server error
 #     return response
@@ -1090,36 +1088,105 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
     permission_required = "ArslanTakipApp.kalipEkran_view_location"
     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
+    def get(self, request, *args, **kwargs):
         if self.request.user.is_superuser:
             raise PermissionDenied("Superuserların sayfayı kullanımı yasaktır.")
         
+        context = self.get_context_data(**kwargs)  # Assuming get_context_data is properly setting up the context
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         loc = get_objects_for_user(self.request.user, "ArslanTakipApp.goz_view_location", klass=Location)
         loc_list = list(loc.values('id', 'locationName'))
+        loc_list.sort(key=lambda x: int(re.search(r'\d+', x['locationName']).group()))
+
         gozler = {l['locationName']: [] for l in loc_list}
-        sorted_gozler_keys = sorted(gozler, key=lambda x: int(re.search(r'\d+', x).group()))
-        gozler = OrderedDict((key, gozler[key]) for key in sorted_gozler_keys)
-        
-        gozKalip = (DiesLocation.objects.filter(kalipVaris__in=loc)
-                    .order_by('kalipVaris__locationName')
-                    .select_related('kalipVaris'))
+        gozKalip = DiesLocation.objects.filter(kalipVaris__in=loc).select_related('kalipVaris')
         
         for kalip in gozKalip:
-            formatted_date = DateFormat(kalip.hareketTarihi).format('Y-m-d H:i:s')  # Format datetime for JS
             gozler[kalip.kalipVaris.locationName].append({
                 'kalipNo': kalip.kalipNo,
-                'hareketTarihi': formatted_date,
+                'hareketTarihi': DateFormat(kalip.hareketTarihi).format('Y-m-d H:i:s'),
                 'locationName': kalip.kalipVaris.locationName,
             })
-            
-        gozData = [{'locationName': k, 'kalıplar': v} for k, v in gozler.items()]
-        context['gozData'] = gozData
+        
+        context['gozData'] = [{'locationName': k, 'kalıplar': v} for k, v in gozler.items()]
         return context
     
     def post(self, request, *args, **kwargs):
-        print("deneme") 
+        if not request.user.is_authenticated or request.user.is_superuser:
+            return JsonResponse({"error": "Unauthorized access."}, status=403)
+        
+        try:
+            data = request.POST
+            kalipNo = data['kalipNo']
+            firinGoz = data['firinNo']
+
+            if not kalipNo or not firinGoz:
+                return JsonResponse({"error": "Missing required data."}, status=400)
+            
+            loc = get_objects_for_user(self.request.user, "ArslanTakipApp.goz_view_location", klass=Location)
+            gonder = loc.get(locationName__contains=firinGoz)
+            gozCapacity = gonder.capacity
+
+            print(gonder)
+            print(gozCapacity)
+
+            if gozCapacity == None:
+                print("None burda")
+                k = DiesLocation.objects.get(kalipNo = kalipNo)
+                if k.kalipVaris.id != gonder:
+                    hareket = Hareket()
+                    hareket.kalipKonum_id = k.kalipVaris.id
+                    hareket.kalipVaris_id = gonder.id
+                    hareket.kalipNo = kalipNo
+                    hareket.kimTarafindan_id = request.user.id
+                    hareket.save()
+                    response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
+                else:
+                    response = JsonResponse({"error": "Kalıp fırına gönderilemedi."}, status=400)
+                return response
+            else:
+                firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonder.id).count()
+                if firinKalipSayisi < gozCapacity:
+                    k = DiesLocation.objects.get(kalipNo = kalipNo)
+                    if k.kalipVaris.id != gonder:
+                        hareket = Hareket()
+                        hareket.kalipKonum_id = k.kalipVaris.id
+                        hareket.kalipVaris_id = gonder.id
+                        hareket.kalipNo = kalipNo
+                        hareket.kimTarafindan_id = request.user.id
+                        hareket.save()
+                        response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
+                    else:
+                        response = JsonResponse({"error": "Kalıp fırına gönderilemedi."}, status=400)
+                    return response
+                else:
+                    response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
+                    response.status_code = 500
+                    
+            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris=gonder).count()
+            if firinKalipSayisi < gozCapacity:
+                return self.infoBoxEkle(kalipNo, gonder.id, request)
+            else:
+                return JsonResponse({"error": "Capacity full, cannot add more dies."}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+        
+    def infoBoxEkle(self, kalipNo, gonderId, request):
+        k = DiesLocation.objects.get(kalipNo=kalipNo)
+        if k.kalipVaris.id != gonderId:
+            Hareket.objects.create(
+                kalipKonum_id=k.kalipVaris.id,
+                kalipVaris_id=gonderId,
+                kalipNo=kalipNo,
+                kimTarafindan_id=request.user.id
+            )
+            return JsonResponse({"message": "Die successfully added to the furnace."})
+        return JsonResponse({"error": "Failed to add die to the furnace."}, status=500)
+
         
 def kalipfirini_meydan(request):
     params = json.loads(unquote(request.GET.get('params')))

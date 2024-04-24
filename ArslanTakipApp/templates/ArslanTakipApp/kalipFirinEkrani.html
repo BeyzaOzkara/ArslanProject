@@ -99,6 +99,41 @@
         }
     }
 
+    .row.flex-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Centering items in the row */
+    }
+
+    .info-box {
+        flex: 1 0 21%; /* Flex-grow, flex-shrink and flex-basis */
+        margin: 10px; /* Margin for spacing */
+        min-width: 250px; /* Minimum width of each card */
+        max-width: 300px; /* Maximum width of each card to ensure they don't get too large */
+        display: flex;
+        flex-direction: column; /* Stack children vertically */
+        align-items: center; /* Center align the items */
+    }
+
+    /* Media queries to adjust flex-basis based on the screen size */
+    @media (max-width: 768px) {
+        .info-box {
+        flex: 1 0 90%; /* Take nearly full width on small screens */
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .info-box {
+        flex: 1 0 45%; /* Take about half width on medium screens */
+        }
+    }
+
+    @media (min-width: 1025px) {
+        .info-box {
+        flex: 1 0 30%; /* Take about one-third width on large screens */
+        }
+    }
+
   </style>
 {% endblock %}
 
@@ -112,25 +147,23 @@
             <div class="card-body">
                 <div class="row">
                     {% for kalip in goz.kalıplar %}
-                        <div class="col-md-4 col-sm-6">
+                        <div class="row flex-row">
                             <!-- Info box -->
                             <div class="info-box">
                                 <div class="info-box-content">
-                                    <div class="row">
-                                        <div class="container col-lg-6">
-                                          <span class="info-box-text" style="font-size: 3.7vh; text-align:center;">{{ kalip.kalipNo }}</span>
-                                        </div>
-                                        <div class="container col-lg-6" style= "margin-top:auto; margin-bottom:auto; display: flex; justify-content: center;">
-                                            <div class="timer"  data-hareket-tarihi="{{ kalip.hareketTarihi }}" style="width: 200px; height: 200px;" id="timer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
-                                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                                    <circle cx="50" cy="50" stroke="#800" stroke-width="4" r="45" fill="grey" />
-                                                    <path class="halfC" d="M 50 5 L 50 50 A 45 45 0 0 1 95 50 Z" fill="green" fill-opacity="0"></path>
-                                                    <circle class="warnC" cx="50" cy="50" r="45" fill="red" fill-opacity="0"></circle>
-                                                    <!-- Ensure the text is centered within the circle -->
-                                                    <text class="base-timer__label--hours" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
-                                                    <text class="base-timer__label--minutes" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
-                                                </svg>
-                                            </div>
+                                    <div style="text-align: center;">
+                                        <span class="info-box-text" style="font-size: 3.7vh;">{{ kalip.kalipNo }}</span>
+                                    </div>
+                                    <div  style="margin-top:auto; margin-bottom:auto; display: flex; justify-content: center;">
+                                        <div class="timer"  data-hareket-tarihi="{{ kalip.hareketTarihi }}" style="width: 200px; height: 200px;" id="timer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="50" cy="50" stroke="#800" stroke-width="4" r="45" fill="grey" />
+                                                <path class="halfC" d="M 50 5 L 50 50 A 45 45 0 0 1 95 50 Z" fill="green" fill-opacity="0"></path>
+                                                <circle class="warnC" cx="50" cy="50" r="45" fill="red" fill-opacity="0"></circle>
+                                                <!-- Ensure the text is centered within the circle -->
+                                                <text class="base-timer__label--hours" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
+                                                <text class="base-timer__label--minutes" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
+                                            </svg>
                                         </div>
                                     </div>
                                 </div>
@@ -320,16 +353,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
 btnFirinaEkle = document.getElementById('btnFirinaEkle');
 btnFirinaEkle.addEventListener('click', () => {
-    let firinNo = document.getElementById('firinNo').value;
-    if (firinNo != "" ){
-        PostForm();
-        $('#kalipModal').modal('hide');
-    }
-    else {
+    if ($('#firinNo').val() !== "") {
+        postForm();
+    } else {
         alert("Lütfen göz seçiniz!");
     }
 });
 
+function postForm() {
+    $.ajax({
+        url: $('#ekleForm').attr('action'),
+        type: 'POST',
+        data: $('#ekleForm').serialize(),
+        success: function(response) {
+            $('#kalipModal').modal('hide');
+            alert("İşlem başarılı: " + response.message);
+            window.location.reload();
+        },
+        error: function(xhr) {
+            // Handle errors
+            const errorMsg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An error occurred.";
+            alert("Error: " + errorMsg);
+        }
+    });
+}
 
 </script>
 
