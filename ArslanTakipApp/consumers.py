@@ -74,9 +74,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 notification = Notification.objects.get(id=notification_id)
                 if notification.user == self.user and not notification.is_marked:
                     notification.is_marked = True
+                    notification.col_marked = "#4B56D2"
                     notification.save()
                 elif notification.user == self.user and notification.is_marked:
                     notification.is_marked = False
+                    notification.col_marked = "#E9ECEF"
                     notification.save()
                 return True
             await get_notification(notification_id)
