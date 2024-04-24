@@ -1381,6 +1381,7 @@ def yuda_kaydet(request):
                     subject=f"Yeni YUDA",
                     where_id=y.id,
                     new_made_by = request.user,
+                    col_marked = "grey",
                 )
             
                 channel_layer = get_channel_layer()
@@ -1823,6 +1824,7 @@ def yudaDetailComment(request):
                     subject=f"Yeni YUDA Yorum",
                     where_id=y.id,
                     new_made_by = request.user,
+                    col_marked = "grey",
                 )
             
                 channel_layer = get_channel_layer()
