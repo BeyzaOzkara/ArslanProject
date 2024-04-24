@@ -141,11 +141,9 @@
 <div class="container mt-3">
     {% for goz in gozData %}
         <div class="card mb-3">
-            <div class="card-header" style="font-size: 3.7vh; text-align: center; font-weight: bold;">
-                {{ goz.locationName }}
-            </div>
             <div class="card-body">
                 <div class="row">
+                    <h1 style="font-size: 3.7vh; text-align: center; font-weight: bold; writing-mode: vertical-lr; text-orientation: upright;">{{ goz.locationName }}</h1>
                     {% for kalip in goz.kalıplar %}
                         <div class="row flex-row">
                             <!-- Info box -->
@@ -174,7 +172,7 @@
     {% endfor %}
 </div>
 
-<button id="open-panel-btn" style="display:none;">KALIP EKLE</button>
+<button id="open-panel-btn" style="display:none; writing-mode: vertical-rl; text-orientation: upright; font-weight: bold;">KALIP EKLE</button>
 <div id="side-panel" class="side-panel">
     <button id="close-panel-btn">Kapat</button>
     <div id="meydan-kalip-tabulator" class="mt-3"></div>
@@ -210,7 +208,7 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 
 {% endblock %}
 

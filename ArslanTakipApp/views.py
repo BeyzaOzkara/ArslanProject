@@ -1112,8 +1112,8 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
                 'hareketTarihi': DateFormat(kalip.hareketTarihi).format('Y-m-d H:i:s'),
                 'locationName': kalip.kalipVaris.locationName,
             })
-        
-        context['gozData'] = [{'locationName': k, 'kalıplar': v} for k, v in gozler.items()]
+        gozData = [{'locationName': k, 'kalıplar': v} for k, v in gozler.items() if v]
+        context['gozData'] = gozData
         return context
     
     def post(self, request, *args, **kwargs):

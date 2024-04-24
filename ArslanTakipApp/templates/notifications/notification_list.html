@@ -95,6 +95,9 @@
             row.getElement().style.backgroundColor = "#1e3b20";
         }
     },
+    cellClick:function(e, cell){
+      
+    },
     columns:[
             {title:"", field:"col_marked" ,formatter:"color", width:50},
             {title:"Kim", field:"Kisi"},
@@ -104,10 +107,15 @@
     ],
   });
 
+  tableNoti.on("cellClick", function(e, cell){
+      console.log(cell);
+      console.log(cell.getData());
+  });
+
   tableNoti.on("rowClick", (e, row) => {
-    console.log(tableNoti.getData())
+    // console.log(tableNoti.getData())
     var nId = row.getData().id; // Get the ID from the row data
-    // window.location.href = '/notif/' + nId; // Redirect the user to the notification page
+    window.location.href = '/notif/' + nId; // Redirect the user to the notification page
   });
   
 </script>
