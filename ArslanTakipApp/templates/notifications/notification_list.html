@@ -87,6 +87,9 @@
     paginationMode:"remote",
     filterMode:"remote",
     paginationSize:30,
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
     rowFormatter:function(row){
         if(row.getData().col == "blue"){
             row.getElement().style.backgroundColor = "#1e3b20";
@@ -102,8 +105,6 @@
   });
 
   tableNoti.on("rowClick", (e, row) => {
-    console.log(e);
-    console.log(row);
     console.log(tableNoti.getData())
     var nId = row.getData().id; // Get the ID from the row data
     // window.location.href = '/notif/' + nId; // Redirect the user to the notification page

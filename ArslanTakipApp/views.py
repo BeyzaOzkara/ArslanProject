@@ -2205,11 +2205,14 @@ def notifications_all(request):
     filter_list = params.get("filter", [])
     q = {}
 
+    notis = Notification.objects.filter(user=request.user)
+
     if len(filter_list) > 0:
         for i in filter_list:
+            print("burda")
             q = filter_method(i, q)
-
-    filtered_notis = Notification.objects.filter(user=request.user).filter(**q).order_by('-timestamp')
+    
+    filtered_notis = notis.filter(**q).order_by('-timestamp')
     notiList = list(filtered_notis.values()[offset:limit])
 
     # notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
