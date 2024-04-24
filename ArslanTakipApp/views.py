@@ -1383,7 +1383,7 @@ def yuda_kaydet(request):
                     subject=f"Yeni YUDA",
                     where_id=y.id,
                     new_made_by = request.user,
-                    col_marked = "grey",
+                    col_marked = "#E9ECEF",
                 )
                 logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
             
@@ -1826,7 +1826,7 @@ def yudaDetailComment(request):
                     subject=f"Yeni YUDA Yorum",
                     where_id=y.id,
                     new_made_by = request.user,
-                    col_marked = "grey",
+                    col_marked = "#E9ECEF",
                 )
                 logger.debug(f"Comment Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
                 
