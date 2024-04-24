@@ -21,13 +21,13 @@
             <a href="/location" class="nav-link">Kalıp Arşivi</a>
         </li>
         {% endif %}
-        {% if perms.ArslanTakipApp.kalipEkran_view_location %}
+        {% if not perms.ArslanTakipApp.kalipEkran_view_location or user.is_superuser%}
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/kalipfirini" class="nav-link">Kalıp Fırını</a>
+            <a href="/yudas" class="nav-link">YUDA Listesi</a>
         </li>
         {% else %}
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/yudas" class="nav-link">YUDA Listesi</a>
+            <a href="/kalipfirini" class="nav-link">Kalıp Fırını</a>
         </li>
         {% endif %}
     </ul>

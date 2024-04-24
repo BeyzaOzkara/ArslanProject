@@ -14,7 +14,8 @@
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
-  
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+
   <style>
     .callout.callout-info {
         border-width: 40px; /* Adjust the size as needed */
@@ -41,6 +42,8 @@
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
 
 <script>
   // var data = JSON.parse('{{ notifications|escapejs }}');
@@ -66,7 +69,7 @@
     };
     socket.send(JSON.stringify(data));
 
-  }
+  };
 
   var tableNoti = new Tabulator("#tabNoti", {
     height:"600px",
@@ -114,6 +117,8 @@
     }
       
   });
+
+  
   
 </script>
 

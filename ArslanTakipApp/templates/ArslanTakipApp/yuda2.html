@@ -1050,6 +1050,8 @@
             eBoy = $('#eloksalBoy').val();
             if($('#eloksalTemiz').is(':checked')){
                 eTemiz = "Temiz Kesim";
+                $("#tVar").prop("checked", true).trigger("click");
+                $("#talasliImalatAciklama").val("Temiz kesim yapılacak.");
             }
             else{
                 eTemiz = "Temiz Kesim Değil";
@@ -1074,6 +1076,8 @@
         }
         if($('#boyaTemiz').is(':checked')){
             bTemiz = "Temiz Kesim";
+            $("#tVar").prop("checked", true).trigger("click");
+            $("#talasliImalatAciklama").val("Temiz kesim yapılacak.");
         }
         else{
             bTemiz = "Temiz Kesim Değil";
@@ -1095,6 +1099,8 @@
         let ahsapKaplama, ahsapKaplamaId, aTemiz = "";
         if($('#ahsapTemiz').is(':checked')){
             aTemiz = "Temiz Kesim";
+            $("#tVar").prop("checked", true).trigger("click");
+            $("#talasliImalatAciklama").val("Temiz kesim yapılacak.");
         }
         else{
             aTemiz = "Temiz Kesim Değil";
