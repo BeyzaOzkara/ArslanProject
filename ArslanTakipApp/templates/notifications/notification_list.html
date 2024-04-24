@@ -18,7 +18,7 @@
   <style>
     .callout.callout-info {
         border-width: 40px; /* Adjust the size as needed */
-        border-color: #17a2b8; /* Change the color if necessary */
+        border-color: #6aafac; /* Change the color if necessary */
     }
   </style>
 
@@ -91,12 +91,9 @@
         return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
     },
     rowFormatter:function(row){
-        if(row.getData().col == "blue"){
-            row.getElement().style.backgroundColor = "#1e3b20";
+        if(row.getData().col_marked == "#4B56D2"){
+            row.getElement().style.backgroundColor = "#BFCFE7";
         }
-    },
-    cellClick:function(e, cell){
-      
     },
     columns:[
             {title:"", field:"col_marked" ,formatter:"color", width:50},
@@ -108,14 +105,15 @@
   });
 
   tableNoti.on("cellClick", function(e, cell){
-      console.log(cell);
-      console.log(cell.getData());
-  });
-
-  tableNoti.on("rowClick", (e, row) => {
-    // console.log(tableNoti.getData())
-    var nId = row.getData().id; // Get the ID from the row data
-    window.location.href = '/notif/' + nId; // Redirect the user to the notification page
+    var cellField = cell.getElement().getAttribute('tabulator-field');
+    if (cellField != "col_marked") {
+      var nId = cell.getData().id; // Get the ID from the row data
+      window.location.href = '/notif/' + nId;
+    }
+    else {
+      // change is_marked
+    }
+      
   });
   
 </script>
