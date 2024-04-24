@@ -2193,13 +2193,31 @@ def yudaDeleteCancel(request, yId):
 
     return response
 
-def all_notifications_view(request):
-    notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
+class AllNotificationsView(generic.TemplateView):
+    template_name = 'notifications/notification_list.html'
+
+def notifications_all(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+
+    size = params.get("size", 7)  # Default size to 7
+    page = params.get("page", 1)  # Default page to 1
+    offset, limit = calculate_pagination(page, size)
+    filter_list = params.get("filter", [])
+    q = {}
+
+    if len(filter_list) > 0:
+        for i in filter_list:
+            q = filter_method(i, q)
+
+    filtered_notis = Notification.objects.filter(user=request.user).filter(**q).order_by('-timestamp')
+    notiList = list(filtered_notis.values()[offset:limit])
+
+    # notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
     yudaNoti = []
     ycommentNoti = []
-    for n in notifications:
+    for n in notiList:
         n["Kisi"] = get_user_full_name(n['new_made_by_id'])
-        n['timestamp'] = n['timestamp'].strftime('%d-%m-%y %H:%M')
+        n['timestamp'] = format_date_time(n['timestamp'])
         n['CizimNo'] = ""
         if n['subject'] == "Yeni YUDA":
             y = YudaForm.objects.get(id = n['where_id'])
@@ -2212,10 +2230,18 @@ def all_notifications_view(request):
             n['comment']=cleaned_message
             n['CizimNo'] = YudaForm.objects.get(id = n['where_id']).CizimNo
             ycommentNoti.append(n)
+    
+    notis_count = filtered_notis.count()
+    last_page = math.ceil(notis_count / size)
+    response_data = {
+        'last_page' : last_page,
+        'data' : notiList
+    }
+    data = json.dumps(response_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
-    data = json.dumps(notifications, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    context = {'notifications': data, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
-    return render(request, 'notifications/notification_list.html', context)
+    # data = json.dumps(notifications, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    # context = {'notifications': data, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
+    HttpResponse(data)
 
 def notifReadAll(request):
     try:

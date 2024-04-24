@@ -35,74 +35,7 @@
     </div>
 
     <hr>
-    <div class="container-fluid">
-      <div class="row px-4">
-        <div class="col alert alert-info">
-          <h5><i class="icon fas fa-bell"></i></h5>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6">
-            <h2 class="pl-4">Yeni YUDA</h2>
-            <div class="row row-cols-2">
-                {% for yuda in yudas %}
-                <div class="col px-4">
-                  <div class="notification-item w-100">
-                    <div class="notification-border" id="nb{{ yuda.id}}" style="background-color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ yuda.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ yuda.id }})">
-                      <span style="opacity: 0;">&nbsp;</span>
-                    </div>
-                    <div class="notification-content"id="nc{{ yuda.id}}" onclick="markNotificationAsRead({{ yuda.id }})">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <i class="fas fa-file mr-2"></i>
-                                {{ yuda.Kisi }}
-                            </div>
-                            <small>{{ yuda.timestamp }}</small>
-                        </div>
-                        <div class="notiMessage">{{ yuda.message }}</div>
-                        <div class="dropdown-divider"></div>
-                    </div>
-                  </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="col-md-6">
-            <h2 class="pl-4">Yorumlar</h2>
-            <div class="row row-cols-2">
-                {% for ycomment in ycomments %}
-                <div class="col px-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <div class="d-flex justify-content-between">
-                        <div>
-                            <i class="fas fa-file mr-2"></i>
-                            {{ ycomment.Kisi }}
-                        </div>
-                        <small>{{ ycomment.timestamp }}</small>
-                      </div>
-                    </div>
-                    <div class="card-body">
-                      <div class="notification-item w-100">
-                        <div class="notification-border" id="nb{{ ycomment.id}}" style="background-color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}; color: {{ ycomment.is_marked|yesno:'blue,#e0e0e0' }}" onclick="markAsMarked({{ ycomment.id }})">
-                          <span style="opacity: 0;">&nbsp;</span>
-                        </div>
-                        <div class="notification-content" id="nc{{ ycomment.id}}" onclick="markNotificationAsRead({{ ycomment.id }})">
-                            
-                            <div class="notiMessage">{{ ycomment.comment }}</div>
-                            <div class="dropdown-divider"></div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-    </div>
+    
 {% endblock %}
 
 {% block javascript %}
@@ -110,7 +43,7 @@
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 
 <script>
-  var data = JSON.parse('{{ notifications|escapejs }}');
+  // var data = JSON.parse('{{ notifications|escapejs }}');
 
   var notiMessages = document.getElementsByClassName('notiMessage');
   for (var i = 0; i < notiMessages.length; i++) {
@@ -149,7 +82,11 @@
     height:"500px",
     layout:"fitColumns",
     placeholder:"Bildirimler",
-    data: data,
+    ajaxURL:"/allNotifications", 
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
     rowFormatter:function(row){
         if(row.getData().col == "blue"){
             row.getElement().style.backgroundColor = "#1e3b20";
