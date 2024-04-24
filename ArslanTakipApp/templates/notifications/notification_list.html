@@ -92,7 +92,7 @@
     },
     rowFormatter:function(row){
         if(row.getData().col_marked == "#4B56D2"){
-            row.getElement().style.backgroundColor = "#BFCFE7";
+            row.getElement().style.backgroundColor = "#DFECF9 ";
         }
     },
     columns:[
@@ -106,12 +106,13 @@
 
   tableNoti.on("cellClick", function(e, cell){
     var cellField = cell.getElement().getAttribute('tabulator-field');
+    var nId = cell.getData().id; // Get the ID from the row data
     if (cellField != "col_marked") {
-      var nId = cell.getData().id; // Get the ID from the row data
-      window.location.href = '/notif/' + nId;
+      markNotificationAsRead(nId);
     }
     else {
       // change is_marked
+      markAsMarked(nId);
     }
       
   });
