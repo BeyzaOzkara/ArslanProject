@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import logging
 import re
 import base64, binascii, zlib
 import datetime
@@ -44,6 +45,7 @@ from django.utils.dateformat import DateFormat
 
 
 locale.setlocale(locale.LC_ALL, 'tr_TR.UTF-8')
+logger = logging.getLogger(__name__)
 
 class IndexView(generic.TemplateView):
     template_name = 'ArslanTakipApp/index.html'
@@ -1383,6 +1385,7 @@ def yuda_kaydet(request):
                     new_made_by = request.user,
                     col_marked = "grey",
                 )
+                logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
             
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
@@ -1401,6 +1404,8 @@ def yuda_kaydet(request):
                         },
                     }
                 )
+                logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+            
 
             response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
         except json.JSONDecodeError:
@@ -1815,7 +1820,6 @@ def yudaDetailComment(request):
                     Note = "",
                 )
 
-            acanKisi = get_user_full_name(request.user.id)
             allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
             for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
@@ -1827,7 +1831,8 @@ def yudaDetailComment(request):
                     new_made_by = request.user,
                     col_marked = "grey",
                 )
-            
+                logger.debug(f"Comment Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
                     f'notifications_{request.user.id}',
@@ -1845,6 +1850,7 @@ def yudaDetailComment(request):
                         },
                     }
                 )
+                logger.debug(f"Comment Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
             
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
