@@ -2209,8 +2209,14 @@ def notifications_all(request):
 
     if len(filter_list) > 0:
         for i in filter_list:
-            print("burda")
-            q = filter_method(i, q)
+            if i['field'] == 'Kisi':
+                userIds = User.objects.filter(username__icontains = i['value']).values_list('id', flat=True) # get the ids
+                q["new_made_by_id__in"] = userIds
+            elif i['field'] == 'CizimNo':
+                cizimIds = YudaForm.objects.filter(CizimNo__icontains = i['value']).values_list('id', flat=True)
+                q["where_id__in"] = cizimIds
+            else:
+                q = filter_method(i, q)
     
     filtered_notis = notis.filter(**q).order_by('-timestamp')
     notiList = list(filtered_notis.values()[offset:limit])

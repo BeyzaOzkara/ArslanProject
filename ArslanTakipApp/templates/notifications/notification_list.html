@@ -69,7 +69,7 @@
   }
 
   var tableNoti = new Tabulator("#tabNoti", {
-    height:"500px",
+    height:"600px",
     layout:"fitColumns",
     placeholder:"Bildirimler",
     ajaxURL:"/notifications/all", 
@@ -87,9 +87,9 @@
     },
     columns:[
             {title:"", field:"col_marked" ,formatter:"color", width:50},
-            {title:"Kim", field:"Kisi"},
-            {title:"İçerik", field:"message"},
-            {title:"Çizim No", field:"CizimNo"},
+            {title:"Kim", field:"Kisi", headerFilter:"input"},
+            {title:"İçerik", field:"message", headerFilter:"input"},
+            {title:"Çizim No", field:"CizimNo", headerFilter:"input"},
             {title:"Zaman", field:"timestamp"},
     ],
   });
@@ -102,7 +102,6 @@
       markNotificationAsRead(nId);
     }
     else {
-      // change is_marked
       if (cell.getRow().getElement().style.backgroundColor) { // marked değil ise
         cell.getRow().getElement().removeAttribute("style");
         cell.getElement().style.backgroundColor = "#E9ECEF";
@@ -111,7 +110,6 @@
         cell.getRow().getElement().style.backgroundColor = "#DFECF9";
         cell.getElement().style.backgroundColor = "#4B56D2";
       }
-      console.log(nId);
       markAsMarked(nId);
     }
       
