@@ -152,9 +152,15 @@
     layout:"fitDataFill",
     placeholder:"Bildirimler",
     data: data,
+    rowFormatter:function(row){
+        if(row.getData().col == "blue"){
+            row.getElement().style.backgroundColor = "#1e3b20";
+        }
+    },
     columns:[
             {title:"Kim", field:"Kisi"},
             {title:"İçerik", field:"message"},
+            {title:"", field:"col_marked" ,formatter:"color", width:50},
     ],
   });
 
