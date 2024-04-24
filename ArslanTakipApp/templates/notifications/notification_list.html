@@ -25,22 +25,20 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="pl-4">Bildirimler</h1>
-    <hr>
     <div class="card">
       <div class="card-header">
-        <h3>TABULATOR DENEME</h3>
+        <h3>BİLDİRİMLER</h3>
       </div>
       <div class="card-body">
         <div id="tabNoti"></div>
       </div>
     </div>
 
+    <hr>
     <div class="container-fluid">
       <div class="row px-4">
         <div class="col alert alert-info">
-          <h5><i class="icon fas fa-info"></i> Info!</h5>
-          Info preview.
+          <h5><i class="icon fas fa-bell"></i></h5>
         </div>
       </div>
 
@@ -167,6 +165,8 @@
   });
 
   tableNoti.on("rowClick", (e, row) => {
+    console.log(e);
+    console.log(row);
     var nId = row.getData().id; // Get the ID from the row data
     window.location.href = '/notif/' + nId; // Redirect the user to the notification page
   });
