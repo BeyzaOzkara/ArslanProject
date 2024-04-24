@@ -2241,7 +2241,7 @@ def notifications_all(request):
 
     # data = json.dumps(notifications, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     # context = {'notifications': data, 'yudas': yudaNoti, 'ycomments': ycommentNoti}
-    HttpResponse(data)
+    return HttpResponse(data)
 
 def notifReadAll(request):
     try:
