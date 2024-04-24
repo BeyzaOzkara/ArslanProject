@@ -149,7 +149,7 @@
 
   var tableNoti = new Tabulator("#tabNoti", {
     height:"500px",
-    layout:"fitDataFill",
+    layout:"fitColumns",
     placeholder:"Bildirimler",
     data: data,
     rowFormatter:function(row){
@@ -161,6 +161,7 @@
             {title:"", field:"col_marked" ,formatter:"color", width:50},
             {title:"Kim", field:"Kisi"},
             {title:"İçerik", field:"message"},
+            {title:"Çizim No", field:"CizimNo"},
             {title:"Zaman", field:"timestamp"},
     ],
   });

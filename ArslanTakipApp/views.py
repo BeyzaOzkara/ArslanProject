@@ -2203,14 +2203,17 @@ def all_notifications_view(request):
     for n in notifications:
         n["Kisi"] = get_user_full_name(n['new_made_by_id'])
         n['timestamp'] = n['timestamp'].strftime('%d-%m-%y %H:%M')
+        n['CizimNo'] = ""
         if n['subject'] == "Yeni YUDA":
             y = YudaForm.objects.get(id = n['where_id'])
             n['message'] = y.MusteriFirmaAdi + n['message'].split("..")[1]
+            n['CizimNo'] = y.CizimNo
             yudaNoti.append(n)
         elif n['subject'] == "Yeni YUDA Yorum":
             c = Comment.objects.filter(Kullanici_id=n['new_made_by_id'], FormModel='YudaForm', FormModelId=n['where_id']).latest('Tarih')
             cleaned_message = re.sub(r'<p>\s*<br>\s*</p>', '', c.Aciklama)
             n['comment']=cleaned_message
+            n['CizimNo'] = YudaForm.objects.get(id = n['where_id']).CizimNo
             ycommentNoti.append(n)
 
     data = json.dumps(notifications, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
