@@ -1284,6 +1284,7 @@ def yuda(request, objId):
     data = json.dumps(parameters, indent=1)
     return HttpResponse(data)
 
+@transaction.atomic
 def yuda_kaydet(request):
     if request.method == "POST":
         try:
@@ -1371,7 +1372,6 @@ def yuda_kaydet(request):
                 )
             
             # for user in User.objects.exclude(id=request.user.id):
-            acanKisi = get_user_full_name(request.user.id)
             allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
             for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
@@ -1785,7 +1785,8 @@ def yudaDetail2(request, yId):
     formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     svgData = json.dumps(svgData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'svgData': svgData, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
-    
+
+@transaction.atomic
 def yudaDetailComment(request):
     if request.method == 'POST':
         try:

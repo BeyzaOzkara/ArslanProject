@@ -1232,6 +1232,7 @@
     };
 
     document.querySelector("#yudaKaydet").addEventListener('click', function(){
+        this.disabled = true;
         var formData = new FormData();
         formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
 
@@ -1300,6 +1301,7 @@
             },
             error: function(response) {
                 // Hata durumunda işlemler
+                this.disabled = false;
                 alert('Dosya yüklemesi başarısız oldu. '+response.responseJSON.error);
             }
         });
