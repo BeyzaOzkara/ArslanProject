@@ -100,13 +100,13 @@
             {title:"Zaman", field:"timestamp"},
     ],
   });
-  console.log(tableNoti.getData())
 
   tableNoti.on("rowClick", (e, row) => {
     console.log(e);
     console.log(row);
+    console.log(tableNoti.getData())
     var nId = row.getData().id; // Get the ID from the row data
-    window.location.href = '/notif/' + nId; // Redirect the user to the notification page
+    // window.location.href = '/notif/' + nId; // Redirect the user to the notification page
   });
   
 </script>
