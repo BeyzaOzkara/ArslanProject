@@ -1586,7 +1586,6 @@ def format_yuda_details(yList):
         for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
             if i[key]:
                 json_data = json.loads(i[key])
-                print(json_data)
                 if key == 'AlasimKondusyon':
                     i[key] = process_alasim(json_data)
                 elif key == 'YuzeyPres':
@@ -1726,9 +1725,7 @@ def format_row(row):
     return formatted_data
 
 def yudaDetail(request, yId):
-    #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
-    # print(yudaFiles)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     # if yudaFiles.filter(FileTitle = "Şartname").exists():

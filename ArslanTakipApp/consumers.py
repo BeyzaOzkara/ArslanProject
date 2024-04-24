@@ -102,6 +102,5 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                     'is_marked': notification.is_marked,
                     'timestamp': notification.timestamp.strftime('%d-%m %H:%M'),
                 }})
-            self.logger.debug(f"Notifications are sent")
         except Exception as e:
             self.logger.debug(f"Error fetching unread notifications: {e}")
