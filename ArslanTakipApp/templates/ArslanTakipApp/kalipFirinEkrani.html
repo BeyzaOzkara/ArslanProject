@@ -58,7 +58,7 @@
         cursor: pointer;
     }
 
-    .card-container {
+    .card-container { /* Kalıp eklemedeki card */
         flex: 1 0 auto; /* Adjust this value based on the number of items or available space */
         min-width: 150px;
         margin: 5px; /* Small margin for spacing between cards */
@@ -160,7 +160,6 @@
                                                 <circle cx="50" cy="50" stroke="#800" stroke-width="4" r="45" fill="grey" />
                                                 <path class="halfC" d="M 50 5 L 50 50 A 45 45 0 0 1 95 50 Z" fill="green" fill-opacity="0"></path>
                                                 <circle class="warnC" cx="50" cy="50" r="45" fill="red" fill-opacity="0"></circle>
-                                                <!-- Ensure the text is centered within the circle -->
                                                 <text class="base-timer__label--hours" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
                                                 <text class="base-timer__label--minutes" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-size="2.8vh" fill="white">00</text>
                                             </svg>
@@ -293,8 +292,6 @@ document.addEventListener("DOMContentLoaded", function() {
             {title:"Kalıp No", field:"kalipNo",  headerFilter:"input", cellClick:function(e, cell){
             let kalip = cell.getData().kalipNo;
             document.getElementById("kalipNo").value = kalip;
-            
-            //gözlerin kaç tane olacağını burda yaz 
             showKalipModal();
             }},
         ],
@@ -371,7 +368,6 @@ function postForm() {
             window.location.reload();
         },
         error: function(xhr) {
-            // Handle errors
             const errorMsg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An error occurred.";
             alert("Error: " + errorMsg);
         }
