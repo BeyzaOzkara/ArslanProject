@@ -699,10 +699,10 @@
         let allFilled = true;
         let $infoBox = $(this).closest('.required-info');
         if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
-        if ($infoBox.length == 0){ // info box içinde olmayanlar --> talaşlı imalat, paketleme ve dosya
+        if ($infoBox.length == 0){
             allFilled = checkRequiredField($(this), allFilled);
         }
-        else { // info-box içinde olanlar
+        else {
             let checkResult = false;
             let $reqInputs = $infoBox.find('[required]');
             $reqInputs.each(function(r) {
@@ -716,7 +716,6 @@
         } 
     });
     
-    /* is template is used with yuda/yId or used with yudaEdit/yId */
     var formData = new FormData();
     var full = false;
     function changeFunction () {

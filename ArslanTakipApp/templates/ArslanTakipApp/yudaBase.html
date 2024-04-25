@@ -530,25 +530,35 @@
                 </div>
                 <div class="tab-pane" id="tab_7">
                     <div class="card">
-                        <div class="card-header">Yüklenecek Dosyalar</div>
-                        <div class="card-body" id="dosyaBody">
+                        <div class="card-header">Mevcut Dosyalar</div>
+                        <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="input-group border border-danger">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple required>
-                                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
-                                        </div>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
-                                        </div>
-                                    </div>
-                                    <div id="fileTitles" class="form-group"></div>
+                                    <div id="oldFileDiv" class="form-group"></div>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
+                  </div>
+                  <div class="card">
+                      <div class="card-header">Dosya Yükle</div>
+                      <div class="card-body" id="dosyaBody">
+                          <div class="row">
+                              <div class="col-12">
+                                  <div class="input-group">
+                                      <div class="custom-file">
+                                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                                      </div>
+                                      <div class="input-group-append">
+                                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                                      </div>
+                                  </div>
+                                  <div id="fileTitles" class="form-group"></div>
+                              </div>
+                          </div>
+
+                      </div>
+                  </div>
                 </div>
             </div>
         </form>
