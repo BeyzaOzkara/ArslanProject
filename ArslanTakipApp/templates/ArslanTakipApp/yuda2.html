@@ -23,10 +23,7 @@
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
   <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
   <style>
-    /* .required-info {
-        border: 1px solid red !important;
-    } */
-        .required-info {
+    .required-info {
     border: 1px solid red;
     }
 
@@ -636,7 +633,6 @@
 
 {% block extra_js %}
 <script>
-
     function formatNumber(number) {
         number = number.replace(/[^\d,]/g, '')
         var parts = [];

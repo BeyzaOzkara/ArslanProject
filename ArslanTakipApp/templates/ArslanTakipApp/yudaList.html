@@ -419,15 +419,19 @@
               <a>${item.GüncelTarih}</a>
           </td>
           <td class="project-actions text-right">
-              <a class="btn btn-primary btn-sm" href="yudaDetail/${item.id}">
+              <a class="btn btn-primary btn-sm" href="yudaCopy/${item.id}" data-toggle="tooltip" title="Kopyala">
+                  <i class="fas fa-clone">
+                  </i>
+              </a>
+              <a class="btn btn-primary btn-sm" href="yudaDetail/${item.id}" data-toggle="tooltip" title="Görüntüle">
                   <i class="fas fa-eye">
                   </i>
               </a>
-                  <a class="btn btn-info btn-sm" href="yudaEdit/${item.id}">
+                  <a class="btn btn-info btn-sm" href="yudaEdit/${item.id}" data-toggle="tooltip" title="Düzenle">
                       <i class="fas fa-pencil-alt">
                       </i>
                   </a>
-                  <a class="btn btn-info btn-sm" href="yudaDelete/${item.id}">
+                  <a class="btn btn-info btn-sm" href="yudaDelete/${item.id}" data-toggle="tooltip" title="Sil">
                       <i class="fas fa-trash">
                       </i>
                   </a>

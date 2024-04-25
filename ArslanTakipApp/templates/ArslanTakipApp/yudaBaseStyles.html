@@ -2,28 +2,46 @@
 
 {% block styles %}
 <style>
-  .toast-orta-center { 
-      top: 30%;   
-      margin: 0 auto;  
-      left: 50%;   
-      margin-left: -150px;
-  }
-  .toast-title {
-      font-size: x-large;
-  }
-  .toast-message {
-      font-size: x-large;
-  }
-  .custom-file-input ~ .custom-file-label::after {
-      content: "Gözat";
-  }
-  .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
-  .overflow {
-      display: block;
-      white-space: nowrap;
-      width: 250px; 
-      overflow: hidden;
-      text-overflow: ellipsis;
-  }
+    .required-info {
+        border: 1px solid red;
+    }
+
+    /* Green border when required fields are filled */
+    .validated {
+        border: 1px solid green;
+    }
+
+    .toast-orta-center { 
+        top: 30%;   
+        margin: 0 auto;  
+        left: 50%;   
+        margin-left: -150px;
+    }
+    .toast-title {
+        font-size: x-large;
+    }
+    .toast-message {
+        font-size: x-large;
+    }
+
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
+
+    .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
+    .overflow {
+        display: block;
+        white-space: nowrap;
+        width: 250px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nav-link.active[href="#ytab_home"],
+    .nav-link.active[href="#ytab_home"]:hover,
+    .nav-link.active[href="#ytab_home"]:focus {
+        background-color: #007bff; /* Change this color to match your primary color */
+        color: #ffffff; /* Text color for active tab */
+    }
 </style>
 {% endblock %}

@@ -14287,3 +14287,16 @@ Traceback (most recent call last):
     raise e.__class__(
 ValueError: Field 'id' expected a number but got '[object File]'.
 [35;1mHTTP GET /yudaDetail/[object%20File] 500 [0.13, 127.0.0.1:50547][0m
+Internal Server Error: /yudaCopy/187
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 265, in _get_response_async
+    self.check_response(response, callback)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view ArslanTakipApp.views.yudaCopy didn't return an HttpResponse object. It returned None instead.
+[35;1mHTTP GET /yudaCopy/187 500 [0.07, 127.0.0.1:56520][0m

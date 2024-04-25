@@ -3,554 +3,565 @@
 {% block content %}
 <div class="container-fluid">
     <div class="card">
-      <div class="card-header d-flex p-0">
-        <h3 class="card-title p-3">YENİ ÜRÜN DEVREYE ALMA FORMU</h3>
-        <ul class="nav nav-pills ml-auto p-2">
-          <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
-          <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Alaşım ve Kondüsyon</a></li>
-          <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', 'br')">Tolerans</a></li>
-          <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
-          <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Talaşlı İmalat</a></li>
-          <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Paketleme</a></li>
-          <li class="nav-item"><a class="nav-link" href="#tab_7" data-toggle="tab">Dosya</a></li>
-        </ul>
-      </div>
-      <div class="card-body">
+        <div class="card-header d-flex p-0">
+            <h3 class="card-title p-3">YENİ ÜRÜN DEVREYE ALMA FORMU</h3>
+
+            <ul class="nav nav-pills ml-auto p-2">
+              <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab" onclick="toastClick('info', 'Müşteri Alaşım belirtmediyse 6060 ya da 6063, Kondüsyon belirtmediyse T66 seçin.', 'br')">Alaşım ve Kondüsyon</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', 'br')">Tolerans</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab">Talaşlı İmalat</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab">Paketleme</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_7" data-toggle="tab">Dosya</a></li>
+            </ul>
+        </div><!-- /.card-header -->
+        <div class="card-body" id="formBody">
         <form enctype="multipart/form-data" action="" method="post" id="yudaForm">
-          <div class="tab-content">
-              <div class="tab-pane active" id="tab_1">
-                  <div class="card">
-                      <div class="card-header">Sipariş Detayları</div>
-                      <div class="card-body">
-                          <div class="row">
-                              <div class="col-12 col-sm-4">
-                                <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                    <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI</span>
-                                    <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" required>
-                                    <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1">
+                    <div class="card">
+                        <div class="card-header">Sipariş Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light  required-info">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ FİRMA ADI*</span>
+                                      <input type="text" name="MusteriFirmaAdi" id="musteriFirmaAdi" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()" required>
+                                      <!-- <span class="info-box-number text-center text-muted mb-0">var-yok</span> -->
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="col-12 col-sm-4">
-                                <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                    <span class="info-box-text text-center text-bold">SON KULLANICI FİRMA</span>
-                                    <input type="text" name="SonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2 kaydet" placeholder="Paylaşıldıysa lütfen girin">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">SON KULLANICI FİRMA</span>
+                                      <input type="text" name="SonKullaniciFirma" id="sonKullaniciFirma" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()" placeholder="Paylaşıldıysa lütfen girin">
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="col-12 col-sm-4">
-                                <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                    <span class="info-box-text text-center text-bold">PROFİLİN KULLANILDIĞI YER</span>
-                                    <input type="text" name="KullanimAlani" id="kullanimAlani" class="form-control mt-2 kaydet" placeholder="ÖRN: Solar Otomotiv..">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">PROFİLİN KULLANILDIĞI YER</span>
+                                      <input type="text" name="KullanimAlani" id="kullanimAlani" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()" placeholder="ÖRN: Solar Otomotiv..">
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-12 col-sm-4">
-                                <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                    <span class="info-box-text text-center text-bold">MÜŞTERİ RESİM/PARÇA NO</span>
-                                    <input type="text" name="CizimNo" id="cizimNo" class="form-control mt-2 kaydet">
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ RESİM/PARÇA NO</span>
+                                      <input type="text" name="CizimNo" id="cizimNo" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="col-12 col-sm-4">
-                                <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                    <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ</span>
-                                    <div class="input-group mt-2">
-                                      <input type="text" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
-                                      <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        <label class="btn btn-outline-primary active">
-                                            <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet" value="kg" autocomplete="off"> KG
-                                          </label>
-                                          <label class="btn btn-outline-primary">
-                                            <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off"> ADET
-                                          </label>
-                                      </div>
-                                      <span class="input-group-text" style="font-weight: bold;">
-                                        /
-                                      </span>
-                                      <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                          <label class="btn btn-outline-primary active">
-                                            <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off"> HAFTA
-                                          </label>
-                                          <label class="btn btn-outline-primary">
-                                            <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off"> AY
-                                          </label>
-                                          <label class="btn btn-outline-primary">
-                                            <input type="radio" name="ProfilSip" id="sipYil" class="kaydet" value="YIL" autocomplete="off"> YIL
-                                          </label>
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light required-info">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">PROFİL SİPARİŞİ*</span>
+                                      <div class="input-group mt-2">
+                                        <input type="text" oninput="this.value = formatNumber(this.value)" placeholder="kg" name="YillikProfilSiparisiMiktar" id="yillikProfilSiparisi" class="form-control kaydet" required>
+                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-outline-danger active">
+                                                <input type="radio" name="ProfilMiktarBirim" id="birimKg" class="kaydet is-warning" value="kg" autocomplete="off" required> KG
+                                              </label>
+                                              <label class="btn btn-outline-danger">
+                                                <input type="radio" name="ProfilMiktarBirim" id="birimAdet" class="kaydet" value="adet" autocomplete="off" required> ADET
+                                              </label>
+                                        </div>
+                                        <span class="input-group-text" style="font-weight: bold;">/</span>
+                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-outline-danger active">
+                                              <input type="radio" name="ProfilSip" id="sipHafta" class="kaydet" value="HAFTA" autocomplete="off" required> HAFTA
+                                            </label>
+                                            <label class="btn btn-outline-danger">
+                                              <input type="radio" name="ProfilSip" id="sipAy" class="kaydet" value="AY" autocomplete="off" required> AY
+                                            </label>
+                                            <label class="btn btn-outline-danger">
+                                              <input type="radio" name="ProfilSip" id="sipYil" class="kaydet" value="YIL" autocomplete="off" required> YIL
+                                            </label>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="col-12 col-sm-4">
-                                <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                    <span class="info-box-text text-center text-bold">MÜŞTERİ ÖDEME VADESİ</span>
-                                    <input type="text" name="MusteriOdemeVadesi" id="musteriOdemeVadesi" class="form-control mt-2 kaydet">
-                                  </div>
-                                </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="tab-pane" id="tab_2">
-                  <div class="card">
-                      <div class="card-header">Alaşım ve Kondüsyon Detayları</div>
-                      <div class="card-body">
-                          <div class="row" id="alasimKondusyonRow">
-                              <div class="col-lg-2">
-                                  <div class="form-group">
-                                  <select name="AlasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer'); if(this.value==0){digerFunction('alasimSelect', 'alasimDigerDiv')}">
-                                      <option value="alasimSelected" id="alasimSelected" selected disabled>Alaşım </option>
-                                      
-                                  </select>
-                                  <div class="input-group" id="alasimDigerDiv" style="display: none;">
-                                      <input type="text" class="form-control" name="AlasimDiger" placeholder="Alaşım" id="alasimDiger">
-                                      <div class="input-group-append">
-                                          <span class="input-group-text" id="alasimDigerSpan" onclick="digerFunction('alasimDigerDiv', 'alasimSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
-                                      </div>
-                                  </div>
-                                  </div>
-                              </div>
-                              <div class="col-lg-2">
-                                  <div class="form-group">
-                                  <select name="KondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer'); if(this.value==0){digerFunction('kondusyonSelect', 'kondusyonDigerDiv')}">
-                                      <option value="kondusyonSelected" id="kondusyonSelected" selected disabled>Kondüsyon </option>
-                                      
-                                  </select>
-                                  <div class="input-group" id="kondusyonDigerDiv" style="display: none;">
-                                      <input type="text" class="form-control" placeholder="Kondüsyon" id="kondusyonDiger">
-                                      <div class="input-group-append">
-                                          <span class="input-group-text" id="kondusyonDigerSpan" onclick="digerFunction('kondusyonDigerDiv', 'kondusyonSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
-                                      </div>
-                                  </div>
-                                  </div>
-                              </div>
-                              <div class="col-lg-2">
-                                  <div class="form-group">
-                                  <button type="button" id="AlasimKondusyonEkle" class="btn btn-outline-primary" >Ekle</button>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-12">
+                                <div class="col-12 col-sm-4">
                                   <div class="info-box bg-light">
-                                      <div class="info-box-content">
-                                          <div id="alasimTabulator"></div>
-                                      </div>
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold">MÜŞTERİ ÖDEME VADESİ</span>
+                                      <input type="text" name="MusteriOdemeVadesi" id="musteriOdemeVadesi" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
                                   </div>
-                              </div>
-                          </div>
-                          <input type="text" name="AlasimKondusyon" id="alasimTabData" style="display: none;" class="kaydet" required>
-                      </div>
-                  </div>
-              </div>
-              <div class="tab-pane" id="tab_3">
-                  <div class="card">
-                      <div class="card-header">Tolerans Detayları</div>
-                      <div class="card-body">
-                          <div class="row">
-                              <div class="col-12 col-sm-4">
-                                  <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">DIN TOLERANS</span>
-                                      <select name="DinTolerans" id="dinTolerans" class="form-control mb-3 mt-3 kaydet" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
-                                          <option value="" selected disabled>Tolerans seçiniz</option>
-                                          <option value="EN 755-3">EN 755-3   Yuvarlak Dolu</option>
-                                          <option value="EN 755-4">EN 755-4   Kare Dolu</option>
-                                          <option value="EN 755-5">EN 755-5   Diktörtgen Boru</option>
-                                          <option value="EN 755-6">EN 755-6   Altıgen Boru</option>
-                                          <option value="EN 755-7">EN 755-7   Dikişsiz Boru</option>
-                                          <option value="EN 755-8">EN 755-8   Dikişli Boru (Portol)</option>
-                                          <option value="EN 755-9">EN 755-9   Profil</option>
-                                          <option value="EN 12020-2">EN 12020-2   Profiller için hassas olerans</option>
-                                          <option value="Diger">Diğer</option>
-                                      </select>
-                                  </div>
-                                  </div>
-                              </div>
-                              <div class="col-12 col-sm-4">
-                                  <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI</span>
-                                      <!-- multiselect ile seçilsin select2 -->
-                                      <div class="form-group mt-3">
-                                          <select class="select2bs4 kaydet" multiple="multiple" id="birlikteCalisan" name="BirlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
-                                              <option value="Aparatı Var">Aparatı Var</option>
-                                              <option value="Kendisiyle Çalışır">Kendisiyle Çalışır</option>
-                                              <option value="Yok">Yok</option>
-                                          </select>
-                                      </div>
-                                  </div>
-                                  </div>
-                              </div>
-                              <div class="col-12 col-sm-4">
-                                  <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
-                                      <div class="row mb-3 mt-3">
-                                          <div class="input-group col-lg-12">
-                                              <div class="input-group-prepend">
-                                                <span class="input-group-text checkSpan" id="metreSpan">
-                                                    <input type="checkbox" class="metreCheckbox kaydet" name="MetreAgirlikTalebi" id="metreCheckbox">
-                                                </span>
-                                              </div>
-                                              <input type="text" class="form-control metreInput" value="VAR" style="background-color: transparent;" readonly>
-                                              <input type="text" class="form-control col-lg-4 kaydet" placeholder="minimum" name="MATmin" id="minMAT" style="display: none;">
-                                              <input type="text" class="form-control col-lg-4 kaydet" placeholder="maximum" name="MATmax" id="maxMAT" style="display: none;">
-                                          </div>
-                                      </div>
-                                  </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-12 ">
-                                  <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</span>
-                                      <textarea name="OnemliOlculer" class="form-control mt-3 kaydet" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi"></textarea>
-                                  </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="tab-pane" id="tab_4">
-                  <div class="card">
-                      <div class="card-header d-flex p-0">
-                          <h3 class="card-title p-3">Yüzey Detayları</h3>
-                          <ul class="nav nav-pills ml-auto p-2">
-                              <li class="nav-item"><a class="nav-link active" href="#ytab_1" data-toggle="tab">Pres</a></li>
-                              <li class="nav-item"><a class="nav-link" href="#ytab_2" data-toggle="tab" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a></li>
-                              <li class="nav-item"><a class="nav-link" href="#ytab_3" data-toggle="tab" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a></li>
-                              <li class="nav-item"><a class="nav-link" href="#ytab_4" data-toggle="tab" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a></li>
-                          </ul>
-                      </div>
-                      <div class="card-body">
-                          <div class="tab-content">
-                              <div class="tab-pane active" id="ytab_1">
-                                  <div class="row">
-                                      <div class="form-group col-lg-4">
-                                          <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if(this.value == 'Pres Yüzey'){toastClick('info', 'Müşteriye Pres olarak sevk edilecekse doldurunuz', 'br')}
-                                                                                                                  else if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal'){toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','br')}
-                                                                                                                  else if(this.value == 'Boya Kalite'){toastClick('info', 'Boya işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın. ','br')}">
-                                              <option value="yuzeyPresDetay" id="yuzeyPresSelected" selected disabled>Yüzey Detay</option>
-                                              <option value="Pres Yüzey">Pres Yüzey</option>
-                                              <option value="Eloksal Kalite">Eloksal Kalite</option>
-                                              <option value="Boya Kalite">Boya Kalite</option>
-                                              <option value="Parlak Eloksal">Parlak Eloksal</option>
-                                          </select>
-                                      </div>
-                                      <div class="form-group col-lg-1">
-                                          <input type="number" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
-                                      </div>
-                                      <div class="form-group col-lg-1">
-                                          <button type="button" id="YuzeyPresEkle" class="btn btn-outline-primary" >Ekle</button>
-                                      </div> 
-                                  </div>
-                                  <div class="row">
-                                      <div class="col-12">
-                                          <div class="info-box">
-                                              <div class="info-box-content">
-                                                  <div id="yuzeyPresTabulator"></div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <input type="text" name="YuzeyPres" id="yPresTabData" class="kaydet" style="display: none;" required>
-                              </div>
-                              <div class="tab-pane" id="ytab_2">
-                                      <div class="row">
-                                          <div class="col-lg-2">
-                                              <div class="form-group">
-                                              <select name="matlastirmaSelect" class="form-control" id="matlastirmaSelect" onchange="selectFunction(this.value, 'eloksalRenkSelect', 'Matlaştırma', '')">
-                                                  <option value="Matlaştırma" id="matlastirmaSelected" selected disabled>Matlaştırma </option>
-                                                  
-                                              </select>
-                                              </div>
-                                          </div>
-                                          <div class="col-lg-2">
-                                              <div class="form-group">
-                                              <select name="eloksalRenkSelect" class="form-control" id="eloksalRenkSelect">
-                                                  <option value="Renk" id="eloksalRenkSelected" selected disabled>Renk </option>
-                                                  
-                                              </select>
-                                              </div>
-                                          </div>
-                                          <div class="col-lg-2">
-                                              <div class="form-group">
-                                              <select name="kaplamaKalinlikSelect" class="form-control" id="eloksalKaplamaKalinligiSelect" onchange="selectFunction(this.value, '', 'Kaplama Kalınlığı', 'Diğer')">
-                                                  <option value="Kaplama Kalınlığı" id="kaplamaKalinlikSelected" selected disabled>Kaplama Kalınlığı </option>
-                                                  
-                                              </select>
-                                              </div>
-                                          </div>
-                                          <div class="col-lg-1">
-                                              <div class="form-group">
-                                                  <input type="number" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" min="0" id="eloksalBoy">
-                                              </div>
-                                          </div>
-                                          <div class="col-lg-2 form-group">
-                                              <div class="row">
-                                              <div class="input-group col-lg-8">
-                                                  <div class="input-group-prepend">
-                                                    <span class="input-group-text checkSpan">
-                                                      <input type="checkbox" class="temizCheckbox" id="eloksalTemiz">
-                                                    </span>
-                                                  </div>
-                                                  <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
-                                              </div>
-                                              <div class="col-lg-4" >
-                                                  <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-primary">Ekle</button>
-                                              </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                      <div class="row">
-                                          <div class="col-12">
-                                              <div class="info-box">
-                                                  <div class="info-box-content">
-                                                      <div id="eloksalTabulator"></div>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  <input type="text" name="YuzeyEloksal" class="kaydet" id="yEloksalTabData" style="display: none;" required>
-                              </div>
-                              <div class="tab-pane" id="ytab_3">
-                                  <div class="row">
-                                      <div class="form-group col-lg-1">
-                                          <select name="turSelect" id="turSelect" class="form-control">
-                                              <option value="Tür" id="turSelected" selected disabled>Tür </option>
-                                          </select>
-                                      </div>
-                                      <div class="col-lg-5">
-                                      <div class="row">
-                                          <div class="input-group col-lg-9">
-                                              <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control col-lg-4" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
-                                                  <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
-                                              </select>
-                                              <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;">
-                                              <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
-                                              <select name="boyaClassSelect" id="boyaClassSelect" class="form-control col-lg-3" onclick="toastClick('info','Belirtilmediyse Class 1','')">
-                                                  <option value="boyaClass" selected>Class 1</option>
-                                                  <option value="boyaClass2">Class 2</option>
-                                                  <option value="boyaClass3">Class 3</option>
-                                              </select>
-                                              <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu">
-                                          </div>
-                                          <div class="col-lg-3">
-                                              <div class="input-group ">
-                                                  <div class="input-group-prepend">
-                                                      <span class="input-group-text ral" id="RALspan" style="color: rgb(231, 231, 231);">...</span>
-                                                      <span class="input-group-text" id="">RAL </span>
-                                                  </div>
-                                                  <input type="text" class="form-control" id="RALinput" maxlength="4" size="4">
-                                              </div>
-                                          </div>
-                                      </div>
-                                      </div>
-                                      <div class="form-group input-group col-lg-1">
-                                          <select name="boyaKalinlikSelect" id="boyaKalinlikSelect" class="form-control">
-                                              <option value="boyaKalınlık" selected disabled>Kalınlık</option>
-                                          </select>
-                                      </div>
-                                      <div class="form-group col-lg-1">
-                                          <input type="number" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
-                                      </div>
-                                      <div class="form-group col-lg-3">
-                                      <div class="row">
-                                          <div class="input-group col-lg-5">
-                                              <div class="input-group-prepend">
-                                                <span class="input-group-text checkSpan">
-                                                  <input type="checkbox" class="temizCheckbox" id="boyaTemiz">
-                                                </span>
-                                              </div>
-                                              <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
-                                          </div>
-                                          <div class="col-lg-7">
-                                              <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama">
-                                          </div>
-                                      </div>    
-                                      </div>
-                                      
-                                      <div class="form-group col-lg-1">
-                                          <button type="button" id="YuzeyBoyaEkle" class="btn btn-outline-primary" >Ekle</button>
-                                      </div> 
-                                  </div>
-                                  <div class="row">
-                                      <div class="col-12 info-box">
-                                          <div class="info-box-content">
-                                              <div id="yuzeyBoyaTabulator"></div>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <input type="text" name="YuzeyBoya" class="kaydet" id="yBoyaTabData" style="display: none;" required>
-                              </div>
-                              <div class="tab-pane" id="ytab_4">
-                                  <div id="ahsapTab">
-                                      <div class="row">
-                                          <div class="col-lg-6 form-group">
-                                              <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="if(this.value==0){ digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')}">
-                                                  <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
-                                              </select>
-                                              <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
-                                                  <input type="text" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
-                                                  <div class="input-group-append">
-                                                      <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                          <div class="col-lg-1">
-                                              <input type="number" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
-                                          </div>
-                                          <div class="col-lg-2 form-group">
-                                              <div class="row">
-                                              <div class="input-group col-lg-8">
-                                                  <div class="input-group-prepend">
-                                                    <span class="input-group-text checkSpan">
-                                                      <input type="checkbox" class="temizCheckbox" id="ahsapTemiz">
-                                                    </span>
-                                                  </div>
-                                                  <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
-                                              </div>
-                                              <div class="col-lg-4" >
-                                                  <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-primary">Ekle</button>
-                                              </div>
-                                              </div>
-                                          </div>
-                                          <!-- <div class="col-lg-2 form-group">
-                                              
-                                          </div> -->
-                                      </div>
-                                      <div class="row">
-                                          <div class="col-12 info-box">
-                                              <div class="info-box-content">
-                                                  <div id="ahsapKaplamaTabulator"></div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                      <input type="text" name="YuzeyAhsap" class="kaydet" id="yAhsapTabData" style="display: none;" required>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="tab-pane" id="tab_5">
-                  <div class="card">
-                      <div class="card-header">Talaşlı İmalat Detayları</div>
-                      <div class="card-body">
-                          <div class="row">
-                              <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
-                                  <label class="btn btn-outline-primary">
-                                    <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off"> YOK
-                                  </label>
-                                  <label class="btn btn-outline-primary active">
-                                    <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off"> VAR
-                                  </label>
-                                  <label class="btn btn-outline-primary">
-                                    <input type="radio" class="kaydet" name="TalasliImalat" id="tMusteri" value="Müşteri Yapacak" autocomplete="off"> MÜŞTERİ YAPACAK
-                                  </label>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-12">
-                                  <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                      <input type="text" name="TalasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2 kaydet">
-                                  </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="tab-pane" id="tab_6">
-                  <div class="card">
-                      <div class="card-header">Paketleme Detayları</div>
-                      <div class="card-body">
-                          <div class="row">
-                              <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
-                                  <label class="btn btn-outline-primary active">
-                                    <input type="radio" name="Paketleme" class="kaydet" id="pStandart" value="Standart Palet" autocomplete="off"> STANDART PALET
-                                  </label>
-                                  <label class="btn btn-outline-primary">
-                                    <input type="radio" name="Paketleme" class="kaydet" id="pIhracat" value="Ihracat Palet" autocomplete="off"> İHRACAT PALET
-                                  </label>
-                                  <label class="btn btn-outline-primary">
-                                    <input type="radio" name="Paketleme" class="kaydet" id="pOzel" value="Ozel Paketleme" autocomplete="off"> ÖZEL PAKETLEME
-                                  </label>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-12">
-                                  <div class="info-box bg-light">
-                                  <div class="info-box-content">
-                                      <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
-                                      <input type="text" name="PaketlemeAciklama" id="paketlemeAciklama" class="form-control mt-2 kaydet">
-                                  </div>
-                                  </div>
-                              </div>
-                          </div>
-                          </div>
-                      </div>
-              </div>
-              <div class="tab-pane" id="tab_7">
-                  <div class="card">
-                        <div class="card-header">Mevcut Dosyalar</div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div id="oldFileDiv" class="form-group"></div>
                                 </div>
                             </div>
                         </div>
-                  </div>
-                  <div class="card">
-                      <div class="card-header">Dosya Yükle</div>
-                      <div class="card-body" id="dosyaBody">
-                          <div class="row">
-                              <div class="col-12">
-                                  <div class="input-group">
-                                      <div class="custom-file">
-                                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
-                                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
-                                      </div>
-                                      <div class="input-group-append">
-                                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
-                                      </div>
-                                  </div>
-                                  <div id="fileTitles" class="form-group"></div>
-                              </div>
-                          </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_2">
+                    <div class="card">
+                        <div class="card-header">Alaşım ve Kondüsyon Detayları</div>
+                        <div class="card-body">
+                            <div class="row" id="alasimKondusyonRow">
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                    <select name="AlasimSelect" class="form-control" id="alasimSelect" onchange="selectFunction(this.value, 'kondusyonSelect', 'Alaşım', 'Diğer'); if(this.value==0){digerFunction('alasimSelect', 'alasimDigerDiv')}">
+                                        <option value="alasimSelected" id="alasimSelected" selected disabled>Alaşım* </option>
+                                        
+                                    </select>
+                                    <div class="input-group" id="alasimDigerDiv" style="display: none;">
+                                        <input type="text" class="form-control" name="AlasimDiger" placeholder="Alaşım" id="alasimDiger" oninput="this.value = this.value.toUpperCase()">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="alasimDigerSpan" onclick="digerFunction('alasimDigerDiv', 'alasimSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                    <select name="KondusyonSelect" class="form-control" id="kondusyonSelect" onchange="selectFunction(this.value, '', 'Kondüsyon', 'Diğer'); if(this.value==0){digerFunction('kondusyonSelect', 'kondusyonDigerDiv')}">
+                                        <option value="kondusyonSelected" id="kondusyonSelected" selected disabled>Kondüsyon* </option>
+                                        
+                                    </select>
+                                    <div class="input-group" id="kondusyonDigerDiv" style="display: none;">
+                                        <input type="text" class="form-control" placeholder="Kondüsyon" id="kondusyonDiger" oninput="this.value = this.value.toUpperCase()">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="kondusyonDigerSpan" onclick="digerFunction('kondusyonDigerDiv', 'kondusyonSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                    <button type="button" id="AlasimKondusyonEkle" class="btn btn-outline-danger" >Ekle</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content">
+                                            <div id="alasimTabulator"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="text" name="AlasimKondusyon" id="alasimTabData" style="display: none;" class="kaydet" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_3">
+                    <div class="card">
+                        <div class="card-header">Tolerans Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light required-info">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">DIN TOLERANS*</span>
+                                        <select name="DinTolerans" id="dinTolerans" class="form-control mb-3 mt-3 kaydet" onchange="if(this.value=='Diger'){toastClick('info','Lütfen şartname dosyasını ekleyin!','')}else if(this.value=='EN 755-7'){toastClick('warning','DİKİŞSİZ BORU ÜRETİMİMİZ YOKTUR!','')}" required>
+                                            <option value="" selected disabled>Tolerans seçiniz</option>
+                                            <option value="EN 755-3">EN 755-3   Yuvarlak Dolu</option>
+                                            <option value="EN 755-4">EN 755-4   Kare Dolu</option>
+                                            <option value="EN 755-5">EN 755-5   Diktörtgen Dolu (Lama)</option>
+                                            <option value="EN 755-6">EN 755-6   Altıgen Dolu</option>
+                                            <option value="EN 755-7">EN 755-7   Dikişsiz Boru</option>
+                                            <option value="EN 755-8">EN 755-8   Dikişli Boru (Portol)</option>
+                                            <option value="EN 755-9">EN 755-9   Profil</option>
+                                            <option value="EN 12020-2">EN 12020-2   Profiller için hassas tolerans</option>
+                                            <option value="Diger">Diğer</option>
+                                        </select>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light required-info">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">BİRLİKTE ÇALIŞAN APARATI VAR MI*</span>
+                                        <!-- multiselect ile seçilsin select2 -->
+                                        <div class="form-group mt-3">
+                                            <select class="select2bs4 kaydet" multiple="multiple" id="birlikteCalisan" name="BirlikteCalisan" data-placeholder="Select a State" style="width: 100%;" required>
+                                                <option value="Birlikte Çalışan Aparatı Var">Aparatı Var</option>
+                                                <option value="Kendisiyle Çalışır">Kendisiyle Çalışır</option>
+                                                <option value="Birlikte Çalışan Aparatı Yok">Yok</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">Metre Ağırlık Talebi</span>
+                                        <div class="row mb-3 mt-3">
+                                            <div class="input-group col-lg-12">
+                                                <div class="input-group-prepend">
+                                                <span class="input-group-text checkSpan" id="metreSpan">
+                                                    <input type="checkbox" class="metreCheckbox kaydet" name="MetreAgirlikTalebi" id="metreCheckbox">
+                                                </span>
+                                                </div>
+                                                <input type="text" class="form-control metreInput" value="VAR" style="background-color: transparent;" readonly>
+                                                <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control col-lg-4 kaydet" placeholder="minimum (kg/m)" name="MATmin" id="minMAT" style="display: none;">
+                                                <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control col-lg-4 kaydet" placeholder="maximum (kg/m)" name="MATmax" id="maxMAT" style="display: none;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 ">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">ÖNEMLİ ÖLÇÜLER VE TOLERANSLAR</span>
+                                        <textarea name="OnemliOlculer" class="form-control mt-3 kaydet" id="onemliOlculer" rows="5" placeholder="Özellikle dikkat edilecek ölçü bilgisi" oninput="this.value = this.value.toUpperCase()"></textarea>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_4">
+                    <div class="card card-primary card-tabs">
+                        <div class="card-header d-flex p-0">
+                            <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+                                <!-- <li class="pt-2 px-3"><h3 class="card-title">Yüzey Detayları</h3></li> -->
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#ytab_home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true" style="color: #ffffff;"><i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                                  </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-pres-tab" data-toggle="pill" href="#ytab_1" role="tab" aria-controls="custom-tabs-two-pres" aria-selected="true">Pres</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-eloksal-tab" data-toggle="pill" href="#ytab_2" role="tab" aria-controls="custom-tabs-two-eloksal" aria-selected="false" onclick="toastClick('info', 'Eloksal Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Eloksal</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-boya-tab" data-toggle="pill" href="#ytab_3" role="tab" aria-controls="custom-tabs-two-boya" aria-selected="false" onclick="toastClick('info', 'Boya Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Boya</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="custom-tabs-two-ahsap-tab" data-toggle="pill" href="#ytab_4" role="tab" aria-controls="custom-tabs-two-ahsap" aria-selected="false" onclick="toastClick('info', 'Ahşap Kaplama Arslan Alüminyum tarafından yapılacaksa doldurunuz.', 'br')">Ahşap Kaplama</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="ytab_home">
+                                    <div class="row">
+                                        <ul>
+                                            <li>Müşteriye pres olarak sevk edilecekse Pres Sekmesinde "Pres Yüzey" seçiniz.</li>
+                                            <li>Eloksal işlemi müşteri tarafından yapılacak ise Pres Sekmesinde "Eloksal Kalite" seçiniz. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın.</li>
+                                            <li>Eloksal işlemi müşteri tarafından yapılacak ise Pres Sekmesinde "Parlak Eloksal" seçiniz. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın.</li>
+                                            <li>Boya işlemi müşteri tarafından yapılacak ise Pres Sekmesinde "Boya Kalite" seçiniz. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="ytab_1">
+                                    <div class="row">
+                                        <div class="form-group col-lg-4">
+                                            <select name="presYuzeyDetay" id="yuzeyPresSelect" class="form-control" onchange="if(this.value == 'Pres Yüzey'){toastClick('info', 'Müşteriye Pres olarak sevk edilecekse doldurunuz', 'br')}
+                                                                                                                    else if (this.value =='Eloksal Kalite' || this.value == 'Parlak Eloksal'){toastClick('info','Eloksal işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Eloksal sekmesini kullanın. ','br')}
+                                                                                                                    else if(this.value == 'Boya Kalite'){toastClick('info', 'Boya işlemi müşteri tarafından yapılacak ise doldurun. Arslan Alüminyum tarafından yapılacak ise Boya sekmesini kullanın. ','br')}">
+                                                <option value="yuzeyPresDetay" id="yuzeyPresSelected" selected disabled>Yüzey Detay</option>
+                                                <option value="Pres Yüzey">Pres Yüzey</option>
+                                                <option value="Eloksal Kalite">Eloksal Kalite</option>
+                                                <option value="Boya Kalite">Boya Kalite</option>
+                                                <option value="Parlak Eloksal">Parlak Eloksal</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-1">
+                                            <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" min="0" max="15000" name="yPresBoy" id="yuzeyPresBoy">
+                                        </div>
+                                        <div class="form-group col-lg-1">
+                                            <button type="button" id="YuzeyPresEkle" class="btn btn-outline-primary" >Ekle</button>
+                                        </div> 
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="info-box">
+                                                <div class="info-box-content">
+                                                    <div id="yuzeyPresTabulator"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="text" name="YuzeyPres" id="yPresTabData" class="kaydet" style="display: none;" required>
+                                </div>
+                                <div class="tab-pane fade" id="ytab_2">
+                                        <div class="row">
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
+                                                <select name="matlastirmaSelect" class="form-control" id="matlastirmaSelect" onchange="selectFunction(this.value, 'eloksalRenkSelect', 'Matlaştırma', '')">
+                                                    <option value="Matlaştırma" id="matlastirmaSelected" selected disabled>Matlaştırma </option>
+                                                    
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
+                                                <select name="eloksalRenkSelect" class="form-control" id="eloksalRenkSelect">
+                                                    <option value="Renk" id="eloksalRenkSelected" selected disabled>Renk </option>
+                                                    
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
+                                                <select name="kaplamaKalinlikSelect" class="form-control" id="eloksalKaplamaKalinligiSelect" onchange="selectFunction(this.value, '', 'Kaplama Kalınlığı', 'Diğer')">
+                                                    <option value="Kaplama Kalınlığı" id="kaplamaKalinlikSelected" selected disabled>Kaplama Kalınlığı </option>
+                                                    
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-1">
+                                                <div class="form-group">
+                                                    <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" name="eloksalBoy" min="0" id="eloksalBoy">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 form-group">
+                                                <div class="row">
+                                                <div class="input-group col-lg-8">
+                                                    <div class="input-group-prepend">
+                                                      <span class="input-group-text checkSpan">
+                                                        <input type="checkbox" class="temizCheckbox" id="eloksalTemiz">
+                                                      </span>
+                                                    </div>
+                                                    <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                </div>
+                                                <div class="col-lg-4" >
+                                                    <button type="button" id="YuzeyEloksalEkle" class="btn btn-outline-primary">Ekle</button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="info-box">
+                                                    <div class="info-box-content">
+                                                        <div id="eloksalTabulator"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <input type="text" name="YuzeyEloksal" class="kaydet" id="yEloksalTabData" style="display: none;" required>
+                                </div>
+                                <div class="tab-pane fade" id="ytab_3">
+                                    <div class="row">
+                                        <div class="form-group col-lg-1">
+                                            <select name="turSelect" id="turSelect" class="form-control">
+                                                <option value="Tür" id="turSelected" selected disabled>Tür </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-5">
+                                        <div class="row">
+                                            <div class="input-group col-lg-9">
+                                                <select name="boyaMarkaSelect" id="boyaMarkaSelect" class="form-control col-lg-4" onchange="if(this.value==0){digerFunction('boyaMarkaSelect', 'boyaMarkaDiger, #boyaDigerSpan')}">
+                                                    <option value="boyaMarkaSelected" id="boyaMarkaSelected" selected disabled>Marka</option>
+                                                </select>
+                                                <input type="text" class="form-control" id="boyaMarkaDiger" style="display: none;" oninput="this.value = this.value.toUpperCase()">
+                                                <span class="input-group-text" id="boyaDigerSpan" style="display: none;" onclick="digerFunction('boyaDigerSpan, #boyaMarkaDiger', 'boyaMarkaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                                <select name="boyaClassSelect" id="boyaClassSelect" class="form-control col-lg-3" onclick="toastClick('info','Belirtilmediyse Class 1','')">
+                                                    <option value="boyaClass" selected>CLASS 1</option>
+                                                    <option value="boyaClass2">CLASS 2</option>
+                                                    <option value="boyaClass3">CLASS 3</option>
+                                                </select>
+                                                <input type="text" class="form-control" placeholder="Marka Renk Kodu" name="markaRenkKodu" id="markaRenkKodu" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <div class="input-group ">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text ral" id="RALspan" style="color: rgb(231, 231, 231);">...</span>
+                                                        <span class="input-group-text" id="">RAL </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" id="RALinput" maxlength="4" size="4">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        <div class="form-group input-group col-lg-1">
+                                            <select name="boyaKalinlikSelect" id="boyaKalinlikSelect" class="form-control">
+                                                <option value="boyaKalınlık" selected disabled>Kalınlık</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-1">
+                                            <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" name="boyaBoy" min="0" id="boyaBoy">
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                        <div class="row">
+                                            <div class="input-group col-lg-5">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text checkSpan">
+                                                    <input type="checkbox" class="temizCheckbox" id="boyaTemiz">
+                                                  </span>
+                                                </div>
+                                                <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <input type="text" class="form-control" placeholder="Açıklama" name="boyaAciklama" id="boyaAciklama" oninput="this.value = this.value.toUpperCase()">
+                                            </div>
+                                        </div>    
+                                        </div>
+                                        
+                                        <div class="form-group col-lg-1">
+                                            <button type="button" id="YuzeyBoyaEkle" class="btn btn-outline-primary" >Ekle</button>
+                                        </div> 
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 info-box">
+                                            <div class="info-box-content">
+                                                <div id="yuzeyBoyaTabulator"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="text" name="YuzeyBoya" class="kaydet" id="yBoyaTabData" style="display: none;" required>
+                                </div>
+                                <div class="tab-pane fade" id="ytab_4">
+                                    <div id="ahsapTab">
+                                        <div class="row">
+                                            <div class="col-lg-6 form-group">
+                                                <select name="ahsapKaplamaSelect" id="ahsapKaplamaSelect" class="form-control" onchange="if(this.value==0){ digerFunction('ahsapKaplamaSelect', 'ahsapKaplamaDigerDiv')}">
+                                                    <option value="ahsapKaplamaSelected" id="ahsapKaplamaSelected" selected disabled>Ahşap Kaplama</option>
+                                                </select>
+                                                <div class="input-group" id="ahsapKaplamaDigerDiv" style="display: none;">
+                                                    <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="Ahşap Kaplama" class="form-control" id="ahsapKaplamaDiger">
+                                                    <div class="input-group-append">
+                                                        <span  class="input-group-text" id="ahsapKaplamaDigerSpan" onclick="digerFunction('ahsapKaplamaDigerDiv', 'ahsapKaplamaSelect')"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-1">
+                                                <input type="text" oninput="this.value = formatNumber(this.value)" class="form-control" placeholder="Boy (mm)" name="ahsapBoy" min="0" id="ahsapBoy">
+                                            </div>
+                                            <div class="col-lg-2 form-group">
+                                                <div class="row">
+                                                <div class="input-group col-lg-8">
+                                                    <div class="input-group-prepend">
+                                                      <span class="input-group-text checkSpan">
+                                                        <input type="checkbox" class="temizCheckbox" id="ahsapTemiz">
+                                                      </span>
+                                                    </div>
+                                                    <input type="text" class="form-control temizInput" value="Temiz Kesim" style="background-color: transparent;" readonly>
+                                                </div>
+                                                <div class="col-lg-4" >
+                                                    <button type="button" id="ahsapKaplamaEkle" class="btn btn-outline-primary">Ekle</button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="col-lg-2 form-group">
+                                                
+                                            </div> -->
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12 info-box">
+                                                <div class="info-box-content">
+                                                    <div id="ahsapKaplamaTabulator"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="text" name="YuzeyAhsap" class="kaydet" id="yAhsapTabData" style="display: none;" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_5">
+                    <div class="card">
+                        <div class="card-header">Talaşlı İmalat Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tVar" value="Var" autocomplete="off" required> VAR
+                                    </label>
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tYok" value="Yok" autocomplete="off" required> YOK
+                                    </label>
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" class="kaydet" name="TalasliImalat" id="tMusteri" value="Müşteri Yapacak" autocomplete="off" required> MÜŞTERİ YAPACAK
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
+                                        <input type="text" name="TalasliImalatAciklama" id="talasliImalatAciklama" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_6">
+                    <div class="card">
+                        <div class="card-header">Paketleme Detayları</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
+                                    <label class="btn btn-outline-danger active">
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pStandart" value="Standart Palet" autocomplete="off" required> STANDART PALET
+                                    </label>
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pIhracat" value="Ihracat Palet" autocomplete="off" required> İHRACAT PALET
+                                    </label>
+                                    <label class="btn btn-outline-danger">
+                                      <input type="radio" name="Paketleme" class="kaydet" id="pOzel" value="Ozel Paketleme" autocomplete="off" required> ÖZEL PAKETLEME
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">AÇIKLAMA</span>
+                                        <input type="text" name="PaketlemeAciklama" id="paketlemeAciklama" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="tab-pane" id="tab_7">
+                    <div class="card">
+                        <div class="card-header">Yüklenecek Dosyalar</div>
+                        <div class="card-body" id="dosyaBody">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group border border-danger">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple required>
+                                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                                        </div>
+                                    </div>
+                                    <div id="fileTitles" class="form-group"></div>
+                                </div>
+                            </div>
 
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </form>
-      </div>
-      <div class="card-footer">
-        <div class="progress" style="height: 60px;">
-          <div class="progress-bar bg-warning" role="progressbar"
-               aria-valuenow="0" aria-valuemin="1" aria-valuemax="100" style="width: 1%;" id="kaydetProgress">
-               <button type="button" id="yudaKaydet" class="btn btn-block bg-gradient-primary btn-lg" style="height: 100%; ">KAYDET</button>
-          </div>
-      </div>
-      </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+        <div class="card-footer">
+            <!--  -->
+            <div class="progress" style="height: 60px;">
+                <div class="progress-bar bg-warning" role="progressbar"
+                     aria-valuenow="0" aria-valuemin="1" aria-valuemax="100" style="width: 1%;" id="kaydetProgress">
+                     <button type="button" id="yudaKaydet" class="btn btn-block bg-gradient-primary btn-lg" style="height: 100%; ">KAYDET</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

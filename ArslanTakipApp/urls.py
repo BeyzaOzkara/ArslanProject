@@ -69,6 +69,7 @@ urlpatterns = [
     path('yudaDelete/<str:yId>', views.yudaDelete, name='yudaDelete'),
     path('yudaEdit/<str:yId>', views.yudaEdit),
     path('yudachange/<str:yId>', views.yudachange),
+    path('yudaCopy/<str:yId>', views.yudaCopy),
     path('deletedYudas', login_required(views.DeletedYudasView.as_view()), name='deletedYudas'),
     path('deletedYudas/list', views.deletedYudas_list),
     path('yudaDeleteCancel/<str:yId>', views.yudaDeleteCancel),

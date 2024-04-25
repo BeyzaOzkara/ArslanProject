@@ -41,7 +41,7 @@ from .forms import PasswordChangingForm
 from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
-from django.core.mail import send_mail
+from mailer import send_mail
 # Create your views here.
 
 
@@ -957,7 +957,6 @@ def eksiparis_acil(request):
         },
     )
 
-    users = User.objects.values()
     ekSiparis = EkSiparis.objects.order_by("Sira").exclude(MsSilindi = True).exclude(Silindi=True)
     ekSiparisList = list(ekSiparis.values())
 
@@ -1008,84 +1007,6 @@ def eksiparis_acil(request):
             ek.Sira = f['Sira']
             ek.save()
         return HttpResponseRedirect("/eksiparis")
-
-
-#sayfayı açma yetkisi sadece belli kullanıcıların olsun
-# class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
-#     permission_required = "ArslanTakipApp.kalipEkran_view_location"
-#     template_name = 'ArslanTakipApp/kalipFirinEkrani.html'
-
-# def infoBoxEkle(kalipNo, gonder, gonderId, request):
-#     k = DiesLocation.objects.get(kalipNo = kalipNo)
-#     if k.kalipVaris.id != gonder:
-#         hareket = Hareket()
-#         hareket.kalipKonum_id = k.kalipVaris.id
-#         hareket.kalipVaris_id = gonderId
-#         hareket.kalipNo = kalipNo
-#         hareket.kimTarafindan_id = request.user.id
-#         hareket.save()
-#         response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
-#     else:
-#         response = JsonResponse({"error": "Kalıp fırına gönderilemedi."})
-#         response.status_code = 500 #server error
-#     return response
-
-# def kalipfirini_goz(request):
-#     #hangi kalıp fırın giriş yapan kullanıcıya göre belirlenecek
-#     #şimdilik gözlerin kalıp sınırı yokmuş gibi ama daha sonra bir sınır verilecek
-#     #HTMLe döndürülecek data kalıp no ve fırında geçirdiği süre ya da fırına atılış zamanı
-#     #ona bağlı olarak kaç saat olduğu htmlde hesaplanabilir
-#     #fırına atıldığı süre almak daha mantıklı, kalıbın o lokasyona yapıldan hareket saati
-#     if request.user.is_superuser:
-#         return JsonResponse({"error": "Superuserların sayfayı kullanımı yasaktır."}, status=403)
-
-#     loc = get_objects_for_user(request.user, "ArslanTakipApp.goz_view_location", klass=Location)
-#     loc_list = list(loc.values('id', 'locationName'))
-
-#     gozler = {l['locationName']: [] for l in loc_list}
-    
-#     if request.method == "GET":
-#         gozKalip = (DiesLocation.objects.filter(kalipVaris__in=loc)
-#                     .order_by('kalipVaris__locationName', 'kalipNo')
-#                     .select_related('kalipVaris'))
-        
-#         # Her göz için kalıpları grupla
-#         for kalip in gozKalip:
-#             gozler[kalip.kalipVaris.locationName].append({
-#                 'kalipNo': kalip.kalipNo,
-#                 'hareketTarihi': kalip.hareketTarihi,
-#                 'locationName': kalip.kalipVaris.locationName,
-#             })
-        
-#         try:
-#             gozData = [{'gozCount': len(gozler)}] + [
-#                 {'locationName': k, 'kalıplar': v} for k, v in gozler.items()
-#             ]
-#             data = json.dumps(gozData, cls=DjangoJSONEncoder)
-#             return HttpResponse(data, content_type='application/json')
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=500)
-    
-#     elif request.method == "POST":
-#         kalipNo = request.POST['kalipNo']
-#         firinGoz = request.POST['firinNo'][:-5]
-#         gonder = loc.get(locationName__contains = firinGoz)
-#         gonderId = gonder.id
-#         gozCapacity = Location.objects.get(id = gonderId).capacity
-
-#         if gozCapacity == None:
-#             response = infoBoxEkle(kalipNo, gonder, gonderId, request)
-#         else:
-#             firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = gonderId).count()
-#             if firinKalipSayisi < gozCapacity:
-#                 response = infoBoxEkle(kalipNo, gonder, gonderId, request)
-#             else:
-#                 response = JsonResponse({"error": "Fırın kalıp kapasitesini doldurdu, kalıp eklenemez!"})
-#                 response.status_code = 500         
-
-
-#     return response
-
 
 class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
     permission_required = "ArslanTakipApp.kalipEkran_view_location"
@@ -1189,8 +1110,7 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
             )
             return JsonResponse({"message": "Die successfully added to the furnace."})
         return JsonResponse({"error": "Failed to add die to the furnace."}, status=500)
-
-        
+  
 def kalipfirini_meydan(request):
     params = json.loads(unquote(request.GET.get('params')))
     size = params["size"]
@@ -1219,7 +1139,6 @@ def kalipfirini_meydan(request):
     lastData['data'] = meydanData
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
-
 
 class BaskiGecmisiView(generic.TemplateView):
     template_name = 'ArslanTakipApp/baskiGecmisi.html'
@@ -1377,36 +1296,37 @@ def yuda_kaydet(request):
             # for user in User.objects.exclude(id=request.user.id):
             allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
-            for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
-                notification = Notification.objects.create(
-                    user=u,
-                    message=f'{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
-                    subject=f"Yeni YUDA",
-                    where_id=y.id,
-                    new_made_by = request.user,
-                    col_marked = "#E9ECEF",
-                )
-                logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
-            
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(
-                    f'notifications_{request.user.id}',
-                    {
-                        'type': 'send_notification',
-                        'notification': {
-                            'id': notification.id,
-                            'subject': notification.subject,
-                            'made_by': get_user_full_name(notification.new_made_by_id),
-                            'message': notification.message,
-                            'where_id': notification.where_id,
-                            'is_read': notification.is_read,
-                            'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
-                            'is_marked': notification.is_marked,
-                        },
-                    }
-                )
-                logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
-            
+            if request.user.id != 1:
+                for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
+                    notification = Notification.objects.create(
+                        user=u,
+                        message=f'{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+                        subject=f"Yeni YUDA",
+                        where_id=y.id,
+                        new_made_by = request.user,
+                        col_marked = "#E9ECEF",
+                    )
+                    logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                
+                    channel_layer = get_channel_layer()
+                    async_to_sync(channel_layer.group_send)(
+                        f'notifications_{request.user.id}',
+                        {
+                            'type': 'send_notification',
+                            'notification': {
+                                'id': notification.id,
+                                'subject': notification.subject,
+                                'made_by': get_user_full_name(notification.new_made_by_id),
+                                'message': notification.message,
+                                'where_id': notification.where_id,
+                                'is_read': notification.is_read,
+                                'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
+                                'is_marked': notification.is_marked,
+                            },
+                        }
+                    )
+                    logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                
 
             response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
         except json.JSONDecodeError:
@@ -1459,7 +1379,7 @@ def yudas_list(request):
                     q[i['field'] + "__startswith"] = i['value']
             else:
                 q = filter_method(i, q)
-    print(q)
+
     filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
     yudaList = list(filtered_yudas.values()[offset:limit])
     
@@ -1820,36 +1740,37 @@ def yudaDetailComment(request):
 
             allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
-            for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
-                notification = Notification.objects.create(
-                    user=u,
-                    message=f'{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
-                    subject=f"Yeni YUDA Yorum",
-                    where_id=y.id,
-                    new_made_by = request.user,
-                    col_marked = "#E9ECEF",
-                )
-                logger.debug(f"Comment Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+            if request.user.id != 1:
+                for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
+                    notification = Notification.objects.create(
+                        user=u,
+                        message=f'{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
+                        subject=f"Yeni YUDA Yorum",
+                        where_id=y.id,
+                        new_made_by = request.user,
+                        col_marked = "#E9ECEF",
+                    )
+                    logger.debug(f"Comment Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                    
+                    channel_layer = get_channel_layer()
+                    async_to_sync(channel_layer.group_send)(
+                        f'notifications_{request.user.id}',
+                        {
+                            'type': 'send_notification',
+                            'notification': {
+                                'id': notification.id,
+                                'subject': notification.subject,
+                                'made_by': get_user_full_name(notification.new_made_by_id),
+                                'message': notification.message,
+                                'where_id': notification.where_id,
+                                'is_read': notification.is_read,
+                                'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
+                                'is_marked': notification.is_marked,
+                            },
+                        }
+                    )
+                    logger.debug(f"Comment Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
                 
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(
-                    f'notifications_{request.user.id}',
-                    {
-                        'type': 'send_notification',
-                        'notification': {
-                            'id': notification.id,
-                            'subject': notification.subject,
-                            'made_by': get_user_full_name(notification.new_made_by_id),
-                            'message': notification.message,
-                            'where_id': notification.where_id,
-                            'is_read': notification.is_read,
-                            'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
-                            'is_marked': notification.is_marked,
-                        },
-                    }
-                )
-                logger.debug(f"Comment Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
-            
             response = JsonResponse({'message': 'Kayıt başarılı'})
         except json.JSONDecodeError:
             response = JsonResponse({'error': 'Geçersiz JSON formatı'})
@@ -2106,6 +2027,21 @@ def yudachange(request, yId):
     
     response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
     return response
+
+def yudaCopy(request, yId):
+    print("yuda copy")
+    yudaFiles = getFiles("YudaForm", yId)
+    files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+    yuda = YudaForm.objects.filter(id = yId).values()
+    yudaList = list(yuda)
+
+    for i in yudaList:
+        i['Tarih'] = format_date(i['Tarih'])
+
+    yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return render(request, 'ArslanTakipApp/yudaCopy.html', {'yuda_json':yudaData, 'files_json':files})
+
 
 class DeletedYudasView(generic.TemplateView):
     template_name = 'ArslanTakipApp/deletedYudas.html'

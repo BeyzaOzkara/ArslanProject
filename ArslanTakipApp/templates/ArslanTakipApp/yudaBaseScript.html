@@ -5,7 +5,83 @@
 
 {% block extra_js %}
 <script>
-    /* is template is used with yuda/yId or used with yudaEdit/yId */
+    function formatNumber(number) {
+        number = number.replace(/[^\d,]/g, '')
+        var parts = [];
+        var partsWithComma = number.split(',');
+        var integerPart = partsWithComma[0].replace(/\D/g, ''); // Remove non-numeric characters from integer part
+    
+        while (integerPart.length > 3) {
+            parts.unshift(integerPart.slice(-3));
+            integerPart = integerPart.slice(0, -3);
+        }
+        if (integerPart) {
+            parts.unshift(integerPart);
+        }
+        let a = parts.join('.');
+        if (partsWithComma.length > 1) {
+            a += (',' + partsWithComma[1].replace(/[^\d]/g, '')); // Remove non-numeric characters from decimal part
+        }
+    
+        return a;
+    };
+    
+    function checkRequiredField(i, allFilled) {
+        let sType = i.attr('type') || i.prop('type');
+        if (sType == 'text') {
+            if (i.val() === '') {
+                allFilled = false; 
+            }
+        }
+        else if (sType == 'radio') {
+            let $radioLabels = i.closest('.btn-group-toggle').find('label');
+            let isChecked = i.is(':checked');
+            $radioLabels.each(function() {
+                let $label = $(this);
+                if (isChecked && !$label.hasClass('btn-outline-primary')) {
+                    $label.removeClass('btn-outline-danger').addClass('btn-outline-primary');
+                }
+                else if(!isChecked && !$label.hasClass('btn-outline-primary')){
+                    allFilled = false;
+                }
+            });
+        }
+        else if (sType == 'select-multiple') {
+            let results = [];
+            let opt;
+            for (let j=0; j< i[0].options.length; j++){
+                opt = i[0].options[j]
+                if(opt.selected){results.push(opt.value);}
+            };
+            if (results.length == 0) {
+                allFilled = false;
+            }
+        }
+    
+        return allFilled;
+    };
+    
+    $(':input[required]').on('change', function() {
+        let allFilled = true;
+        let $infoBox = $(this).closest('.required-info');
+        if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
+        if ($infoBox.length == 0){
+            allFilled = checkRequiredField($(this), allFilled);
+        }
+        else {
+            let checkResult = false;
+            let $reqInputs = $infoBox.find('[required]');
+            $reqInputs.each(function(r) {
+                allFilled = checkRequiredField($(this), allFilled);
+            });
+        }
+        if (allFilled) {
+            $infoBox.addClass('validated').removeClass('required-info');
+        } else {
+            $infoBox.removeClass('validated').addClass('required-info');
+        } 
+    });
+    
     var formData = new FormData();
     var full = false;
     function changeFunction () {
@@ -17,20 +93,18 @@
                 }
             }
             let yuzde = req*100/requiredElements.length;
-            if (yuzde <= 100){
-                yuzde = 100;
-            }
+            // if (yuzde <= 100){yuzde = 100;}
             document.getElementById('kaydetProgress').style.width = yuzde +'%';
             if(yuzde >= 100 ){
                 if(full == false){
                     setTimeout(function(){
-                    document.getElementById('kaydetProgress').style.width = '0%';
-                    setTimeout(function(){$('#yudaKaydet').show();
-                        document.getElementById('kaydetProgress').style.width = '100%';
+                        document.getElementById('kaydetProgress').style.width = '0%';
+                        setTimeout(function(){$('#yudaKaydet').show();
+                            document.getElementById('kaydetProgress').style.width = '100%';
+                        }, 600);
+    
                     }, 600);
-
-                }, 600);
-                full = true;
+                    full = true;
                 };
                 
             }
@@ -40,28 +114,17 @@
         }
         
     };
-
+    
     $(':input, .select').on('edit change', function(){changeFunction()});
-
-    $('#metreCheckbox').on('change', function(){
-        if($('#metreCheckbox').is(":checked")){
-            $('#minMAT, #maxMAT').show();
-            $('#minMAT, #maxMAT').prop('required', true);
-        }
-        else {
-            $('#minMAT, #maxMAT').hide();
-            $('#minMAT, #maxMAT').prop('required', false);
-        }
-        changeFunction();
-    });
-
-    /* $('.checkSpan').click(
+    
+    $('.checkSpan').click(
         function() {
             var cb = $(this).find(":checkbox")[0];
-
+    
             if (!$(cb).attr("checked")) {
                 $(cb).attr("checked", "checked");
                 if(this.id=="metreSpan"){
+                    /* $('#matInputDiv').show(); */
                     $('#minMAT, #maxMAT').show();
                     $('#minMAT, #maxMAT').prop('required', true);
                     changeFunction();
@@ -69,6 +132,7 @@
             } else {
                 $(cb).removeAttr("checked");
                 if(this.id=="metreSpan"){
+                    /* $('#matInputDiv').hide(); */
                     $('#minMAT, #maxMAT').hide();
                     $('#minMAT, #maxMAT').prop('required', false);
                     changeFunction();
@@ -77,11 +141,11 @@
             
         }
     );
-
+    
     $('.checkSpan .temizCheckbox').click(
         function(event){
             event.stopPropagation();
-    }); */
+    });
     
     function toastClick(iconInput, titleInput, position){
         toastr.remove();
@@ -94,7 +158,7 @@
         }
         var pos = {"":"toast-top-right", "oc":"toast-orta-center", "br":"toast-bottom-right", "tc":"toast-top-center"};
         let posi = pos[position];
-
+    
         if(iconInput=="success"){
             toastr.success(titleInput,"",{"positionClass": posi})
         }
@@ -108,11 +172,11 @@
             toastr.warning(titleInput,"DİKKAT",{"positionClass": posi})
         }
     }
-
+    
     var deleteIcon = function(cell, formatterParams, onRendered){ 
         return "<i class='fa fa-trash'></i>";
     };
-
+    
     var alasimTab = new Tabulator("#alasimTabulator", {
         layout:"fitColumns",
         data:[],
@@ -129,13 +193,15 @@
                 $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
                 if(alasimTab.getData().length == 0){
                     $('#alasimTabData').prop('required', true);
+                    $('#AlasimKondusyonEkle').removeClass('btn-outline-primary');
+                    $('#AlasimKondusyonEkle').addClass('btn-outline-danger');
                 }
                 changeFunction();
             }
             }
         ],
     });
-
+    
     var yuzeyPresTabulator = new Tabulator('#yuzeyPresTabulator', {
         layout:"fitColumns",
         data:[],
@@ -152,7 +218,7 @@
             }}
         ]
     });
-
+    
     var eloksalTabulator = new Tabulator("#eloksalTabulator", {
         layout:"fitColumns",
         data:[],
@@ -175,7 +241,7 @@
             }}
         ]
     });
-
+    
     var yuzeyBoyaTabulator = new Tabulator("#yuzeyBoyaTabulator", {
         layout:"fitColumns",
         data:[],
@@ -202,7 +268,7 @@
             }}
         ]
     });
-
+    
     var ahsapKaplamaTabulator = new Tabulator("#ahsapKaplamaTabulator", {
         layout:"fitColumns",
         data:[],
@@ -221,7 +287,7 @@
             }}
         ]
     });
-
+    
     function checkNull(){
         if(ahsapKaplamaTabulator.getData().length == 0 && yuzeyBoyaTabulator.getData().length == 0 && eloksalTabulator.getData().length == 0 && yuzeyPresTabulator.getData().length == 0){
             $('#yAhsapTabData, #yEloksalTabData, #yPresTabData, #yBoyaTabData').prop('required', true);
@@ -231,8 +297,18 @@
         }
         changeFunction();
     }
-
-
+    
+    $('#metreCheck').on('change.bootstrapSwitch', function(e) {
+        let metreC = e.target.checked;
+        if (!metreC){
+            $('#minMAT, #maxMAT').attr('disabled', 'disabled');
+        }
+        else {
+            $('#minMAT, #maxMAT').removeAttr('disabled');
+        }
+    });
+    
+    
     function digerFunction(selectId, digerId){
         $('#'+selectId).hide();
         if(selectId.includes('Select')){
@@ -240,7 +316,7 @@
         };
         $('#'+digerId).show();
     }; /* texti kapatmak için de bunu çağır */
-
+    
     function selectFunction(objId, target, title, diger) {
         if (objId == 0){
             if(target != ""){
@@ -274,7 +350,7 @@
             }
         }
     };
-
+    
     selectFunction(1, "alasimSelect", "Alaşım", "Diğer");
     selectFunction(20, "matlastirmaSelect", "Matlaştırma", "");
     selectFunction(59,"eloksalKaplamaKalinligiSelect", "Kaplama Kalınlığı", "");
@@ -284,7 +360,7 @@
     selectFunction(112, "boyaMarkaSelect", "Marka", "Diğer");
     /* bütün selectler için arraya alıp for yap */
     /* ekleye tıklatınca tabulatore eklesin inputlardakileri de veritabanına kaydet*/
-
+    
     document.getElementById("AlasimKondusyonEkle").addEventListener("click", function(){
         /* AlaşımDiger ve KondüsyonDigeri arraye alıp for döndürüp tek if else ile yapılabilir */
         let alasimID, kondusyonID, alasim, kondusyon = "";
@@ -302,26 +378,30 @@
         else {
             kondusyon = $('#kondusyonDiger').val();
         }
-        if(alasim!="Alaşım " && kondusyon!="Kondüsyon "){
+        if(alasim!="Alaşım* " && kondusyon!="Kondüsyon* "){
             alasimTab.addData({AlasimID:alasimID, KondusyonID:kondusyonID, Alasim:alasim, Kondusyon:kondusyon});
             $('#alasimTabData').val(JSON.stringify(alasimTab.getData()));
             $('#alasimTabData').removeAttr('required');
+            if ($('#AlasimKondusyonEkle').hasClass('btn-outline-danger')) {
+                $('#AlasimKondusyonEkle').removeClass('btn-outline-danger');
+                $('#AlasimKondusyonEkle').addClass('btn-outline-primary');
+            }
             changeFunction();
         }
     });
-
+    
     document.getElementById("YuzeyPresEkle").addEventListener("click", function(){
         let yPresSelect, yPresBoy = "";
         if($('#yuzeyPresSelect').val() != null && $('#yuzeyPresBoy').val()!=""){
             yPresSelect = $('#yuzeyPresSelect').val();
             yPresBoy = $('#yuzeyPresBoy').val();
-
+    
             yuzeyPresTabulator.addData({YuzeyDetay:yPresSelect, YuzeyPresBoy:yPresBoy}, false);
             $('#yPresTabData').val(JSON.stringify(yuzeyPresTabulator.getData()));
             checkNull();
         }
     });
-
+    
     document.getElementById("YuzeyEloksalEkle").addEventListener("click", function(){
         let matlastirma, renk, kalinlik, eBoy, eTemiz, matlastirmaId, renkId, kalinlikId = "";
         if($('#matlastirmaSelect').val() != null && $('#eloksalRenkSelect').val() != null && $('#eloksalKaplamaKalinligiSelect').val() != null && $('#eloksalBoy').val()!=""){
@@ -331,6 +411,8 @@
             eBoy = $('#eloksalBoy').val();
             if($('#eloksalTemiz').is(':checked')){
                 eTemiz = "Temiz Kesim";
+                $("#tVar").prop("checked", true).trigger("click");
+                $("#talasliImalatAciklama").val("Temiz kesim yapılacak.");
             }
             else{
                 eTemiz = "Temiz Kesim Değil";
@@ -343,7 +425,7 @@
             checkNull();
         }
     });
-
+    
     document.getElementById("YuzeyBoyaEkle").addEventListener("click", function(){
         let boyaMarka, boyaMarkaID, bTemiz, boyaKalinlik, boyaKalinlikID = "";
         if(document.getElementById("boyaMarkaDiger").style.display == "none"){
@@ -355,6 +437,8 @@
         }
         if($('#boyaTemiz').is(':checked')){
             bTemiz = "Temiz Kesim";
+            $("#tVar").prop("checked", true).trigger("click");
+            $("#talasliImalatAciklama").val("Temiz kesim yapılacak.");
         }
         else{
             bTemiz = "Temiz Kesim Değil";
@@ -371,11 +455,13 @@
             checkNull();
         }
     });
-
+    
     document.getElementById("ahsapKaplamaEkle").addEventListener('click', function(){
         let ahsapKaplama, ahsapKaplamaId, aTemiz = "";
         if($('#ahsapTemiz').is(':checked')){
             aTemiz = "Temiz Kesim";
+            $("#tVar").prop("checked", true).trigger("click");
+            $("#talasliImalatAciklama").val("Temiz kesim yapılacak.");
         }
         else{
             aTemiz = "Temiz Kesim Değil";
@@ -393,8 +479,8 @@
             checkNull();
         }
     });
-
-
+    
+    
     $('#RALinput').keyup(function() {
         let defaultClass = "input-group-text ral"
         if ($('#RALinput').val().length === 4 ) {
@@ -405,20 +491,20 @@
             document.getElementById('RALspan').setAttribute("class", defaultClass);
         }
     });
-
+    
     $("input[data-bootstrap-switch]").each(function(){
       $(this).bootstrapSwitch('state', $(this).prop('checked'));
     });
-
+    
     $(document).ready(function () {
         bsCustomFileInput.init();
     });
-
+    
     //Initialize Select2 Elements
     $('.select2bs4').select2({
       theme: 'bootstrap4'
     });
-
+    
     var selectedFiles = [];
     $('#fileInput').on('change', function(e) {
         Array.from(e.target.files).forEach(function(newFile) {
@@ -427,13 +513,90 @@
             }
         });
         updateFileList();
+        toggleRequiredInfo();
     });
-
+    
     function fileAlreadySelected(newFile) {
         return selectedFiles.some(function(existingFile) {
             return newFile.name === existingFile.name && newFile.size === existingFile.size;
         });
+    };
+    
+    function validateFiles() {
+        if (selectedFiles.length === 0) {
+            $('#fileInput').val('');
+            $('#fileInput').next('label').html('Dosyaları Seçin');
+            changeFunction();
+            toggleRequiredInfo();
+        }
+        return true;
+    };
+    
+    function updateFileList() {
+        validateFiles();
+        var fileTitles = $('#fileTitles');
+        fileTitles.empty(); // Önceki başlık alanlarını temizle
+    
+        var row = $('<div class="row"></div>');
+        fileTitles.append(row);
+    
+        selectedFiles.forEach(function(file, index){
+            let fileType = file.name.split(".").pop().toLowerCase();
+            var column = $(
+                `<div class="col-md-6 mt-3">
+                    <div class="mp-3 d-flex justify-content-between border rounded">
+                        <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                        <div class="p-1 flex-grow-1">
+                            <label class="overflow">${file.name}</label>
+                            <select class="form-control kaydet" name="fileTitles[]">
+                                <option value="Diğer">Diğer</option>
+                                <option value="Teknik Resim">Teknik Resim</option>
+                                <option value="Şartname">Şartname</option>
+                                <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index})">
+                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                        </button>
+                    </div>
+                </div>`
+            );
+    
+            row.append(column);
+    
+            if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+                row = $('<div class="row"></div>');
+                fileTitles.append(row);
+            }
+        });
+    
+    };
+    
+    function toggleRequiredInfo() {
+        var fileInput = document.getElementById('fileInput');
+        var inputGroup = fileInput.closest('.input-group');
+        if (selectedFiles.length === 0) {
+            inputGroup.classList.add('border', 'border-danger');
+        } else {
+            inputGroup.classList.remove('border', 'border-danger');
+        }
     }
+    
+    window.removeFile = function(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+        toggleRequiredInfo();
+    };
+    
+    function DosyaTemizle(){
+        selectedFiles = [];
+        $('#fileInput').val('');
+        $('#fileInput').next('label').html('Dosyaları Seçin');
+        //document.getElementById("fileInput").validity.valid = false;
+        changeFunction();
+        updateFileList();
+        toggleRequiredInfo();
+    };
 
     var deletedFileId = [];
     function removeUploadedFiles(id){
@@ -487,59 +650,7 @@
                 oldFilesDiv.append(row);
             }
         });
-    }
-
-    function updateFileList() {
-        var fileTitles = $('#fileTitles');
-        fileTitles.empty(); // Önceki başlık alanlarını temizle
-
-        var row = $('<div class="row"></div>');
-		fileTitles.append(row);
-        
-        selectedFiles.forEach(function(file, index){ 
-            let fileName = file.name || file.File;
-            let fileType = fileName.split(".").pop().toLowerCase();
-            let fileTitle = file.FileTitle || "";
-            var column = $(
-                `<div class="col-md-6 mt-3">
-                    <div class="mp-3 d-flex justify-content-between border rounded">
-                        <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
-                        <div class="p-1 flex-grow-1">
-                            <label class="overflow">${fileName}</label>
-                            <select class="form-control kaydet" name="fileTitles[]">
-                                <option value="Teknik Resim">Teknik Resim</option>
-                                <option value="Şartname">Şartname</option>
-                                <option value="Paketleme Talimatı">Paketleme Talimatı</option>
-                                <option value="Diger">Diğer</option>
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index})">
-                            <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
-                        </button>
-                    </div>
-                </div>`
-            );
-            
-            row.append(column);
-
-            if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
-                row = $('<div class="row"></div>');
-                fileTitles.append(row);
-            }
-        });
-
     };
-
-    window.removeFile = function(index) {
-        selectedFiles.splice(index, 1);
-        updateFileList();
-    };
-
-    function DosyaTemizle(){
-        selectedFiles = [];
-        updateFileList();
-    };
-
-
+   
 </script>
 {% endblock %}
