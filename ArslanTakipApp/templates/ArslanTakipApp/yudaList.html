@@ -205,11 +205,31 @@
   }
 
   function applyFiltersFromState() {
-    // Example of setting filter inputs; needs customization based on actual filter elements:
     $('#yudaNoFilter').val(filterList.find(f => f.field === 'YudaNo')?.value || '');
     $('#musteriFirmaFilter').val(filterList.find(f => f.field === 'MusteriFirmaAdi')?.value || '');
-    $('#bolumFilter').val(filterList.find(f => f.field === 'Bolum')?.value || []).trigger('change');
-    // Continue for other filters
+    $('#dosyaFilter').val(filterList.find(f => f.field === 'Dosya')?.value || '');
+    $('#cizimFilter').val(filterList.find(f => f.field === 'CizimNo')?.value || '');
+
+    const bolumFilterValues = filterList.find(f => f.field === 'Bolum')?.value || [];
+    $('#bolumFilter').val(bolumFilterValues).trigger('change');
+    const musteriTemsilcisiSelect = filterList.find(f => f.field === 'YudaAcanKisi_id')?.value || '';
+    $('#musteriTemsilcisiSelect').val(musteriTemsilcisiSelect).trigger('change');
+
+    const tarihFilter = filterList.find(f => f.field === 'Tarih');
+    if (tarihFilter) {
+        const tarihPicker = $('#tarihFilter').data('daterangepicker');
+        tarihPicker.setStartDate(new Date(tarihFilter.type));
+        tarihPicker.setEndDate(new Date(tarihFilter.value));
+        $('#tarihFilter').val(tarihPicker.startDate.format('DD-MM-YYYY') + ' | ' + tarihPicker.endDate.format('DD-MM-YYYY'));
+    }
+
+    const guncelTarihFilter = filterList.find(f => f.field === 'GüncelTarih');
+    if (guncelTarihFilter) {
+        const guncelTarihPicker = $('#guncelTarihFilter').data('daterangepicker');
+        guncelTarihPicker.setStartDate(new Date(guncelTarihFilter.type));
+        guncelTarihPicker.setEndDate(new Date(guncelTarihFilter.value));
+        $('#guncelTarihFilter').val(guncelTarihPicker.startDate.format('DD-MM-YYYY') + ' | ' + guncelTarihPicker.endDate.format('DD-MM-YYYY'));
+    }
   }
 
   $(document).ready(function() {
