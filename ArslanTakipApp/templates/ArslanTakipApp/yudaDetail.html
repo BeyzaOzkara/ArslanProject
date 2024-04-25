@@ -736,6 +736,7 @@
     var row = $('<div class="row"></div>');
     fileTitles.append(row);
 
+    // <label class="overflow">${file.name}</label>
     selectedFiles.forEach(function(file, index){
         let fileType = file.name.split(".").pop().toLowerCase();
         var column = $(
@@ -743,7 +744,7 @@
                 <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
                     <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                     <div class="p-1 flex-grow-1">
-                        <label class="overflow">${file.name}</label>
+                      <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
                         <select class="form-control kaydet" name="fileTitles[]">
                             <option value="Teknik Resim">Teknik Resim</option>
                             <option value="Şartname">Şartname</option>
@@ -766,6 +767,18 @@
         }
     });
 
+  };
+
+  $(document).on('click', '.clickable-file-label', function() {
+    let index = $(this).data('index');
+    let file = selectedFiles[index];
+    openFile(file);
+  });
+
+  function openFile(file) {
+      var url = URL.createObjectURL(file);
+      window.open(url, '_blank'); // Opens the file in a new tab
+      URL.revokeObjectURL(url); // Clean up the URL after opening
   };
 
   window.removeFile = function(index, cId) {

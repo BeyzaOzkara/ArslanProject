@@ -180,82 +180,116 @@
 
 {% block extra_js %} 
 <script>
-    let itemsPerPage = 7;  // Başlangıçta varsayılan değer
-    let filterList = [];
-    const tableBody = $('#yudaTBody');
+  let itemsPerPage = 7;  // Başlangıçta varsayılan değer
+  let filterList = [];
+  const tableBody = $('#yudaTBody');
 
-    $('#filterButton').click(function() {
-        $('#filterPanelModal').modal('show');
-    });
+  function saveState() {
+    const state = {
+        filterList: filterList,
+        currentPage: currentPage,
+        itemsPerPage: itemsPerPage
+    };
+    sessionStorage.setItem('yudaListState', JSON.stringify(state));
+  }
 
-    var tarihFilterList = {};
-    var guncelTarihFilterList = {};
-    $('#tarihFilter').on('apply.daterangepicker', function(ev, picker) {
-      var start = picker.startDate;
-      var end = picker.endDate;
-      tarihFilterList ={ field: "Tarih", type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')};
-      $( "#tarihFilter" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
-    });
+  function restoreState() {
+    const state = JSON.parse(sessionStorage.getItem('yudaListState'));
+    if (state) {
+        filterList = state.filterList;
+        currentPage = state.currentPage;
+        itemsPerPage = state.itemsPerPage;
+        $('#perPageSelect').val(itemsPerPage); // Update items per page dropdown
+        applyFiltersFromState(); // Apply filters to UI components based on stored state
+    }
+  }
 
-    $('#guncelTarihFilter').on('apply.daterangepicker', function(ev, picker) {
-      var start = picker.startDate;
-      var end = picker.endDate;
-      guncelTarihFilterList ={ field: "GüncelTarih", type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')};
-      $( "#guncelTarihFilter" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
-    });
+  function applyFiltersFromState() {
+    // Example of setting filter inputs; needs customization based on actual filter elements:
+    $('#yudaNoFilter').val(filterList.find(f => f.field === 'YudaNo')?.value || '');
+    $('#musteriFirmaFilter').val(filterList.find(f => f.field === 'MusteriFirmaAdi')?.value || '');
+    $('#bolumFilter').val(filterList.find(f => f.field === 'Bolum')?.value || []).trigger('change');
+    // Continue for other filters
+  }
 
-    $('#applyFilter').click(function() {
-        const yudaNoFilter = $('#yudaNoFilter').val();
-        const musteriFirmaFilter = $('#musteriFirmaFilter').val();
-        const bolumFilter = $('#bolumFilter').val();
-        const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
-        const dosyaFilter = $('#dosyaFilter').val();
-        const cizimFilter = $('#cizimFilter').val();
-        const tarihFilter = $('#tarihFilter').val();
-        const guncelTarihFilter = $('#guncelTarihFilter').val();
-        filterList = [];
+  $(document).ready(function() {
+    restoreState();
+    loadPage(currentPage); // Load page based on restored state
+  });
 
-        if (yudaNoFilter != "") {
-          filterList.push({ field: 'YudaNo', type:'like', value: yudaNoFilter });
-        };
-        if (musteriFirmaFilter != ""){
-          filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });
-        };
-        if (bolumFilter.length != 0){
-          if (bolumFilter[0] != '') {
-            filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
-          }
-          else if (bolumFilter[0] == '' && bolumFilter.length != 1){
-            filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
-          }
-        };
-        if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
-          filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
-        };
-        if (dosyaFilter != "") {
-          filterList.push({ field: 'Dosya', type:'like', value: dosyaFilter });
-        };
-        if (cizimFilter != "") {
-          filterList.push({ field: 'CizimNo', type:'like', value: cizimFilter });
-        };
-        if (tarihFilter != "") {
-          filterList.push(tarihFilterList);
+  $('#filterButton').click(function() {
+      $('#filterPanelModal').modal('show');
+  });
+
+  var tarihFilterList = {};
+  var guncelTarihFilterList = {};
+  $('#tarihFilter').on('apply.daterangepicker', function(ev, picker) {
+    var start = picker.startDate;
+    var end = picker.endDate;
+    tarihFilterList ={ field: "Tarih", type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')};
+    $( "#tarihFilter" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
+  });
+
+  $('#guncelTarihFilter').on('apply.daterangepicker', function(ev, picker) {
+    var start = picker.startDate;
+    var end = picker.endDate;
+    guncelTarihFilterList ={ field: "GüncelTarih", type: start.format('YYYY-MM-DD'), value: end.format('YYYY-MM-DD')};
+    $( "#guncelTarihFilter" ).val(start.format('DD-MM-YYYY') + ' | '+ end.format('DD-MM-YYYY'));
+  });
+
+  $('#applyFilter').click(function() {
+      const yudaNoFilter = $('#yudaNoFilter').val();
+      const musteriFirmaFilter = $('#musteriFirmaFilter').val();
+      const bolumFilter = $('#bolumFilter').val();
+      const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
+      const dosyaFilter = $('#dosyaFilter').val();
+      const cizimFilter = $('#cizimFilter').val();
+      const tarihFilter = $('#tarihFilter').val();
+      const guncelTarihFilter = $('#guncelTarihFilter').val();
+      filterList = [];
+
+      if (yudaNoFilter != "") {
+        filterList.push({ field: 'YudaNo', type:'like', value: yudaNoFilter });
+      };
+      if (musteriFirmaFilter != ""){
+        filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });
+      };
+      if (bolumFilter.length != 0){
+        if (bolumFilter[0] != '') {
+          filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
         }
-        if (guncelTarihFilter != "") {
-          filterList.push(guncelTarihFilterList);
+        else if (bolumFilter[0] == '' && bolumFilter.length != 1){
+          filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
         }
-        
-        loadPage(1);
+      };
+      if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
+        filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
+      };
+      if (dosyaFilter != "") {
+        filterList.push({ field: 'Dosya', type:'like', value: dosyaFilter });
+      };
+      if (cizimFilter != "") {
+        filterList.push({ field: 'CizimNo', type:'like', value: cizimFilter });
+      };
+      if (tarihFilter != "") {
+        filterList.push(tarihFilterList);
+      }
+      if (guncelTarihFilter != "") {
+        filterList.push(guncelTarihFilterList);
+      }
+      
+      loadPage(1);
+      saveState();
+      $('#filterPanelModal').modal('hide');
+  });
 
-        $('#filterPanelModal').modal('hide');
-    });
+  document.getElementById('btnTemizle').addEventListener('click', () => {
+    $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #cizimFilter, #dosyaFilter, #tarihFilter').val("");
+    $('#bolumFilter').val([]).trigger('change');
+    sessionStorage.removeItem('yudaListState');
+  });
 
-    document.getElementById('btnTemizle').addEventListener('click', () => {
-      $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #cizimFilter, #dosyaFilter, #tarihFilter').val("");
-      $('#bolumFilter').val([]).trigger('change');
-    });
-  
-    $('.select2bs4').select2({
+  $('.select2bs4').select2({
       theme: 'bootstrap4',
       allowClear: true
     });
@@ -459,6 +493,7 @@
   };
 
   const loadPage = (page) => {
+    currentPage = page;
       const params = {
         page: page,
         size: itemsPerPage,
@@ -482,12 +517,12 @@
 
   $('#perPageSelect').on('change', function () {
     itemsPerPage = parseInt($(this).val());
-    currentPage = 1;  // Sayfa değiştiğinde ilk sayfaya geç
+    currentPage = 1;  // Sayfa başına sayısı değiştiğinde ilk sayfaya geç
     loadPage(currentPage);
   });
 
   let currentPage = 1;
-  loadPage(currentPage);  // İlk sayfa yüklendiğinde verileri ve pagination'ı getir
+  loadPage(currentPage);
 
 </script>
 {% endblock %}

@@ -41,6 +41,7 @@ from .forms import PasswordChangingForm
 from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
+from django.core.mail import send_mail
 # Create your views here.
 
 
@@ -2223,7 +2224,6 @@ def notifications_all(request):
     filtered_notis = notis.filter(**q).order_by('-timestamp')
     notiList = list(filtered_notis.values()[offset:limit])
 
-    # notifications = list(Notification.objects.filter(user=request.user).values().order_by('-timestamp'))
     yudaNoti = []
     ycommentNoti = []
     for n in notiList:
