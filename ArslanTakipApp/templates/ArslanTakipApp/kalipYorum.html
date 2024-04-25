@@ -1,0 +1,34 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+<link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- Summernote -->
+<script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
+
+{% endblock %}

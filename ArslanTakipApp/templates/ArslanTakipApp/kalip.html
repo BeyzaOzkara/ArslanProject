@@ -287,7 +287,8 @@ var listIcon = function(cell, formatterParams, onRendered){
 };
 
 var msgIcon = function(cell, formatterParams, onRendered) {
-    return "<a href=''><i class='fa fa-comments'></i></a>"
+    let kId = cell.getData().id;
+    return `<a href='die/${kId}'><i class='fa fa-comments'></i></a>`;
 }
 
 var aktifIcon = function(cell, formatterParams, onRendered){
@@ -410,7 +411,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
 
             },
             },
-            {formatter:msgIcon, title:"", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+            {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 console.log("msgIcon");
             }},
             {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},

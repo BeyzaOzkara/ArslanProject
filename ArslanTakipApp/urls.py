@@ -38,6 +38,7 @@ urlpatterns = [
     path('kalip/liste', views.kalip_liste),
     path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
+    path('die/<str:kId>', views.kalipYorum, name='kalipYorum'),
     path('qr/', views.qrKalite, name='qr'),
     path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
     path('siparis/', login_required(views.SiparisView.as_view())),

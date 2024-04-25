@@ -460,6 +460,10 @@ def location_kalip(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
+def kalipYorum(request, kId):
+    print("kalipYorum")
+    return render(request, 'ArslanTakipApp/kalipYorum.html')
+
 key = b'arslandenemebyz1'
 
 # def encrypt_aes_ecb(key, plaintext):
@@ -528,22 +532,6 @@ def qrKalite_deneme(request):
     user = request.user
     message = "Yuda Kaydet"
     y = YudaForm.objects.get(id=107)
-
-    for n in Notification.objects.all():
-        print(f"id: {n.new_made_by_id} made_by: {n.new_made_by}")
-       
-
-    # object_perms = GroupObjectPermission.objects.filter(object_pk=y.id, content_type__model='yudaform', permission__codename='gorme_yuda')
-    # allowed_groups = list(set([perm.group for perm in object_perms]))
-    # print(allowed_groups)
-
-    # groups_with_perms = get_groups_with_perms(y, attach_perms=True)
-    # allowed_groups = [group for group, perms in groups_with_perms.items() if 'gorme_yuda' in perms]
-
-    # allowed_users = []
-    # for group in allowed_groups:
-    #     group_users = group.user_set.all()  # Assuming 'user_set' is the related manager for users in a group
-    #     allowed_users.extend(group_users)
 
     allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
