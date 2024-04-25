@@ -287,8 +287,10 @@ var listIcon = function(cell, formatterParams, onRendered){
 };
 
 var msgIcon = function(cell, formatterParams, onRendered) {
+    console.log(cell);
+    console.log(cell.getData());
     let kId = cell.getData().id;
-    return `<a href='die/${kId}'><i class='fa fa-comments'></i></a>`;
+    return `<a href='/die/${kId}'><i class='fa fa-comments'></i></a>`;
 }
 
 var aktifIcon = function(cell, formatterParams, onRendered){
