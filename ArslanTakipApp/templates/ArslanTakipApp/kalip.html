@@ -236,11 +236,6 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-    
-
-/* var elem = document.getElementById('kalipKart');
-elem.style.display = 'none';
- */
 //define column header menu as column visibility toggle
 var headerMenu = function(){
     var menu = [];
@@ -288,11 +283,15 @@ var headerMenu = function(){
 
 var listIcon = function(cell, formatterParams, onRendered){ 
     //<a href="#kalip_karti"></a>
-    return "<a href='#kalip_karti'><i class='fa fa-list-ul'></i></a> "; //icon değiştir
+    return "<a href='#kalip_karti'><i class='fa fa-list-ul'></i></a> ";
 };
-var aktifIcon = function(cell, formatterParams, onRendered){ 
-    //<a href="#kalip_karti"></a>
-    return "<i class='fa fa-list-ul'></i> "; //icon değiştir
+
+var msgIcon = function(cell, formatterParams, onRendered) {
+    return "<a href=''><i class='fa fa-comments'></i></a>"
+}
+
+var aktifIcon = function(cell, formatterParams, onRendered){
+    return "<i class='fa fa-list-ul'></i> ";
 };
 var hatAccessor = function(value, data, type, params, column){
     if (value == params.Hatasiz){
@@ -411,6 +410,9 @@ var tableKalip = new Tabulator("#kalipListe-table", {
 
             },
             },
+            {formatter:msgIcon, title:"", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                console.log("msgIcon");
+            }},
             {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
             accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
             {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,

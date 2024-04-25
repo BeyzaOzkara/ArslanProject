@@ -698,6 +698,7 @@
     $(':input[required]').on('change', function() {
         let allFilled = true;
         let $infoBox = $(this).closest('.required-info');
+        console.log($infoBox);
         if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
         if ($infoBox.length == 0){
             allFilled = checkRequiredField($(this), allFilled);

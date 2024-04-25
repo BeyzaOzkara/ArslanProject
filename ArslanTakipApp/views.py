@@ -2029,7 +2029,6 @@ def yudachange(request, yId):
     return response
 
 def yudaCopy(request, yId):
-    print("yuda copy")
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 

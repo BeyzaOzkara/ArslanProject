@@ -614,13 +614,11 @@
     function UploadedFiles() {
         var oldFilesDiv = $('#oldFileDiv');
         oldFilesDiv.empty(); // Önceki başlık alanlarını temizle
-        console.log(oldFilesDiv)
 
         var row = $('<div class="row"></div>');
 		oldFilesDiv.append(row);
 
-        oldFiles.forEach(function(file, index){ 
-            console.log(index)
+        oldFiles.forEach(function(file, index){
             let fileName = file.name || file.File;
             let fileType = fileName.split(".").pop().toLowerCase();
             let fileTitle = file.FileTitle || "";

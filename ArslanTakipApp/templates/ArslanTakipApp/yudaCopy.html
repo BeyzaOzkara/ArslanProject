@@ -55,8 +55,7 @@
 
     yudaData.forEach(y => {
         let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-        console.log(y);
-        //profil siparişi sorununu hallet4
+
         for (let i = 0; i < formElements.length; i++) {
             const fieldName = formElements[i].name;
             const fieldValue = y[fieldName];
@@ -98,7 +97,6 @@
                 }
                 checkNull();
             }
-            
         }
 
         $('#birlikteCalisan').val(y.BirlikteCalisan);
@@ -111,7 +109,6 @@
         }
     
         changeFunction();
-        // checkRequiredField();
     });
 
 
