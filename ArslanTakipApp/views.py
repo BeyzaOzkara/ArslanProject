@@ -1459,11 +1459,11 @@ def yudas_list(request):
     data = json.dumps(response_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def process_comment(comment):
+def process_comment(comment): #biri parent yorumu silerse reply olan yorum gözükmemiş olur bunu düzelt
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
     comment['Tarih'] = format_date_time(comment['Tarih'])
     comment['cfiles'] = list(getFiles("Comment", comment['id']))
-    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()]
+    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
     return comment
 
 def format_yuda_details2(yList):
