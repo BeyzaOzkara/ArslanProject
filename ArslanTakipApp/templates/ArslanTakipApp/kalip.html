@@ -632,7 +632,7 @@ function fileInputChange(e, r){
                 </div>
                 <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${reply.id})"></i>
               </div>
-              <button type="button" class="btn btn-default" id="gonder${reply.id}" onclick="handleReply(${reply.id})">Gönder</button>
+              <button type="button" class="btn btn-default" id="gonder${reply.id}" onclick="handleReply(${reply.FormModelId}, ${reply.id})">Gönder</button>
           </form>`);
 
     const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
@@ -708,7 +708,7 @@ function createCommentElement(comment) {
                 </div>
                 <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
               </div>
-              <button type="button" class="btn btn-default" id="gonder${comment.id}" onclick="handleReply(${comment.id})">Gönder</button>
+              <button type="button" class="btn btn-default" id="gonder${comment.id}" onclick="handleReply(${comment.FormModelId}, ${comment.id})">Gönder</button>
           </form>`);
         
     const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
@@ -849,12 +849,12 @@ function deleteComment(cId) {
     }
 };
 
-function handleReply(commentId) {
+function handleReply(modelId, commentId) {
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
       editComment(commentId);
     }
     else {
-      yorumPaylas(kId="", cId=commentId);
+      yorumPaylas(kId=modelId, cId=commentId);
     }
 };
 
