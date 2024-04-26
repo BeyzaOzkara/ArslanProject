@@ -886,6 +886,10 @@ $("input[data-bootstrap-switch]").each(function(){
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
     var textareaValue = $(`#yorumText${kId}`).summernote('code');
+    if (cId != "") {
+        textareaValue = $(`#yorumText${cId}`).summernote('code');
+    }
+    
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", kId);
     yorumData.append("yorum", textareaValue);
