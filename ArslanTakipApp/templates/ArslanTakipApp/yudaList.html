@@ -518,25 +518,25 @@
 
   const loadPage = (page) => {
     currentPage = page;
-      const params = {
-        page: page,
-        size: itemsPerPage,
-        filter: filterList,
-      };
-      $.ajax({
-          url: `yudas/list`,
-          method: 'GET',
-          data: { params: JSON.stringify(params)},
-          dataType: 'json',
-          success: function (paginatedData) {
-              getProjects(paginatedData);
-              renderPagination(paginatedData.last_page);
-              getTemsilci(paginatedData.temsil)
-          },
-          error: function (error) {
-              console.error('Error loading paginated data:', error);
-          }
-      });
+    const params = {
+      page: page,
+      size: itemsPerPage,
+      filter: filterList,
+    };
+    $.ajax({
+        url: `yudas/list`,
+        method: 'GET',
+        data: { params: JSON.stringify(params)},
+        dataType: 'json',
+        success: function (paginatedData) {
+            getProjects(paginatedData);
+            renderPagination(paginatedData.last_page);
+            getTemsilci(paginatedData.temsil)
+        },
+        error: function (error) {
+            console.error('Error loading paginated data:', error);
+        }
+    });
   };
 
   $('#perPageSelect').on('change', function () {

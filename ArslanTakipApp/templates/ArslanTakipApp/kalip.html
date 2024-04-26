@@ -9,9 +9,14 @@
 {% include 'adminlte/lib/_styles.html' %}
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 <link rel="stylesheet" href="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
 
 
 <style>
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
     .tabulator-menu{
         width: 200px;
         height: 150px;
@@ -29,6 +34,9 @@
     img {
         width:100%;
         height:100%;
+    }
+    .nested-replies {
+        margin-left: 20px; /* Adjust the indentation level as needed */
     }
 </style>
     
@@ -49,12 +57,15 @@
                         <i class="fas fa-file-excel"></i>
                         excell
                     </a>
+                    <a class="btn btn-app bg-success" style="float: left;" id="btnComment">
+                        <i class="fas fa-comments"></i>
+                    </a>
                 </div>
             </div>
             <div class="card" id="kalipListe-table"></div>
         </div>
         <div class="container-fluid col-lg-7">
-                <div class="card container-fluid " id="kalip_karti" style="visibility: hidden;">
+                <div class="card container-fluid " id="kalip_karti" style="display: none;">
                 <!-- Kalıp Kartı -->
                 <div class="card-body">
                     <div class="row">
@@ -226,9 +237,57 @@
         </div>
         <!--Pres Üretim Raporu start -->
         <div class="container-fluid col-lg-5">
-            <div class="card" id="presURaporListe-table" style="visibility: hidden;"></div>
+            <div class="card" id="presURaporListe-table" style="display: none;"></div>
         </div>
-        
+    </div>
+    <div class="row">
+        <div class="container-fluid col-lg-12">
+            <div class="card" id="dieComment" style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title">Paylaşılanlar</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+                        <i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12" id="commentCol"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="diePostComment" style="display: none;">
+                <div class="card-header">
+                  <h3 class="card-title">Paylaşım Yap</h3>
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+                      <i class="fas fa-minus"></i></button>
+                  </div>
+                </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
+                <div class="card-body" id="yorumCard">
+                  <div class="row" style="height: 265px;">
+                    <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol">
+                      <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
+                                      style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;display: none;">
+                      <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                        </div>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                        </div>
+                      </div>
+                      <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                    </div>
+                  </div>
+                  <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
+                  <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
+                </div>
+              </div>
+        </div>
     </div>
 </div>
 
@@ -236,6 +295,29 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+    
+let userID = "{{user.id}}";
+var selectedFiles = [];
+$(function () {
+    // Summernote
+    $('.textarea').summernote({
+      disableResizeEditor: true,
+      height:200,
+      toolbar: [
+        //['misc', ['undo', 'redo']],
+        ['style', ['bold', 'italic', 'underline']],
+        ['font', ['superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table'],
+        ['custom', ['specialchars']],
+      ]
+    });
+    
+  });
+
 //define column header menu as column visibility toggle
 var headerMenu = function(){
     var menu = [];
@@ -285,17 +367,14 @@ var listIcon = function(cell, formatterParams, onRendered){
     //<a href="#kalip_karti"></a>
     return "<a href='#kalip_karti'><i class='fa fa-list-ul'></i></a> ";
 };
-
 var msgIcon = function(cell, formatterParams, onRendered) {
-    console.log(cell);
     console.log(cell.getData());
-    let kId = cell.getData().KalipNo;
-    return `<a href='/die/${kId}'><i class='fa fa-comments'></i></a>`;
+    return `<a href='#dieComment'><i class='fa fa-comments'></i></a>`;
 }
-
 var aktifIcon = function(cell, formatterParams, onRendered){
     return "<i class='fa fa-list-ul'></i> ";
 };
+
 var hatAccessor = function(value, data, type, params, column){
     if (value == params.Hatasiz){
         value = 'Hatasız';
@@ -364,8 +443,8 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 presURaporu.setFilter([{ field: 'KalipNo', type: '=', value: cell.getData().KalipNo }, 
                     ]);
                 presURaporu.redraw(true);
-                document.getElementById("kalip_karti").style.visibility = 'visible';
-                document.getElementById("presURaporListe-table").style.visibility = 'visible';
+                document.getElementById("kalip_karti").style.display = 'block';
+                document.getElementById("presURaporListe-table").style.display = 'block';
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
                 if (kal.Silindi == 1){
                     kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
@@ -414,7 +493,10 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             },
             },
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                console.log("msgIcon");
+                let kId = cell.getData().KalipNo;
+                clickComment(kId);
+                document.getElementById("dieComment").style.display = 'block';
+                document.getElementById("diePostComment").style.display = 'block';
             }},
             {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
             accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
@@ -486,6 +568,306 @@ var presURaporu = new Tabulator("#presURaporListe-table", {
     ]
 });
 
+function nestedReplies(replies) {
+    const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
+
+    replies.forEach(reply => {
+        const replyElement = createReplyElement(reply);
+        nestedRepliesContainer.append(replyElement);
+    });
+
+    return nestedRepliesContainer;
+}
+
+function fileInputChange(e, r){
+    console.log("burda")
+      Array.from(e.target.files).forEach(function(newFile) {
+          if (!fileAlreadySelected(newFile)) {
+              selectedFiles.push(newFile);
+              updateFileList(r);
+          }
+      });
+  }
+
+  function createReplyElement(reply) {
+    const userBlock = `<div class="user-block">
+                          <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                          <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
+                          <span class="description">${reply.Tarih}</span>
+                      </div>`;
+    const replyContent = `<p>${reply.Aciklama}</p>`;
+    const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
+
+    reply.cfiles.forEach(cf => {
+        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileElement = $('<p></p>').append(fileLink);
+        replyElement.append(fileElement);
+    });
+
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
+        const replyForm = replyElement.find(`#replyComment${reply.id}`);
+        replyForm.collapse('toggle');
+        $(`#yorumText${reply.id}`).summernote("code", "");
+        const sendButton = replyElement.find(`#gonder${reply.id}`);
+        sendButton.text('Gönder');
+    });
+
+    const replyFormCollapse = $(`<div class="collapse" id="replyComment${reply.id}"></div>`).html(`
+          <form>
+              <div class="form-group">
+                <div class="row" style="height: 265px;">
+                  <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${reply.id}">
+                    <textarea class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
+                                    style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                  </div>
+                  <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${reply.id}" style="height: 265px;display: none;">
+                    <div class="input-group">
+                      <div class="custom-file">
+                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${reply.id}" lang="tr" onchange="fileInputChange(event, ${reply.id})" multiple>
+                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                      </div>
+                      <div class="input-group-append">
+                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${reply.id})">Temizle</span>
+                      </div>
+                    </div>
+                    <div id="fileTitles${reply.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                  </div>
+                </div>
+                <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${reply.id})"></i>
+              </div>
+              <button type="button" class="btn btn-default" id="gonder${reply.id}" onclick="handleReply(${reply.id})">Gönder</button>
+          </form>`);
+
+    const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
+        const replyForm = replyElement.find(`#replyComment${reply.id}`);
+        replyForm.collapse('toggle');
+        $(`#yorumText${reply.id}`).summernote("code", reply.Aciklama);
+        const sendButton = replyElement.find(`#gonder${reply.id}`);
+        sendButton.text('Düzenle'); // Change button text to indicate editing
+    });
+    const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
+        deleteComment(reply.id);
+    });
+
+    replyElement.append(replyButton, replyFormCollapse);
+    if (reply.Kullanici_id == userID) {
+      replyElement.append(editButton, deleteButton); // edit eklenecek
+    };
+
+    if (reply.replies.length > 0) {
+        const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
+        replyElement.append(nestedRepliesContainer);
+    }
+
+    return replyElement;
+}
+
+function createCommentElement(comment) {
+    const userBlock = `<div class="user-block">
+                          <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                          <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
+                          <span class="description">${comment.Tarih}</span>
+                      </div>`;
+    const commentContent = `<p>${comment.Aciklama}</p>`;
+    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
+
+    comment.cfiles.forEach(cf => {
+        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+        const fileElement = $('<p></p>').append(fileLink);
+        commentElement.append(fileElement);
+    });
+
+    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
+        const replyForm = commentElement.find(`#replyComment${comment.id}`);
+        replyForm.collapse('toggle');
+        $(`#yorumText${comment.id}`).summernote("code", "");
+        const sendButton = commentElement.find(`#gonder${comment.id}`);
+        sendButton.text('Gönder');
+    });
+    
+    commentElement.append(replyButton);
+
+    const replyFormCollapse = $(`<div class="collapse" id="replyComment${comment.id}"></div>`).html(` 
+          <form>
+              <div class="form-group">
+
+                <div class="row" style="height: 265px;">
+                  <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
+                    <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
+                                    style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                  </div>
+                  <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${comment.id}" style="height: 265px;display: none;">
+                    <div class="input-group">
+                      <div class="custom-file">
+                          <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${comment.id}" lang="tr" onchange="fileInputChange(event, ${comment.id})" multiple>
+                          <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                      </div>
+                      <div class="input-group-append">
+                          <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${comment.id})">Temizle</span>
+                      </div>
+                    </div>
+                    <div id="fileTitles${comment.id}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                  </div>
+                </div>
+                <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${comment.id})"></i>
+              </div>
+              <button type="button" class="btn btn-default" id="gonder${comment.id}" onclick="handleReply(${comment.id})">Gönder</button>
+          </form>`);
+        
+    const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
+        const replyForm = commentElement.find(`#replyComment${comment.id}`);
+        replyForm.collapse('toggle');
+        $(`#yorumText${comment.id}`).summernote("code", comment.Aciklama);
+        const sendButton = commentElement.find(`#gonder${comment.id}`);
+        sendButton.text('Düzenle'); // Change button text to indicate editing
+
+    });
+    const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
+        deleteComment(comment.id);
+    });
+    
+    if (comment.Kullanici_id == userID) {
+      commentElement.append(editButton, deleteButton); // edit eklenecek
+    };
+    commentElement.append(replyFormCollapse);
+
+    if (comment.replies.length > 0) {
+        const repliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(comment.replies));
+        commentElement.append(repliesContainer);
+    }
+
+    return commentElement;
+};
+
+function getComments(comments) {
+    const commentCol = $('#commentCol');
+    commentCol.empty();
+
+    comments.forEach(comment => {
+        const commentElement = createCommentElement(comment);
+        commentCol.append(commentElement);
+    });
+}
+
+function clickComment(kalipNo) {
+    $.ajax({
+        url: `comments/${kalipNo}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function (commentData) {
+            getComments(JSON.parse(commentData));
+        },
+        error: function (error) {
+            console.error('Error loading comments data:', error);
+        }
+    });
+}
+
+$('#btnComment').on('click', function() {
+    document.getElementById("dieComment").style.display = 'block';
+    document.getElementById("diePostComment").style.display = 'block';
+    let kalipNo = "3311-106"; // tabulatorden tkladığımızda alınacak
+    $.ajax({
+        url: `comments/${kalipNo}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function (commentData) {
+            getComments(JSON.parse(commentData));
+        },
+        error: function (error) {
+            console.error('Error loading comments data:', error);
+        }
+    });
+})
+
+$('#fileInput').on('change', function(e) {
+    Array.from(e.target.files).forEach(function(newFile) {
+        if (!fileAlreadySelected(newFile)) {
+            selectedFiles.push(newFile);
+        }
+    });
+    updateFileList();
+});
+
+function fileAlreadySelected(newFile) {
+      return selectedFiles.some(function(existingFile) {
+          return newFile.name === existingFile.name && newFile.size === existingFile.size;
+      });
+  };
+
+function updateFileList(cId="") {
+    var fileTitles = $(`#fileTitles${cId}`);
+    fileTitles.empty(); // Önceki başlık alanlarını temizle
+
+    var row = $('<div class="row"></div>');
+    fileTitles.append(row);
+
+    // <label class="overflow">${file.name}</label>
+    selectedFiles.forEach(function(file, index){
+        let fileType = file.name.split(".").pop().toLowerCase();
+        var column = $(
+            `<div class="col-md-6 mt-3">
+                <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
+                    <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                    <div class="p-1 flex-grow-1">
+                      <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
+                        <select class="form-control kaydet" name="fileTitles[]">
+                            <option value="Teknik Resim">Teknik Resim</option>
+                            <option value="Şartname">Şartname</option>
+                            <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                            <option value="Diger">Diğer</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
+                        <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                    </button>
+                </div>
+            </div>`
+        );
+
+        row.append(column);
+
+        if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+            row = $('<div class="row"></div>');
+            fileTitles.append(row);
+        }
+    });
+
+  };
+
+function deleteComment(cId) {
+    let con = confirm("Silmek istediğinize emin misiniz?");
+    if (con == true) {
+      $.ajax({
+        url: '/kalipCDelete/'+cId,
+        type: 'GET',
+        success: function (response) {
+            alert(response.message);
+            window.location.reload();
+        },
+        error: function (error) {
+          alert('Yorum silinemedi. '+error);
+        }
+      });
+    }
+};
+
+function handleReply(commentId) {
+    if ($(`#gonder${commentId}`).text() == 'Düzenle') {
+      editComment(commentId);
+    }
+    else {
+        console.log(commentId)
+      yorumPaylas(commentId);
+    }
+};
+
+function DosyaEkle(a="") {
+    changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";
+    
+    document.getElementById('yorumTextCol'+a).setAttribute("class", changedClass);
+    $('#dosyaEkleCol'+a).show();
+};
 
 //trigger download of data.xlsx file
 document.getElementById("download-xlsx").addEventListener("click", function(){
@@ -505,15 +887,36 @@ $("input[data-bootstrap-switch]").each(function(){
       $(this).bootstrapSwitch('state', $(this).prop('checked'));
     });
 
-/* $(document).ready(function(){
-    $('.image-thumb').on('click', function(){
-        var $image_element = $(this).find('img');
-        $('.image').prop('src', $image_element.attr('src'));
-        $('.image-thumb.active').removeClass('active');
-        $(this).addClass('active');
+function yorumPaylas(kId=""){
+    let kalipNo = "3311-106"; // tabulatore tıkladığımızda alınacak kId
+    var yorumData = new FormData();
+    var textareaValue = $(`#yorumText${kId}`).summernote('code');
+    console.log(textareaValue);
+    yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    yorumData.append("formID", "3311-106");
+    yorumData.append("yorum", textareaValue);
+    selectedFiles.forEach(function(file) {
+        yorumData.append('yfiles', file);
     });
-}); */
+    if (kId != "") {
+        yorumData.append("replyID", kId);
+    }
+    $.ajax({
+            url: `comments/${kalipNo}`,
+            type: 'POST',
+            data: yorumData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                alert("burda")
+                window.location.reload();
+            },
+            error: function(response) {
+                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+            }
+    });
 
+};
 
 </script>
 
@@ -526,5 +929,7 @@ $("input[data-bootstrap-switch]").each(function(){
 <script type="text/javascript" src="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
 
+<script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
 <!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
 {% endblock %}

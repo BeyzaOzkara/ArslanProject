@@ -460,9 +460,44 @@ def location_kalip(request):
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
-def kalipYorum(request, kId):
-    print("kalipYorum")
-    return render(request, 'ArslanTakipApp/kalipYorum.html')
+def kalip_comments(request, kId):
+    if request.method == "GET":
+        yudaComments = getParentComments("KalipMs", kId)
+        yudaCList = [process_comment(comment) for comment in yudaComments]
+        comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+        data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+        return HttpResponse(data)
+    elif request.method == "POST":
+        print("deneme")
+        try:
+            req = request.POST
+            print(req)
+            c = Comment()
+            c.Kullanici = request.user
+            c.FormModel = "KalipMs"
+            c.FormModelId = req['formID']
+            c.Aciklama = req['yorum']
+            if 'replyID' in req:
+                replyID = req['replyID']
+                c.ReplyTo = Comment.objects.get(id=replyID)
+            c.save()
+
+            for file in request.FILES.getlist('yfiles'):
+                UploadFile.objects.create(
+                    File = file,
+                    FileModel = "Comment",
+                    FileModelId = c.id,
+                    FileSize = file.size,
+                    UploadedBy = c.Kullanici,
+                    Note = "",
+                )
+                
+            response = JsonResponse({'message': 'Kayıt başarılı'})
+        except Exception as e:
+            response = JsonResponse({'error': str(e)})
+            response.status_code = 500 #server error
+        return response
 
 key = b'arslandenemebyz1'
 

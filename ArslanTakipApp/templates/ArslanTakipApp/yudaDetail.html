@@ -694,9 +694,6 @@
   };
 
   function handleReply(commentId) {
-    console.log('Reply clicked for comment ID:', commentId);
-    console.log($(`#gonder${commentId}`).text())
-
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
       editComment(commentId);
     }
@@ -828,10 +825,7 @@
     if (yId != "") {
       yorumData.append("replyID", yId);
     }
-    //dosya yüklerken önceki dosya yükleme gibi olmalı title işaretlenmeli
-    // for (var pair of yorumData.entries()) {
-    //     console.log(pair[0]+ ', ' + pair[1]); 
-    // }
+
     $.ajax({
             url: '/yudaDetailComment',
             type: 'POST',
@@ -839,11 +833,9 @@
             contentType: false,
             processData: false,
             success: function(response) {
-                // Başarılı yükleme sonrası işlemler
                 window.location.reload();
             },
             error: function(response) {
-                // Hata durumunda işlemler
                 alert('Yorum kaydedilemedi. '+response.responseJSON.error);
             }
     });
