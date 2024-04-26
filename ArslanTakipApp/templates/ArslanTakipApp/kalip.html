@@ -867,23 +867,62 @@ function DosyaEkle(a="") {
     $('#dosyaEkleCol'+a).show();
 };
 
-//trigger download of data.xlsx file
-document.getElementById("download-xlsx").addEventListener("click", function(){
-    tableKalip.download("xlsx", "data.xlsx", {sheetName:"My Data"});
-});
-
-$(function () {
-    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
-        event.preventDefault();
-        $(this).ekkoLightbox({
-        alwaysShowClose: true
-        });
+$('#fileInput').on('change', function(e) {
+    Array.from(e.target.files).forEach(function(newFile) {
+        if (!fileAlreadySelected(newFile)) {
+            selectedFiles.push(newFile);
+        }
     });
-});
+    updateFileList();
+  });
 
-$("input[data-bootstrap-switch]").each(function(){
-      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+  function fileAlreadySelected(newFile) {
+      return selectedFiles.some(function(existingFile) {
+          return newFile.name === existingFile.name && newFile.size === existingFile.size;
+      });
+  };
+
+  function updateFileList(cId="") {
+    var fileTitles = $(`#fileTitles${cId}`);
+    fileTitles.empty(); // Önceki başlık alanlarını temizle
+
+    var row = $('<div class="row"></div>');
+    fileTitles.append(row);
+
+    // <label class="overflow">${file.name}</label>
+    selectedFiles.forEach(function(file, index){
+        let fileType = file.name.split(".").pop().toLowerCase();
+        var column = $(
+            `<div class="col-md-6 mt-3">
+                <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
+                    <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
+                    <div class="p-1 flex-grow-1">
+                      <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
+                        <select class="form-control kaydet" name="fileTitles[]">
+                            <option value="Teknik Resim">Teknik Resim</option>
+                            <option value="Şartname">Şartname</option>
+                            <option value="Paketleme Talimatı">Paketleme Talimatı</option>
+                            <option value="Diger">Diğer</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
+                        <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
+                    </button>
+                </div>
+            </div>`
+        );
+
+        row.append(column);
+
+        if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
+            row = $('<div class="row"></div>');
+            fileTitles.append(row);
+        }
     });
+
+  };
+
+
 
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
@@ -916,6 +955,88 @@ function yorumPaylas(kId="", cId=""){
     });
 
 };
+
+$(document).on('click', '.clickable-file-label', function() {
+    let index = $(this).data('index');
+    let file = selectedFiles[index];
+    openFile(file);
+  });
+
+function openFile(file) {
+    var url = URL.createObjectURL(file);
+    window.open(url, '_blank'); // Opens the file in a new tab
+    URL.revokeObjectURL(url); // Clean up the URL after opening
+};
+
+window.removeFile = function(index, cId) {
+    selectedFiles.splice(index, 1);
+    updateFileList(cId);
+};
+
+function DosyaTemizle(cId){
+    selectedFiles = [];
+    updateFileList(cId);
+};
+
+function editComment(commentId) {
+const editData = new FormData();
+var textareaValue = $(`#yorumText${commentId}`).summernote('code');
+editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+editData.append("commentId", commentId);
+editData.append("commentText", textareaValue);
+
+$.ajax({
+    url: 'editcomment',
+    type: 'POST',
+    data: editData,
+    contentType: false,
+    processData: false,
+    success: function(response) {
+    alert(response.message);
+    window.location.reload();
+    },
+    error: function(response) {
+    console.log(response.error);
+    alert('Yorum düzenlenemedi.');
+    }
+});
+}
+
+function deleteComment(cId) {
+    let con = confirm("Silmek istediğinize emin misiniz?");
+    if (con == true) {
+      $.ajax({
+        url: 'deletecomment/'+cId,
+        type: 'GET',
+        success: function (response) {
+            alert(response.message);
+            window.location.reload();
+        },
+        error: function (error) {
+          alert('Yorum silinemedi. '+error);
+        }
+      });
+    }
+
+};
+
+$(function () {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox({
+        alwaysShowClose: true
+        });
+    });
+});
+
+$("input[data-bootstrap-switch]").each(function(){
+    $(this).bootstrapSwitch('state', $(this).prop('checked'));
+});
+
+//trigger download of data.xlsx file
+document.getElementById("download-xlsx").addEventListener("click", function(){
+    tableKalip.download("xlsx", "data.xlsx", {sheetName:"My Data"});
+});
 
 </script>
 

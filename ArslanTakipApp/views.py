@@ -500,6 +500,13 @@ def kalip_comments_post(request):
             response.status_code = 500 #server error
         return response
 
+def kalip_comments_edit(request):
+    print("edit")
+
+def kalip_comments_delete(request, cId):
+    print("delete")
+    print(cId)
+
 key = b'arslandenemebyz1'
 
 # def encrypt_aes_ecb(key, plaintext):
