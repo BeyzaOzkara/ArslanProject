@@ -979,30 +979,32 @@ function DosyaTemizle(cId){
 };
 
 function editComment(commentId) {
-const editData = new FormData();
-var textareaValue = $(`#yorumText${commentId}`).summernote('code');
-editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
-editData.append("commentId", commentId);
-editData.append("commentText", textareaValue);
+    console.log(commentId);
+    const editData = new FormData();
+    var textareaValue = $(`#yorumText${commentId}`).summernote('code');
+    editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    editData.append("commentId", commentId);
+    editData.append("commentText", textareaValue);
 
-$.ajax({
-    url: 'editcomment',
-    type: 'POST',
-    data: editData,
-    contentType: false,
-    processData: false,
-    success: function(response) {
-    alert(response.message);
-    window.location.reload();
-    },
-    error: function(response) {
-    console.log(response.error);
-    alert('Yorum düzenlenemedi.');
-    }
-});
+    $.ajax({
+        url: 'editcomment',
+        type: 'POST',
+        data: editData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+        alert(response.message);
+        window.location.reload();
+        },
+        error: function(response) {
+        console.log(response.error);
+        alert('Yorum düzenlenemedi.');
+        }
+    });
 }
 
 function deleteComment(cId) {
+    console.log(cId);
     let con = confirm("Silmek istediğinize emin misiniz?");
     if (con == true) {
       $.ajax({

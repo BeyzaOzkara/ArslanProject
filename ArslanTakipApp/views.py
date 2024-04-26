@@ -501,11 +501,29 @@ def kalip_comments_post(request):
         return response
 
 def kalip_comments_edit(request):
-    print("edit")
+    if request.method == 'POST':
+        req = request.POST
+        try:
+            c = Comment.objects.get(id=req["commentId"])
+            c.Aciklama = req["commentText"]
+            c.save()
+            #dosyalar için olan bölüm de eklenecek
+            response = JsonResponse({'message': 'Kayıt başarılı'})
+        except Exception as e:
+            response = JsonResponse({'error': str(e)})
+            response.status_code = 500 #server error
+        return response
 
 def kalip_comments_delete(request, cId):
-    print("delete")
-    print(cId)
+    try:
+        comment = Comment.objects.get(id = cId)
+        comment.Silindi = True
+        comment.save()
+        response = JsonResponse({'message': 'Yorum başarıyla silindi.'})
+    except Exception as e:
+        response = JsonResponse({'error': str(e)})
+        response.status_code = 500 #server error
+    return response
 
 key = b'arslandenemebyz1'
 
