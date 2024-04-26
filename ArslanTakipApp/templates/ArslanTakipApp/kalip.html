@@ -855,8 +855,7 @@ function handleReply(commentId) {
       editComment(commentId);
     }
     else {
-        console.log(commentId)
-      yorumPaylas(commentId);
+      yorumPaylas(cId=commentId);
     }
 };
 
@@ -885,28 +884,27 @@ $("input[data-bootstrap-switch]").each(function(){
       $(this).bootstrapSwitch('state', $(this).prop('checked'));
     });
 
-function yorumPaylas(kId=""){
+function yorumPaylas(kId="", cId=""){
     let kalipNo = "3311-106"; // tabulatore tıkladığımızda alınacak kId
     var yorumData = new FormData();
     var textareaValue = $(`#yorumText${kId}`).summernote('code');
     console.log(textareaValue);
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
-    yorumData.append("formID", "3311-106");
+    yorumData.append("formID", kId);
     yorumData.append("yorum", textareaValue);
     selectedFiles.forEach(function(file) {
         yorumData.append('yfiles', file);
     });
-    if (kId != "") {
-        yorumData.append("replyID", kId);
+    if (cId != "") {
+        yorumData.append("replyID", cId);
     }
     $.ajax({
-            url: `comments/${kalipNo}`,
+            url: `postcomment`,
             type: 'POST',
             data: yorumData,
             contentType: false,
             processData: false,
             success: function(response) {
-                alert("burda")
                 window.location.reload();
             },
             error: function(response) {

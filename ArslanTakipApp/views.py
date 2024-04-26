@@ -468,19 +468,20 @@ def kalip_comments(request, kId):
 
         data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
-    elif request.method == "POST":
-        print("deneme")
+
+def kalip_comments_post(request):
+    if request.method == "POST":
         try:
             req = request.POST
-            print(req)
             c = Comment()
             c.Kullanici = request.user
             c.FormModel = "KalipMs"
             c.FormModelId = req['formID']
-            c.Aciklama = req['yorum']
             if 'replyID' in req:
                 replyID = req['replyID']
                 c.ReplyTo = Comment.objects.get(id=replyID)
+                c.FormModelId = c.ReplyTo.FormModelId
+            c.Aciklama = req['yorum']
             c.save()
 
             for file in request.FILES.getlist('yfiles'):
