@@ -289,7 +289,7 @@
                     </div>
                   </div>
                   <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
-                  <button type="button" class="btn btn-primary" name="yorumPaylas">Paylaş</button>
+                  <button type="button" class="btn btn-primary" id="yorumPaylas">Paylaş</button>
                 </div>
             </div>
         </div>
@@ -513,9 +513,8 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             },
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kId = cell.getData().KalipNo;
-                document.getElementsByName("yorumPaylas")[0].setAttribute("id", `yorumPaylas${kId}`);
                 clickComment(kId);
-                // $(`#yorumPaylas${kId}`).on('click', yorumPaylas(kId));
+                document.getElementById("yorumPaylas").addEventListener("click", function(){yorumPaylas(kId)});
                 document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
@@ -777,30 +776,12 @@ function clickComment(kalipNo) {
         dataType: 'json',
         success: function (commentData) {
             getComments(JSON.parse(commentData));
-            $(`#yorumPaylas${kalipNo}`).on('click', yorumPaylas(kalipNo));
         },
         error: function (error) {
             console.error('Error loading comments data:', error);
         }
     });
 }
-
-// $('#btnComment').on('click', function() {
-//     document.getElementById("dieComment").style.display = 'block';
-//     document.getElementById("diePostComment").style.display = 'block';
-//     let kalipNo = "3311-106"; // tabulatorden tkladığımızda alınacak
-//     $.ajax({
-//         url: `comments/${kalipNo}`,
-//         method: 'GET',
-//         dataType: 'json',
-//         success: function (commentData) {
-//             getComments(JSON.parse(commentData));
-//         },
-//         error: function (error) {
-//             console.error('Error loading comments data:', error);
-//         }
-//     });
-// })
 
 $('#fileInput').on('change', function(e) {
     Array.from(e.target.files).forEach(function(newFile) {
@@ -915,12 +896,6 @@ $('#fileInput').on('change', function(e) {
                     <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                     <div class="p-1 flex-grow-1">
                       <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
-                        <select class="form-control kaydet" name="fileTitles[]">
-                            <option value="Teknik Resim">Teknik Resim</option>
-                            <option value="Şartname">Şartname</option>
-                            <option value="Paketleme Talimatı">Paketleme Talimatı</option>
-                            <option value="Diger">Diğer</option>
-                        </select>
                     </div>
                     <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
                         <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
@@ -938,6 +913,7 @@ $('#fileInput').on('change', function(e) {
     });
 
   };
+
 
 
 function yorumPaylas(kId="", cId=""){

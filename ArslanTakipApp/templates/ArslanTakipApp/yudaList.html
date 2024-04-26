@@ -199,8 +199,9 @@
         filterList = state.filterList;
         currentPage = state.currentPage;
         itemsPerPage = state.itemsPerPage;
-        $('#perPageSelect').val(itemsPerPage); // Update items per page dropdown
+        $('#perPageSelect').val(itemsPerPage).trigger('change'); // Update items per page dropdown
         applyFiltersFromState(); // Apply filters to UI components based on stored state
+        loadPage(currentPage); 
     }
   }
 
