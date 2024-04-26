@@ -491,8 +491,9 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             },
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kId = cell.getData().KalipNo;
+                console.log(kId);
                 clickComment(kId);
-                document.getElementById("yorumPaylas").onclick(yorumPaylas(kId));
+                document.getElementById("yorumPaylas").addEventListener("click", function(){yorumPaylas(kId)});
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
             }},
