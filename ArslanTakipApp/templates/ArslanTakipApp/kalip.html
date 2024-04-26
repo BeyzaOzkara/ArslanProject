@@ -281,7 +281,7 @@
                     </div>
                   </div>
                   <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
-                  <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
+                  <button type="button" class="btn btn-primary" id="yorumPaylas">Paylaş</button>
                 </div>
               </div>
         </div>
@@ -492,6 +492,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kId = cell.getData().KalipNo;
                 clickComment(kId);
+                document.getElementById("yorumPaylas").onclick(yorumPaylas(kId));
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
             }},
