@@ -515,7 +515,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 let kId = cell.getData().KalipNo;
                 clickComment(kId);
                 document.getElementsByName("yorumPaylas")[0].setAttribute("id", `yorumPaylas${kId}`);
-                $(`#yorumPaylas${kId}`).on('click', yorumPaylas(kId));
+                // $(`#yorumPaylas${kId}`).on('click', yorumPaylas(kId));
                 document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
