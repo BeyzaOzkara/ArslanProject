@@ -57,9 +57,6 @@
                         <i class="fas fa-file-excel"></i>
                         excell
                     </a>
-                    <a class="btn btn-app bg-success" style="float: left;" id="btnComment">
-                        <i class="fas fa-comments"></i>
-                    </a>
                 </div>
             </div>
             <div class="card" id="kalipListe-table"></div>
@@ -763,22 +760,22 @@ function clickComment(kalipNo) {
     });
 }
 
-$('#btnComment').on('click', function() {
-    document.getElementById("dieComment").style.display = 'block';
-    document.getElementById("diePostComment").style.display = 'block';
-    let kalipNo = "3311-106"; // tabulatorden tkladığımızda alınacak
-    $.ajax({
-        url: `comments/${kalipNo}`,
-        method: 'GET',
-        dataType: 'json',
-        success: function (commentData) {
-            getComments(JSON.parse(commentData));
-        },
-        error: function (error) {
-            console.error('Error loading comments data:', error);
-        }
-    });
-})
+// $('#btnComment').on('click', function() {
+//     document.getElementById("dieComment").style.display = 'block';
+//     document.getElementById("diePostComment").style.display = 'block';
+//     let kalipNo = "3311-106"; // tabulatorden tkladığımızda alınacak
+//     $.ajax({
+//         url: `comments/${kalipNo}`,
+//         method: 'GET',
+//         dataType: 'json',
+//         success: function (commentData) {
+//             getComments(JSON.parse(commentData));
+//         },
+//         error: function (error) {
+//             console.error('Error loading comments data:', error);
+//         }
+//     });
+// })
 
 $('#fileInput').on('change', function(e) {
     Array.from(e.target.files).forEach(function(newFile) {
