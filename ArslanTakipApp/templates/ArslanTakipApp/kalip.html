@@ -808,12 +808,6 @@ function updateFileList(cId="") {
                     <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                     <div class="p-1 flex-grow-1">
                       <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
-                        <select class="form-control kaydet" name="fileTitles[]">
-                            <option value="Teknik Resim">Teknik Resim</option>
-                            <option value="Şartname">Şartname</option>
-                            <option value="Paketleme Talimatı">Paketleme Talimatı</option>
-                            <option value="Diger">Diğer</option>
-                        </select>
                     </div>
                     <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
                         <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
