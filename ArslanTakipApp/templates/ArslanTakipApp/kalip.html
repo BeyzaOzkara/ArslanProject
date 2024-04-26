@@ -264,7 +264,7 @@
                 <div class="card-body" id="yorumCard">
                   <div class="row" style="height: 265px;">
                     <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol">
-                      <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
+                      <textarea class="textarea" name="ilkYorumText" id="yorumText" placeholder=" . . . "
                                       style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                     </div>
                     <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;display: none;">
@@ -494,6 +494,7 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 console.log(kId);
                 clickComment(kId);
                 document.getElementById("yorumPaylas").addEventListener("click", function(){yorumPaylas(kId)});
+                document.getElementsByName("ilkYorumText").setAttribute("id", `yorumText${kId}`);
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
             }},
@@ -579,7 +580,6 @@ function nestedReplies(replies) {
 }
 
 function fileInputChange(e, r){
-    console.log("burda")
       Array.from(e.target.files).forEach(function(newFile) {
           if (!fileAlreadySelected(newFile)) {
               selectedFiles.push(newFile);
@@ -886,7 +886,6 @@ $("input[data-bootstrap-switch]").each(function(){
     });
 
 function yorumPaylas(kId="", cId=""){
-    let kalipNo = "3311-106"; // tabulatore tıkladığımızda alınacak kId
     var yorumData = new FormData();
     var textareaValue = $(`#yorumText${kId}`).summernote('code');
     console.log(textareaValue);
