@@ -515,6 +515,8 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 let kId = cell.getData().KalipNo;
                 clickComment(kId);
                 document.getElementById("yorumPaylas").addEventListener("click", (e) => {
+                    console.log(e);
+                    console.log(e.target);
                     if (element.contains(e.target)) {
                         e.stopPropagation();
                     };
