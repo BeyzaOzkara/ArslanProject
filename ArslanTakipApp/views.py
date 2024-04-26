@@ -1463,7 +1463,7 @@ def process_comment(comment):
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
     comment['Tarih'] = format_date_time(comment['Tarih'])
     comment['cfiles'] = list(getFiles("Comment", comment['id']))
-    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id']).values()]
+    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()]
     return comment
 
 def format_yuda_details2(yList):
