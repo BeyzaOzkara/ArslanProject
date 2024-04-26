@@ -514,8 +514,12 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kId = cell.getData().KalipNo;
                 clickComment(kId);
-                document.getElementById("yorumPaylas").removeEventListener("click", yorumPaylas(kId));
-                document.getElementById("yorumPaylas").addEventListener("click", yorumPaylas(kId));
+                document.getElementById("yorumPaylas").addEventListener("click", (e) => {
+                    if (element.contains(e.target)) {
+                        e.stopPropagation();
+                    };
+                    yorumPaylas(kId);
+                });
                 document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
