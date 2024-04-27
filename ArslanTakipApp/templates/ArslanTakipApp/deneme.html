@@ -634,20 +634,20 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
-function replyEditBtnClick(id, element, text) {
-    const replyForm = element.find(`#replyComment${id}`);
+function replyEditBtnClick(id, eleme, text) {
+    const replyForm = $(eleme).find(`#replyComment${id}`);
     replyForm.collapse('toggle');
     $(`#yorumText${id}`).summernote("code", "");
-    const sendButton = element.find(`#gonder${id}`);
+    const sendButton = $(eleme).find(`#gonder${id}`);
     sendButton.text(text);
 }
 
-function createReplyButton(id, element, text) {
-    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${element}', '${text}')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+function createReplyButton(id, eleme, text) {
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme}', ${text})" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
-function createEditButton(id, element, text) {
-    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${element}', '${text}')">düzenle</a></span>`;
+function createEditButton(id, eleme, text) {
+    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme}', ${text})">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -681,7 +681,6 @@ function createReplyElement(reply) {
         replyElement.append(fileElement);
     });
 
-    console.log(typeof replyElement);
     const replyButton = createReplyButton(reply.id, replyElement, 'Gönder');
     replyElement.append(replyButton);
 
