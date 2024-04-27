@@ -634,10 +634,11 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
-function replyEditBtnClick(id, eleme, text) {
+function replyEditBtnClick(id, eleme, text, summer="") {
     const replyForm = $(eleme).find(`#replyComment${id}`);
+    console.log(replyForm);
     replyForm.collapse('toggle');
-    $(`#yorumText${id}`).summernote("code", "");
+    $(`#yorumText${id}`).summernote("code", $(summer));
     const sendButton = $(eleme).find(`#gonder${id}`);
     sendButton.text($(text));
 }
@@ -646,8 +647,8 @@ function createReplyButton(id, eleme, text) {
     return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
-function createEditButton(id, eleme, text) {
-    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}')">düzenle</a></span>`;
+function createEditButton(id, eleme, text, summer) {
+    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -686,7 +687,7 @@ function createReplyElement(reply) {
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
-        const editButton = createEditButton(reply.id, replyElement, 'Düzenle');
+        const editButton = createEditButton(reply.id, replyElement, 'Düzenle', reply.Aciklama);
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(reply.id); });
         replyElement.append(editButton, deleteButton);
     };
@@ -716,7 +717,7 @@ function createCommentElement(comment) {
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
-        const editButton = createEditButton(comment.id, commentElement, 'Düzenle');
+        const editButton = createEditButton(comment.id, commentElement, 'Düzenle', comment.Aciklama);
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(comment.id); });
         commentElement.append(editButton, deleteButton); // edit eklenecek
     };
