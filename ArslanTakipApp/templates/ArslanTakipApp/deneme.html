@@ -634,6 +634,22 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
+function replyBtnClick(id, element, text) {
+    const replyForm = element.find(`#replyComment${id}`);
+    replyForm.collapse('toggle');
+    $(`#yorumText${id}`).summernote("code", "");
+    const sendButton = element.find(`#gonder${id}`);
+    sendButton.text(text);
+}
+
+function createReplyButton(id, element, text) {
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyBtnClick(${id}, ${element}, ${text})" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+}
+
+function createEditButton(id, element, text) {
+    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyBtnClick(${id}, ${element}, ${text})">düzenle</a></span>`;
+}
+
 function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -665,31 +681,16 @@ function createReplyElement(reply) {
         replyElement.append(fileElement);
     });
 
-    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
-        const replyForm = replyElement.find(`#replyComment${reply.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${reply.id}`).summernote("code", "");
-        const sendButton = replyElement.find(`#gonder${reply.id}`);
-        sendButton.text('Gönder');
-    });
+    const replyButton = createReplyButton(reply.id, replyElement, 'Gönder');
+    replyElement.append(replyButton);
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
-
-    const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        const replyForm = replyElement.find(`#replyComment${reply.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${reply.id}`).summernote("code", reply.Aciklama);
-        const sendButton = replyElement.find(`#gonder${reply.id}`);
-        sendButton.text('Düzenle'); // Change button text to indicate editing
-    });
-    const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
-        deleteComment(reply.id);
-    });
-
-    replyElement.append(replyButton, replyFormCollapse);
     if (reply.Kullanici_id == userID) {
-      replyElement.append(editButton, deleteButton); // edit eklenecek
+        const editButton = createEditButton(reply.id, replyElement, 'Düzenle');
+        const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(reply.id); });
+        replyElement.append(editButton, deleteButton);
     };
+    replyElement.append(replyFormCollapse);
 
     if (reply.replies.length > 0) {
         const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
@@ -710,32 +711,14 @@ function createCommentElement(comment) {
         commentElement.append(fileElement);
     });
 
-    const replyButton = $(`<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyComment${comment.id}" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`).on('click', (e) => {
-        const replyForm = commentElement.find(`#replyComment${comment.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${comment.id}`).summernote("code", "");
-        const sendButton = commentElement.find(`#gonder${comment.id}`);
-        sendButton.text('Gönder');
-    });
-    
+    const replyButton = createReplyButton(comment.id, commentElement);
     commentElement.append(replyButton);
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
-        
-    const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        const replyForm = commentElement.find(`#replyComment${comment.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${comment.id}`).summernote("code", comment.Aciklama);
-        const sendButton = commentElement.find(`#gonder${comment.id}`);
-        sendButton.text('Düzenle'); // Change button text to indicate editing
-
-    });
-    const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
-        deleteComment(comment.id);
-    });
-    
     if (comment.Kullanici_id == userID) {
-      commentElement.append(editButton, deleteButton); // edit eklenecek
+        const editButton = createEditButton(comment.id, commentElement, 'Düzenle');
+        const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(comment.id); });
+        commentElement.append(editButton, deleteButton); // edit eklenecek
     };
     commentElement.append(replyFormCollapse);
 
