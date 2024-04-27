@@ -639,6 +639,7 @@ function replyEditBtnClick(id, eleme, text, summer) {
     console.log(replyForm);
     replyForm.collapse('toggle');
     console.log(summer)
+    console.log($(summer))
     let sText = $(summer);
     console.log(sText)
     $(`#yorumText${id}`).summernote("code", sText);
@@ -651,7 +652,7 @@ function createReplyButton(id, eleme, text) {
 }
 
 function createEditButton(id, eleme, text, summer) {
-    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')"> aria-expanded="false" aria-controls="collapseExample"düzenle</a></span>`;
+    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -690,7 +691,7 @@ function createReplyElement(reply) {
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
-        const editButton = createEditButton(reply.id, replyElement, 'Düzenle', reply.Aciklama);
+        const editButton = createEditButton(reply.id, replyElement, 'Düzenle', String(reply.Aciklama));
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(reply.id); });
         replyElement.append(editButton, deleteButton);
     };
