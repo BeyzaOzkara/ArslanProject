@@ -639,15 +639,15 @@ function replyEditBtnClick(id, eleme, text) {
     replyForm.collapse('toggle');
     $(`#yorumText${id}`).summernote("code", "");
     const sendButton = $(eleme).find(`#gonder${id}`);
-    sendButton.text(text);
+    sendButton.text($(text));
 }
 
 function createReplyButton(id, eleme, text) {
-    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme}', ${text})" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme}', '${text}')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
 function createEditButton(id, eleme, text) {
-    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme}', ${text})">düzenle</a></span>`;
+    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme}', '${text}')">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
