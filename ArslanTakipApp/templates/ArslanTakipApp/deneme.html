@@ -638,7 +638,7 @@ function replyEditBtnClick(id, eleme, text, summer) {
     const replyForm = $(eleme).find(`#replyComment${id}`);
     console.log(replyForm);
     replyForm.collapse('toggle');
-    $(`#yorumText${id}`).summernote("code", $(summer));
+    $(`#yorumText${id}`).summernote("code", summer);
     const sendButton = $(eleme).find(`#gonder${id}`);
     sendButton.text($(text));
 }
