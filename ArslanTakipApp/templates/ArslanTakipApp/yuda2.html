@@ -599,9 +599,9 @@
                         <div class="card-body" id="dosyaBody">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="input-group border border-danger">
+                                    <div class="input-group border border-warning">
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple required>
+                                            <input type="file" class="custom-file-input half-required" name="Dosyalar" id="fileInput" lang="tr" multiple>
                                             <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
                                         </div>
                                         <div class="input-group-append">
@@ -1211,9 +1211,9 @@
         var fileInput = document.getElementById('fileInput');
         var inputGroup = fileInput.closest('.input-group');
         if (selectedFiles.length === 0) {
-            inputGroup.classList.add('border', 'border-danger');
+            inputGroup.classList.add('border', 'border-warning');
         } else {
-            inputGroup.classList.remove('border', 'border-danger');
+            inputGroup.classList.remove('border', 'border-warning');
         }
     }
     
@@ -1234,81 +1234,89 @@
     };
 
     document.querySelector("#yudaKaydet").addEventListener('click', function(){
-        this.disabled = true;
-        var formData = new FormData();
-        formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+        let halfElements = document.getElementById("yudaForm").querySelectorAll(".half-required"); // half-required elementlerin boş değerli olanlarına bu olmadan kaydetmek istediğinize emin misiniz desin
+        var saveConfirm = true;
+        if (selectedFiles == []) {
+            saveConfirm = confirm("Dosya eklemeden kaydetmek istediğinize emin misiniz?");
+        }
+        if (saveConfirm) {
+            this.disabled = true;
+            var formData = new FormData();
+            formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
 
-        selectedFiles.forEach(function(file) {
-            formData.append('files[]', file);
-        });
+            selectedFiles.forEach(function(file) {
+                formData.append('files[]', file);
+            });
 
-        let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
-        var values = {};
-        
-        for(let i = 0; i < formElements.length; i++) {
-            if (formElements[i].type == "radio") {
-                if($('#'+formElements[i].id).is(':checked')){
+            let formElements = document.getElementById("yudaForm").querySelectorAll(".kaydet");
+            var values = {};
+                
+            
+            for(let i = 0; i < formElements.length; i++) {
+                if (formElements[i].type == "radio") {
+                    if($('#'+formElements[i].id).is(':checked')){
+                        values[formElements[i].name] = formElements[i].value;
+                        formData.append([formElements[i].name], formElements[i].value);
+                    }
+                }
+                else if (formElements[i].type == "checkbox" ) {
+                    if ($('#'+formElements[i].id).is(':checked')){
+                        if (formElements[i].name == "MetreAgirlikTalebi"){
+                            values[formElements[i].name] = "Var";
+                            formData.append([formElements[i].name], "Var");
+                        }
+                        else {
+                            values[formElements[i].name] = "Temiz Kesim";
+                            formData.append([formElements[i].name], "Temiz Kesim");
+                        };
+                    }
+                    else {
+                        if (formElements[i].name == "MetreAgirlikTalebi"){
+                            values[formElements[i].name] = "Yok";
+                            formData.append([formElements[i].name], "Yok");
+                        }
+                        else {
+                            values[formElements[i].name] = "Temiz Kesim Değil";
+                            formData.append([formElements[i].name], "Temiz Kesim Değil");
+                        };
+                    }
+                }
+                else if (formElements[i].type == "select-multiple"){
+                    let results = [];
+                    let opt;
+                    for (let j=0; j< formElements[i].options.length; j++){
+                        opt = formElements[i].options[j]
+                        if(opt.selected){results.push(opt.value);}
+                    };
+                    values[formElements[i].name] = results;
+                    formData.append([formElements[i].name], results);
+                }
+                else{
                     values[formElements[i].name] = formElements[i].value;
                     formData.append([formElements[i].name], formElements[i].value);
                 }
-            }
-            else if (formElements[i].type == "checkbox" ) {
-                if ($('#'+formElements[i].id).is(':checked')){
-                    if (formElements[i].name == "MetreAgirlikTalebi"){
-                        values[formElements[i].name] = "Var";
-                        formData.append([formElements[i].name], "Var");
-                    }
-                    else {
-                        values[formElements[i].name] = "Temiz Kesim";
-                        formData.append([formElements[i].name], "Temiz Kesim");
-                    };
+            };
+                
+            $.ajax({
+                url: '/yudakaydet',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    // Başarılı yükleme sonrası işlemler
+                    alert('Dosyalar başarıyla yüklendi! '+response.message);
+                    window.location.href = "/yudaDetail/"+response.id;
+                },
+                error: function(response) {
+                    // Hata durumunda işlemler
+                    this.disabled = false;
+                    alert('Dosya yüklemesi başarısız oldu. '+response.responseJSON.error);
                 }
-                else {
-                    if (formElements[i].name == "MetreAgirlikTalebi"){
-                        values[formElements[i].name] = "Yok";
-                        formData.append([formElements[i].name], "Yok");
-                    }
-                    else {
-                        values[formElements[i].name] = "Temiz Kesim Değil";
-                        formData.append([formElements[i].name], "Temiz Kesim Değil");
-                    };
-                }
-            }
-            else if (formElements[i].type == "select-multiple"){
-                let results = [];
-                let opt;
-                for (let j=0; j< formElements[i].options.length; j++){
-                    opt = formElements[i].options[j]
-                    if(opt.selected){results.push(opt.value);}
-                };
-                values[formElements[i].name] = results;
-                formData.append([formElements[i].name], results);
-            }
-            else{
-                values[formElements[i].name] = formElements[i].value;
-                formData.append([formElements[i].name], formElements[i].value);
-            }
-        };
+            });
 
-        $.ajax({
-            url: '/yudakaydet',
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                // Başarılı yükleme sonrası işlemler
-                alert('Dosyalar başarıyla yüklendi! '+response.message);
-                window.location.href = "/yudaDetail/"+response.id;
-            },
-            error: function(response) {
-                // Hata durumunda işlemler
-                this.disabled = false;
-                alert('Dosya yüklemesi başarısız oldu. '+response.responseJSON.error);
-            }
-        });
+        }
         
-
     });
 
 
