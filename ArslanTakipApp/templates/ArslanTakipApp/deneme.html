@@ -634,7 +634,7 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
-function replyBtnClick(id, element, text) {
+function replyEditBtnClick(id, element, text) {
     const replyForm = element.find(`#replyComment${id}`);
     replyForm.collapse('toggle');
     $(`#yorumText${id}`).summernote("code", "");
@@ -681,6 +681,7 @@ function createReplyElement(reply) {
         replyElement.append(fileElement);
     });
 
+    console.log(typeof replyElement);
     const replyButton = createReplyButton(reply.id, replyElement, 'Gönder');
     replyElement.append(replyButton);
 
