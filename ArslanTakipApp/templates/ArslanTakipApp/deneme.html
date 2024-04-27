@@ -638,7 +638,8 @@ function replyEditBtnClick(id, eleme, text, summer) {
     const replyForm = $(eleme).find(`#replyComment${id}`);
     console.log(replyForm);
     replyForm.collapse('toggle');
-    let sText = summer;
+    console.log(summer)
+    let sText = $(summer);
     console.log(sText)
     $(`#yorumText${id}`).summernote("code", sText);
     const sendButton = $(eleme).find(`#gonder${id}`);
@@ -650,7 +651,7 @@ function createReplyButton(id, eleme, text) {
 }
 
 function createEditButton(id, eleme, text, summer) {
-    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', ${summer})">düzenle</a></span>`;
+    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
