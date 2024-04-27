@@ -643,11 +643,11 @@ function replyEditBtnClick(id, element, text) {
 }
 
 function createReplyButton(id, element, text) {
-    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyBtnClick(${id}, ${element}, ${text})" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${element}', '${text}')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
 function createEditButton(id, element, text) {
-    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyBtnClick(${id}, ${element}, ${text})">düzenle</a></span>`;
+    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${element}', '${text}')">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
