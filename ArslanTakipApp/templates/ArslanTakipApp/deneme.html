@@ -759,7 +759,7 @@ function getComments(comments) {
 
 function clickComment(kalipNo) {
     $.ajax({
-        url: `comments/${kalipNo}`,
+        url: `/kalip/comments/${kalipNo}`,
         method: 'GET',
         dataType: 'json',
         success: function (commentData) {
@@ -819,22 +819,6 @@ function updateFileList(cId="") {
     });
 
   };
-
-function deleteComment(cId) {
-    let confirmed = confirm("Silmek istediğinize emin misiniz?");
-    if (!confirmed) return;
-    $.ajax({
-    url: '/kalipCDelete/'+cId,
-    type: 'GET',
-    success: function (response) {
-        alert(response.message);
-        window.location.reload();
-    },
-    error: function (error) {
-        alert('Yorum silinemedi. '+error);
-    }
-    });
-};
 
 function handleReply(modelId, commentId) {
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
@@ -918,7 +902,7 @@ function yorumPaylas(kId="", cId=""){
         yorumData.append("replyID", cId);
     }
     $.ajax({
-            url: `postcomment`,
+            url: `/kalip/postcomment`,
             type: 'POST',
             data: yorumData,
             contentType: false,
@@ -963,7 +947,7 @@ function editComment(commentId) {
     editData.append("commentText", textareaValue);
 
     $.ajax({
-        url: 'editcomment',
+        url: '/kalip/editcomment',
         type: 'POST',
         data: editData,
         contentType: false,
@@ -982,7 +966,7 @@ function deleteComment(cId) {
     let con = confirm("Silmek istediğinize emin misiniz?");
     if (con == true) {
       $.ajax({
-        url: 'deletecomment/'+cId,
+        url: '/kalip/deletecomment/'+cId,
         type: 'GET',
         success: function (response) {
             alert(response.message);
