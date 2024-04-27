@@ -651,7 +651,7 @@ function createReplyButton(id, eleme, text) {
 }
 
 function createEditButton(id, eleme, text, summer) {
-    return `<span class="ml-2"><a role="button" style="color:blue" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')">düzenle</a></span>`;
+    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')"> aria-expanded="false" aria-controls="collapseExample"düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
