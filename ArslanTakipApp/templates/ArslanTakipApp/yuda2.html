@@ -1304,13 +1304,13 @@
                 processData: false,
                 success: function(response) {
                     // Başarılı yükleme sonrası işlemler
-                    alert('Dosyalar başarıyla yüklendi! '+response.message);
+                    alert(''+response.message);
                     window.location.href = "/yudaDetail/"+response.id;
                 },
                 error: function(response) {
                     // Hata durumunda işlemler
                     this.disabled = false;
-                    alert('Dosya yüklemesi başarısız oldu. '+response.responseJSON.error);
+                    alert('Kayıt başarısız oldu. '+response.responseJSON.error);
                 }
             });
 
