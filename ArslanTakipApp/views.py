@@ -387,6 +387,9 @@ def kalip(request):
 class KalipView(generic.TemplateView):
     template_name = 'ArslanTakipApp/kalip.html'
 
+class DenemeView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/deneme.html'
+
 def kalip_tum(request):
     #şimdilik bütün kalıp sayısını döndür
     #asıl istenen filter yapıldığında kaç tane kalıp var o sayı döndürülecek

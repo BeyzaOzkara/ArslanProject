@@ -634,16 +634,6 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
-// Define a function to create buttons (reply, edit, delete) HTML
-function createButtons(reply) {
-    const buttons = [];
-    if (reply.Kullanici_id === userID) {
-        buttons.push('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>',
-                     '<span class="ml-2"><a role="button" style="color:red">sil</a></span>');
-    }
-    return buttons.join('');
-}
-
 function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -664,14 +654,13 @@ function fileInputChange(e, r){
       });
   }
 
-  function createReplyElement(reply) {
+function createReplyElement(reply) {
     const userBlock = createUserBlock(reply);
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
     reply.cfiles.forEach(cf => {
         const fileLink = createFileLink(cf);
-        // const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
         const fileElement = $('<p></p>').append(fileLink);
         replyElement.append(fileElement);
     });
@@ -711,22 +700,17 @@ function fileInputChange(e, r){
 }
 
 function createCommentElement(comment) {
-    const userBlock = `<div class="user-block">
-                          <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
-                          <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
-                          <span class="description">${comment.Tarih}</span>
-                      </div>`;
+    const userBlock = createUserBlock(comment);
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     comment.cfiles.forEach(cf => {
         const fileLink = createFileLink(cf);
-        // const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
         const fileElement = $('<p></p>').append(fileLink);
         commentElement.append(fileElement);
     });
 
-    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
+    const replyButton = $(`<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyComment${comment.id}" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`).on('click', (e) => {
         const replyForm = commentElement.find(`#replyComment${comment.id}`);
         replyForm.collapse('toggle');
         $(`#yorumText${comment.id}`).summernote("code", "");
@@ -837,20 +821,19 @@ function updateFileList(cId="") {
   };
 
 function deleteComment(cId) {
-    let con = confirm("Silmek istediğinize emin misiniz?");
-    if (con == true) {
-      $.ajax({
-        url: '/kalipCDelete/'+cId,
-        type: 'GET',
-        success: function (response) {
-            alert(response.message);
-            window.location.reload();
-        },
-        error: function (error) {
-          alert('Yorum silinemedi. '+error);
-        }
-      });
+    let confirmed = confirm("Silmek istediğinize emin misiniz?");
+    if (!confirmed) return;
+    $.ajax({
+    url: '/kalipCDelete/'+cId,
+    type: 'GET',
+    success: function (response) {
+        alert(response.message);
+        window.location.reload();
+    },
+    error: function (error) {
+        alert('Yorum silinemedi. '+error);
     }
+    });
 };
 
 function handleReply(modelId, commentId) {
@@ -878,13 +861,13 @@ $('#fileInput').on('change', function(e) {
     updateFileList();
   });
 
-  function fileAlreadySelected(newFile) {
-      return selectedFiles.some(function(existingFile) {
-          return newFile.name === existingFile.name && newFile.size === existingFile.size;
-      });
-  };
+function fileAlreadySelected(newFile) {
+    return selectedFiles.some(function(existingFile) {
+        return newFile.name === existingFile.name && newFile.size === existingFile.size;
+    });
+};
 
-  function updateFileList(cId="") {
+function updateFileList(cId="") {
     var fileTitles = $(`#fileTitles${cId}`);
     fileTitles.empty(); // Önceki başlık alanlarını temizle
 
@@ -899,7 +882,7 @@ $('#fileInput').on('change', function(e) {
                 <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
                     <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                     <div class="p-1 flex-grow-1">
-                      <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
+                        <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
                     </div>
                     <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
                         <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
@@ -916,9 +899,7 @@ $('#fileInput').on('change', function(e) {
         }
     });
 
-  };
-
-
+};
 
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
@@ -956,7 +937,7 @@ $(document).on('click', '.clickable-file-label', function() {
     let index = $(this).data('index');
     let file = selectedFiles[index];
     openFile(file);
-  });
+});
 
 function openFile(file) {
     var url = URL.createObjectURL(file);
@@ -1012,7 +993,6 @@ function deleteComment(cId) {
         }
       });
     }
-
 };
 
 $(function () {

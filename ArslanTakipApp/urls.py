@@ -35,6 +35,7 @@ urlpatterns = [
     path('location/hareket', views.location_hareket),
     path('hareket', login_required(views.HareketView.as_view())),
     path('kalip/', login_required(views.KalipView.as_view())),
+    path('deneme/', views.DenemeView.as_view()),
     path('kalip/liste', views.kalip_liste),
     path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
