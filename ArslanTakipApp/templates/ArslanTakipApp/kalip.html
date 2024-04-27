@@ -589,6 +589,14 @@ var presURaporu = new Tabulator("#presURaporListe-table", {
     ]
 });
 
+function createUserBlock(comment) {
+    return `<div class="user-block">
+                <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
+                <span class="description">${comment.Tarih}</span>
+            </div>`;
+};
+
 function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -610,11 +618,12 @@ function fileInputChange(e, r){
   }
 
   function createReplyElement(reply) {
-    const userBlock = `<div class="user-block">
-                          <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
-                          <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
-                          <span class="description">${reply.Tarih}</span>
-                      </div>`;
+    const userBlock = createUserBlock(reply)
+    // const userBlock = `<div class="user-block">
+    //                       <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+    //                       <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
+    //                       <span class="description">${reply.Tarih}</span>
+    //                   </div>`;
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
