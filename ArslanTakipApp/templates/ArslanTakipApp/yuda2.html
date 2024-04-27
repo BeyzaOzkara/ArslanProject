@@ -698,7 +698,6 @@
     $(':input[required]').on('change', function() {
         let allFilled = true;
         let $infoBox = $(this).closest('.required-info');
-        console.log($infoBox);
         if ($infoBox.length == 0){$infoBox = $(this).closest('.validated');}
         if ($infoBox.length == 0){
             allFilled = checkRequiredField($(this), allFilled);
@@ -1236,7 +1235,7 @@
     document.querySelector("#yudaKaydet").addEventListener('click', function(){
         let halfElements = document.getElementById("yudaForm").querySelectorAll(".half-required"); // half-required elementlerin boş değerli olanlarına bu olmadan kaydetmek istediğinize emin misiniz desin
         var saveConfirm = true;
-        if (selectedFiles == []) {
+        if (selectedFiles.length === 0) {
             saveConfirm = confirm("Dosya eklemeden kaydetmek istediğinize emin misiniz?");
         }
         if (saveConfirm) {
