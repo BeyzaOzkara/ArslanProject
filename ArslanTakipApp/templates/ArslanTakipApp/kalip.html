@@ -272,7 +272,7 @@
                 <div class="card-body" id="yorumCard">
                   <div class="row" style="height: 265px;">
                     <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol">
-                      <textarea class="textarea" name="ilkYorumText" id="yorumText" placeholder=" . . . "
+                      <textarea class="textarea" name="ilkYorumText" data-kalip="" id="yorumText" placeholder=" . . . "
                                       style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                     </div>
                     <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;display: none;">
@@ -416,7 +416,7 @@ var aktAccessor = function(value, data, type, params, column) {
 var kSayisi = 0;
 var toplamKalip = function(values, data, calcParams) {
     $.ajax({
-      url: `/kalip/tum`,
+      url: `tum`,
       method: 'GET',
       dataType: 'json',
       success: function (sayi) {
@@ -429,11 +429,40 @@ var toplamKalip = function(values, data, calcParams) {
     return kSayisi;
 }
 
+function updateInfoElements(kal) {
+    const elementMappings = {
+        "infoDurumu": kal.Silindi == 1 ? "Silindi, Sebebi: " + kal.SilinmeSebebi : (kal.AktifPasif ? (kal.Hatali ? "Aktif" : "Hatalı ve Aktif") : (kal.Hatali ? "Pasif" : "Hatalı ve Pasif")),
+        "infoKalipNo": kal.KalipNo, "infoFirmaAdi": kal.FirmaAdi, "infoGramaj": kal.ProfilGramaj + " kg/m",
+        "infoSonUretimGramaj": kal.SonUretimGr + " kg/m", "infoUreticiFirma": kal.UreticiFirma, "infoSonUretimTarihi": kal.SonUretimTarih,
+        "infoKaliteAciklama": kal.KaliteAciklama, "infoKalipAciklama": kal.KalipAciklama, "infoCins": kal.Cinsi,
+        "infoFigür": kal.GozAdedi, "infoUretimTopKG": kal.UretimToplamKg + " kg", "infoSonTen": kal.TeniferKalanOmurKg + " kg",
+        "infoSonTenTarihi": kal.SonTeniferTarih, "infoTeniferNo": kal.TeniferNo, "infoCap": kal.Capi + " mm", "infoPaket": kal.PaketBoyu + " mm",
+    };
+
+    for (const key in elementMappings) {
+        if (elementMappings.hasOwnProperty(key)) {
+            document.getElementById(key).innerText = elementMappings[key];
+        }
+    }
+
+    const rdizin = kal.ResimDizini.replace(/\s/g, '') + "Teknik1.jpg";
+    const rdizin2 = kal.ResimDizini.replace(/\s/g, '') + "Teknik2.jpg";
+    document.getElementById("TeknikResim").src = "http://arslan/static" + rdizin.slice(13);
+    document.getElementById("TeknikA").href = "http://arslan/static" + rdizin.slice(13);
+    document.getElementById("TeknikResim2").src = "http://arslan/static" + rdizin2.slice(13);
+    document.getElementById("TeknikB").href = "http://arslan/static" + rdizin2.slice(13);
+}
+
+function handleCommentPost() {
+    let kNo = $('#yorumText').data("kalip");
+    yorumPaylas(kNo);
+}
+
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
     layout:"fitDataFill",
     placeholder:"Kalıp Liste",
-    ajaxURL:"/kalip/liste",
+    ajaxURL:"liste",
     progressiveLoad:"scroll",
     paginationMode:"remote",
     filterMode:"remote",
@@ -457,65 +486,23 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             headerMenu:headerMenu, //add a menu to this column header
             columns:[
             {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-            //e - the click event object
-            //cell - cell component
                 presURaporu.setFilter([{ field: 'KalipNo', type: '=', value: cell.getData().KalipNo }, 
                     ]);
                 presURaporu.redraw(true);
                 document.getElementById("kalip_karti").style.display = 'block';
                 document.getElementById("presURaporListe-table").style.display = 'block';
-                kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
-                if (kal.Silindi == 1){
-                    kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
-                }
-                else if (kal.Silindi == 0){
-                    if (kal.AktifPasif == false){
-                        if (kal.Hatali == 1){
-                            kal.Silindi = "Hatalı ve Pasif"
-                        }else{
-                            kal.Silindi = "Pasif"
-                        }
-                    }
-                    else if (kal.AktifPasif == true) {
-                    if (kal.Hatali == 0){
-                        kal.Silindi = "Hatalı ve Aktif"
-                    }else{
-                        kal.Silindi = "Aktif"
-                    }
-                }
-                }
-                
-                document.getElementById("infoDurumu").innerText = kal.Silindi;
-                document.getElementById("infoKalipNo").innerText = kal.KalipNo;
-                document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
-                document.getElementById("infoGramaj").innerText = kal.ProfilGramaj + " kg/m";
-                document.getElementById("infoSonUretimGramaj").innerText = kal.SonUretimGr + " kg/m";
-                document.getElementById("infoUreticiFirma").innerText = kal.UreticiFirma;
-                document.getElementById("infoSonUretimTarihi").innerText = kal.SonUretimTarih; 
-                document.getElementById("infoKaliteAciklama").innerText = kal.KaliteAciklama;
-                document.getElementById("infoKalipAciklama").innerText = kal.KalipAciklama;
-                document.getElementById("infoCins").innerText = kal.Cinsi;
-                document.getElementById("infoFigür").innerText = kal.GozAdedi;
-                document.getElementById("infoUretimTopKG").innerText = kal.UretimToplamKg + " kg";
-                document.getElementById("infoSonTen").innerText = kal.TeniferKalanOmurKg + " kg"; 
-                document.getElementById("infoSonTenTarihi").innerText = kal.SonTeniferTarih; //ten numarası
-                document.getElementById("infoTeniferNo").innerText = kal.TeniferNo;
-                document.getElementById("infoCap").innerText = kal.Capi + " mm";
-                document.getElementById("infoPaket").innerText = kal.PaketBoyu + " mm";
-                var rdizin = kal.ResimDizini.replace(/\s/g,'') + "Teknik1.jpg";
-                var rdizin2 = kal.ResimDizini.replace(/\s/g,'') + "Teknik2.jpg";
-                document.getElementById("TeknikResim").src = "http://arslan/static" + rdizin.slice(13);
-                document.getElementById("TeknikA").href = "http://arslan/static" + rdizin.slice(13);
-                document.getElementById("TeknikResim2").src = "http://arslan/static" + rdizin2.slice(13);
-                document.getElementById("TeknikB").href = "http://arslan/static" + rdizin2.slice(13);
-
+                kal = cell.getData();
+                updateInfoElements(kal);
             },
             },
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kId = cell.getData().KalipNo;
                 clickComment(kId);
-                document.getElementById("yorumPaylas").addEventListener("click", function(){yorumPaylas(kId)});
-                document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
+                $('#yorumText').data('kalip', kId);
+                // document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
+                document.getElementById("yorumPaylas").removeEventListener("click", handleCommentPost);
+                document.getElementById("yorumPaylas").addEventListener("click", handleCommentPost);
+                
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
             }},
@@ -573,7 +560,7 @@ var presURaporu = new Tabulator("#presURaporListe-table", {
     height:"720px",
     layout:"fitDataFill",
     placeholder:"Pres Üretim Raporu",
-    ajaxURL:"/kalip/rapor",
+    ajaxURL:"rapor",
     progressiveLoad:"scroll",
     paginationMode:"remote",
     filterMode:"remote",
@@ -599,9 +586,9 @@ function createUserBlock(comment) {
 
 // Define a function to create file link HTML
 function createFileLink(cf) {
-    return `<a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
+    return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
                 <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
-            </a>`;
+            </a></p>`;
 };
 
 // Define a function to create a reply form HTML
@@ -634,6 +621,29 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
+function replyEditBtnClick(id, action) {
+    const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
+    replyForm.collapse('toggle');
+    if (action === "Düzenle") { 
+        const existingText = $(`#yorumText${id}`).val();
+        $(`#yorumText${id}`).summernote("code", existingText); 
+    }
+    const sendButton = $(`#gonder${id}`);
+    sendButton.text(action);
+}
+
+function createReplyButton(id) {
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+}
+
+function createEditButton(id) {
+    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+}
+
+function createDeleteButton(id) {
+    return `<span class="ml-2"><a role="button" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
+}
+
 function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -659,37 +669,15 @@ function createReplyElement(reply) {
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
-    reply.cfiles.forEach(cf => {
-        const fileLink = createFileLink(cf);
-        const fileElement = $('<p></p>').append(fileLink);
-        replyElement.append(fileElement);
-    });
+    reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
-        const replyForm = replyElement.find(`#replyComment${reply.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${reply.id}`).summernote("code", "");
-        const sendButton = replyElement.find(`#gonder${reply.id}`);
-        sendButton.text('Gönder');
-    });
+    replyElement.append(createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
-
-    const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        const replyForm = replyElement.find(`#replyComment${reply.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${reply.id}`).summernote("code", reply.Aciklama);
-        const sendButton = replyElement.find(`#gonder${reply.id}`);
-        sendButton.text('Düzenle'); // Change button text to indicate editing
-    });
-    const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
-        deleteComment(reply.id);
-    });
-
-    replyElement.append(replyButton, replyFormCollapse);
     if (reply.Kullanici_id == userID) {
-      replyElement.append(editButton, deleteButton); // edit eklenecek
+        replyElement.append(createEditButton(reply.id), createDeleteButton(reply.id));
     };
+    replyElement.append(replyFormCollapse);
 
     if (reply.replies.length > 0) {
         const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>').append(nestedReplies(reply.replies));
@@ -704,38 +692,12 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
-    comment.cfiles.forEach(cf => {
-        const fileLink = createFileLink(cf);
-        const fileElement = $('<p></p>').append(fileLink);
-        commentElement.append(fileElement);
-    });
-
-    const replyButton = $(`<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyComment${comment.id}" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`).on('click', (e) => {
-        const replyForm = commentElement.find(`#replyComment${comment.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${comment.id}`).summernote("code", "");
-        const sendButton = commentElement.find(`#gonder${comment.id}`);
-        sendButton.text('Gönder');
-    });
-    
-    commentElement.append(replyButton);
+    comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
+    commentElement.append(createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
-        
-    const editButton = $('<span class="ml-2"><a role="button" style="color:blue">düzenle</a></span>').on('click', (e) => {
-        const replyForm = commentElement.find(`#replyComment${comment.id}`);
-        replyForm.collapse('toggle');
-        $(`#yorumText${comment.id}`).summernote("code", comment.Aciklama);
-        const sendButton = commentElement.find(`#gonder${comment.id}`);
-        sendButton.text('Düzenle'); // Change button text to indicate editing
-
-    });
-    const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => {
-        deleteComment(comment.id);
-    });
-    
     if (comment.Kullanici_id == userID) {
-      commentElement.append(editButton, deleteButton); // edit eklenecek
+        commentElement.append(createEditButton(comment.id), createDeleteButton(comment.id));
     };
     commentElement.append(replyFormCollapse);
 
@@ -801,7 +763,7 @@ function updateFileList(cId="") {
                 <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
                     <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                     <div class="p-1 flex-grow-1">
-                      <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
+                      <label class="overflow" data-index="${index}">${file.name}</label>
                     </div>
                     <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
                         <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
@@ -820,28 +782,13 @@ function updateFileList(cId="") {
 
   };
 
-function deleteComment(cId) {
-    let confirmed = confirm("Silmek istediğinize emin misiniz?");
-    if (!confirmed) return;
-    $.ajax({
-    url: '/kalipCDelete/'+cId,
-    type: 'GET',
-    success: function (response) {
-        alert(response.message);
-        window.location.reload();
-    },
-    error: function (error) {
-        alert('Yorum silinemedi. '+error);
-    }
-    });
-};
-
 function handleReply(modelId, commentId) {
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
       editComment(commentId);
     }
     else {
-      yorumPaylas(kId=modelId, cId=commentId);
+        alert(commentId);
+        yorumPaylas(kId=modelId, cId=commentId);
     }
 };
 
@@ -861,52 +808,9 @@ $('#fileInput').on('change', function(e) {
     updateFileList();
   });
 
-function fileAlreadySelected(newFile) {
-    return selectedFiles.some(function(existingFile) {
-        return newFile.name === existingFile.name && newFile.size === existingFile.size;
-    });
-};
-
-function updateFileList(cId="") {
-    var fileTitles = $(`#fileTitles${cId}`);
-    fileTitles.empty(); // Önceki başlık alanlarını temizle
-
-    var row = $('<div class="row"></div>');
-    fileTitles.append(row);
-
-    // <label class="overflow">${file.name}</label>
-    selectedFiles.forEach(function(file, index){
-        let fileType = file.name.split(".").pop().toLowerCase();
-        var column = $(
-            `<div class="col-md-6 mt-3">
-                <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
-                    <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
-                    <div class="p-1 flex-grow-1">
-                        <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
-                    </div>
-                    <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
-                        <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
-                    </button>
-                </div>
-            </div>`
-        );
-
-        row.append(column);
-
-        if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
-            row = $('<div class="row"></div>');
-            fileTitles.append(row);
-        }
-    });
-
-};
-
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
-    var textareaValue = $(`#yorumText${kId}`).summernote('code');
-    if (cId != "") {
-        textareaValue = $(`#yorumText${cId}`).summernote('code');
-    }
+    var textareaValue = $(`#yorumText${cId}`).summernote('code');
     
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", kId);
@@ -914,9 +818,7 @@ function yorumPaylas(kId="", cId=""){
     selectedFiles.forEach(function(file) {
         yorumData.append('yfiles', file);
     });
-    if (cId != "") {
-        yorumData.append("replyID", cId);
-    }
+    if (cId != "") { yorumData.append("replyID", cId); }
     $.ajax({
             url: `postcomment`,
             type: 'POST',
@@ -927,22 +829,10 @@ function yorumPaylas(kId="", cId=""){
                 window.location.reload();
             },
             error: function(response) {
-                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+                alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
             }
     });
 
-};
-
-$(document).on('click', '.clickable-file-label', function() {
-    let index = $(this).data('index');
-    let file = selectedFiles[index];
-    openFile(file);
-});
-
-function openFile(file) {
-    var url = URL.createObjectURL(file);
-    window.open(url, '_blank'); // Opens the file in a new tab
-    URL.revokeObjectURL(url); // Clean up the URL after opening
 };
 
 window.removeFile = function(index, cId) {
