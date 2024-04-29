@@ -457,35 +457,33 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             headerMenu:headerMenu, //add a menu to this column header
             columns:[
             {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-            //e - the click event object
-            //cell - cell component
                 presURaporu.setFilter([{ field: 'KalipNo', type: '=', value: cell.getData().KalipNo }, 
                     ]);
                 presURaporu.redraw(true);
                 document.getElementById("kalip_karti").style.display = 'block';
                 document.getElementById("presURaporListe-table").style.display = 'block';
                 kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
-                if (kal.Silindi == 1){
-                    kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
-                }
-                else if (kal.Silindi == 0){
-                    if (kal.AktifPasif == false){
-                        if (kal.Hatali == 1){
-                            kal.Silindi = "Hatalı ve Pasif"
-                        }else{
-                            kal.Silindi = "Pasif"
-                        }
-                    }
-                    else if (kal.AktifPasif == true) {
-                    if (kal.Hatali == 0){
-                        kal.Silindi = "Hatalı ve Aktif"
-                    }else{
-                        kal.Silindi = "Aktif"
-                    }
-                }
-                }
+                // if (kal.Silindi == 1){
+                //     kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
+                // }
+                // else if (kal.Silindi == 0){
+                //     if (kal.AktifPasif == false){
+                //         if (kal.Hatali == 1){
+                //             kal.Silindi = "Hatalı ve Pasif"
+                //         }else{
+                //             kal.Silindi = "Pasif"
+                //         }
+                //     }
+                //     else if (kal.AktifPasif == true) {
+                //     if (kal.Hatali == 0){
+                //         kal.Silindi = "Hatalı ve Aktif"
+                //     }else{
+                //         kal.Silindi = "Aktif"
+                //     }
+                // }
+                // }
                 
-                document.getElementById("infoDurumu").innerText = kal.Silindi;
+                document.getElementById("infoDurumu").innerText = kal.Silindi == 1 ? "Silindi, Sebebi: " + kal.SilinmeSebebi : (kal.AktifPasif ? (kal.Hatali ? "Hatalı ve Aktif" : "Aktif") : (kal.Hatali ? "Hatalı ve Pasif" : "Pasif"));
                 document.getElementById("infoKalipNo").innerText = kal.KalipNo;
                 document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
                 document.getElementById("infoGramaj").innerText = kal.ProfilGramaj + " kg/m";
@@ -634,26 +632,23 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
-function replyEditBtnClick(id, action, summer) {
+function replyEditBtnClick(id, action) {
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
-
-    if (action === "Düzenle") {
-        $(`#yorumText${id}`).summernote("code", $(summer));
+    if (action === "Düzenle") { 
+        const existingText = $(`#yorumText${id}`).val();
+        $(`#yorumText${id}`).summernote("code", existingText); 
     }
-
     const sendButton = $(`#gonder${id}`);
-    console.log(sendButton);
-    console.log(action);
     sendButton.text(action);
 }
 
-function createReplyButton(id, text) {
-    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder', '')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+function createReplyButton(id) {
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
-function createEditButton(id, text, summer) {
-    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle', '${summer}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+function createEditButton(id) {
+    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -683,12 +678,11 @@ function createReplyElement(reply) {
 
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    const replyButton = createReplyButton(reply.id, 'Gönder');
-    replyElement.append(replyButton);
+    replyElement.append(createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
-        const editButton = createEditButton(reply.id, 'Düzenle', String(reply.Aciklama));
+        const editButton = createEditButton(reply.id);
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(reply.id); });
         replyElement.append(editButton, deleteButton);
     };
@@ -708,13 +702,11 @@ function createCommentElement(comment) {
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
-
-    const replyButton = createReplyButton(comment.id, commentElement);
-    commentElement.append(replyButton);
+    commentElement.append(createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
-        const editButton = createEditButton(comment.id, 'Düzenle', comment.Aciklama);
+        const editButton = createEditButton(comment.id);
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(comment.id); });
         commentElement.append(editButton, deleteButton);
     };
@@ -883,7 +875,6 @@ function DosyaTemizle(cId){
 
 function editComment(commentId) {
     const editData = new FormData();
-    console.log(commentId);
     var textareaValue = $(`#yorumText${commentId}`).summernote('code');
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     editData.append("commentId", commentId);
