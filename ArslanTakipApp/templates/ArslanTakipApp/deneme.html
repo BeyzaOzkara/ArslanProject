@@ -599,9 +599,9 @@ function createUserBlock(comment) {
 
 // Define a function to create file link HTML
 function createFileLink(cf) {
-    return `<a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
+    return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
                 <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
-            </a>`;
+            </a></p>`;
 };
 
 // Define a function to create a reply form HTML
@@ -634,25 +634,24 @@ function createReplyForm(replyId, modelId) {
             </div>`;
 }
 
-function replyEditBtnClick(id, eleme, text, summer) {
-    const replyForm = $(eleme).find(`#replyComment${id}`);
-    console.log(replyForm);
+function replyEditBtnClick(id, action, summer) {
+    const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
-    console.log(summer)
-    console.log($(summer))
-    let sText = $(summer);
-    console.log(sText)
-    $(`#yorumText${id}`).summernote("code", sText);
-    const sendButton = $(eleme).find(`#gonder${id}`);
-    sendButton.text($(text));
+
+    if (action === "Düzenle") {
+        $(`#yorumText${id}`).summernote("code", $(summer));
+    }
+
+    const sendButton = $(`#gonder${id}`);
+    sendButton.text(action);
 }
 
-function createReplyButton(id, eleme, text) {
-    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+function createReplyButton(id, text) {
+    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder', '')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
-function createEditButton(id, eleme, text, summer) {
-    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, '${eleme.selector}', '${text}', '${summer}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+function createEditButton(id, text, summer) {
+    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle', '${summer}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -680,18 +679,14 @@ function createReplyElement(reply) {
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
-    reply.cfiles.forEach(cf => {
-        const fileLink = createFileLink(cf);
-        const fileElement = $('<p></p>').append(fileLink);
-        replyElement.append(fileElement);
-    });
+    reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    const replyButton = createReplyButton(reply.id, replyElement, 'Gönder');
+    const replyButton = createReplyButton(reply.id, 'Gönder');
     replyElement.append(replyButton);
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
-        const editButton = createEditButton(reply.id, replyElement, 'Düzenle', String(reply.Aciklama));
+        const editButton = createEditButton(reply.id, 'Düzenle', String(reply.Aciklama));
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(reply.id); });
         replyElement.append(editButton, deleteButton);
     };
@@ -710,18 +705,14 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
-    comment.cfiles.forEach(cf => {
-        const fileLink = createFileLink(cf);
-        const fileElement = $('<p></p>').append(fileLink);
-        commentElement.append(fileElement);
-    });
+    comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
 
     const replyButton = createReplyButton(comment.id, commentElement);
     commentElement.append(replyButton);
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
-        const editButton = createEditButton(comment.id, commentElement, 'Düzenle', comment.Aciklama);
+        const editButton = createEditButton(comment.id, 'Düzenle', comment.Aciklama);
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(comment.id); });
         commentElement.append(editButton, deleteButton); // edit eklenecek
     };
@@ -832,46 +823,6 @@ $('#fileInput').on('change', function(e) {
     });
     updateFileList();
   });
-
-function fileAlreadySelected(newFile) {
-    return selectedFiles.some(function(existingFile) {
-        return newFile.name === existingFile.name && newFile.size === existingFile.size;
-    });
-};
-
-function updateFileList(cId="") {
-    var fileTitles = $(`#fileTitles${cId}`);
-    fileTitles.empty(); // Önceki başlık alanlarını temizle
-
-    var row = $('<div class="row"></div>');
-    fileTitles.append(row);
-
-    // <label class="overflow">${file.name}</label>
-    selectedFiles.forEach(function(file, index){
-        let fileType = file.name.split(".").pop().toLowerCase();
-        var column = $(
-            `<div class="col-md-6 mt-3">
-                <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
-                    <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
-                    <div class="p-1 flex-grow-1">
-                        <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
-                    </div>
-                    <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
-                        <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
-                    </button>
-                </div>
-            </div>`
-        );
-
-        row.append(column);
-
-        if ((index + 1) % 2 === 0 && index + 1 < selectedFiles.length) {
-            row = $('<div class="row"></div>');
-            fileTitles.append(row);
-        }
-    });
-
-};
 
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
