@@ -58,9 +58,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 if notification.user == self.user and not notification.is_read:
                     notification.is_read = True
                     notification.save()
-                elif notification.user == self.user and notification.is_read:
-                    notification.is_read = False
-                    notification.save()
                 return True
             await get_notification(notification_id)
         except Exception as e:

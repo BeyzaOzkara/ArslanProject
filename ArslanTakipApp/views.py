@@ -2203,8 +2203,6 @@ def notifications_all(request):
             elif i['field'] == 'CizimNo':
                 cizimIds = YudaForm.objects.filter(CizimNo__icontains = i['value']).values_list('id', flat=True)
                 q["where_id__in"] = cizimIds
-            elif i['field'] == 'timestamp':
-                print("time")
             else:
                 q = filter_method(i, q)
     

@@ -93,6 +93,7 @@
             {title:"Kim", field:"Kisi", headerFilter:"input"},
             {title:"İçerik", field:"message", headerFilter:"input"},
             {title:"Çizim No", field:"CizimNo", headerFilter:"input"},
+            {title:"Okundu", field:"is_read", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}},
             {title:"Zaman", field:"timestamp"},
     ],
   });

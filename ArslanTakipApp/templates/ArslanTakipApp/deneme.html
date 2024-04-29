@@ -640,6 +640,10 @@ function createEditButton(id) {
     return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
+function createDeleteButton(id) {
+    return `<span class="ml-2"><a role="button" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
+}
+
 function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -671,9 +675,7 @@ function createReplyElement(reply) {
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
-        const editButton = createEditButton(reply.id);
-        const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(reply.id); });
-        replyElement.append(editButton, deleteButton);
+        replyElement.append(createEditButton(reply.id), createDeleteButton(reply.id));
     };
     replyElement.append(replyFormCollapse);
 
@@ -695,9 +697,7 @@ function createCommentElement(comment) {
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
-        const editButton = createEditButton(comment.id);
-        const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(comment.id); });
-        commentElement.append(editButton, deleteButton);
+        commentElement.append(createEditButton(comment.id), createDeleteButton(comment.id));
     };
     commentElement.append(replyFormCollapse);
 
@@ -763,7 +763,7 @@ function updateFileList(cId="") {
                 <div class="mp-2 d-flex ml-2 mr-2 justify-content-between border rounded">
                     <span class="fiv-cla fiv-icon-${fileType} border-right-0" rounded-left"></span>
                     <div class="p-1 flex-grow-1">
-                      <label class="overflow clickable-file-label" data-index="${index}">${file.name}</label>
+                      <label class="overflow" data-index="${index}">${file.name}</label>
                     </div>
                     <button type="button" class="btn btn-lg rounded-right" onclick="removeFile(${index}, ${cId})">
                         <i class="fas fa-times fa-spin-hover fa-lg text-danger"></i>
@@ -810,10 +810,7 @@ $('#fileInput').on('change', function(e) {
 
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
-    var textareaValue = $(`#yorumText`).summernote('code');
-    if (cId != "") {
-        textareaValue = $(`#yorumText${cId}`).summernote('code');
-    }
+    var textareaValue = $(`#yorumText${cId}`).summernote('code');
     
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", kId);
@@ -821,9 +818,7 @@ function yorumPaylas(kId="", cId=""){
     selectedFiles.forEach(function(file) {
         yorumData.append('yfiles', file);
     });
-    if (cId != "") {
-        yorumData.append("replyID", cId);
-    }
+    if (cId != "") { yorumData.append("replyID", cId); }
     $.ajax({
             url: `/kalip/postcomment`,
             type: 'POST',
@@ -834,22 +829,10 @@ function yorumPaylas(kId="", cId=""){
                 window.location.reload();
             },
             error: function(response) {
-                alert('Yorum kaydedilemedi. '+response.responseJSON.error);
+                alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
             }
     });
 
-};
-
-$(document).on('click', '.clickable-file-label', function() {
-    let index = $(this).data('index');
-    let file = selectedFiles[index];
-    openFile(file);
-});
-
-function openFile(file) {
-    var url = URL.createObjectURL(file);
-    window.open(url, '_blank'); // Opens the file in a new tab
-    URL.revokeObjectURL(url); // Clean up the URL after opening
 };
 
 window.removeFile = function(index, cId) {
