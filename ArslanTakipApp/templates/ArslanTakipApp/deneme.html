@@ -716,7 +716,7 @@ function createCommentElement(comment) {
     if (comment.Kullanici_id == userID) {
         const editButton = createEditButton(comment.id, 'Düzenle', comment.Aciklama);
         const deleteButton = $('<span class="ml-2"><a role="button" style="color:red">sil</a></span>').on('click', (e) => { deleteComment(comment.id); });
-        commentElement.append(editButton, deleteButton); // edit eklenecek
+        commentElement.append(editButton, deleteButton);
     };
     commentElement.append(replyFormCollapse);
 
@@ -802,6 +802,9 @@ function updateFileList(cId="") {
   };
 
 function handleReply(modelId, commentId) {
+    console.log(modelId);
+    console.log(commentId);
+    console.log("if")
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
       editComment(commentId);
     }
@@ -882,6 +885,7 @@ function DosyaTemizle(cId){
 
 function editComment(commentId) {
     const editData = new FormData();
+    console.log(commentId);
     var textareaValue = $(`#yorumText${commentId}`).summernote('code');
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     editData.append("commentId", commentId);
