@@ -271,15 +271,15 @@
                 </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
                 <div class="card-body" id="yorumCard">
                   <div class="row" style="height: 265px;">
-                    <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol">
+                    <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1" id="yorumTextCol">
                       <textarea class="textarea" name="ilkYorumText" data-kalip="" id="yorumText" placeholder=" . . . "
                                       style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                     </div>
-                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;display: none;">
+                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;">
                       <div class="input-group">
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
-                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Fotoğraf Yükle</label>
                         </div>
                         <div class="input-group-append">
                             <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
@@ -417,7 +417,7 @@ var kSayisi = 0;
 var toplamKalip = function(values, data, calcParams) {
     $.ajax({
       url: `tum`,
-      method: 'GET',
+      method: 'GET', 
       dataType: 'json',
       success: function (sayi) {
         kSayisi = parseInt(sayi);
@@ -597,15 +597,15 @@ function createReplyForm(replyId, modelId) {
                 <form>
                     <div class="form-group">
                         <div class="row" style="height: 265px;">
-                        <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${replyId}">
+                        <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1" id="yorumTextCol${replyId}">
                             <textarea class="textarea" name="yorumText" id="yorumText${replyId}" placeholder=" . . . "
                                             style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                         </div>
-                        <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${replyId}" style="height: 265px;display: none;">
+                        <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${replyId}" style="height: 265px;">
                             <div class="input-group">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput${replyId}" lang="tr" onchange="fileInputChange(event, ${replyId})" multiple>
-                                <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Dosyaları Seçin</label>
+                                <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Fotoğraf Yükle</label>
                             </div>
                             <div class="input-group-append">
                                 <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle(${replyId})">Temizle</span>
