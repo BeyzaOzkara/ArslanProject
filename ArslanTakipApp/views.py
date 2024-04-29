@@ -1737,7 +1737,7 @@ def yudaDetail2(request, yId):
         fi = UploadFile.objects.get(Q(FileModel = "YudaForm") & Q(FileModelId = yId) & Q(FileTitle = 'Şartname'))
         svgData = yudaDetailSvg(request, fi.File.path)
         
-    yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
+    yudaComments = getParentComments("YudaForm", yId).order_by("-Tarih")
     yudaCList = [process_comment(comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
