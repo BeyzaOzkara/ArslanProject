@@ -272,7 +272,7 @@
                 <div class="card-body" id="yorumCard">
                   <div class="row" style="height: 265px;">
                     <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol">
-                      <textarea class="textarea" name="ilkYorumText" id="yorumText" placeholder=" . . . "
+                      <textarea class="textarea" name="ilkYorumText" data-kalip="" id="yorumText" placeholder=" . . . "
                                       style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                     </div>
                     <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;display: none;">
@@ -429,6 +429,35 @@ var toplamKalip = function(values, data, calcParams) {
     return kSayisi;
 }
 
+function updateInfoElements(kal) {
+    const elementMappings = {
+        "infoDurumu": kal.Silindi == 1 ? "Silindi, Sebebi: " + kal.SilinmeSebebi : (kal.AktifPasif ? (kal.Hatali ? "Aktif" : "Hatalı ve Aktif") : (kal.Hatali ? "Pasif" : "Hatalı ve Pasif")),
+        "infoKalipNo": kal.KalipNo, "infoFirmaAdi": kal.FirmaAdi, "infoGramaj": kal.ProfilGramaj + " kg/m",
+        "infoSonUretimGramaj": kal.SonUretimGr + " kg/m", "infoUreticiFirma": kal.UreticiFirma, "infoSonUretimTarihi": kal.SonUretimTarih,
+        "infoKaliteAciklama": kal.KaliteAciklama, "infoKalipAciklama": kal.KalipAciklama, "infoCins": kal.Cinsi,
+        "infoFigür": kal.GozAdedi, "infoUretimTopKG": kal.UretimToplamKg + " kg", "infoSonTen": kal.TeniferKalanOmurKg + " kg",
+        "infoSonTenTarihi": kal.SonTeniferTarih, "infoTeniferNo": kal.TeniferNo, "infoCap": kal.Capi + " mm", "infoPaket": kal.PaketBoyu + " mm",
+    };
+
+    for (const key in elementMappings) {
+        if (elementMappings.hasOwnProperty(key)) {
+            document.getElementById(key).innerText = elementMappings[key];
+        }
+    }
+
+    const rdizin = kal.ResimDizini.replace(/\s/g, '') + "Teknik1.jpg";
+    const rdizin2 = kal.ResimDizini.replace(/\s/g, '') + "Teknik2.jpg";
+    document.getElementById("TeknikResim").src = "http://arslan/static" + rdizin.slice(13);
+    document.getElementById("TeknikA").href = "http://arslan/static" + rdizin.slice(13);
+    document.getElementById("TeknikResim2").src = "http://arslan/static" + rdizin2.slice(13);
+    document.getElementById("TeknikB").href = "http://arslan/static" + rdizin2.slice(13);
+}
+
+function handleCommentPost() {
+    let kNo = $('#yorumText').data("kalip");
+    yorumPaylas(kNo);
+}
+
 var tableKalip = new Tabulator("#kalipListe-table", {
     height:"700px",
     layout:"fitDataFill",
@@ -462,58 +491,18 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 presURaporu.redraw(true);
                 document.getElementById("kalip_karti").style.display = 'block';
                 document.getElementById("presURaporListe-table").style.display = 'block';
-                kal = cell.getData(); //durumu aktif pasif silindi silinme sebebi
-                // if (kal.Silindi == 1){
-                //     kal.Silindi = "Silindi" + " , Sebebi: " + kal.SilinmeSebebi 
-                // }
-                // else if (kal.Silindi == 0){
-                //     if (kal.AktifPasif == false){
-                //         if (kal.Hatali == 1){
-                //             kal.Silindi = "Hatalı ve Pasif"
-                //         }else{
-                //             kal.Silindi = "Pasif"
-                //         }
-                //     }
-                //     else if (kal.AktifPasif == true) {
-                //     if (kal.Hatali == 0){
-                //         kal.Silindi = "Hatalı ve Aktif"
-                //     }else{
-                //         kal.Silindi = "Aktif"
-                //     }
-                // }
-                // }
-                
-                document.getElementById("infoDurumu").innerText = kal.Silindi == 1 ? "Silindi, Sebebi: " + kal.SilinmeSebebi : (kal.AktifPasif ? (kal.Hatali ? "Hatalı ve Aktif" : "Aktif") : (kal.Hatali ? "Hatalı ve Pasif" : "Pasif"));
-                document.getElementById("infoKalipNo").innerText = kal.KalipNo;
-                document.getElementById("infoFirmaAdi").innerText = kal.FirmaAdi;
-                document.getElementById("infoGramaj").innerText = kal.ProfilGramaj + " kg/m";
-                document.getElementById("infoSonUretimGramaj").innerText = kal.SonUretimGr + " kg/m";
-                document.getElementById("infoUreticiFirma").innerText = kal.UreticiFirma;
-                document.getElementById("infoSonUretimTarihi").innerText = kal.SonUretimTarih; 
-                document.getElementById("infoKaliteAciklama").innerText = kal.KaliteAciklama;
-                document.getElementById("infoKalipAciklama").innerText = kal.KalipAciklama;
-                document.getElementById("infoCins").innerText = kal.Cinsi;
-                document.getElementById("infoFigür").innerText = kal.GozAdedi;
-                document.getElementById("infoUretimTopKG").innerText = kal.UretimToplamKg + " kg";
-                document.getElementById("infoSonTen").innerText = kal.TeniferKalanOmurKg + " kg"; 
-                document.getElementById("infoSonTenTarihi").innerText = kal.SonTeniferTarih; //ten numarası
-                document.getElementById("infoTeniferNo").innerText = kal.TeniferNo;
-                document.getElementById("infoCap").innerText = kal.Capi + " mm";
-                document.getElementById("infoPaket").innerText = kal.PaketBoyu + " mm";
-                var rdizin = kal.ResimDizini.replace(/\s/g,'') + "Teknik1.jpg";
-                var rdizin2 = kal.ResimDizini.replace(/\s/g,'') + "Teknik2.jpg";
-                document.getElementById("TeknikResim").src = "http://arslan/static" + rdizin.slice(13);
-                document.getElementById("TeknikA").href = "http://arslan/static" + rdizin.slice(13);
-                document.getElementById("TeknikResim2").src = "http://arslan/static" + rdizin2.slice(13);
-                document.getElementById("TeknikB").href = "http://arslan/static" + rdizin2.slice(13);
-
+                kal = cell.getData();
+                updateInfoElements(kal);
             },
             },
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kId = cell.getData().KalipNo;
                 clickComment(kId);
-                document.getElementById("yorumPaylas").addEventListener("click", function(){yorumPaylas(kId)});
-                document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
+                $('#yorumText').data('kalip', kId);
+                // document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
+                document.getElementById("yorumPaylas").removeEventListener("click", handleCommentPost);
+                document.getElementById("yorumPaylas").addEventListener("click", handleCommentPost);
+                
                 document.getElementById("dieComment").style.display = 'block';
                 document.getElementById("diePostComment").style.display = 'block';
             }},
@@ -821,7 +810,7 @@ $('#fileInput').on('change', function(e) {
 
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
-    var textareaValue = $(`#yorumText${kId}`).summernote('code');
+    var textareaValue = $(`#yorumText`).summernote('code');
     if (cId != "") {
         textareaValue = $(`#yorumText${cId}`).summernote('code');
     }
