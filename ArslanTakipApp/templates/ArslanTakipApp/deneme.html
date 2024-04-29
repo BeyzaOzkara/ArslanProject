@@ -802,13 +802,11 @@ function updateFileList(cId="") {
   };
 
 function handleReply(modelId, commentId) {
-    console.log(modelId);
-    console.log(commentId);
-    console.log("if")
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
       editComment(commentId);
     }
     else {
+        console.log(modelId);
       yorumPaylas(kId=modelId, cId=commentId);
     }
 };
