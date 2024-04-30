@@ -658,12 +658,12 @@ function createImagePreview(cf) {
     var file_format = /[^.]*$/.exec(cf.File)[0];
     var fileHtml ="";
     if (format_array.indexOf(file_format) > -1) {
-        fileHtml = `<p><img class="imgComment" onclick="imgClick()" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
+        fileHtml = `<p><img class="imgComment" onclick="imgClick" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
     }
     return fileHtml;
 }
 
-function imageClick() {
+function imgClick() {
     document.getElementById("imgModal").style.display = "block";
     modalImg.src = this.src;
     captionText.innerHTML = this.alt;
