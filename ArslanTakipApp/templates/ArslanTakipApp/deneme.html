@@ -46,13 +46,13 @@
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
-    #imgComment {
+
+    .imgComment {
         border-radius: 5px;
         cursor: pointer;
         transition: 0.3s;
     }
-
-    #imgComment:hover {opacity: 0.7;}
+    .imgComment:hover {opacity: 0.7;}
 
     #pictureModal {
         display: none;
@@ -656,10 +656,11 @@ function createFileLink(cf) {
 function createImagePreview(cf) {
     var format_array = ["img", "jpg", "PNG", "png"]
     var file_format = /[^.]*$/.exec(cf.File)[0];
+    var fileHtml ="";
     if (format_array.indexOf(file_format) > -1) {
-        console.log("deneme");
-        return `<p><img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
+        fileHtml = `<p><img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
     }
+    return fileHtml;
 }
 
 // Define a function to create a reply form HTML
@@ -763,6 +764,7 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
+    comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
     commentElement.append(createReplyButton(comment.id));
 
