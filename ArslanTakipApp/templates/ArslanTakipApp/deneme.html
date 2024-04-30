@@ -101,6 +101,12 @@
         from {transform:scale(0)} 
         to {transform:scale(1)}
     }
+
+    @media only screen and (max-width: 700px){
+        .modal-content {
+            width: 100%;
+        }
+    }
 </style>
     
 {% endblock %}
@@ -642,6 +648,13 @@ function createUserBlock(comment) {
 
 // Define a function to create file link HTML
 function createFileLink(cf) {
+    var format_array = ["img", "jpg"]
+    var file_format = /[^.]*$/.exec(cf.File)[0];
+    console.log(file_format);
+    if (format_array.indexOf(file_format) > -1) {
+        console.log("deneme");
+        // <img id="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px">
+    }
     return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
                 <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
             </a></p>`;

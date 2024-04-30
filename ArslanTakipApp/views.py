@@ -1711,7 +1711,6 @@ def yudaDetail(request, yId):
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
-    # print(f"yudaDetails{yudaDetails}")
     
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
