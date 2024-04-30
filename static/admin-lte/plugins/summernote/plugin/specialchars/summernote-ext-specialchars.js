@@ -36,12 +36,9 @@
 
       // special characters data set
       var specialCharDataSet = [
-        '&iexcl;', '&cent;', '&euro;', '&pound;', '&yen;', '&brvbar;', 
-        '&sect;', '&uml;', '&copy;', '&ordf;', '&laquo;', '&not;',
-        '&reg;', '&macr;', '&deg;', '&plusmn;', '&sup2;',
-        '&sup3;', '&acute;', '&micro;', '&para;', '&middot;',
-        '&cedil;', '&sup1;', '&ordm;', '&raquo;', '&frac14;',
-        '&frac12;', '&frac34;', '&iquest;', '&times;', '&divide;',
+        '&reg;', '&macr;', '&deg;', '&plusmn;', '&sup2;', '&sup3;', 
+        '&acute;', '&micro;', '&para;', '&middot;', '&cedil;', 
+        '&sup1;', '&ordm;', '&raquo;', '&iquest;', '&times;', '&divide;',
         '&fnof;', '&circ;', '&tilde;', '&ndash;', '&mdash;',
         '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;',
         '&bdquo;', '&Dagger;', '&bull;', '&permil;', '&prime;', '&Prime;',
@@ -49,12 +46,9 @@
         '&larr;', '&uarr;', '&rarr;', '&darr;', '&harr;', '&crarr;', '&lArr;',
         '&uArr;', '&rArr;', '&dArr;', '&hArr;', '&forall;',
         '&part;', '&exist;', '&empty;', '&nabla;', '&isin;',
-        '&notin;', '&ni;', '&prod;', '&sum;', '&minus;',
-        '&lowast;', '&radic;', '&prop;', '&infin;', '&ang;',
-        '&and;', '&or;', '&cap;', '&cup;', '&int;',
-        '&sim;', '&cong;', '&asymp;', '&ne;', '&equiv;', '&le;', '&ge;',
-        '&sub;', '&sup;', '&nsub;', '&sube;', '&supe;', '&oplus;', '&otimes;',
-        '&perp;', '&sdot;', '&lceil;', '&rceil;', '&lfloor;', '&rfloor;'
+        '&notin;', '&ni;', '&prod;', '&lowast;', '&radic;', 
+        '&prop;', '&infin;', '&ang;', '&and;', '&or;', '&cap;', 
+        '&cup;', '&int;', '&sim;', '&cong;', '&asymp;', '&le;', '&ge;',
       ];
 
       context.memo('button.specialchars', function() {
