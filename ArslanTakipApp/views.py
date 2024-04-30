@@ -227,6 +227,71 @@ def location_list(a):
     data = json.dumps(childData)
     return data
 
+def location_kalip(request):
+    #kalıp arşivi sayfasındaki kalıplar
+    if request.method == "GET":
+        path = request.get_full_path()
+        print(path)
+        params = json.loads(unquote(request.GET.get('params')))
+        size = params["size"]
+        page = params["page"]
+        filter_list = params["filter"]
+        q = {}
+
+        loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
+        loc_list = list(loc.values())
+        locs = [l['id'] for l in loc_list]
+        query = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
+        lfil =[]
+        if request.user.is_superuser:
+            query = DiesLocation.objects.all().order_by('kalipNo')
+        
+        if len(filter_list)>0:
+            for i in filter_list:
+                if i["type"] == "like":
+                    q[i['field']+"__startswith"] = i['value']
+                elif i["type"] == "=":
+                    #q[i['field']] = i['value']
+                    loca = loc.values().get(id = i['value'])
+                    if loca['isPhysical']: 
+                        q[i['field']] = i['value']
+                    else :
+                        lo = loc.values().filter(locationRelationID_id = i['value'])
+                        for j in list(lo):
+                            if j['isPhysical']:
+                                lfil.append(j['id'])
+                            else:
+                                filo = loc.values().filter(locationRelationID_id = j['id'])
+                                for f in list(filo):
+                                    if f['isPhysical']:
+                                        lfil.append(f['id'])
+                                    else :
+                                        filo2 = loc.values().filter(locationRelationID_id = f['id'])
+                                        for b in list(filo2):
+                                            if b['isPhysical']:
+                                                lfil.append(b['id'])
+                        #print(lfil)
+                        query = DiesLocation.objects.filter(kalipVaris_id__in=lfil)
+
+        query = query.filter(**q) 
+        kal = KalipMs.objects.using('dies').all()
+        a = list(query.values()[(page-1)*size:page*size])
+        for b in a:
+            s = kal.get(KalipNo=b['kalipNo'])
+            if s.Silindi == 1 or s.AktifPasif == 'Pasif':
+                #print(b)
+                a.remove(b)
+                #print("silindi")
+            c = kal.get(KalipNo=b['kalipNo']).Hatali
+            if c==1:
+                b['Hatali'] = 1
+        #print(a)
+        kalip_count = query.count()
+        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+        lastData['data'] = a #list(query.values()[(page-1)*size:page*size])
+        data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+        return HttpResponse(data)
+
 def kalip_liste(request):
     #Kalıp Listesi Detaylı
     params = json.loads(unquote(request.GET.get('params')))
@@ -396,72 +461,6 @@ def kalip_tum(request):
     kalipSayisi = KalipMs.objects.using('dies').count()
     data = json.dumps(kalipSayisi, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
-
-def location_kalip(request):
-    #kalıp arşivi sayfasındaki kalıplar
-    if request.method == "GET":
-        path = request.get_full_path()
-        print(path)
-        params = json.loads(unquote(request.GET.get('params')))
-        size = params["size"]
-        page = params["page"]
-        filter_list = params["filter"]
-        q = {}
-
-        loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
-        loc_list = list(loc.values())
-        locs = [l['id'] for l in loc_list]
-        query = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
-        lfil =[]
-        if request.user.is_superuser:
-            query = DiesLocation.objects.all().order_by('kalipNo')
-        
-        if len(filter_list)>0:
-            for i in filter_list:
-                if i["type"] == "like":
-                    q[i['field']+"__startswith"] = i['value']
-                elif i["type"] == "=":
-                    #q[i['field']] = i['value']
-                    loca = loc.values().get(id = i['value'])
-                    if loca['isPhysical']: 
-                        q[i['field']] = i['value']
-                    else :
-                        lo = loc.values().filter(locationRelationID_id = i['value'])
-                        for j in list(lo):
-                            if j['isPhysical']:
-                                lfil.append(j['id'])
-                            else:
-                                filo = loc.values().filter(locationRelationID_id = j['id'])
-                                for f in list(filo):
-                                    if f['isPhysical']:
-                                        lfil.append(f['id'])
-                                    else :
-                                        filo2 = loc.values().filter(locationRelationID_id = f['id'])
-                                        #print(filo2)
-                                        for b in list(filo2):
-                                            if b['isPhysical']:
-                                                lfil.append(b['id'])
-                        #print(lfil)
-                        query = DiesLocation.objects.filter(kalipVaris_id__in=lfil)
-
-        query = query.filter(**q) 
-        kal = KalipMs.objects.using('dies').all()
-        a = list(query.values()[(page-1)*size:page*size])
-        for b in a:
-            s = kal.get(KalipNo=b['kalipNo'])
-            if s.Silindi == 1 or s.AktifPasif == 'Pasif':
-                #print(b)
-                a.remove(b)
-                #print("silindi")
-            c = kal.get(KalipNo=b['kalipNo']).Hatali
-            if c==1:
-                b['Hatali'] = 1
-        #print(a)
-        kalip_count = query.count()
-        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
-        lastData['data'] = a #list(query.values()[(page-1)*size:page*size])
-        data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-        return HttpResponse(data)
 
 def kalip_comments(request, kId):
     if request.method == "GET":

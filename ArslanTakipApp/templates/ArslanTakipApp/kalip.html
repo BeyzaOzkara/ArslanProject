@@ -789,7 +789,7 @@ function createReplyElement(reply) {
 function createCommentElement(comment) {
     const userBlock = createUserBlock(comment);
     const commentContent = `<p>${comment.Aciklama}</p>`;
-    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
+    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent); // görüldü için tik iconu eklenecek. kimse görmediyse tek gri tik 
 
     comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
