@@ -227,18 +227,28 @@ def location_list(a):
     data = json.dumps(childData)
     return data
 
+def filter_locations(locations, target_id, depth=1):
+    filtered_ids = []
+    for location in locations:
+        if location['locationRelationID_id'] == int(target_id):
+            if location['isPhysical']:
+                filtered_ids.append(location['id'])
+            elif depth > 0:
+                child_ids = filter_locations(locations, location['id'], depth - 1)
+                filtered_ids.extend(child_ids)
+    return filtered_ids
+
 def location_kalip(request):
     #kalıp arşivi sayfasındaki kalıplar
     if request.method == "GET":
         path = request.get_full_path()
-        print(path)
         params = json.loads(unquote(request.GET.get('params')))
         size = params["size"]
         page = params["page"]
         filter_list = params["filter"]
         q = {}
 
-        loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all() 
+        loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location)
         loc_list = list(loc.values())
         locs = [l['id'] for l in loc_list]
         query = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
@@ -251,27 +261,32 @@ def location_kalip(request):
                 if i["type"] == "like":
                     q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
-                    #q[i['field']] = i['value']
                     loca = loc.values().get(id = i['value'])
                     if loca['isPhysical']: 
                         q[i['field']] = i['value']
                     else :
-                        lo = loc.values().filter(locationRelationID_id = i['value'])
-                        for j in list(lo):
-                            if j['isPhysical']:
-                                lfil.append(j['id'])
-                            else:
-                                filo = loc.values().filter(locationRelationID_id = j['id'])
-                                for f in list(filo):
-                                    if f['isPhysical']:
-                                        lfil.append(f['id'])
-                                    else :
-                                        filo2 = loc.values().filter(locationRelationID_id = f['id'])
-                                        for b in list(filo2):
-                                            if b['isPhysical']:
-                                                lfil.append(b['id'])
-                        #print(lfil)
-                        query = DiesLocation.objects.filter(kalipVaris_id__in=lfil)
+                        # lo = loc.values().filter(locationRelationID_id = i['value'])
+                        # for j in list(lo):
+                        #     if j['isPhysical']:
+                        #         lfil.append(j['id'])
+                        #     else:
+                        #         filo = loc.values().filter(locationRelationID_id = j['id'])
+                        #         for f in list(filo):
+                        #             if f['isPhysical']:
+                        #                 lfil.append(f['id'])
+                        #             else :
+                        #                 filo2 = loc.values().filter(locationRelationID_id = f['id'])
+                        #                 for b in list(filo2):
+                        #                     if b['isPhysical']:
+                        #                         lfil.append(b['id'])
+                        #                     else:
+                        #                         filo3 = loc.values().filter(locationRelationID_id = f['id'])
+                        #                         for c in list(filo3):
+                        #                             if c['isPhysical']:
+                        #                                 lfil.append(c['id'])
+                        # query = DiesLocation.objects.filter(kalipVaris_id__in=lfil)
+                        filtered_ids = filter_locations(loc.values(), target_id=i['value'], depth=4)
+                        query = DiesLocation.objects.filter(kalipVaris_id__in=filtered_ids)
 
         query = query.filter(**q) 
         kal = KalipMs.objects.using('dies').all()
