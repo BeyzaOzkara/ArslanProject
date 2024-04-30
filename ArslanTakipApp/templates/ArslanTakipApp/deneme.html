@@ -664,9 +664,9 @@ function createImagePreview(cf) {
 }
 
 function imgClick() {
-    document.getElementById("imgModal").style.display = "block";
-    modalImg.src = this.src;
-    captionText.innerHTML = this.alt;
+    document.getElementById("pictureModal").style.display = "block";
+    document.getElementById("imgModal").src = this.src;
+    document.getElementById("caption").innerHTML = this.alt;
 }
 
 // Define a function to create a reply form HTML
