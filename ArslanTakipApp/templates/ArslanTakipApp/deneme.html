@@ -355,7 +355,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="pictureModal" aria-hidden="true">
+    <div class="modal" id="pictureModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -370,7 +370,7 @@
                 </div>
             </div>
         </div>
-    </div>
+      </div>
 </div>
 
 {% endblock %}
@@ -746,7 +746,7 @@ function createReplyElement(reply) {
     const userBlock = createUserBlock(reply);
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
-
+    
     reply.cfiles.forEach(cf => { replyElement.append(createImagePreview(cf)); });
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
