@@ -399,6 +399,7 @@ $(function () {
     $('.textarea').summernote({
       disableResizeEditor: true,
       height:200,
+      lang: 'tr-TR',
       toolbar: [
         //['misc', ['undo', 'redo']],
         ['style', ['bold', 'italic', 'underline']],
@@ -904,7 +905,7 @@ $('#fileInput').on('change', function(e) {
         }
     });
     updateFileList();
-  });
+});
 
 function yorumPaylas(kId="", cId=""){
     var yorumData = new FormData();
@@ -987,7 +988,7 @@ $(function () {
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {
         event.preventDefault();
         $(this).ekkoLightbox({
-        alwaysShowClose: true
+            alwaysShowClose: true
         });
     });
 });

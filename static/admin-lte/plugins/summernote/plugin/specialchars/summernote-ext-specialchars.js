@@ -36,19 +36,16 @@
 
       // special characters data set
       var specialCharDataSet = [
-        '&reg;', '&macr;', '&deg;', '&plusmn;', '&sup2;', '&sup3;', 
-        '&acute;', '&micro;', '&para;', '&middot;', '&cedil;', 
+        '&deg;', '&plusmn;', '&sup2;', '&sup3;', '&micro;',
         '&sup1;', '&ordm;', '&raquo;', '&iquest;', '&times;', '&divide;',
         '&fnof;', '&circ;', '&tilde;', '&ndash;', '&mdash;',
         '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;',
-        '&bdquo;', '&Dagger;', '&bull;', '&permil;', '&prime;', '&Prime;',
-        '&lsaquo;', '&rsaquo;', '&oline;', '&frasl;', '&trade;', '&alefsym;',
-        '&larr;', '&uarr;', '&rarr;', '&darr;', '&harr;', '&crarr;', '&lArr;',
-        '&uArr;', '&rArr;', '&dArr;', '&hArr;', '&forall;',
-        '&part;', '&exist;', '&empty;', '&nabla;', '&isin;',
+        '&bdquo;', '&Dagger;', '&bull;', '&prime;', '&Prime;',
+        '&lsaquo;', '&rsaquo;', '&frasl;', '&trade;', '&alefsym;',
+        '&forall;', '&part;', '&exist;', '&empty;', '&nabla;', '&isin;',
         '&notin;', '&ni;', '&prod;', '&lowast;', '&radic;', 
-        '&prop;', '&infin;', '&ang;', '&and;', '&or;', '&cap;', 
-        '&cup;', '&int;', '&sim;', '&cong;', '&asymp;', '&le;', '&ge;',
+        '&prop;', '&infin;', '&ang;', '&and;', '&or;', '&int;', 
+        '&sim;', '&cong;', '&asymp;', '&le;', '&ge;',
       ];
 
       context.memo('button.specialchars', function() {
