@@ -37,15 +37,7 @@
       // special characters data set
       var specialCharDataSet = [
         '&deg;', '&plusmn;', '&sup2;', '&sup3;', '&micro;',
-        '&sup1;', '&ordm;', '&raquo;', '&iquest;', '&times;', '&divide;',
-        '&fnof;', '&circ;', '&tilde;', '&ndash;', '&mdash;',
-        '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;',
-        '&bdquo;', '&Dagger;', '&bull;', '&prime;', '&Prime;',
-        '&lsaquo;', '&rsaquo;', '&frasl;', '&trade;', '&alefsym;',
-        '&forall;', '&part;', '&exist;', '&empty;', '&nabla;', '&isin;',
-        '&notin;', '&ni;', '&prod;', '&lowast;', '&radic;', 
-        '&prop;', '&infin;', '&ang;', '&and;', '&or;', '&int;', 
-        '&sim;', '&cong;', '&asymp;', '&le;', '&ge;',
+        '&empty;', '&sim;', '&cong;', '&le;', '&ge;',
       ];
 
       context.memo('button.specialchars', function() {
