@@ -74,7 +74,7 @@
   margin: auto;
   display: block;
   width: 80%;
-  max-width: 700px;
+  max-width: 80%;
 }
 
 /* Caption of Modal Image */
@@ -685,7 +685,7 @@ function imgClick(imgComment) {
 var span = document.getElementsByClassName("close")[0];
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() { 
-  modal.style.display = "none";
+  document.getElementById("myModal").style.display = "none";
 }
 
 // Define a function to create a reply form HTML
