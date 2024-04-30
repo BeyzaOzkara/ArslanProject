@@ -650,14 +650,15 @@ function createUserBlock(comment) {
 function createFileLink(cf) {
     var format_array = ["img", "jpg", "PNG", "png"]
     var file_format = /[^.]*$/.exec(cf.File)[0];
+    var fileHtml = `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
+                <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
+            </a></p>`
     console.log(file_format);
     if (format_array.indexOf(file_format) > -1) {
         console.log("deneme");
-        // <img id="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px">
+        fileHtml += `<img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px">`;
     }
-    return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
-                <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
-            </a></p>`;
+    return fileHtml;
 };
 
 // Define a function to create a reply form HTML
