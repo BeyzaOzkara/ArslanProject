@@ -656,7 +656,7 @@ function createFileLink(cf) {
     console.log(file_format);
     if (format_array.indexOf(file_format) > -1) {
         console.log("deneme");
-        fileHtml += `<img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px">`;
+        fileHtml += `<p><img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
     }
     return fileHtml;
 };
