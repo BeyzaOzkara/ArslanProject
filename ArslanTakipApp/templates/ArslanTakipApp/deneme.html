@@ -648,18 +648,19 @@ function createUserBlock(comment) {
 
 // Define a function to create file link HTML
 function createFileLink(cf) {
+    return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
+                <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
+            </a></p>`;
+};
+
+function createImagePreview(cf) {
     var format_array = ["img", "jpg", "PNG", "png"]
     var file_format = /[^.]*$/.exec(cf.File)[0];
-    var fileHtml = `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
-                <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
-            </a></p>`
-    console.log(file_format);
     if (format_array.indexOf(file_format) > -1) {
         console.log("deneme");
-        fileHtml += `<p><img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
+        return `<p><img class="imgComment" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
     }
-    return fileHtml;
-};
+}
 
 // Define a function to create a reply form HTML
 function createReplyForm(replyId, modelId) {
@@ -738,7 +739,7 @@ function createReplyElement(reply) {
     const userBlock = createUserBlock(reply);
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
-
+    reply.cfiles.forEach(cf => { replyElement.append(createImagePreview(cf)); });
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
     replyElement.append(createReplyButton(reply.id));
