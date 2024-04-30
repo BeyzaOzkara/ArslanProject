@@ -648,7 +648,7 @@ function createUserBlock(comment) {
 
 // Define a function to create file link HTML
 function createFileLink(cf) {
-    var format_array = ["img", "jpg"]
+    var format_array = ["img", "jpg", "PNG", "png"]
     var file_format = /[^.]*$/.exec(cf.File)[0];
     console.log(file_format);
     if (format_array.indexOf(file_format) > -1) {
