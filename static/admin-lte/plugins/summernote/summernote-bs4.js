@@ -10052,7 +10052,7 @@ var ui_ui = function ui(editorOptions) {
       })($node, options);
     },
     button: function button($node, options) {
-      return renderer["a" /* default */].create('<button type="button" class="note-btn btn btn-light btn-sm" tabindex="-1">', function ($node, options) {
+      return renderer["a" /* default */].create('<button type="button" class="note-btn btn btn-light btn-lg" tabindex="-1">', function ($node, options) {
         if (options && options.tooltip) {
           $node.attr({
             title: options.tooltip,
