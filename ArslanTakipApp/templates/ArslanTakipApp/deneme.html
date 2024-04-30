@@ -665,7 +665,6 @@ function createImagePreview(cf) {
 
 function imgClick(imgComment) {
     document.getElementById("pictureModal").style.display = "block";
-    console.log(imgComment)
     document.getElementById("imgModal").src = imgComment.src;
     document.getElementById("caption").innerHTML = imgComment.alt;
 }
@@ -747,6 +746,7 @@ function createReplyElement(reply) {
     const userBlock = createUserBlock(reply);
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
+    
     reply.cfiles.forEach(cf => { replyElement.append(createImagePreview(cf)); });
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 

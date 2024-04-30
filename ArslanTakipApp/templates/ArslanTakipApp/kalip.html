@@ -46,6 +46,64 @@
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
+
+    
+    .imgComment {
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .imgComment:hover {opacity: 0.7;}
+    #pictureModal {
+        display: none;
+        position: fixed;
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.9);
+    }
+    #imgModal {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+    #caption {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        color: #ccc;
+        padding: 10px 0;
+        height: 150px;
+    }
+    #imgModal, #caption {
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+    }
+    @-webkit-keyframes zoom {
+        from {-webkit-transform:scale(0)} 
+        to {-webkit-transform:scale(1)}
+    }
+
+    @keyframes zoom {
+        from {transform:scale(0)} 
+        to {transform:scale(1)}
+    }
+
+    @media only screen and (max-width: 700px){
+        .modal-content {
+            width: 100%;
+        }
+    }
 </style>
     
 {% endblock %}
@@ -591,6 +649,23 @@ function createFileLink(cf) {
             </a></p>`;
 };
 
+function createImagePreview(cf) {
+    var format_array = ["img", "jpg", "PNG", "png"]
+    var file_format = /[^.]*$/.exec(cf.File)[0];
+    var fileHtml ="";
+    if (format_array.indexOf(file_format) > -1) {
+        fileHtml = `<p><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
+    }
+    return fileHtml;
+}
+
+function imgClick(imgComment) {
+    document.getElementById("pictureModal").style.display = "block";
+    console.log(imgComment)
+    document.getElementById("imgModal").src = imgComment.src;
+    document.getElementById("caption").innerHTML = imgComment.alt;
+}
+
 // Define a function to create a reply form HTML
 function createReplyForm(replyId, modelId) {
     return `<div class="collapse" id="replyComment${replyId}">
@@ -669,6 +744,7 @@ function createReplyElement(reply) {
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
+    reply.cfiles.forEach(cf => { replyElement.append(createImagePreview(cf)); });
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
     replyElement.append(createReplyButton(reply.id));
@@ -692,6 +768,7 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
+    comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
     commentElement.append(createReplyButton(comment.id));
 
