@@ -71,7 +71,7 @@
     }
 
     /* Modal Content (image) */
-    .modal-content {
+    #myModal {
         margin: auto;
         display: block;
         width: 80%;
@@ -109,7 +109,7 @@
     }
 
     /* The Close Button */
-    .close {
+    #close {
         position: absolute;
         top: 15px;
         right: 35px;
@@ -119,8 +119,8 @@
         transition: 0.3s;
     }
 
-    .close:hover,
-    .close:focus {
+    #close:hover,
+    #close:focus {
         color: #bbb;
         text-decoration: none;
         cursor: pointer;
@@ -381,7 +381,7 @@
         </div>
     </div>
     <div id="myModal" class="modal">
-        <span class="close">&times;</span>
+        <span class="close" id="close">&times;</span>
         <img class="modal-content" id="img01">
         <div id="caption"></div>s
     </div>
