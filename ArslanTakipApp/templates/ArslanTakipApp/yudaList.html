@@ -234,6 +234,7 @@
     }
   }
 
+  let currentPage =1;
   $(document).ready(function() {
     restoreState();
     loadPage(currentPage); // Load page based on restored state
@@ -548,8 +549,9 @@
     loadPage(currentPage);
   });
 
-  let currentPage = 1;
-  loadPage(currentPage);
+  $('a[href^="/yudas"]').on('click', function() { //Yuda Listesi linkine tıkladığında state kaldırılsın
+    sessionStorage.removeItem('yudaListState');
+  });
 
 </script>
 {% endblock %}
