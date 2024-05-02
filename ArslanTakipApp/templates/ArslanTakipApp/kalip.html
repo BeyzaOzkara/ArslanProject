@@ -374,11 +374,6 @@
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal">
-        <span class="close" id="close">&times;</span>
-        <img class="modal-content" id="img01">
-        <div id="caption"></div>
-    </div>
 </div>
 
 {% endblock %}
@@ -667,19 +662,23 @@ function createImagePreview(cf) {
     var file_format = /[^.]*$/.exec(cf.File)[0];
     var fileHtml ="";
     if (format_array.indexOf(file_format) > -1) {
-        fileHtml = `<p><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
+        fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
     }
     return fileHtml;
 }
 
 function imgClick(imgComment) {
-    document.getElementById("myModal").style.display = "block";
-    document.getElementById("img01").src = imgComment.src;
-    document.getElementById("caption").innerHTML = imgComment.alt;
-}
-var span = document.getElementById("close");
-span.onclick = function() {
-    document.getElementById("myModal").style.display = "none";
+    const modal = document.createElement("div");
+    modal.setAttribute("class", "modal");
+    document.querySelector(".main").append(modal);
+    const newImage = document.createElement("img");
+    newImage.setAttribute("src", imgComment.src);
+    const closeBtn = document.createElement("i");
+    closeBtn.setAttribute("class", "fas fa-times closeBtn");
+    closeBtn.onclick = () => {
+        modal.remove();
+    };
+    modal.append(newImage, closeBtn);
 }
 
 // Define a function to create a reply form HTML
@@ -760,7 +759,13 @@ function createReplyElement(reply) {
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
-    reply.cfiles.forEach(cf => { replyElement.append(createImagePreview(cf)); });
+    if (reply.cfiles.length > 0) {
+        const imgElement = $('<div class="main"></div>');
+        const galleryElement = $('<div class="gallery"></div>');
+        reply.cfiles.forEach(cf => { galleryElement.append(createImagePreview(cf)); });
+        imgElement.append(galleryElement);
+        replyElement.append(imgElement);
+    }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
     replyElement.append(createReplyButton(reply.id));
@@ -784,7 +789,14 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent); // görüldü için tik iconu eklenecek. kimse görmediyse tek gri tik 
 
-    comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
+    if (comment.cfiles.length > 0) {
+        console.log("sıfırdan büyük");
+        const imgElement = $('<div class="main"></div>');
+        const galleryElement = $('<div class="gallery"></div>');
+        comment.cfiles.forEach(cf => { galleryElement.append(createImagePreview(cf)); });
+        imgElement.append(galleryElement);
+        commentElement.append(imgElement);
+    }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
     commentElement.append(createReplyButton(comment.id));
 
