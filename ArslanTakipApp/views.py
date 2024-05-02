@@ -391,6 +391,22 @@ def kalip_rapor(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+def view_comment(request, comments):
+    print(f"comments: {comments.value()}")
+    user = request.user  # Assuming user is authenticated
+
+    if user:  # Check if user is authenticated
+        for i in comments:
+            print(f"i: {i}")
+            c = Comment.objects.get(id=i["id"])
+            print(f"c: {c}")
+            c.mark_viewed(user)
+            c.save()
+
+        return True
+    else:
+        return False
+
 #gelen id başka konumların parenti ise altındakileri listele??
 def location_hareket(request):
     params = json.loads(unquote(request.GET.get('params')))
@@ -456,6 +472,7 @@ def kalip_tum(request):
 def kalip_comments(request, kId):
     if request.method == "GET":
         yudaComments = getParentComments("KalipMs", kId).order_by("Tarih")
+        view_comment(request, yudaComments)
         yudaCList = [process_comment(comment) for comment in yudaComments]
         comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 

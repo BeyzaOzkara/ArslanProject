@@ -49,6 +49,9 @@
     .iconelement {
         color: #ccc;
     }
+    .readbyall {
+        color: #4FB6EC;
+    }
 
 
     .main {
@@ -57,7 +60,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px 0px 60px 0px;
+        padding: 20px 0px 10px 0px;
     }
     .gallery {
         display: grid;
@@ -771,7 +774,7 @@ function createReplyElement(reply) {
     }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    const iconElement = $('<i class="fa fa-check mr-2 iconelement" aria-hidden="true"></i>');
+    const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
     replyElement.append(iconElement, createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);

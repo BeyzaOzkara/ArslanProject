@@ -339,6 +339,13 @@ class Comment(models.Model):
     Aciklama = models.CharField(null=True, blank=True)
     ReplyTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     Silindi = models.BooleanField(default=False ,null=True, blank=True)
+    ViewedUsers = models.ManyToManyField(User, related_name='viewed_comments', blank=True)  # Field to track viewed users
+
+    def mark_viewed(self, user):
+        """
+        Mark a comment as viewed by a user.
+        """
+        self.ViewedUsers.add(user)
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
