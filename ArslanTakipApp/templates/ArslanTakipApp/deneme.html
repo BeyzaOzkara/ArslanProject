@@ -769,7 +769,7 @@ function createReplyElement(reply) {
     const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
-    if (reply.cfiles.length() > 0) {
+    if (reply.cfiles.length > 0) {
         console.log("sıfırdan büyük");
         const imgElement = $('div class="main"><div class="gallery"></div></div>');
         reply.cfiles.forEach(cf => { imgElement.append(createImagePreview(cf)); });
@@ -798,7 +798,7 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
-    if (comment.cfiles.length() > 0) {
+    if (comment.cfiles.length > 0) {
         console.log("sıfırdan büyük");
         const imgElement = $('div class="main"><div class="gallery"></div></div>');
         comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
