@@ -712,9 +712,7 @@ function replyEditBtnClick(id, action) {
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
     if (action === "Düzenle") { 
-        console.log(document.getElementById(`aciklama${id}`))
         const existingText = document.getElementById(`aciklama${id}`).innerHTML;
-        console.log(existingText)
         $(`#yorumText${id}`).summernote("code", existingText); 
     }
     const sendButton = $(`#gonder${id}`);
@@ -755,7 +753,7 @@ function fileInputChange(e, r){
 
 function createReplyElement(reply) {
     const userBlock = createUserBlock(reply);
-    const replyContent = `<p class="aciklama${reply.id}">${reply.Aciklama}</p>`;
+    const replyContent = $(`<div id="aciklama${reply.id}"></div>`).append(reply.Aciklama);
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
     if (reply.cfiles.length > 0) {
@@ -888,9 +886,20 @@ function updateFileList(cId="") {
 
 function handleReply(modelId, commentId) {
     if ($(`#gonder${commentId}`).text() == 'Düzenle') {
-      editComment(commentId);
+        editComment(commentId);
     }
     else {
+        $.ajax({
+            url: `/view/comment/${commentId}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function () {
+                alert("başarılı")
+            },
+            error: function (error) {
+                console.error('Error loading comments data:', error);
+            }
+        });
         alert(commentId);
         yorumPaylas(kId=modelId, cId=commentId);
     }
@@ -950,17 +959,6 @@ function DosyaTemizle(cId){
 };
 
 function editComment(commentId) {
-    $.ajax({
-        url: `/view/comment/${commentId}`,
-        method: 'GET',
-        dataType: 'json',
-        success: function () {
-            alert("başarılı")
-        },
-        error: function (error) {
-            console.error('Error loading comments data:', error);
-        }
-    });
     const editData = new FormData();
     var textareaValue = $(`#yorumText${commentId}`).summernote('code');
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
