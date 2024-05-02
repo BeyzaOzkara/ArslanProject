@@ -47,14 +47,12 @@
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
 
-    
     .imgComment {
         border-radius: 5px;
         cursor: pointer;
         transition: 0.3s;
     }
     .imgComment:hover {opacity: 0.7;}
-
         /* The Modal (background) */
     #myModal {
         display: none; /* Hidden by default */
@@ -69,15 +67,13 @@
         background-color: rgb(0,0,0); /* Fallback color */
         background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
     }
-
     /* Modal Content (image) */
-    #myModal {
+    #img01 {
         margin: auto;
         display: block;
         width: 80%;
         max-width: fit-content;
     }
-
     /* Caption of Modal Image */
     #caption {
         margin: auto;
@@ -89,7 +85,6 @@
         padding: 10px 0;
         height: 150px;
     }
-
     /* Add Animation */
     #img01, #caption {  
         -webkit-animation-name: zoom;
@@ -97,12 +92,10 @@
         animation-name: zoom;
         animation-duration: 0.6s;
     }
-
     @-webkit-keyframes zoom {
         from {-webkit-transform:scale(0)} 
         to {-webkit-transform:scale(1)}
     }
-
     @keyframes zoom {
         from {transform:scale(0)} 
         to {transform:scale(1)}
@@ -128,9 +121,9 @@
 
     /* 100% Image Width on Smaller Screens */
     @media only screen and (max-width: 700px){
-    #img01 {
-        width: 100%;
-    }
+        .modal-content {
+            width: 100%;
+        }
     }
 
 </style>
@@ -384,7 +377,7 @@
     <div id="myModal" class="modal">
         <span class="close" id="close">&times;</span>
         <img class="modal-content" id="img01">
-        <div id="caption"></div>s
+        <div id="caption"></div>
     </div>
 </div>
 
@@ -684,7 +677,7 @@ function imgClick(imgComment) {
     document.getElementById("img01").src = imgComment.src;
     document.getElementById("caption").innerHTML = imgComment.alt;
 }
-var span = document.getElementsByClassName("close")[0];
+var span = document.getElementById("close");
 span.onclick = function() {
     document.getElementById("myModal").style.display = "none";
 }
