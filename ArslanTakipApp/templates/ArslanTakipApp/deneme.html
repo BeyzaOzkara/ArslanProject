@@ -785,7 +785,7 @@ function createReplyElement(reply) {
 
 function createCommentElement(comment) {
     const userBlock = createUserBlock(comment);
-    const commentContent = `<p class="aciklama${comment.id}">${comment.Aciklama}</p>`;
+    const commentContent = $(`<div class="aciklama${comment.id}"></div>`).append(comment.Aciklama);
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     if (comment.cfiles.length > 0) {
