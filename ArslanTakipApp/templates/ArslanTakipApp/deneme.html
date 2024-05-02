@@ -98,7 +98,6 @@
         margin-top: -1px;
         animation: zoom 0.3s ease-in-out;
     }
-
     @keyframes zoom {
         from {
             transform: scale(0);
@@ -109,7 +108,7 @@
     }
     .main .modal img {
         width: 80%;
-        max-width: fit-content;
+        object-fit: contain;
     }
     .closeBtn {
         color: rgba(255, 255, 255, 0.87);
@@ -121,7 +120,6 @@
         cursor: pointer;
         transition: 0.2s ease-in-out;
     }
-
     .closeBtn:hover {
         color: rgb(255, 255, 255);
     }
