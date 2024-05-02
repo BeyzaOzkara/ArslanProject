@@ -190,6 +190,7 @@
         currentPage: currentPage,
         itemsPerPage: itemsPerPage
     };
+    console.log(currentPage);
     sessionStorage.setItem('yudaListState', JSON.stringify(state));
   }
 
@@ -197,9 +198,9 @@
     const state = JSON.parse(sessionStorage.getItem('yudaListState'));
     if (state) {
         filterList = state.filterList;
-        currentPage = state.currentPage;
         itemsPerPage = state.itemsPerPage;
         $('#perPageSelect').val(itemsPerPage).trigger('change'); // Update items per page dropdown
+        currentPage = state.currentPage;
         applyFiltersFromState(); // Apply filters to UI components based on stored state
         loadPage(currentPage); 
     }
@@ -499,6 +500,7 @@
       }
 
       loadPage(currentPage);
+      saveState();
     });
   };
 
