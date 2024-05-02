@@ -39,9 +39,6 @@
         width:100%;
         height:100%;
     }
-
-
-
     img {
         width:100%;
         height:100%;
@@ -50,90 +47,85 @@
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
 
-    .imgComment {
-        border-radius: 5px;
-        cursor: pointer;
-        transition: 0.3s;
+    .main {
+        width: 100%;
+        flex-direction: column;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 0px 60px 0px;
     }
-    .imgComment:hover {opacity: 0.7;}
+    .gallery {
+        display: grid;
+        width: 90%;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 10px;
+    }
+    .gallery__item {
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+    .gallery__item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.3s ease-in-out;
+    }
+    .gallery__item img:hover {
+        transform: scale(1.1);
+    }
+    @media (max-width: 950px) {
+        .gallery {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 550px) {
+        .gallery {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
 
-    /* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
-}
+    .modal {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.733);
+        margin-top: -1px;
+        animation: zoom 0.3s ease-in-out;
+    }
 
-/* Modal Content (image) */
-.modal-content {
-  margin: auto;
-  display: block;
-  width: 80%;
-  max-width: fit-content;
-}
+    @keyframes zoom {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+    .modal img {
+        width: 50%;
+        object-fit: cover;
+    }
+    .closeBtn {
+        color: rgba(255, 255, 255, 0.87);
+        font-size: 25px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 20px;
+        cursor: pointer;
+        transition: 0.2s ease-in-out;
+    }
 
-/* Caption of Modal Image */
-#caption {
-  margin: auto;
-  display: block;
-  width: 80%;
-  max-width: 700px;
-  text-align: center;
-  color: #ccc;
-  padding: 10px 0;
-  height: 150px;
-}
+    .closeBtn:hover {
+        color: rgb(255, 255, 255);
+    }
 
-/* Add Animation */
-.modal-content, #caption {  
-  -webkit-animation-name: zoom;
-  -webkit-animation-duration: 0.6s;
-  animation-name: zoom;
-  animation-duration: 0.6s;
-}
-
-@-webkit-keyframes zoom {
-  from {-webkit-transform:scale(0)} 
-  to {-webkit-transform:scale(1)}
-}
-
-@keyframes zoom {
-  from {transform:scale(0)} 
-  to {transform:scale(1)}
-}
-
-/* The Close Button */
-.close {
-  position: absolute;
-  top: 15px;
-  right: 35px;
-  color: #f1f1f1;
-  font-size: 40px;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-.close:hover,
-.close:focus {
-  color: #bbb;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* 100% Image Width on Smaller Screens */
-@media only screen and (max-width: 700px){
-  .modal-content {
-    width: 100%;
-  }
-}
 </style>
     
 {% endblock %}
@@ -381,11 +373,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div id="myModal" class="modal">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="img01">
-        <div id="caption"></div>s
     </div>
 </div>
 
@@ -674,15 +661,30 @@ function createImagePreview(cf) {
     var file_format = /[^.]*$/.exec(cf.File)[0];
     var fileHtml ="";
     if (format_array.indexOf(file_format) > -1) {
-        fileHtml = `<p><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></p>`;
+        fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}" style="width:100%;max-width:300px"></div>`;
     }
     return fileHtml;
 }
 
 function imgClick(imgComment) {
-    document.getElementById("myModal").style.display = "block";
-    document.getElementById("img01").src = imgComment.src;
-    document.getElementById("caption").innerHTML = imgComment.alt;
+    // document.getElementById("myModal").style.display = "block";
+    // document.getElementById("img01").src = imgComment.src;
+    // document.getElementById("caption").innerHTML = imgComment.alt;
+    const modal = document.createElement("div");
+    modal.setAttribute("class", "modal");
+    //add the modal to the main section or the parent element
+    document.querySelector(".main").append(modal);
+    //adding image to modal
+    const newImage = document.createElement("img");
+    newImage.setAttribute("src", src);
+    //creating the close button
+    const closeBtn = document.createElement("i");
+    closeBtn.setAttribute("class", "fas fa-times closeBtn");
+    //close function
+    closeBtn.onclick = () => {
+        modal.remove();
+    };
+    modal.append(newImage, closeBtn);
 }
 
 var span = document.getElementsByClassName("close")[0];
