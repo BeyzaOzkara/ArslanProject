@@ -47,84 +47,84 @@
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
 
-    .imgComment {
-        border-radius: 5px;
+
+    .main {
+        width: 100%;
+        flex-direction: column;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 0px 60px 0px;
+    }
+    .gallery {
+        display: grid;
+        width: 90%;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 10px;
+    }
+    .gallery__item {
         cursor: pointer;
-        transition: 0.3s;
+        overflow: hidden;
+        border-radius: 4px;
     }
-    .imgComment:hover {opacity: 0.7;}
-        /* The Modal (background) */
-    #myModal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        padding-top: 100px; /* Location of the box */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
-    }
-    /* Modal Content (image) */
-    #img01 {
-        margin: auto;
-        display: block;
+    .gallery__item img {
         width: 80%;
-        max-width: fit-content;
+        height: 80%;
+        object-fit: cover;
+        transition: 0.3s ease-in-out;
     }
-    /* Caption of Modal Image */
-    #caption {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-        text-align: center;
-        color: #ccc;
-        padding: 10px 0;
-        height: 150px;
+    .gallery__item img:hover {
+        transform: scale(1.1);
     }
-    /* Add Animation */
-    #img01, #caption {  
-        -webkit-animation-name: zoom;
-        -webkit-animation-duration: 0.6s;
-        animation-name: zoom;
-        animation-duration: 0.6s;
-    }
-    @-webkit-keyframes zoom {
-        from {-webkit-transform:scale(0)} 
-        to {-webkit-transform:scale(1)}
-    }
-    @keyframes zoom {
-        from {transform:scale(0)} 
-        to {transform:scale(1)}
-    }
-
-    /* The Close Button */
-    #close {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-
-    #close:hover,
-    #close:focus {
-        color: #bbb;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    /* 100% Image Width on Smaller Screens */
-    @media only screen and (max-width: 700px){
-        .modal-content {
-            width: 100%;
+    @media (max-width: 950px) {
+        .gallery {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
+    @media (max-width: 550px) {
+        .gallery {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+    .main .modal {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.733);
+        margin-top: -1px;
+        animation: zoom 0.3s ease-in-out;
+    }
+    @keyframes zoom {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+    .main .modal img {
+        width: 80%;
+        object-fit: contain;
+    }
+    .closeBtn {
+        color: rgba(255, 255, 255, 0.87);
+        font-size: 25px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 20px;
+        cursor: pointer;
+        transition: 0.2s ease-in-out;
+    }
+    .closeBtn:hover {
+        color: rgb(255, 255, 255);
+    }
+
 
 </style>
     
