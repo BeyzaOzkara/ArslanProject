@@ -392,7 +392,7 @@ def kalip_rapor(request):
     return HttpResponse(data)
 
 def view_comment(request, comments):
-    print(f"comments: {comments.value()}")
+    print(f"comments: {comments}")
     user = request.user  # Assuming user is authenticated
 
     if user:  # Check if user is authenticated
