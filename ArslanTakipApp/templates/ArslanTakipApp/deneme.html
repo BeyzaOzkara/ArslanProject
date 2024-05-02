@@ -712,7 +712,8 @@ function replyEditBtnClick(id, action) {
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
     if (action === "Düzenle") { 
-        const existingText = document.getElementById(`aciklama${id}`).innerHtml;
+        console.log(document.getElementById(`aciklama${id}`))
+        const existingText = document.getElementById(`aciklama${id}`).innerHTML;
         console.log(existingText)
         $(`#yorumText${id}`).summernote("code", existingText); 
     }
