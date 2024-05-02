@@ -391,9 +391,9 @@ def kalip_rapor(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def view_comment(request, kId):
-    print(f"id: {kId}")
-    comment = Comment.objects.get(id=kId)
+def view_comment(request, cId):
+    print(f"id: {cId}")
+    comment = Comment.objects.get(id=cId)
     print(f"comment: {comment.values()}")
     user = request.user  # Assuming user is authenticated
 

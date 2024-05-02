@@ -823,17 +823,6 @@ function getComments(comments) {
 
 function clickComment(kalipNo) {
     $.ajax({
-        url: `/view/comment/${kalipNo}`,
-        method: 'GET',
-        dataType: 'json',
-        success: function (commentData) {
-            console.log("başarılı")
-        },
-        error: function (error) {
-            console.error('Error loading comments data:', error);
-        }
-    });
-    $.ajax({
         url: `/kalip/comments/${kalipNo}`,
         method: 'GET',
         dataType: 'json',
@@ -959,6 +948,17 @@ function DosyaTemizle(cId){
 };
 
 function editComment(commentId) {
+    $.ajax({
+        url: `/view/comment/${commentId}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function () {
+            alert("başarılı")
+        },
+        error: function (error) {
+            console.error('Error loading comments data:', error);
+        }
+    });
     const editData = new FormData();
     var textareaValue = $(`#yorumText${commentId}`).summernote('code');
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");

@@ -39,7 +39,7 @@ urlpatterns = [
     path('kalip/liste', views.kalip_liste),
     path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
-    path('kalip/comments/<str:kId>', views.kalip_comments, name='kalipComment'),
+    path('kalip/comments/<str:cId>', views.kalip_comments, name='kalipComment'),
     path('view/comment/<str:kId>', views.view_comment, name='viewComment'),
     path('kalip/postcomment', views.kalip_comments_post, name='kalipCommentPost'),
     path('kalip/editcomment', views.kalip_comments_edit, name='kalipCommentEdit'),
