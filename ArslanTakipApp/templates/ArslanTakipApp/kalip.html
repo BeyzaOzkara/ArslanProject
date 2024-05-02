@@ -46,6 +46,9 @@
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
+    .iconelement {
+        color: #ccc;
+    }
 
 
     .main {
@@ -768,7 +771,8 @@ function createReplyElement(reply) {
     }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    replyElement.append(createReplyButton(reply.id));
+    const iconElement = $('<i class="fa fa-check iconelement" aria-hidden="true"></i>');
+    replyElement.append(iconElement, createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
@@ -798,7 +802,9 @@ function createCommentElement(comment) {
         commentElement.append(imgElement);
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
-    commentElement.append(createReplyButton(comment.id));
+
+    const iconElement = $('<i class="fa fa-check iconelement" aria-hidden="true"></i>');
+    commentElement.append(iconElement, createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
