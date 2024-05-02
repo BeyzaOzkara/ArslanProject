@@ -757,7 +757,6 @@ function createReplyElement(reply) {
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
     if (reply.cfiles.length > 0) {
-        console.log("sıfırdan <büyük");
         const imgElement = $('<div class="main"></div>');
         const galleryElement = $('<div class="gallery"></div>');
         reply.cfiles.forEach(cf => { galleryElement.append(createImagePreview(cf)); });
@@ -789,7 +788,6 @@ function createCommentElement(comment) {
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     if (comment.cfiles.length > 0) {
-        console.log("sıfırdan büyük");
         const imgElement = $('<div class="main"></div>');
         const galleryElement = $('<div class="gallery"></div>');
         comment.cfiles.forEach(cf => { galleryElement.append(createImagePreview(cf)); });
@@ -824,6 +822,17 @@ function getComments(comments) {
 }
 
 function clickComment(kalipNo) {
+    $.ajax({
+        url: `/view/comment/${kalipNo}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function (commentData) {
+            console.log("başarılı")
+        },
+        error: function (error) {
+            console.error('Error loading comments data:', error);
+        }
+    });
     $.ajax({
         url: `/kalip/comments/${kalipNo}`,
         method: 'GET',

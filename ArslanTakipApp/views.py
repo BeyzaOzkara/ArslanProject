@@ -391,20 +391,16 @@ def kalip_rapor(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def view_comment(request, form_model, model_id):
-    print(f"form_model: {form_model}")
-    print(f"id: {model_id}")
-    comment = Comment.objects.filter(FormModel=form_model, FormModelId=model_id, Silindi=False)
+def view_comment(request, kId):
+    print(f"id: {kId}")
+    comment = Comment.objects.get(id=kId)
     print(f"comment: {comment.values()}")
     user = request.user  # Assuming user is authenticated
 
     if user:  # Check if user is authenticated
-        for i in comment:
-            print(f"i: {i}")
-            c = Comment.objects.get(id=i["id"])
-            print(f"id: {id}")
-            c.mark_viewed(user)
-            c.save()
+        print(f"id: {comment.id}")
+        comment.mark_viewed(user)
+        comment.save()
 
         return JsonResponse({'message': 'Comment viewed successfully.'})
     else:
