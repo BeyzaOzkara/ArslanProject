@@ -712,7 +712,7 @@ function replyEditBtnClick(id, action) {
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
     if (action === "Düzenle") { 
-        const existingText = $(`#yorumText${id}`).val();
+        const existingText = $(`#aciklama${id}`).val();
         console.log(existingText)
         $(`#yorumText${id}`).summernote("code", existingText); 
     }
@@ -785,7 +785,7 @@ function createReplyElement(reply) {
 
 function createCommentElement(comment) {
     const userBlock = createUserBlock(comment);
-    const commentContent = $(`<div class="aciklama${comment.id}"></div>`).append(comment.Aciklama);
+    const commentContent = $(`<div id="aciklama${comment.id}"></div>`).append(comment.Aciklama);
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     if (comment.cfiles.length > 0) {
