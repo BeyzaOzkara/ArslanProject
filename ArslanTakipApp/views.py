@@ -392,13 +392,10 @@ def kalip_rapor(request):
     return HttpResponse(data)
 
 def view_comment(request, cId):
-    print(f"id: {cId}")
     comment = Comment.objects.get(id=cId)
-    print(f"comment: {comment.values()}")
     user = request.user  # Assuming user is authenticated
 
     if user:  # Check if user is authenticated
-        print(f"id: {comment.id}")
         comment.mark_viewed(user)
         comment.save()
 
