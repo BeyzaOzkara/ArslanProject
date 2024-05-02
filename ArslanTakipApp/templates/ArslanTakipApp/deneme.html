@@ -798,7 +798,11 @@ function createCommentElement(comment) {
     const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
-    comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
+    if (reply.cfiles.length() > 0) {
+        console.log("sıfırdan büyük");
+        const imgElement = $('div class="main"><div class="gallery"></div></div>');
+        comment.cfiles.forEach(cf => { commentElement.append(createImagePreview(cf)); });
+    }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
     commentElement.append(createReplyButton(comment.id));
 
