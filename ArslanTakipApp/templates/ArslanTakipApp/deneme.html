@@ -676,7 +676,7 @@ function imgClick(imgComment) {
     document.querySelector(".main").append(modal);
     //adding image to modal
     const newImage = document.createElement("img");
-    newImage.setAttribute("src", src);
+    newImage.setAttribute("src", imgComment.src);
     //creating the close button
     const closeBtn = document.createElement("i");
     closeBtn.setAttribute("class", "fas fa-times closeBtn");
