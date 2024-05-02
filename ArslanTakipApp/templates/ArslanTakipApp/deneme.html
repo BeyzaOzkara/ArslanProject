@@ -67,8 +67,8 @@
         border-radius: 4px;
     }
     .gallery__item img {
-        width: 100%;
-        height: 100%;
+        width: 80%;
+        height: 80%;
         object-fit: cover;
         transition: 0.3s ease-in-out;
     }
@@ -665,20 +665,13 @@ function createImagePreview(cf) {
 }
 
 function imgClick(imgComment) {
-    // document.getElementById("myModal").style.display = "block";
-    // document.getElementById("img01").src = imgComment.src;
-    // document.getElementById("caption").innerHTML = imgComment.alt;
     const modal = document.createElement("div");
     modal.setAttribute("class", "modal");
-    //add the modal to the main section or the parent element
     document.querySelector(".main").append(modal);
-    //adding image to modal
     const newImage = document.createElement("img");
     newImage.setAttribute("src", imgComment.src);
-    //creating the close button
     const closeBtn = document.createElement("i");
     closeBtn.setAttribute("class", "fas fa-times closeBtn");
-    //close function
     closeBtn.onclick = () => {
         modal.remove();
     };
