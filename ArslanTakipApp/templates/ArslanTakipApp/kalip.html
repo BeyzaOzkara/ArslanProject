@@ -771,7 +771,7 @@ function createReplyElement(reply) {
     }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    const iconElement = $('<i class="fa fa-check iconelement" aria-hidden="true"></i>');
+    const iconElement = $('<i class="fa fa-check mr-2 iconelement" aria-hidden="true"></i>');
     replyElement.append(iconElement, createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
@@ -803,7 +803,7 @@ function createCommentElement(comment) {
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
 
-    const iconElement = $('<i class="fa fa-check iconelement" aria-hidden="true"></i>');
+    const iconElement = $('<i class="fa fa-check mr-2 iconelement" aria-hidden="true"></i>');
     commentElement.append(iconElement, createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
