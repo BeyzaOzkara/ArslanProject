@@ -709,8 +709,6 @@ function createReplyForm(replyId, modelId) {
 }
 
 function replyEditBtnClick(id, action) {
-    console.log(id);
-    console.log(action);
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
     if (action === "Düzenle") { 
@@ -756,7 +754,7 @@ function fileInputChange(e, r){
 
 function createReplyElement(reply) {
     const userBlock = createUserBlock(reply);
-    const replyContent = `<p>${reply.Aciklama}</p>`;
+    const replyContent = `<p class="aciklama${reply.id}">${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
     if (reply.cfiles.length > 0) {
@@ -787,7 +785,7 @@ function createReplyElement(reply) {
 
 function createCommentElement(comment) {
     const userBlock = createUserBlock(comment);
-    const commentContent = `<p>${comment.Aciklama}</p>`;
+    const commentContent = `<p class="aciklama${comment.id}">${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     if (comment.cfiles.length > 0) {
