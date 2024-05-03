@@ -385,7 +385,7 @@ $(function () {
     // Summernote
     $('.textarea').summernote({
       disableResizeEditor: true,
-      height:200,
+      height:300,
       toolbar: [
         //['misc', ['undo', 'redo']],
         ['style', ['bold', 'italic', 'underline']],
@@ -686,7 +686,7 @@ function createReplyForm(replyId, modelId) {
                         <div class="row" style="height: 265px;">
                         <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${replyId}">
                             <textarea class="textarea" name="yorumText" id="yorumText${replyId}" placeholder=" . . . "
-                                            style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                            style="width: 100%; height: 300px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                         </div>
                         <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${replyId}" style="height: 265px;display: none;">
                             <div class="input-group">
@@ -712,7 +712,7 @@ function replyEditBtnClick(id, action) {
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
     if (action === "Düzenle") { 
-        const existingText = document.getElementById(`aciklama${id}`).innerHTML;
+        var existingText = document.getElementById(`aciklama${id}`).innerHTML;
         $(`#yorumText${id}`).summernote("code", existingText); 
     }
     const sendButton = $(`#gonder${id}`);
@@ -766,7 +766,8 @@ function createReplyElement(reply) {
     
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
 
-    replyElement.append(createReplyButton(reply.id));
+    const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
+    replyElement.append(iconElement, createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
@@ -795,7 +796,11 @@ function createCommentElement(comment) {
         commentElement.append(imgElement);
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
-    commentElement.append(createReplyButton(comment.id));
+    // add a checkbox for the user to mark as read the comment
+    const readElement = $('<input type="checkbox" name="readElement" id="readCheckbox">');
+    // if the user has seen the comment turn the checkbox to icon 
+    const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
+    commentElement.append(readElement, iconElement, createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
@@ -889,17 +894,6 @@ function handleReply(modelId, commentId) {
         editComment(commentId);
     }
     else {
-        $.ajax({
-            url: `/view/comment/${commentId}`,
-            method: 'GET',
-            dataType: 'json',
-            success: function () {
-                alert("başarılı")
-            },
-            error: function (error) {
-                console.error('Error loading comments data:', error);
-            }
-        });
         alert(commentId);
         yorumPaylas(kId=modelId, cId=commentId);
     }
@@ -922,6 +916,17 @@ $('#fileInput').on('change', function(e) {
   });
 
 function yorumPaylas(kId="", cId=""){
+    $.ajax({
+            url: `/view/comment/${cId}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function () {
+                alert("başarılı")
+            },
+            error: function (error) {
+                console.error('Error loading comments data:', error);
+            }
+        });
     var yorumData = new FormData();
     var textareaValue = $(`#yorumText${cId}`).summernote('code');
     
