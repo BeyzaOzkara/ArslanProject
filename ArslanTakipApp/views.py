@@ -495,6 +495,7 @@ def kalip_comments_post(request):
             c.Kullanici = request.user
             c.FormModel = "KalipMs"
             c.FormModelId = req['formID']
+            c.Tarih = datetime.datetime.now()
             if 'replyID' in req:
                 replyID = req['replyID']
                 c.ReplyTo = Comment.objects.get(id=replyID)
@@ -1506,8 +1507,7 @@ def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum
     comment_instance = Comment.objects.get(pk=comment['id'])
     views = comment_instance.ViewedUsers.all()
     print(views)
-    if user.id == 1 in views:
-        print("bur")
+    
     is_viewed = user in views
 
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
@@ -1816,6 +1816,7 @@ def yudaDetailComment(request):
             c.Kullanici = request.user
             c.FormModel = "YudaForm"
             c.FormModelId = req['formID']
+            c.Tarih = datetime.datetime.now()
             c.Aciklama = req['yorum']
             if 'replyID' in req:
                 replyID = req['replyID']

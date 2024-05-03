@@ -1027,8 +1027,6 @@ $(document).on('click', 'a[name="blinkread"]', function() {
     // if the checkbox is checked make destroy the elemnt and make the iconElement visible
     var commentId = $(this).attr('data-id');
     // console.log(commentId);
-    $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
-
     $.ajax({
         url: `/view/comment/${commentId}`,
         method: 'GET',
