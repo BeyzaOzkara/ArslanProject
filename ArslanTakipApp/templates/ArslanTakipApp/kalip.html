@@ -131,21 +131,56 @@
         color: rgb(255, 255, 255);
     }
 
-    @keyframes blink {
-        0% {
-        opacity: 1;
-        }
-        50% {
-        opacity: 0;
-        }
-        100% {
-        opacity: 1;
-        }
-    }
-    .blinking-text {
-        animation: blink 1s infinite;
+    /* .blinking-text {
+        color: black;
+        font-weight: bold;
+        animation: blinkingText 1.2s infinite;
     }
 
+    @keyframes blinkingText {
+        0% { color: transparent; }
+        50% { color: inherit; }
+        100% { color: transparent; }
+    } */
+
+    .blinking-text {
+        font-weight: bold;
+        -webkit-animation: glowing 1500ms infinite;
+        -moz-animation: glowing 1500ms infinite;
+        -o-animation: glowing 1500ms infinite;
+        animation: glowing 1500ms infinite;
+    }
+    
+    .blinking-text:hover {
+        font-weight: bold;
+        color: #ffffff;
+        background-color: #FFC107;
+        border-color: #FFC107; 
+    }
+
+    @-webkit-keyframes glowing {
+        0% { -webkit-box-shadow: 0 0 3px #FFC107; }
+        50% { -webkit-box-shadow: 0 0 40px #fdc725; }
+        100% { -webkit-box-shadow: 0 0 3px #FFC107; }
+    }
+
+    @-moz-keyframes glowing {
+        0% { -moz-box-shadow: 0 0 3px #FFC107; }
+        50% { -moz-box-shadow: 0 0 40px #fdc725; }
+        100% { -moz-box-shadow: 0 0 3px #FFC107; }
+    }
+
+    @-o-keyframes glowing {
+        0% { box-shadow: 0 0 3px #FFC107; }
+        50% { box-shadow: 0 0 40px #fdc725; }
+        100% { box-shadow: 0 0 3px #FFC107; }
+    }
+
+    @keyframes glowing {
+        0% { box-shadow: 0 0 3px #FFC107; }
+        50% { box-shadow: 0 0 40px #fdc725; }
+        100% { box-shadow: 0 0 3px #FFC107; }
+    }
 
 </style>
     
@@ -744,19 +779,19 @@ function replyEditBtnClick(id, action) {
 }
 
 function createReplyButton(id) {
-    return `<span><a role="button" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+    return `<span><a role="button" class="btn btn-outline-success btn-sm" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
 function createEditButton(id) {
-    return `<span class="ml-2"><a role="button" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+    return `<span class="ml-2"><a role="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function createDeleteButton(id) {
-    return `<span class="ml-2"><a role="button" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
+    return `<span class="ml-2"><a role="button" class="btn btn-outline-danger btn-sm" onclick="deleteComment(${id})" href="">sil</a></span>`;
 }
 
 function createReadButton(id) {
-    return `<span class="mr-2"><a role="button" style="color:red" class="blinking-text" name="blinkread" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
+    return `<span class="mr-2"><a role="button" class="btn btn-warning btn-sm blinking-text" href="" name="blinkread" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
 }
 
 function nestedReplies(replies) {
