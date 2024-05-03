@@ -805,9 +805,11 @@ function createCommentElement(comment) {
         commentElement.append(imgElement);
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
-
-    const iconElement = $('<i class="fa fa-check mr-2 iconelement" aria-hidden="true"></i>');
-    commentElement.append(iconElement, createReplyButton(comment.id));
+    // add a checkbox for the user to mark as read the comment
+    const readElement = $('<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox"><label for="readCheckbox" class="mr-2" id="readLabel">Okundu İşaretle</label>');
+    // if the user has seen the comment turn the checkbox to icon 
+    const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
+    commentElement.append(readElement, iconElement, createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
