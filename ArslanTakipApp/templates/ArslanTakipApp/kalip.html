@@ -1026,14 +1026,14 @@ function deleteComment(cId) {
 $(document).on('click', 'a[name="blinkread"]', function() {
     // if the checkbox is checked make destroy the elemnt and make the iconElement visible
     var commentId = $(this).attr('data-id');
+    const readE = $(this);
     // console.log(commentId);
     $.ajax({
         url: `/view/comment/${commentId}`,
         method: 'GET',
         dataType: 'json',
         success: function () {
-            $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
-            alert("Başarılı, Comment ID: " + commentId);
+            readE.replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
         },
         error: function (error) {
             console.error('Error loading comments data:', error);
