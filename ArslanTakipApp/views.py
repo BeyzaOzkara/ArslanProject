@@ -12,7 +12,7 @@ import time
 import math
 from urllib.parse import unquote
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
@@ -405,14 +405,16 @@ def view_comment(request, cId):
         return JsonResponse({'error': 'User not authenticated.'}, status=401)
 
 def get_viewed_users(request, cId):
-    print("get viewed users")
-    print(cId)
-    comment_instance = Comment.objects.get(pk=cId)
-    views = comment_instance.ViewedUsers.all().values()
-    print(views)
-    for i in views:
-        print(i)
-        print(i.first_name)
+    if request.method == 'GET':
+        comment_instance = Comment.objects.get(pk=cId)
+        views = comment_instance.ViewedUsers.all()
+        users_data = [{'id': user.id, 'name': user.get_full_name()} for user in views]
+
+        # Return the data as JSON
+        return JsonResponse(users_data, safe=False)  # safe=False is needed to allow non-dict objects
+    else:
+        # If the request is not a GET, return a bad request response
+        return HttpResponseBadRequest("Invalid request method.")
 
 
 #gelen id başka konumların parenti ise altındakileri listele??
@@ -1783,7 +1785,6 @@ def yudaDetail2(request, yId):
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
-    # print(f"yudaDetails{yudaDetails}")
 
     formatted_data = format_row(yudaDetails[0])
     

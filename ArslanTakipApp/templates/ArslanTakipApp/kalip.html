@@ -775,7 +775,7 @@ function createReplyElement(reply) {
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
     var isViewed = comment.Is_Viewed;
     const readElement = $(`<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox${reply.id}"><label for="readCheckbox${reply.id}" class="mr-2" id="readLabel">Okundu İşaretle</label>`);   
-    const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
+    const iconElement = $(`<i class="fa fa-check mr-2 iconelement" name="iconElement" data-id="${reply.id}" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     replyElement.append(elementToAppend, createReplyButton(reply.id));
 
@@ -811,7 +811,7 @@ function createCommentElement(comment) {
     // add a checkbox for the user to mark as read the comment
     const readElement = $(`<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox${comment.id}" data-id="${comment.id}"><label for="readCheckbox${comment.id}" class="mr-2" id="readLabel">Okundu İşaretle</label>`);
     // if the user has seen the comment turn the checkbox to icon
-    const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
+    const iconElement = $(`<i class="fa fa-check mr-2 iconelement" name="iconElement" data-id="${comment.id}" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     commentElement.append(elementToAppend, createReplyButton(comment.id));
 
@@ -1014,7 +1014,7 @@ $(document).on('change', 'input[name="readCheckbox"]', function() {
             method: 'GET',
             dataType: 'json',
             success: function () {
-                $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
+                $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
                 alert("Başarılı, Comment ID: " + commentId);
             },
             error: function (error) {
@@ -1022,6 +1022,43 @@ $(document).on('change', 'input[name="readCheckbox"]', function() {
             }
         });
     }
+});
+
+$(document).on('click', 'i[name="iconElement"]', function() {
+    console.log("icon clicked");
+    // create modal and show who viewed the comment
+    const commentId = $(this).data('id');
+    $.ajax({
+        url: `/getviews/${commentId}`,
+        method: 'GET',
+        success: function(data) {
+            const usersHtml = data.map(user => `<li>${user.name}</li>`).join('');
+            const modalHtml = `
+                <div class="modal fade" id="viewedUsersModal" tabindex="-1" role="dialog" aria-labelledby="viewedUsersModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="viewedUsersModalLabel">Bu paylaşımı görüntüleyen kullanıcılar</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <ul>${usersHtml}</ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>`;
+            $('body').append(modalHtml);
+            $('#viewedUsersModal').modal('show');
+            $('#viewedUsersModal').on('hidden.bs.modal', function () {
+                $(this).remove();  // Destroy the modal on close
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading viewed users:', error);
+        }
+    });
 });
 
 $(function () {
