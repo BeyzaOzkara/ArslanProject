@@ -42,6 +42,7 @@ from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
 from mailer import send_mail
+from django.db.models import Case, When, Value, BooleanField
 # Create your views here.
 
 
@@ -1395,6 +1396,29 @@ def yuda_kaydet(request):
 class YudasView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yudaList.html'
 
+def yuda_filter(i):
+    q = {}
+    if i['field'] == 'Bolum':
+        for bolum in i['value']:
+            if bolum == 'Boya':
+                q['YuzeyBoya__gt'] = ""
+            elif bolum == 'Eloksal':
+                q['YuzeyEloksal__gt'] = ""
+            elif bolum == 'Mekanik Islem':
+                q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
+    elif i['field'] == 'Dosya':
+        file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
+        q['id__in'] = list(file_ids)
+    elif i['field'] == 'Tarih' or i['field'] == 'GüncelTarih': #type = start date, value=finish date
+        if i['type'] != i['value']:
+            q[i['field'] + "__gte"] = i['type']
+            q[i['field'] + "__lt"] = i['value'] + ' 23:59:59'
+        else:
+            q[i['field'] + "__startswith"] = i['value']
+    else:
+        q = filter_method(i, q)
+    return q
+
 def yudas_list(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     for i in params:
@@ -1414,35 +1438,43 @@ def yudas_list(request):
 
     if len(filter_list) > 0:
         for i in filter_list:
-            if i['field'] == 'Bolum':
-                for bolum in i['value']:
-                    if bolum == 'Boya':
-                        q['YuzeyBoya__gt'] = ""
-                    elif bolum == 'Eloksal':
-                        q['YuzeyEloksal__gt'] = ""
-                    elif bolum == 'Mekanik Islem':
-                        q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
-            elif i['field'] == 'Dosya':
-                file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
-                q['id__in'] = list(file_ids)
-            elif i['field'] == 'Tarih' or i['field'] == 'GüncelTarih': #type = start date, value=finish date
-                if i['type'] != i['value']:
-                    q[i['field'] + "__gte"] = i['type']
-                    q[i['field'] + "__lt"] = i['value'] + ' 23:59:59'
-                else:
-                    q[i['field'] + "__startswith"] = i['value']
-            else:
-                q = filter_method(i, q)
+            q = yuda_filter(i)
 
-    filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
-    yudaList = list(filtered_yudas.values()[offset:limit])
+    y = y.filter(Silindi__isnull = True).filter(**q)
+    user_group = request.user.groups.filter(name__endswith=" Bolumu").first()
+    print(user_group)
+
+    if user_group:
+        # Subquery to fetch the approval status for the user's group
+        onay_subquery = YudaOnay.objects.filter(
+            Yuda=OuterRef('pk'),
+            Group=user_group
+        ).order_by('-Tarih').values('OnayDurumu')[:1]
+        
+        y = y.annotate(
+            onay_durumu=Subquery(onay_subquery, output_field=BooleanField())
+        ).order_by(
+            Case(
+                When(onay_durumu=None, then=0),
+                default=1,
+                output_field=BooleanField()
+            ),
+            '-Tarih', 
+            '-YudaNo'
+        )
     
+    filtered_yudas = y.values()
+    yudaList = list(filtered_yudas[offset:limit])
+    # filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
+    # yudaList = list(filtered_yudas.values()[offset:limit])
+    
+    print(f"yudaList1: {yudaList}")
+    print("  .  ")
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
         if o['GüncelTarih'] != None:
             o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
         else: o['GüncelTarih'] = ""
-        # o['MusteriFirmaAdi'] = o['MusteriFirmaAdi'][:15]
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
         for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:
@@ -1453,7 +1485,8 @@ def yudas_list(request):
                 elif yuda_onay.OnayDurumu is False:
                     o['durumlar'][group] = 'danger'
             else: o['durumlar'][group] = 'warning'
-        
+    
+    # print(f"yudaList2: {yudaList}")
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)
     response_data = {
