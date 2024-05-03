@@ -1439,13 +1439,10 @@ def yudas_list(request):
     if len(filter_list) > 0:
         for i in filter_list:
             q = yuda_filter(i)
-
     y = y.filter(Silindi__isnull = True).filter(**q)
-    user_group = request.user.groups.filter(name__endswith=" Bolumu").first()
-    print(user_group)
 
+    user_group = request.user.groups.filter(name__endswith=" Bolumu").first()
     if user_group:
-        # Subquery to fetch the approval status for the user's group
         onay_subquery = YudaOnay.objects.filter(
             Yuda=OuterRef('pk'),
             Group=user_group
@@ -1462,14 +1459,11 @@ def yudas_list(request):
             '-Tarih', 
             '-YudaNo'
         )
+    else: y = y.order_by('-Tarih', '-YudaNo')
     
     filtered_yudas = y.values()
     yudaList = list(filtered_yudas[offset:limit])
-    # filtered_yudas = y.filter(Silindi__isnull = True).filter(**q).order_by("-Tarih", "-YudaNo")
-    # yudaList = list(filtered_yudas.values()[offset:limit])
-    
-    print(f"yudaList1: {yudaList}")
-    print("  .  ")
+
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
         if o['GüncelTarih'] != None:
@@ -1486,7 +1480,6 @@ def yudas_list(request):
                     o['durumlar'][group] = 'danger'
             else: o['durumlar'][group] = 'warning'
     
-    # print(f"yudaList2: {yudaList}")
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)
     response_data = {
