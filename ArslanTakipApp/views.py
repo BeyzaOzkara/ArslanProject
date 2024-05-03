@@ -1508,7 +1508,7 @@ def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum
     comment['Tarih'] = format_date_time(comment['Tarih'])
     comment['Is_Viewed'] = is_viewed
     comment['cfiles'] = list(getFiles("Comment", comment['id']))
-    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
+    comment['replies'] = [process_comment(user, comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
     return comment
 
 def format_yuda_details2(yList):
