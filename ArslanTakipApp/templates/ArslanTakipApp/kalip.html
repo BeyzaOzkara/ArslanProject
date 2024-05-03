@@ -131,6 +131,21 @@
         color: rgb(255, 255, 255);
     }
 
+    @keyframes blink {
+        0% {
+        opacity: 1;
+        }
+        50% {
+        opacity: 0;
+        }
+        100% {
+        opacity: 1;
+        }
+    }
+    .blinking-text {
+        animation: blink 1s infinite;
+    }
+
 
 </style>
     
@@ -740,6 +755,10 @@ function createDeleteButton(id) {
     return `<span class="ml-2"><a role="button" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
 }
 
+function createReadButton(id) {
+    return `<span class="mr-2"><a role="button" style="color:red" class="blinking-text" name="blinkread" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
+}
+
 function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -774,7 +793,7 @@ function createReplyElement(reply) {
     }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
     var isViewed = comment.Is_Viewed;
-    const readElement = $(`<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox${reply.id}"><label for="readCheckbox${reply.id}" class="mr-2" id="readLabel">Okundu İşaretle</label>`);   
+    const readElement = $(`<p class="mr-2 blinking-text" name="blinkread" id="readCheckbox${reply.id}" data-id="${reply.id}">Okundu İşaretle</p>`);   
     const iconElement = $(`<i class="fa fa-check mr-2 iconelement" name="iconElement" data-id="${reply.id}" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     replyElement.append(elementToAppend, createReplyButton(reply.id));
@@ -799,7 +818,6 @@ function createCommentElement(comment) {
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent); // görüldü için tik iconu eklenecek. kimse görmediyse tek gri tik 
 
     if (comment.cfiles.length > 0) {
-        console.log("sıfırdan büyük");
         const imgElement = $('<div class="main"></div>');
         const galleryElement = $('<div class="gallery"></div>');
         comment.cfiles.forEach(cf => { galleryElement.append(createImagePreview(cf)); });
@@ -808,8 +826,8 @@ function createCommentElement(comment) {
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
     var isViewed = comment.Is_Viewed;
-    // add a checkbox for the user to mark as read the comment
-    const readElement = $(`<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox${comment.id}" data-id="${comment.id}"><label for="readCheckbox${comment.id}" class="mr-2" id="readLabel">Okundu İşaretle</label>`);
+    
+    const readElement = createReadButton(comment.id);
     // if the user has seen the comment turn the checkbox to icon
     const iconElement = $(`<i class="fa fa-check mr-2 iconelement" name="iconElement" data-id="${comment.id}" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>`);
     var elementToAppend = isViewed ? iconElement : readElement;
@@ -1005,27 +1023,28 @@ function deleteComment(cId) {
     }
 };
 
-$(document).on('change', 'input[name="readCheckbox"]', function() {
+$(document).on('click', 'a[name="blinkread"]', function() {
     // if the checkbox is checked make destroy the elemnt and make the iconElement visible
-    if ($(this).is(':checked')) {
-        var commentId = $(this).attr('data-id');
-        $.ajax({
-            url: `/view/comment/${commentId}`,
-            method: 'GET',
-            dataType: 'json',
-            success: function () {
-                $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
-                alert("Başarılı, Comment ID: " + commentId);
-            },
-            error: function (error) {
-                console.error('Error loading comments data:', error);
-            }
-        });
-    }
+    var commentId = $(this).attr('data-id');
+    // console.log(commentId);
+    $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
+
+    $.ajax({
+        url: `/view/comment/${commentId}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function () {
+            $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
+            alert("Başarılı, Comment ID: " + commentId);
+        },
+        error: function (error) {
+            console.error('Error loading comments data:', error);
+        }
+    });
+    
 });
 
 $(document).on('click', 'i[name="iconElement"]', function() {
-    console.log("icon clicked");
     // create modal and show who viewed the comment
     const commentId = $(this).data('id');
     $.ajax({
