@@ -92,10 +92,10 @@ def get_user_full_name(user_id):
     return f"{user.first_name} {user.last_name}"
 
 def format_date_time_s(date):
-    return date.strftime("%d-%m-%y %H:%M:%S")
+    return date.strftime("%d-%m-%Y %H:%M:%S")
 
 def format_date_time(date):
-    return date.strftime("%d-%m-%y %H:%M")
+    return date.strftime("%d-%m-%Y %H:%M")
 
 def format_date(date):
     return date.strftime("%d-%m-%Y")
@@ -450,7 +450,6 @@ def location_hareket(request):
     return HttpResponse(data)
 
 def kalip(request):
-    
     return render(request, 'ArslanTakipApp/kalip.html')
 
 class KalipView(generic.TemplateView):
@@ -469,7 +468,7 @@ def kalip_tum(request):
 def kalip_comments(request, kId):
     if request.method == "GET":
         yudaComments = getParentComments("KalipMs", kId).order_by("Tarih")
-        yudaCList = [process_comment(comment) for comment in yudaComments]
+        yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
         comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
         data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -1490,12 +1489,26 @@ def yudas_list(request):
     data = json.dumps(response_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def process_comment(comment): #biri parent yorumu silerse reply olan yorum gözükmemiş olur bunu düzelt
-    comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
-    comment['Tarih'] = format_date_time(comment['Tarih'])
-    comment['cfiles'] = list(getFiles("Comment", comment['id']))
-    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
-    return comment
+def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum gözükmemiş olur bunu düzelt
+    comment_instance = Comment.objects.get(pk=comment['id'])
+    is_viewed = user in comment_instance.ViewedUsers.all()
+    comment_dict = {
+        'id': comment['id'],
+        'KullaniciAdi': get_user_full_name(int(comment['Kullanici_id'])),
+        'Tarih': format_date_time(comment['Tarih']),
+        'Is_Viewed': is_viewed,
+        'cfiles': list(getFiles("Comment", comment['id'])),
+        'replies': [process_comment(user, reply) for reply in Comment.objects.filter(ReplyTo=comment['id'], Silindi=False).values()]
+    }
+    return comment_dict
+
+    # comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
+    # comment['Tarih'] = format_date_time(comment['Tarih'])
+    # comment['cfiles'] = list(getFiles("Comment", comment['id']))
+    # comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
+    # return comment
+
+
 
 def format_yuda_details2(yList):
     for i in yList:
@@ -1735,7 +1748,7 @@ def yudaDetail(request, yId):
     #     yudaDetailSvg(request, fi.File.path)
         
     yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
-    yudaCList = [process_comment(comment) for comment in yudaComments]
+    yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()
@@ -1765,7 +1778,7 @@ def yudaDetail2(request, yId):
         svgData = yudaDetailSvg(request, fi.File.path)
         
     yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
-    yudaCList = [process_comment(comment) for comment in yudaComments]
+    yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
     yudaDetails = YudaForm.objects.filter(id = yId).values()

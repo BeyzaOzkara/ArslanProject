@@ -772,9 +772,11 @@ function createReplyElement(reply) {
     
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
     // add a checkbox for the user to mark as read the comment
+    var isViewed = comment.Is_Viewed;
     const readElement = $(`<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox${reply.id}"><label for="readCheckbox${reply.id}" class="mr-2" id="readLabel">Okundu İşaretle</label>`);   
     const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
-    replyElement.append(readElement, iconElement, createReplyButton(reply.id));
+    var elementToAppend = isViewed ? iconElement : readElement;
+    replyElement.append(elementToAppend, createReplyButton(reply.id));
 
     const replyFormCollapse = createReplyForm(reply.id, reply.FormModelId);
     if (reply.Kullanici_id == userID) {
@@ -803,11 +805,13 @@ function createCommentElement(comment) {
         commentElement.append(imgElement);
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
+    var isViewed = comment.Is_Viewed;
     // add a checkbox for the user to mark as read the comment
     const readElement = $(`<input type="checkbox" class="mr-2" name="readCheckbox" id="readCheckbox${comment.id}" data-id="${comment.id}"><label for="readCheckbox${comment.id}" class="mr-2" id="readLabel">Okundu İşaretle</label>`);
     // if the user has seen the comment turn the checkbox to icon
     const iconElement = $('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>');
-    commentElement.append(readElement, iconElement, createReplyButton(comment.id));
+    var elementToAppend = isViewed ? iconElement : readElement;
+    commentElement.append(elementToAppend, createReplyButton(comment.id));
 
     const replyFormCollapse = createReplyForm(comment.id, comment.FormModelId);
     if (comment.Kullanici_id == userID) {
@@ -1008,6 +1012,7 @@ $(document).on('change', 'input[name="readCheckbox"]', function() {
             method: 'GET',
             dataType: 'json',
             success: function () {
+                $(this).replaceWith($('<i class="fa fa-check mr-2 iconelement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
                 alert("Başarılı, Comment ID: " + commentId);
             },
             error: function (error) {
