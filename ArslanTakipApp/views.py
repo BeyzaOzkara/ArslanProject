@@ -404,6 +404,17 @@ def view_comment(request, cId):
     else:
         return JsonResponse({'error': 'User not authenticated.'}, status=401)
 
+def get_viewed_users(request, cId):
+    print("get viewed users")
+    print(cId)
+    comment_instance = Comment.objects.get(pk=cId)
+    views = comment_instance.ViewedUsers.all().values()
+    print(views)
+    for i in views:
+        print(i)
+        print(i.first_name)
+
+
 #gelen id başka konumların parenti ise altındakileri listele??
 def location_hareket(request):
     params = json.loads(unquote(request.GET.get('params')))
@@ -1492,23 +1503,13 @@ def yudas_list(request):
 def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum gözükmemiş olur bunu düzelt
     comment_instance = Comment.objects.get(pk=comment['id'])
     is_viewed = user in comment_instance.ViewedUsers.all()
-    comment_dict = {
-        'id': comment['id'],
-        'KullaniciAdi': get_user_full_name(int(comment['Kullanici_id'])),
-        'Tarih': format_date_time(comment['Tarih']),
-        'Is_Viewed': is_viewed,
-        'cfiles': list(getFiles("Comment", comment['id'])),
-        'replies': [process_comment(user, reply) for reply in Comment.objects.filter(ReplyTo=comment['id'], Silindi=False).values()]
-    }
-    return comment_dict
 
-    # comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
-    # comment['Tarih'] = format_date_time(comment['Tarih'])
-    # comment['cfiles'] = list(getFiles("Comment", comment['id']))
-    # comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
-    # return comment
-
-
+    comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
+    comment['Tarih'] = format_date_time(comment['Tarih'])
+    comment['Is_Viewed'] = is_viewed
+    comment['cfiles'] = list(getFiles("Comment", comment['id']))
+    comment['replies'] = [process_comment(comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
+    return comment
 
 def format_yuda_details2(yList):
     for i in yList:
