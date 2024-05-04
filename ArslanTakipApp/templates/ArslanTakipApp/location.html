@@ -248,8 +248,6 @@ function kalipGonder() {
         url: '/location/',
         type: 'POST',
         data: kalipData,
-        contentType: false,
-        processData: false,
         success: function(response) {
             toastClick('success', response.message,'tc');
         },
