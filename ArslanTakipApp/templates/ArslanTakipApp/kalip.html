@@ -47,10 +47,10 @@
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
     .iconelement {
-        color: #ccc;
+        color: black;
     }
     .readbyall {
-        color: #4FB6EC;
+        color: #4FB6EC; /*#17a2b8*/
     }
 
 
@@ -131,17 +131,6 @@
         color: rgb(255, 255, 255);
     }
 
-    /* .blinking-text {
-        color: black;
-        font-weight: bold;
-        animation: blinkingText 1.2s infinite;
-    }
-
-    @keyframes blinkingText {
-        0% { color: transparent; }
-        50% { color: inherit; }
-        100% { color: transparent; }
-    } */
 
     .blinking-text {
         font-weight: bold;
@@ -779,19 +768,19 @@ function replyEditBtnClick(id, action) {
 }
 
 function createReplyButton(id) {
-    return `<span><a role="button" class="btn btn-outline-success btn-sm" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
 function createEditButton(id) {
-    return `<span class="ml-2"><a role="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function createDeleteButton(id) {
-    return `<span class="ml-2"><a role="button" class="btn btn-outline-danger btn-sm" onclick="deleteComment(${id})" href="">sil</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:red" onclick="deleteComment(${id})" href="">sil</a></span>`;
 }
 
 function createReadButton(id) {
-    return `<span class="mr-2"><a role="button" class="btn btn-warning btn-sm blinking-text" href="" name="blinkread" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
+    return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" href="" name="blinkread" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -828,8 +817,8 @@ function createReplyElement(reply) {
     }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
     var isViewed = comment.Is_Viewed;
-    const readElement = $(`<p class="mr-2 blinking-text" name="blinkread" id="readCheckbox${reply.id}" data-id="${reply.id}">Okundu İşaretle</p>`);   
-    const iconElement = $(`<i class="fa fa-check mr-2 iconelement" name="iconElement" data-id="${reply.id}" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>`);
+    const readElement = createReadButton(reply.id);
+    const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" onclick="iconClick(${reply.id})" style="color:black;" data-toggle="tooltip" title="Görüntüleyenler" href=""><i class="fa fa-check mr-2 iconelement" name="iconElement" aria-hidden="true"></i></a></span>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     replyElement.append(elementToAppend, createReplyButton(reply.id));
 
@@ -864,7 +853,7 @@ function createCommentElement(comment) {
     
     const readElement = createReadButton(comment.id);
     // if the user has seen the comment turn the checkbox to icon
-    const iconElement = $(`<i class="fa fa-check mr-2 iconelement" name="iconElement" data-id="${comment.id}" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>`);
+    const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold" data-toggle="tooltip" title="Görüntüleyenler"  onclick="iconClick(${comment.id})"><i class="fa fa-check iconelement" name="iconElement" aria-hidden="true"></i></a></span>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     commentElement.append(elementToAppend, createReplyButton(comment.id));
 
@@ -1068,7 +1057,7 @@ $(document).on('click', 'a[name="blinkread"]', function() {
         method: 'GET',
         dataType: 'json',
         success: function () {
-            readE.replaceWith($('<i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i>'));
+            readE.replaceWith($('<span class="ml-2"><i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i></span>'));
         },
         error: function (error) {
             console.error('Error loading comments data:', error);
@@ -1077,9 +1066,7 @@ $(document).on('click', 'a[name="blinkread"]', function() {
     
 });
 
-$(document).on('click', 'i[name="iconElement"]', function() {
-    // create modal and show who viewed the comment
-    const commentId = $(this).data('id');
+function iconClick(commentId) {
     $.ajax({
         url: `/getviews/${commentId}`,
         method: 'GET',
@@ -1111,7 +1098,7 @@ $(document).on('click', 'i[name="iconElement"]', function() {
             console.error('Error loading viewed users:', error);
         }
     });
-});
+};
 
 $(function () {
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {

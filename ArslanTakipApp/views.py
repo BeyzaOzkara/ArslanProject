@@ -1506,7 +1506,7 @@ def yudas_list(request):
 def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum gözükmemiş olur bunu düzelt
     comment_instance = Comment.objects.get(pk=comment['id'])
     views = comment_instance.ViewedUsers.all() 
-    # görmesi gerekenler kullancı grubu oluşturup bu gruptaki herkes görmüş mü kontrol edilsin allViewed = True False
+    # görmesi gerekenler kullanıcı grubu oluşturup bu gruptaki herkes görmüş mü kontrol edilsin allViewed = True False
 
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
     comment['Tarih'] = format_date_time(comment['Tarih'])
