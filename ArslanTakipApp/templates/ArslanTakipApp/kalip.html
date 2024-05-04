@@ -776,11 +776,11 @@ function createEditButton(id) {
 }
 
 function createDeleteButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:red" onclick="deleteComment(${id})" href="">sil</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
 }
 
 function createReadButton(id) {
-    return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" href="" name="blinkread" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
+    return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
 }
 
 function nestedReplies(replies) {
@@ -988,7 +988,7 @@ function yorumPaylas(kId="", cId=""){
             contentType: false,
             processData: false,
             success: function(response) {
-                window.location.reload();
+                window.location.reload(); // reload yapmak yerine aynı sayfada kalmamızı sağlayacak bir şeye ihtiyacımız var
             },
             error: function(response) {
                 alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
@@ -1051,13 +1051,12 @@ $(document).on('click', 'a[name="blinkread"]', function() {
     // if the checkbox is checked make destroy the elemnt and make the iconElement visible
     var commentId = $(this).attr('data-id');
     const readE = $(this);
-    // console.log(commentId);
     $.ajax({
         url: `/view/comment/${commentId}`,
         method: 'GET',
         dataType: 'json',
         success: function () {
-            readE.replaceWith($('<span class="ml-2"><i class="fa fa-check mr-2 iconelement" name="iconElement" data-toggle="tooltip" title="Görüntüleyenler" aria-hidden="true"></i></span>'));
+            readE.replaceWith($(`<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`));
         },
         error: function (error) {
             console.error('Error loading comments data:', error);
