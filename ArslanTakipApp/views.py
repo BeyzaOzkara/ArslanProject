@@ -184,7 +184,7 @@ def location(request):
                 parent.setdefault('_children', []).append(item)
         else:
             root_nodes.append(item)
-
+    get_kalip_sayisi(root_nodes)
     data = json.dumps(root_nodes)
     gonderData = location_list(request.user)
 
@@ -197,9 +197,7 @@ def location(request):
             gozCapacity = Location.objects.get(id = lRec.id).capacity
 
             notPhysical = ["542", "543", "544", "545", "570", "571", "572", "573", "574", "575", "1079"]
-            # dieToName = Location.objects.get(locationRelationID = dieTo).locationName
             if dieTo in notPhysical:
-                # dieToName = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").locationName
                 dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
                 
             if gozCapacity == None:
@@ -215,6 +213,12 @@ def location(request):
         
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
+
+def get_kalip_sayisi(locations):
+    print("kalıp sayısı") #her lokasyon ve altındaki lokasyonlarda kaç kalıp var listeye eklensin.
+    print(locations)
+
+    return locations
 
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
