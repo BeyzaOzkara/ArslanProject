@@ -8,6 +8,7 @@
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/toastr/toastr.min.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -29,12 +30,9 @@
         </div>
     </div>
     <div class="card">
-        <form src="/location" name= "kalip" method="post" >
-          {% csrf_token %}
           <input type="hidden" id="dieList" name="dieList" value="">
           <input type="hidden" id="dieTo" name="dieTo" value="">
-          <button class="btn btn-block bg-gradient-secondary btn-lg" id="kalip-gonder" disabled>Kalıp Gönder</button>
-        </form>
+          <button class="btn btn-block bg-gradient-secondary btn-lg" id="kalip-gonder" onclick="kalipGonder()" disabled>Kalıp Gönder</button>
     </div>
     <div class="card" id="hareket-table"></div>
 </div>
@@ -239,6 +237,59 @@ function formControl(){
     } 
 }
 
+function kalipGonder() {
+    let dieList = document.getElementById("dieList").value;
+    let dieTo = document.getElementById("dieTo").value;
+    const kalipData = new FormData();
+    kalipData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    kalipData.append("dieList", dieList);
+    kalipData.append("dieTo", dieTo);
+    $.ajax({
+        url: '/location/',
+        type: 'POST',
+        data: kalipData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            toastClick('success', response.message,'tc');
+        },
+        error: function(error) {
+            alert('Kalıp gönderilemedi. '+error);
+        }
+    });
+};
+
+function toastClick(iconInput, titleInput, position){
+    toastr.remove();
+    toastr.options ={
+        "timeOut" : 2000,
+        "extendedTimeOut" : 0,
+        "progressBar" : true,
+        "showMethod" : 'slideDown',
+        "hideMethod" : 'slideUp',
+        "fadeOut" : 500,
+    }
+    toastr.options.onHidden = function(){
+        // this will be executed after fadeout, i.e. 2secs after notification has been show
+        window.location.reload();
+    };
+    var pos = {"":"toast-top-right", "oc":"toast-orta-center", "br":"toast-bottom-right", "tc":"toast-top-center"};
+    let posi = pos[position];
+
+    if(iconInput=="success"){
+        toastr.success(titleInput,"İŞLEM BAŞARILI",{"positionClass": posi})
+    }
+    else if(iconInput=="info"){
+        toastr.info(titleInput,"BİLGİ",{"positionClass": posi})
+    }
+    else if(iconInput=="error"){
+        toastr.error(titleInput,"BAŞARISIZ İŞLEM",{"positionClass": posi})
+    }
+    else if(iconInput=="warning"){
+        toastr.warning(titleInput,"DİKKAT",{"positionClass": posi})
+    }
+}
+
 </script>
 
 {% endblock %}
@@ -246,5 +297,6 @@ function formControl(){
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'admin-lte/plugins/toastr/toastr.min.js' %}"></script>
 
 {% endblock %}

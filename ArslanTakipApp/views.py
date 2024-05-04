@@ -189,23 +189,31 @@ def location(request):
     gonderData = location_list(request.user)
 
     if request.method == "POST":
-        dieList = request.POST.get("dieList")
-        dieList = dieList.split(",")
-        dieTo = request.POST.get("dieTo")
-        lRec = Location.objects.get(id = dieTo)
-        gozCapacity = Location.objects.get(id = lRec.id).capacity
+        try:
+            dieList = request.POST.get("dieList")
+            dieList = dieList.split(",")
+            dieTo = request.POST.get("dieTo")
+            lRec = Location.objects.get(id = dieTo)
+            gozCapacity = Location.objects.get(id = lRec.id).capacity
 
-        notPhysical = ["542", "543", "544", "545", "570", "571", "572", "573", "574", "575", "1079"]
-        if dieTo in notPhysical:
-            dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
-            
-        if gozCapacity == None:
-            hareketSave(dieList, lRec, dieTo, request)
-        else:
-            firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
-            if firinKalipSayisi < gozCapacity:
-                if not (firinKalipSayisi + len(dieList)) > gozCapacity:
-                    hareketSave(dieList, lRec, dieTo, request)
+            notPhysical = ["542", "543", "544", "545", "570", "571", "572", "573", "574", "575", "1079"]
+            # dieToName = Location.objects.get(locationRelationID = dieTo).locationName
+            if dieTo in notPhysical:
+                # dieToName = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").locationName
+                dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
+                
+            if gozCapacity == None:
+                hareketSave(dieList, lRec, dieTo, request)
+            else:
+                firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
+                if firinKalipSayisi < gozCapacity:
+                    if not (firinKalipSayisi + len(dieList)) > gozCapacity:
+                        hareketSave(dieList, lRec, dieTo, request)
+            response = JsonResponse({'message': "Kalıplar Başarıyla Gönderildi."})
+        except Exception as e:
+            response = JsonResponse({'error':  'İşlem gerçekleştirilemedi. ' + str(e)})
+        
+        return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
 def location_list(a):
