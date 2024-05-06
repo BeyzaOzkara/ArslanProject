@@ -184,7 +184,7 @@ def location(request):
                 parent.setdefault('_children', []).append(item)
         else:
             root_nodes.append(item)
-    root_nodes = get_kalip_sayisi(request.user, root_nodes)
+    # root_nodes = get_kalip_sayisi(request.user, root_nodes)
     data = json.dumps(root_nodes)
     gonderData = location_list(request.user)
 
