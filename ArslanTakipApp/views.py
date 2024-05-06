@@ -184,7 +184,6 @@ def location(request):
                 parent.setdefault('_children', []).append(item)
         else:
             root_nodes.append(item)
-    # root_nodes = get_kalip_sayisi(request.user, root_nodes)
     data = json.dumps(root_nodes)
     gonderData = location_list(request.user)
 
@@ -213,34 +212,6 @@ def location(request):
         
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
-
-def add_sayi_to_locations(location, all_ids):
-    """
-    Recursively add 'sayi' to location and its children.
-    The 'all_ids' parameter should contain all location IDs for user access.
-    """
-    ids = [location['id']]
-    location['sayi'] = 0  # Initialize 'sayi'
-
-    # Process children
-    if '_children' in location:
-        for child in location['_children']:
-            child_ids = add_sayi_to_locations(child, all_ids)
-            ids.extend(child_ids)
-
-    # Filter IDs that are actually accessible and get the count for DiesLocation
-    accessible_ids = [id_ for id_ in ids if id_ in all_ids]
-    location['sayi'] = DiesLocation.objects.filter(kalipVaris_id__in=accessible_ids).count()
-    return ids
-
-def get_kalip_sayisi(user, locations):
-    loc = get_objects_for_user(user, "ArslanTakipApp.dg_view_location", klass=Location)
-    all_ids = [l['id'] for l in list(loc.values())]  # List all location IDs accessible by user
-
-    for location in locations:
-        add_sayi_to_locations(location, all_ids)
-
-    return locations
 
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
@@ -273,16 +244,6 @@ def filter_locations(locations, target_id, depth=1):
                 filtered_ids.extend(child_ids)
     return filtered_ids
 
-def get_children_ids(location_id):
-    """
-    Recursively get all children IDs for a given location ID.
-    """
-    children_ids = [location_id]
-    children = Location.objects.filter(locationRelationID=location_id)
-    for child in children:
-        children_ids.extend(get_children_ids(child.id))
-    return children_ids
-
 def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
     if request.method == "GET":
         params = json.loads(unquote(request.GET.get('params')))
@@ -298,7 +259,7 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
 
         if request.user.is_superuser:
             query = DiesLocation.objects.all().order_by('kalipNo')
-        children_ids = []
+
         if len(filter_list)>0:
             for i in filter_list: # bir lokasyona tıklandığında o lokasyon ve altında kalan her lokasyon içindeki kalıp sayısı dönsün
                 if i["type"] == "like":
@@ -461,7 +422,6 @@ def get_viewed_users(request, cId):
         # If the request is not a GET, return a bad request response
         return HttpResponseBadRequest("Invalid request method.")
 
-
 #gelen id başka konumların parenti ise altındakileri listele??
 def location_hareket(request):
     params = json.loads(unquote(request.GET.get('params')))
@@ -557,8 +517,12 @@ def kalip_comments_post(request):
                     UploadedBy = c.Kullanici,
                     Note = "",
                 )
-                
-            response = JsonResponse({'message': 'Kayıt başarılı'})
+            
+            yudaComments = getParentComments("KalipMs", c.FormModelId).order_by("Tarih")
+            yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
+            comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+            response = JsonResponse({'message': 'Kayıt başarılı', 'data':comments})
         except Exception as e:
             response = JsonResponse({'error': str(e)})
             response.status_code = 500 #server error

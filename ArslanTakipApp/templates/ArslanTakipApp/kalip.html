@@ -407,7 +407,6 @@
                       <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
                     </div>
                   </div>
-                  <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
                   <button type="button" class="btn btn-primary" id="yorumPaylas">Paylaş</button>
                 </div>
             </div>
@@ -422,26 +421,6 @@
     
 let userID = "{{user.id}}";
 var selectedFiles = [];
-$(function () {
-    // Summernote
-    $('.textarea').summernote({
-      disableResizeEditor: true,
-      height:200,
-      lang: 'tr-TR',
-      toolbar: [
-        //['misc', ['undo', 'redo']],
-        ['style', ['bold', 'italic', 'underline']],
-        ['font', ['superscript', 'subscript']],
-        ['fontsize', ['fontsize']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['height', ['height']],
-        ['table'],
-        ['custom', ['specialchars']],
-      ]
-    });
-    
-  });
 
 //define column header menu as column visibility toggle
 var headerMenu = function(){
@@ -722,7 +701,7 @@ function imgClick(imgComment) {
 
 // Define a function to create a reply form HTML
 function createReplyForm(replyId, modelId) {
-    return `<div class="collapse" id="replyComment${replyId}">
+    return `<div class="collapse mt-2" id="replyComment${replyId}">
                 <form>
                     <div class="form-group">
                         <div class="row" style="height: 265px;">
@@ -743,7 +722,6 @@ function createReplyForm(replyId, modelId) {
                             <div id="fileTitles${replyId}" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
                         </div>
                         </div>
-                        <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle(${replyId})"></i>
                     </div>
                     <button type="button" class="btn btn-default" id="gonder${replyId}" onclick="handleReply(${modelId}, ${replyId})">Gönder</button>
                 </form>
@@ -754,8 +732,11 @@ function replyEditBtnClick(id, action) {
     const replyForm = $(`#replyComment${id}`); // boş döndürüyor düzgün alınmıyor
     replyForm.collapse('toggle');
     if (action === "Düzenle") { 
-        const existingText = $(`#yorumText${id}`).val();
-        $(`#yorumText${id}`).summernote("code", existingText); 
+        const existingText = document.getElementById(`p${id}`).innerHTML;
+        $(`#yorumText${id}`).summernote("code", existingText);
+    }
+    else {
+        $(`#yorumText${id}`).summernote('code', '');
     }
     const sendButton = $(`#gonder${id}`);
     sendButton.text(action);
@@ -810,7 +791,7 @@ function createReplyElement(reply) {
         replyElement.append(imgElement);
     }
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
-    var isViewed = comment.Is_Viewed;
+    var isViewed = reply.Is_Viewed;
     const readElement = createReadButton(reply.id);
     let iconColor = "black";
     if (reply.All_Viewed) {color = "#4FB6EC"}
@@ -834,8 +815,8 @@ function createReplyElement(reply) {
 
 function createCommentElement(comment) {
     const userBlock = createUserBlock(comment);
-    const commentContent = `<p>${comment.Aciklama}</p>`;
-    const commentElement = $('<div class="post"></div>').append(userBlock, commentContent); // görüldü için tik iconu eklenecek. kimse görmediyse tek gri tik 
+    const commentContent = $(`<p id="p${comment.id}"></p>`).append(comment.Aciklama);
+    const commentElement = $(`<div class="post ${comment.id}"></div>`).append(userBlock, commentContent); // görüldü için tik iconu eklenecek. kimse görmediyse tek gri tik 
 
     if (comment.cfiles.length > 0) {
         const imgElement = $('<div class="main"></div>');
@@ -872,10 +853,26 @@ function createCommentElement(comment) {
 function getComments(comments) {
     const commentCol = $('#commentCol');
     commentCol.empty();
-
     comments.forEach(comment => {
         const commentElement = createCommentElement(comment);
         commentCol.append(commentElement);
+
+    });
+    $('.textarea').summernote({
+        disableResizeEditor: true,
+        height:200,
+        lang: 'tr-TR',
+        toolbar: [
+            //['misc', ['undo', 'redo']],
+            ['style', ['bold', 'italic', 'underline']],
+            ['font', ['superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table'],
+            ['custom', ['specialchars']],
+        ]
     });
 }
 
@@ -952,13 +949,6 @@ function handleReply(modelId, commentId) {
     }
 };
 
-function DosyaEkle(a="") {
-    changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";
-    
-    document.getElementById('yorumTextCol'+a).setAttribute("class", changedClass);
-    $('#dosyaEkleCol'+a).show();
-};
-
 $('#fileInput').on('change', function(e) {
     Array.from(e.target.files).forEach(function(newFile) {
         if (!fileAlreadySelected(newFile)) {
@@ -986,7 +976,9 @@ function yorumPaylas(kId="", cId=""){
             contentType: false,
             processData: false,
             success: function(response) {
-                window.location.reload(); // reload yapmak yerine aynı sayfada kalmamızı sağlayacak bir şeye ihtiyacımız var
+                alert("Paylaşım başarılı.");
+                $('#yorumText').summernote('code', '');
+                getComments(JSON.parse(response.data));
             },
             error: function(response) {
                 alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
@@ -1020,7 +1012,10 @@ function editComment(commentId) {
         processData: false,
         success: function(response) {
             alert(response.message);
-            window.location.reload();
+            let p = document.getElementById(`p${commentId}`);
+            p.innerHTML = textareaValue;
+            const replyForm = $(`#replyComment${commentId}`); // boş döndürüyor düzgün alınmıyor
+            replyForm.collapse('toggle');
         },
         error: function(response) {
             alert('Yorum düzenlenemedi.');
@@ -1035,8 +1030,8 @@ function deleteComment(cId) {
         url: 'deletecomment/'+cId,
         type: 'GET',
         success: function (response) {
+            $(`.${cId}`).remove();
             alert(response.message);
-            window.location.reload();
         },
         error: function (error) {
           alert('Yorum silinemedi. '+error);
@@ -1114,6 +1109,26 @@ $("input[data-bootstrap-switch]").each(function(){
 document.getElementById("download-xlsx").addEventListener("click", function(){
     tableKalip.download("xlsx", "data.xlsx", {sheetName:"My Data"});
 });
+$(function () {
+    // Summernote
+    $('.textarea').summernote({
+      disableResizeEditor: true,
+      height:200,
+      lang: 'tr-TR',
+      toolbar: [
+        //['misc', ['undo', 'redo']],
+        ['style', ['bold', 'italic', 'underline']],
+        ['font', ['superscript', 'subscript']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table'],
+        ['custom', ['specialchars']],
+      ]
+    });
+    
+  });
 
 </script>
 

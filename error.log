@@ -20836,3 +20836,11 @@ Traceback (most recent call last):
     raise FieldError(
 django.core.exceptions.FieldError: Unsupported lookup 'onaydurumu' for ManyToOneRel or join on the field not permitted.
 [35;1mHTTP GET /yudas/list?params=%7B%22page%22%3A1%2C%22size%22%3A7%2C%22filter%22%3A%5B%5D%7D 500 [0.13, 127.0.0.1:59871][0m
+Internal Server Error: /kalip/postcomment
+[35;1mHTTP POST /kalip/postcomment 500 [0.03, 127.0.0.1:57246][0m
+Internal Server Error: /kalip/postcomment
+[35;1mHTTP POST /kalip/postcomment 500 [0.04, 127.0.0.1:52578][0m
+Internal Server Error: /kalip/postcomment
+[35;1mHTTP POST /kalip/postcomment 500 [0.05, 127.0.0.1:65444][0m
+Internal Server Error: /kalip/postcomment
+[35;1mHTTP POST /kalip/postcomment 500 [0.03, 127.0.0.1:50517][0m
