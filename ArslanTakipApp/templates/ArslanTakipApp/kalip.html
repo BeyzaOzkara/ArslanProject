@@ -46,12 +46,6 @@
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
-    .iconelement {
-        color: black;
-    }
-    .readbyall {
-        color: #4FB6EC; /*#17a2b8*/
-    }
 
 
     .main {
@@ -818,7 +812,9 @@ function createReplyElement(reply) {
     reply.cfiles.forEach(cf => { replyElement.append(createFileLink(cf)); });
     var isViewed = comment.Is_Viewed;
     const readElement = createReadButton(reply.id);
-    const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" onclick="iconClick(${reply.id})" style="color:black;" data-toggle="tooltip" title="Görüntüleyenler" href=""><i class="fa fa-check mr-2 iconelement" name="iconElement" aria-hidden="true"></i></a></span>`);
+    let iconColor = "black";
+    if (reply.All_Viewed) {color = "#4FB6EC"}
+    const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" onclick="iconClick(${reply.id})" data-toggle="tooltip" title="Görüntüleyenler" href=""><i class="fa fa-check iconelement" style="color:${iconColor}" name="iconElement" aria-hidden="true"></i></a></span>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     replyElement.append(elementToAppend, createReplyButton(reply.id));
 
@@ -853,7 +849,9 @@ function createCommentElement(comment) {
     
     const readElement = createReadButton(comment.id);
     // if the user has seen the comment turn the checkbox to icon
-    const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold" data-toggle="tooltip" title="Görüntüleyenler"  onclick="iconClick(${comment.id})"><i class="fa fa-check iconelement" name="iconElement" aria-hidden="true"></i></a></span>`);
+    let iconColor = "black";
+    if (comment.All_Viewed) { iconColor = "#4FB6EC"}
+    const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Görüntüleyenler"  onclick="iconClick(${comment.id})"><i class="fa fa-check iconelement" style="color:${iconColor}" name="iconElement" aria-hidden="true"></i></a></span>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     commentElement.append(elementToAppend, createReplyButton(comment.id));
 
@@ -883,7 +881,7 @@ function getComments(comments) {
 
 function clickComment(kalipNo) {
     $.ajax({
-        url: `comments/${kalipNo}`,
+        url: `getcomments/${kalipNo}`,
         method: 'GET',
         dataType: 'json',
         success: function (commentData) {
@@ -1056,7 +1054,7 @@ $(document).on('click', 'a[name="blinkread"]', function() {
         method: 'GET',
         dataType: 'json',
         success: function () {
-            readE.replaceWith($(`<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`));
+            readE.replaceWith( $(`<span><a role="button" class="btn btn-light btn-sm" onclick="iconClick(${commentId})" data-toggle="tooltip" title="Görüntüleyenler" href=""><i class="fa fa-check iconelement" style="color:black" name="iconElement" aria-hidden="true"></i></a></span>`))
         },
         error: function (error) {
             console.error('Error loading comments data:', error);

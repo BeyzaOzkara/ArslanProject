@@ -184,7 +184,7 @@ def location(request):
                 parent.setdefault('_children', []).append(item)
         else:
             root_nodes.append(item)
-    get_kalip_sayisi(root_nodes)
+    root_nodes = get_kalip_sayisi(request.user, root_nodes)
     data = json.dumps(root_nodes)
     gonderData = location_list(request.user)
 
@@ -214,9 +214,31 @@ def location(request):
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
-def get_kalip_sayisi(locations):
-    print("kalıp sayısı") #her lokasyon ve altındaki lokasyonlarda kaç kalıp var listeye eklensin.
-    print(locations)
+def add_sayi_to_locations(location, all_ids):
+    """
+    Recursively add 'sayi' to location and its children.
+    The 'all_ids' parameter should contain all location IDs for user access.
+    """
+    ids = [location['id']]
+    location['sayi'] = 0  # Initialize 'sayi'
+
+    # Process children
+    if '_children' in location:
+        for child in location['_children']:
+            child_ids = add_sayi_to_locations(child, all_ids)
+            ids.extend(child_ids)
+
+    # Filter IDs that are actually accessible and get the count for DiesLocation
+    accessible_ids = [id_ for id_ in ids if id_ in all_ids]
+    location['sayi'] = DiesLocation.objects.filter(kalipVaris_id__in=accessible_ids).count()
+    return ids
+
+def get_kalip_sayisi(user, locations):
+    loc = get_objects_for_user(user, "ArslanTakipApp.dg_view_location", klass=Location)
+    all_ids = [l['id'] for l in list(loc.values())]  # List all location IDs accessible by user
+
+    for location in locations:
+        add_sayi_to_locations(location, all_ids)
 
     return locations
 
@@ -490,7 +512,7 @@ def kalip_tum(request):
     data = json.dumps(kalipSayisi, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def kalip_comments(request, kId):
+def kalip_getcomments(request, kId):
     if request.method == "GET":
         yudaComments = getParentComments("KalipMs", kId).order_by("Tarih")
         yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
@@ -1517,8 +1539,14 @@ def yudas_list(request):
 
 def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum gözükmemiş olur bunu düzelt
     comment_instance = Comment.objects.get(pk=comment['id'])
-    views = comment_instance.ViewedUsers.all() 
+    views = comment_instance.ViewedUsers.all()
     # görmesi gerekenler kullanıcı grubu oluşturup bu gruptaki herkes görmüş mü kontrol edilsin allViewed = True False
+    must_view_user_ids = [1, 2, 29]
+    for user_id in must_view_user_ids:
+        if user_id not in [view.id for view in views]:
+            comment['All_Viewed'] = False
+            break
+        else: comment['All_Viewed'] = True
 
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
     comment['Tarih'] = format_date_time(comment['Tarih'])
