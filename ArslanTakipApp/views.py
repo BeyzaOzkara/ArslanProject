@@ -1470,9 +1470,10 @@ def bolumOnayFilter(q, val, user_group):
     if val is not None and user_group:
         if val == "True":
             q['yudaonay__OnayDurumu'] = True
+            q['yudaonay__Group'] = user_group
         elif val == "False":
             q['yudaonay__OnayDurumu'] = False
-        q['yudaonay__Group'] = user_group
+            q['yudaonay__Group'] = user_group
     return q
 
 def yudas_list(request):
