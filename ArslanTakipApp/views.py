@@ -273,6 +273,16 @@ def filter_locations(locations, target_id, depth=1):
                 filtered_ids.extend(child_ids)
     return filtered_ids
 
+def get_children_ids(location_id):
+    """
+    Recursively get all children IDs for a given location ID.
+    """
+    children_ids = [location_id]
+    children = Location.objects.filter(locationRelationID=location_id)
+    for child in children:
+        children_ids.extend(get_children_ids(child.id))
+    return children_ids
+
 def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
     if request.method == "GET":
         params = json.loads(unquote(request.GET.get('params')))
@@ -288,9 +298,9 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
 
         if request.user.is_superuser:
             query = DiesLocation.objects.all().order_by('kalipNo')
-        
+        children_ids = []
         if len(filter_list)>0:
-            for i in filter_list:
+            for i in filter_list: # bir lokasyona tıklandığında o lokasyon ve altında kalan her lokasyon içindeki kalıp sayısı dönsün
                 if i["type"] == "like":
                     q[i['field']+"__startswith"] = i['value']
                 elif i["type"] == "=":
@@ -299,9 +309,10 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
                         q[i['field']] = i['value']
                     else :
                         filtered_ids = filter_locations(loc.values(), target_id=i['value'], depth=4)
-                        query = DiesLocation.objects.filter(kalipVaris_id__in=filtered_ids)
+                        q['kalipVaris_id__in'] =filtered_ids
 
-        query = query.filter(**q) 
+        query = query.filter(**q)
+        sayi = query.count()
         kal = KalipMs.objects.using('dies').all()
         a = list(query.values()[(page-1)*size:page*size])
         for b in a:
@@ -313,7 +324,7 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
                 b['Hatali'] = 1
         #print(a)
         kalip_count = query.count()
-        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+        lastData= {'last_page': math.ceil(kalip_count/size), 'data': [], 'sayi': sayi}
         lastData['data'] = a #list(query.values()[(page-1)*size:page*size])
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)

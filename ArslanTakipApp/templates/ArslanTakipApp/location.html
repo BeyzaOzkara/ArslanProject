@@ -58,7 +58,6 @@ var tableLoc = new Tabulator("#location-tree-table", {
     selectable:1,
     columns:[
     {title:"LOKASYON ADLARI", field:"locationName",headerSort:false},
-    {title:"SAYI", field:"sayi", headerSort:false},
     ],
 });
 
@@ -86,6 +85,18 @@ tableLoc.on("headerClick", function(e, column){
 var listIcon = function(cell, formatterParams, onRendered){ 
     return "<i class='fa fa-list-ul'></i>"; //icon değiştir
 };
+
+var sayiValue;
+
+// Update the 'sayi' value whenever the response is received
+var updateSayiValue = function(response) {
+    sayiValue = "" + response.sayi + " kalıp";
+};
+
+var sayiCalc = function(values, data, calcParams){
+    calc = sayiValue;
+    return calc;
+}
  var tableKalip = new Tabulator("#kalip-table", {
     height:"350px",
     layout:"fitColumns",
@@ -104,10 +115,14 @@ var listIcon = function(cell, formatterParams, onRendered){
     ajaxURLGenerator:function(url, config, params){
         return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
     },
+    ajaxResponse:function(url, params, response){
+        updateSayiValue(response);
+        return response;
+    },
     columns:[{formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
         cell.getRow().toggleSelect();
     }},
-    {title:"KALIP NO", field:"kalipNo",  headerFilter:"input"},
+    {title:"KALIP NO", field:"kalipNo",  headerFilter:"input", topCalc:sayiCalc },
     {formatter:listIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){ 
             var hareketKonumId = 0;
             hareketKonumId=cell.getData().kalipNo;
@@ -115,7 +130,13 @@ var listIcon = function(cell, formatterParams, onRendered){
                 ]);
     }},
     ],
-}); 
+});
+
+tableKalip.on("dataProcessed", function(){
+    console.log("burda")
+    
+})
+
 
 var sdata = [];
 
