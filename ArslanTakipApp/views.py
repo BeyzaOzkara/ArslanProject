@@ -1466,14 +1466,14 @@ def yuda_filter(i):
         q = filter_method(i, q)
     return q
 
-def bolumOnayFilter(q, val, user_group):
-    if val is not None and user_group:
+def bolumOnayFilter(q, val, group):
+    if val is not None and group:
         if val == "True":
             q['yudaonay__OnayDurumu'] = True
-            q['yudaonay__Group'] = user_group
+            q['yudaonay__Group'] = group
         elif val == "False":
             q['yudaonay__OnayDurumu'] = False
-            q['yudaonay__Group'] = user_group
+            q['yudaonay__Group'] = group
     return q
 
 def yudas_list(request):
@@ -1504,26 +1504,7 @@ def yudas_list(request):
             else:
                 q = yuda_filter(i)
 
-    y = y.filter(Silindi__isnull = True).filter(**q)
-
-    if user_group:
-        onay_subquery = YudaOnay.objects.filter(
-            Yuda=OuterRef('pk'),
-            Group=user_group
-        ).order_by('-Tarih').values('OnayDurumu')[:1]
-        
-        y = y.annotate(
-            onay_durumu=Subquery(onay_subquery, output_field=BooleanField())
-        ).order_by(
-            Case(
-                When(onay_durumu=None, then=0),
-                default=1,
-                output_field=BooleanField()
-            ),
-            '-Tarih', 
-            '-YudaNo'
-        )
-    else: y = y.order_by('-Tarih', '-YudaNo')
+    y = y.filter(Silindi__isnull = True).filter(**q).order_by('-Tarih', '-YudaNo')
     
     filtered_yudas = y.values()
     yudaList = list(filtered_yudas[offset:limit])
