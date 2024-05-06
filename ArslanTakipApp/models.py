@@ -265,7 +265,7 @@ class YudaForm(models.Model):
         permissions = [("gorme_yuda", "Yuda Gorme Yetkisi Var"), ("yonetici_yuda", "Yuda Proje Yoneticisi"), ("acan_yuda", "Yuda Acan Kisi")]
 
 class YudaOnay(models.Model):
-    Yuda = models.ForeignKey(YudaForm, on_delete=models.DO_NOTHING, null=True, blank=True)
+    Yuda = models.ForeignKey(YudaForm, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='yudaonay')
     Group = models.ForeignKey(Group, on_delete=models.DO_NOTHING, null=True, blank=True)
     Tarih = models.DateField(auto_now=True, null=True, blank=True)
     OnayDurumu = models.BooleanField(null=True, blank=True)

@@ -1466,6 +1466,15 @@ def yuda_filter(i):
         q = filter_method(i, q)
     return q
 
+def bolumOnayFilter(q, val, user_group):
+    if val is not None and user_group:
+        if val == "True":
+            q['yudaonay__OnayDurumu'] = True
+        elif val == "False":
+            q['yudaonay__OnayDurumu'] = False
+        q['yudaonay__Group'] = user_group
+    return q
+
 def yudas_list(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     for i in params:
@@ -1483,12 +1492,19 @@ def yudas_list(request):
 
     y = get_objects_for_user(request.user, "gorme_yuda", YudaForm.objects.all()) #user görme yetkisinin olduğu yudaları görsün
 
+    user_group = request.user.groups.filter(name__endswith=" Bolumu").first()
     if len(filter_list) > 0:
         for i in filter_list:
-            q = yuda_filter(i)
+            if i['field'] == "bolumOnay":
+                if i['value'] == "None":
+                    y = y.exclude(yudaonay__Group=user_group)
+                else:
+                    q = bolumOnayFilter(q, i['value'], user_group)
+            else:
+                q = yuda_filter(i)
+
     y = y.filter(Silindi__isnull = True).filter(**q)
 
-    user_group = request.user.groups.filter(name__endswith=" Bolumu").first()
     if user_group:
         onay_subquery = YudaOnay.objects.filter(
             Yuda=OuterRef('pk'),

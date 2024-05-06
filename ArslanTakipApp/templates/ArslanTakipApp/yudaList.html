@@ -110,6 +110,17 @@
                     </div>
                   </div>
                 </div>
+                <div class="row">
+                  <div class="form-group col-lg-6 mt-2">
+                    <label for="bolumOnayFilter">Bölümün Onay Durumu: </label>
+                    <select class="form-control mb-2" id="bolumOnaySelect" name="bolumOnaySelect" data-placeholder="Seçim Yapınız">
+                      <option value="All">Hepsi</option>
+                      <option value="True">Onay</option>
+                      <option value="False">Ret</option>
+                      <option value="None">Belirsiz</option>
+                    </select>
+                  </div>
+                </div>
             </div>
             <div class="modal-footer">
               <button type="button" id="btnTemizle" class="btn btn-secondary">Temizle</button>
@@ -216,7 +227,8 @@
     $('#bolumFilter').val(bolumFilterValues).trigger('change');
     const musteriTemsilcisiSelect = filterList.find(f => f.field === 'YudaAcanKisi_id')?.value || '';
     $('#musteriTemsilcisiSelect').val(musteriTemsilcisiSelect).trigger('change');
-
+    const bolumOnaySelect = filterList.find(f => f.field === 'bolumOnay')?.value || '';
+    $('#bolumOnaySelect').val(bolumOnaySelect).trigger('change');
     const tarihFilter = filterList.find(f => f.field === 'Tarih');
     if (tarihFilter) {
         const tarihPicker = $('#tarihFilter').data('daterangepicker');
@@ -272,6 +284,7 @@
       const musteriFirmaFilter = $('#musteriFirmaFilter').val();
       const bolumFilter = $('#bolumFilter').val();
       const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
+      const bolumOnaySelect = $('#bolumOnaySelect').val();
       const dosyaFilter = $('#dosyaFilter').val();
       const cizimFilter = $('#cizimFilter').val();
       const tarihFilter = $('#tarihFilter').val();
@@ -295,6 +308,9 @@
       if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
         filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
       };
+      if (bolumOnaySelect != null && bolumOnaySelect != ""){
+        filterList.push({ field: 'bolumOnay', type:'=', value: bolumOnaySelect });
+      };
       if (dosyaFilter != "") {
         filterList.push({ field: 'Dosya', type:'like', value: dosyaFilter });
       };
@@ -314,7 +330,7 @@
   });
 
   document.getElementById('btnTemizle').addEventListener('click', () => {
-    $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #cizimFilter, #dosyaFilter, #tarihFilter').val("");
+    $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #bolumOnaySelect #cizimFilter, #dosyaFilter, #tarihFilter').val("");
     $('#bolumFilter').val([]).trigger('change');
     sessionStorage.removeItem('yudaListState');
   });
