@@ -174,16 +174,16 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # email configs
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_BACKEND = "mailer.backend.DbBackend"
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "mailer.backend.DbBackend"
 EMAIL_HOST = 'webmail.arslanaluminyum.com'
-# EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
+EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
 EMAIL_USE_TLS = True
 EMAIL_TLS_VERSION = 'TLSv1.2'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
-EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
 EMAIL_TIMEOUT = None
+DEFAULT_FROM_EMAIL = 'yazilim@arslanaluminyum.com'
 
 logger = logging.getLogger('django.email')
 logger.setLevel(logging.DEBUG)
