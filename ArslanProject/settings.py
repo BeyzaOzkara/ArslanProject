@@ -176,11 +176,10 @@ AUTHENTICATION_BACKENDS = (
 # email configs
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = "mailer.backend.DbBackend"
-EMAIL_HOST = 'webmail.arslanaluminyum.com'
+EMAIL_HOST = 'mail.arslanaluminyum.com'
 # EMAIL_USE_SSL = True
 EMAIL_USE_TLS = True
 EMAIL_TLS_VERSION = 'TLSv1.2'
-# EMAIL_SSL_CERTFILE = None
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
 EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
