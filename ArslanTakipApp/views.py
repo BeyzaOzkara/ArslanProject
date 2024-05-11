@@ -29,7 +29,8 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
-from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery
+from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery, FloatField, F
+from django.db.models.functions import Cast
 from django.db import transaction 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -42,7 +43,6 @@ from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
 from mailer import send_mail
-from django.db.models import Case, When, Value, BooleanField
 # Create your views here.
 
 
@@ -362,9 +362,6 @@ def kalip_liste(request):
 
 def kalip_rapor(request):
     params = json.loads(unquote(request.GET.get('params')))
-    for i in params:
-        value = params[i]
-        print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     offset, limit = calculate_pagination(page, size)
@@ -374,7 +371,6 @@ def kalip_rapor(request):
     lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
 
     if len(filter_list)>0:
-        print(filter_list)
         for i in filter_list:
             if i["type"] == "like":
                 q[i['field']+"__startswith"] = i['value']
@@ -475,6 +471,20 @@ class KalipView(generic.TemplateView):
 
 class DenemeView(generic.TemplateView):
     template_name = 'ArslanTakipApp/deneme.html'
+
+def comment_kalip(request, kNo):
+    kalipList = list(KalipMs.objects.using('dies').filter(KalipNo = kNo).values())
+    for i in kalipList:
+        i['ResimDizini'] = "http://arslan/static" + i['ResimDizini'].replace(" ", "")[13:] + "Teknik"
+        i['ResimDizini1'] = i['ResimDizini'] + "1.jpg"
+        i['ResimDizini2'] = i['ResimDizini'] + "2.jpg"
+        if i['UreticiFirma'] == None:
+            i['UreticiFirma'] = ""
+        i['UretimTarihi'] = format_date_time(i['UretimTarihi'])
+        i['SonUretimTarih'] = format_date_time(i['SonUretimTarih'])
+        i['SonTeniferTarih'] = format_date_time(i['SonTeniferTarih'])
+        
+    return render(request, 'ArslanTakipApp/kalipYorum.html', {'kalip_json':kalipList})
 
 def kalip_tum(request):
     #şimdilik bütün kalıp sayısını döndür
@@ -915,9 +925,10 @@ def siparis_ekle(request):
         print(request.POST)
         e = EkSiparis.objects.all()
         siparis = SiparisList.objects.using('dies').all()
+        siparisGet = siparis.get(Kimlik = request.POST['sipKimlik'])
         ekSiparis = EkSiparis()
         ekSiparis.SipKimlik = request.POST['sipKimlik']
-        ekSiparis.SipKartNo = siparis.get(Kimlik = request.POST['sipKimlik']).KartNo
+        ekSiparis.SipKartNo = siparisGet.KartNo
         ekSiparis.EkAdet = request.POST['planlananAdet']
         ekSiparis.EkPresKodu = request.POST['presKodu']
         ekSiparis.EkTermin = request.POST['ekTermin']
@@ -926,6 +937,8 @@ def siparis_ekle(request):
         ekSiparis.Silindi = False
         ekSiparis.MsSilindi = False
         ekSiparis.Sira = e.count()+1
+        ekSiparis.EkBilletTuru = siparisGet.BilletTuru
+        ekSiparis.EkYuzeyOzelligi = siparisGet.YuzeyOzelligi
 
         if not e.filter(SipKartNo = ekSiparis.SipKartNo):
             ekSiparis.EkNo = 1
@@ -958,6 +971,33 @@ def filter_method(i, a):
         a[i['field'] + "__icontains"] = i['value']
     return a
 
+def eksiparis_hammadde(request):
+    ekSiparis = EkSiparis.objects.exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
+    raporlar = ekSiparis.values('EkBilletTuru')\
+                        .annotate(Net=Sum('EkKg'))\
+                        .order_by('EkBilletTuru')
+    raporList = list(raporlar.order_by('-Net'))
+    for i in raporList:
+        pres_raporlar = PresUretimRaporu.objects.using('dies') \
+                        .filter(StokCinsi=i['EkBilletTuru'], PresKodu='4500-1', Tarih__gte='2023-05-01', Tarih__lt='2024-05-02')\
+                        .order_by("KartNo")
+        orta_araisi = pres_raporlar.aggregate(
+            fire=(1 - (Sum(F('IslemGoren_Kg')) / Sum(F('ToplamBilletKg'))))
+        )['fire']
+        i['Brut'] = math.ceil(i['Net'] / (1 - orta_araisi))
+
+    data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+def eksiparis_yuzey(request):
+    ekSiparis = EkSiparis.objects.exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
+    raporlar = ekSiparis.values('EkYuzeyOzelligi')\
+                        .annotate(Net=Sum('EkKg'))\
+                        .order_by('EkYuzeyOzelligi')
+    raporList = list(raporlar.order_by('-Net'))
+    data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
 def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     #for i in params:
@@ -966,7 +1006,6 @@ def eksiparis_list(request):
     page = params["page"]
     filter_list = params["filter"]
     offset, limit = calculate_pagination(page, size)
-    users = User.objects.values()
     
     siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
         select={
@@ -1015,17 +1054,15 @@ def eksiparis_list(request):
                 e['KondusyonTuru'] = siparis1.KondusyonTuru
                 e['SiparisTamam'] = siparis1.SiparisTamam
                 e['SonTermin'] = format_date(siparis1.SonTermin)
-                e['BilletTuru'] = siparis1.BilletTuru
                 e['TopTenKg'] = siparis1.TopTenKg
-            
-
+                
     ek_count = ekSiparis.count()
     lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
     lastData['data'] = ekSiparisList
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def eksiparis_acil(request):
+def eksiparis_acil(request): # planlama listesi düzenleme
     siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
         select={
             "TopTenKg": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
@@ -1130,9 +1167,6 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
             loc = get_objects_for_user(self.request.user, "ArslanTakipApp.goz_view_location", klass=Location)
             gonder = loc.get(locationName__contains=firinGoz)
             gozCapacity = gonder.capacity
-
-            print(gonder)
-            print(gozCapacity)
 
             if gozCapacity == None:
                 print("None burda")

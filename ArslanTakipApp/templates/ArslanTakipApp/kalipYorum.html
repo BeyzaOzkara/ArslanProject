@@ -7,6 +7,7 @@
 
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
 <link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
 <link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
@@ -17,20 +18,209 @@
 <div class="container-fluid">
     <div class="card" id="dieInfo">
         <div class="card-header">
-            <h1 class="card-title">Kalıp No</h1>
+            <h1 class="card-title">Kalıp</h1>
             <div class="card-tools">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+                    <i class="fas fa-minus"></i>
                 </button>
             </div>
         </div>
+        {% for kalip in kalip_json %}
         <div class="card-body">
-
+        <div class="row">
+            <div class="container-fluid col-lg-7">
+                <div class="card container-fluid " id="kalip_karti">
+                <!-- Kalıp Kartı -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="row col-lg-4">
+                            <div class="container-fluid col-lg-12">
+                                <div class="card col-lg-12">
+                                    <div class="card-body" id="photos">  <!-- Fotoğraflar  -->
+                                        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                                            <div class="carousel-inner">
+                                                <div class="carousel-item active">
+                                                    <a href="{{ kalip.ResimDizini1 }}" data-toggle="lightbox" id="TeknikA">
+                                                        <img id="TeknikResim" class="d-block w-100" alt="First slide" src="{{ kalip.ResimDizini1 }}" > </a>
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <a href="{{ kalip.ResimDizini2 }}" data-toggle="lightbox" id="TeknikB">
+                                                        <img id="TeknikResim2" class="d-block w-100" alt="Second slide" src="{{ kalip.ResimDizini2 }}" > </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card col-lg-12">
+                                    <div class="card-body">
+                                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                            <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-left"></i> </span>
+                                            <span class="sr-only">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                                            <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-right"></i> </span>
+                                            <span class="sr-only">Next</span>
+                                        </a>
+                                        <ol class="carousel-indicators">
+                                            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="" style="background-color: rgb(226, 141, 43);"></li>
+                                            <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""  style="background-color: rgb(226, 141, 43);"></li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row col-lg-8">
+                            <div class="container-fluid">
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                    <span class="info-box-text">KALIP NO:</span>
+                                    <span class="info-box-number" id="infoKalipNo">{{ kalip.KalipNo }}</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                    <span class="info-box-text">MÜŞTERİ (FİRMA) ADI:</span>
+                                    <span class="info-box-number" id="infoFirmaAdi">{{ kalip.FirmaAdi }}</span>
+                                    </div>
+                                </div>
+                                <div class="container-fluid">
+                                <div class="row">
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">RESİM GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoGramaj">{{ kalip.ProfilGramaj }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">SON ÜRETİM GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoSonUretimGramaj">{{ kalip.SonUretimGr }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="container-fluid">
+                        <div class="row ">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">ÜRETİCİ FİRMA:</span>
+                                <span class="info-box-number" id="infoUreticiFirma">{{ kalip.UreticiFirma }}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">CİNSİ:</span>
+                                <span class="info-box-number" id="infoCins">{{ kalip.Cinsi }}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">FİGÜR:</span>
+                                <span class="info-box-number" id="infoFigür">{{ kalip.GozAdedi }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                    <div class="row">
+                                        <span class="info-box-text col-lg-5" style="line-height: 30px; vertical-align: middle;">Ø ÇAPI:</span>
+                                        <span class="info-box-text col-lg-2">x</span>
+                                        <span class="info-box-text col-lg-5" style="line-height: 30px; vertical-align: middle;">PAKET BOYU:</span>
+                                    </div>
+                                    <div class="row">
+                                        <span class="info-box-number col-lg-5" id="infoCap">{{ kalip.Capi }} mm</span>
+                                        <span class="info-box-text col-lg-2">x</span>
+                                        <span class="info-box-number col-lg-5" id="infoPaket">{{ kalip.PaketBoyu }} mm</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">SON ÜRETİM TARİHİ:</span>
+                                <span class="info-box-number" id="infoSonUretimTarihi">{{ kalip.SonUretimTarih }}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">SON TEN. TARİHİ:</span>
+                                <span class="info-box-number" id="infoSonTenTarihi">{{ kalip.SonTeniferTarih }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">ÜRETİM TOPLAM KG:</span>
+                                <span class="info-box-number" id="infoUretimTopKG">{{ kalip.UretimToplamKg }}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">TEN KALAN OMUR KG:</span>
+                                <span class="info-box-number" id="infoSonTen">{{ kalip.TeniferKalanOmurKg }}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">Sıradaki Tenifer:</span>
+                                <span class="info-box-number" id="infoTeniferNo">{{ kalip.TeniferNo }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">DURUMU:</span>
+                                <span class="info-box-number" id="infoDurumu">{% if kalip.Silindi == 1 %} Silindi; Sebebi: {{ kalip.SilinmeSebebi }} {% else %} 
+                                    {% if kalip.AktifPasif == "Aktif" %} 
+                                        {% if kalip.Hatali == False %} Aktif {% else %} Hatalı ve Aktif {% endif %}
+                                    {% else %}
+                                        {% if kalip.Hatali == False %} Pasif {% else %} Hatalı ve Pasif {% endif %}
+                                    {% endif %}
+                                {% endif %}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">KALIP AÇIKLAMA:</span>
+                                <span class="info-box-number" id="infoKalipAciklama">{{ kalip.KalipAciklama }}</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">KALİTE AÇIKLAMA:</span>
+                                <span class="info-box-number" id="infoKaliteAciklama">{{ kalip.KaliteAciklama}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <!--row end-->
+                </div>
+                </div>
+                <!--kalipKart end-->
+            </div>
+            <!--Pres Üretim Raporu start -->
+            <div class="container-fluid col-lg-5">
+                <div class="card" id="presURaporListe-table"></div>
+            </div>
         </div>
+        </div>
+        {% endfor %}
     </div>
     <div class="card" id="dieComments">
         <div class="card-header">
-            <h2>Paylaşılanlar</h2>
+            <h2 class="card-title">Paylaşılanlar</h2>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
         </div>
         <div class="card-body">
 
@@ -41,12 +231,40 @@
 
 {% block extra_js %}
 <script>
+    var presURaporu = new Tabulator("#presURaporListe-table", {
+        height:"720px",
+        layout:"fitDataFill",
+        placeholder:"Pres Üretim Raporu",
+        ajaxURL:"/kalip/rapor",
+        progressiveLoad:"scroll",
+        paginationMode:"remote",
+        filterMode:"remote",
+        paginationSize:30,
+        ajaxURLGenerator:function(url, config, params){
+            return url + "?params=" + encodeURI(JSON.stringify(params));
+        },
+        columns:[
+            {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+            {title:"TARİH", field:"Tarih",formatter:"html", headerFilter:"input"},
+            {title:"DURUM", field:"Durum", headerFilter:"input"},
+            {title:"AÇIKLAMA", field:"HataAciklama", headerFilter:"input"},
+        ]
+    });
+
+    $(document).ready(function() {
+        let kNo = document.getElementById("infoKalipNo").innerText;
+        presURaporu.setFilter([{ field: 'KalipNo', type: '=', value: kNo }]);
+        presURaporu.redraw(true);
+    });
+
+
 
 </script>
 {% endblock %}
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 <script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
 <!-- Summernote -->

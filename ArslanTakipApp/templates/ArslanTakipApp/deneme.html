@@ -839,11 +839,11 @@ function getComments(comments) {
 
 function clickComment(kalipNo) {
     $.ajax({
-        url: `/kalip/comments/${kalipNo}`,
+        url: `/diesChat/${kalipNo}`,
         method: 'GET',
         dataType: 'json',
-        success: function (commentData) {
-            getComments(JSON.parse(commentData));
+        success: function () {
+            
         },
         error: function (error) {
             console.error('Error loading comments data:', error);

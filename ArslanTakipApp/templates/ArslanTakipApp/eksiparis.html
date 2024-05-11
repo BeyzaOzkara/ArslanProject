@@ -14,6 +14,14 @@
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
   <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+  <style>
+  #hammaddeTable, #yuzeyTable{
+      max-width:300px;
+      margin-right: 5px;
+      border: 1px solid gray;
+      border-radius: 6px;
+  }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -21,10 +29,24 @@
 <div class="container col-lg-12">
   <h1 class="col-lg-11" style="text-align: center;">Arslan Alüminyum Üretim Planı</h1>
   <h2 class="col-lg-11" style="text-align: center;">YAPIM AŞAMASINDA (design)</h2>
-  <button type="button" id="btnAcilListeDuzenle" class="btn btn-info" >Planlama Listesi Düzenle</button>
-  <div id="ekSiparisTable"></div>
+  <div class="card">
+    <button type="button" id="btnAcilListeDuzenle" class="btn btn-info" >Planlama Listesi Düzenle</button>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div id="hammaddeTable"></div>
+        <div id="yuzeyTable"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+        <div id="ekSiparisTable"></div>
+    </div>
+  </div>
   <div class="modal fade" id="acilModal" tabindex="-1" aria-labelledby="acilModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Planlama Listesi Düzenle</h5>
@@ -98,10 +120,33 @@
       return "<i class='fa fa-circle'></i>";
   };
 
+  var hammaddeTable =new Tabulator("#hammaddeTable", {
+    maxHeight:"400px",
+    layout:"fitDataFill",
+    placeholder:"Sipariş Hammadde",
+    ajaxURL:"/eksiparis/hammadde",
+    columns: [
+      {title:"Billet Türü", field: "EkBilletTuru"},
+      {title:"Brüt", field: "Brut"},
+      {title:"Net", field: "Net"}
+    ]
+  });
+  
+  var yuzeyTable =new Tabulator("#yuzeyTable", {
+    maxHeight:"400px",
+    layout:"fitDataFill",
+    placeholder:"Sipariş Hammadde",
+    ajaxURL:"/eksiparis/yuzey",
+    columns: [
+      {title:"Yüzey Özelliği", field: "EkYuzeyOzelligi"},
+      {title:"Net", field: "Net"},
+    ]
+  });
+
   var ekSiparisTable = new Tabulator("#ekSiparisTable", {
     height:"650px",
     layout:"fitDataFill",
-    placeholder:"Ek Sipariş Liste",
+    placeholder:"Sipariş Liste",
     ajaxURL:"/eksiparis/list",
     ajaxURLGenerator:function(url, config, params){
         return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
@@ -125,7 +170,8 @@
         {title:"Kg", field:"EkKg", headerFilter:"input"},
         {title:"Adet", field:"EkAdet", headerFilter:"input"},
         {title:"Firma Adı", field:"FirmaAdi", visible:false, headerFilter:"input"},
-        {title:"Billet Türü", field:"BilletTuru", headerFilter:"input"},
+        {title:"Billet Türü", field:"EkBilletTuru", headerFilter:"input"},
+        {title:"Yüzey Özelliği", field:"EkYuzeyOzelligi", headerFilter:"input"},
         {title:"Son Termin", field:"SonTermin", visible:false, headerFilter:"input"},
         {title:"Sipariş Kg", field:"GirenKg", headerFilter:"input"},
         {title:"Sipariş Kalan", field:"Kg", headerFilter:"input"},
@@ -154,19 +200,9 @@
     ajaxURL:"/eksiparis/acil",
     popupContainer:true,
     movableRows:true,
-    /* rowFormatter: row => {
-      let data = row.getData();
-        if (data.Silindi == true) {
-          row.getElement().style.color = "#a3050a" 
-          data.Silindi = "Evet";
-          }
-        else if (data.Silindi == false) {
-          data.Silindi = "Hayır";
-        }
-    }, */
     columns:[
         {rowHandle:true, formatter:"handle", title:"", headerMenu:headerMenu, headerSort:false, frozen:true, width:40, minWidth:40},
-        {title:"Kart No", field:"SipKartNo"},
+        {title:"Kart No", field:"SipKartNo", visible:false},
         {title:"Silindi", field:"Silindi", visible:false},
         {title:"Profil No", field:"ProfilNo"},
         {title:"Durumu", field:"EkDurumu", visible:false},
@@ -174,6 +210,8 @@
         {title:"Ek Termin", field:"EkTermin"},
         {title:"Ek Kg", field:"EkKg"},
         {title:"Firma Adı", field:"FirmaAdi"},
+        {title:"Yüzey Özelliği", field:"EkYuzeyOzelligi"},
+        {title:"Billet Türü", field:"EkBilletTuru"},
         {title:"Billet Türü", field:"BilletTuru", visible:false},
         {title:"Son Termin", field:"SonTermin", visible:false},
         {title:"Sipariş Kg", field:"GirenKg", visible:false},

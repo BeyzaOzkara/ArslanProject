@@ -152,6 +152,8 @@ class PresUretimRaporu(models.Model):
     BitisSaati = models.DateTimeField(null=True)
     HataAciklama = models.CharField(null=True)
     Durum = models.CharField(null=True)
+    IslemGoren_Kg = models.FloatField(null=True)
+    ToplamBilletKg = models.FloatField(null=True)
     
     class Meta:
         managed = False
@@ -177,6 +179,7 @@ class SiparisList(models.Model):
     BilletTuru = models.CharField(null=True)
     PresKodu = models.CharField(null=True)
     Profil_Gramaj = models.FloatField(null=True)
+    YuzeyOzelligi = models.CharField(null=True)
 
 
     class Meta:
@@ -189,6 +192,7 @@ class EkSiparis(models.Model):
     SipKimlik = models.IntegerField(null=True)
     EkPresKodu = models.CharField(null=True)
     EkTermin = models.DateTimeField(null=True)
+    EkBilletTuru = models.CharField(null=True, blank=True)
     EkKg = models.FloatField(null=True, verbose_name="Ek Kg")
     EkKalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
     KimTarafindan = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -197,6 +201,7 @@ class EkSiparis(models.Model):
     Sira = models.IntegerField(null=True)
     EkDurumu = models.FloatField(null=True)
     EkAdet = models.IntegerField(null=True)
+    EkYuzeyOzelligi = models.CharField(null=True)
     
     class Meta:
         verbose_name="EkSiparis"
