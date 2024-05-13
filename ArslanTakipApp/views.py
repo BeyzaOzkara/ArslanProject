@@ -1009,19 +1009,27 @@ def eksiparis_hammadde(request):
     raporlar = ekSiparis.values('EkBilletTuru')\
                         .annotate(Net=Sum('EkKg'))\
                         .order_by('EkBilletTuru')
-    raporList = list(raporlar.order_by('-Net'))
-    for i in raporList:
-        pres_raporlar = PresUretimRaporu.objects.using('dies') \
-                        .annotate(Sure_float=Cast('Sure', output_field=FloatField())) \
-                        .filter(StokCinsi=i['EkBilletTuru'])\
-                        .order_by("KartNo")
-        orta_araisi = pres_raporlar.aggregate(
-            fire=(1 - (Sum(F('IslemGoren_Kg')) / Sum(F('ToplamBilletKg'))))
-        )['fire'] or 0
-        i['Brut'] = math.ceil(i['Net'] / (1 - orta_araisi))
-    data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return HttpResponse(data)
+    ek_raporlar = raporlar.order_by('-Net')
+    billet_types = [r['EkBilletTuru'] for r in ek_raporlar]
 
+    pres_raporlar = PresUretimRaporu.objects.using('dies')\
+                        .filter(StokCinsi__in=billet_types)\
+                        .values('StokCinsi')\
+                        .annotate(TotalIslemGorenKg=Sum('IslemGoren_Kg'), TotalBilletKg=Sum('ToplamBilletKg'))
+    pres_data_map = {item['StokCinsi']: item for item in pres_raporlar}
+
+    for ek in ek_raporlar:
+        billet_type = ek['EkBilletTuru']
+        net = ek['Net']
+        pres_data = pres_data_map.get(billet_type, {})
+        total_islem_goren_kg = pres_data.get('TotalIslemGorenKg', 0)
+        total_billet_kg = pres_data.get('TotalBilletKg', 0)
+        fire = 1 - (total_islem_goren_kg / total_billet_kg if total_billet_kg else 0)
+        ek['Brut'] = math.ceil(net / (1 - fire)) if fire < 1 else net
+
+    data = json.dumps(list(ek_raporlar), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+    
 def eksiparis_yuzey(request):
     ekSiparis = EkSiparis.objects.exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
     raporlar = ekSiparis.values('EkYuzeyOzelligi')\
