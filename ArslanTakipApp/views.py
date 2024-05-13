@@ -377,7 +377,7 @@ def kalip_rapor(request):
             elif i["type"] == "=":
                 q[i['field']] = i['value']
     
-        query = PresUretimRaporu.objects.using('dies').all()
+        query = PresUretimRaporu.objects.using('dies').annotate(toplam_sure=Cast(Sum('Sure'), FloatField())).all()
         query = query.filter(**q).order_by('-Tarih') 
 
         g = list(query.values()[offset:limit])
@@ -890,7 +890,9 @@ def siparis_child(request, pNo):
     #print()
     gonder = list(child)
     for c in gonder:
-        pkodu = PresUretimRaporu.objects.using('dies').filter(KalipNo=c["KalipNo"]).order_by("-Tarih", "-BitisSaati").values("PresKodu","Tarih", "BitisSaati")
+        pkodu = PresUretimRaporu.objects.using('dies') \
+                        .annotate(toplam_sure=Cast(Sum('Sure'), FloatField())) \
+                        .filter(KalipNo=c["KalipNo"]).order_by("-Tarih", "-BitisSaati").values("PresKodu","Tarih", "BitisSaati")
         k = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
         if pkodu:
             c['SonPresKodu'] = pkodu[0]['PresKodu']
@@ -912,7 +914,9 @@ def siparis_presKodu(request, pNo):
     kalipNoList = list(child.order_by().values_list('KalipNo', flat=True).distinct())
 
     kalipPresKodu = list(child.order_by().values_list('PresKodu', flat=True).distinct())
-    uRaporuPresKodu = list(PresUretimRaporu.objects.using('dies').filter(KalipNo__in = kalipNoList).order_by().values_list('PresKodu', flat=True).distinct())
+    uRaporuPresKodu = list(PresUretimRaporu.objects.using('dies')
+                        .annotate(toplam_sure=Cast(Sum('Sure'), FloatField())) \
+                        .filter(KalipNo__in = kalipNoList).order_by().values_list('PresKodu', flat=True).distinct())
     uRaporuPresKodu = [x.strip(' ') for x in uRaporuPresKodu]
 
     diff = [x for x in uRaporuPresKodu if x not in kalipPresKodu]
@@ -971,6 +975,35 @@ def filter_method(i, a):
         a[i['field'] + "__icontains"] = i['value']
     return a
 
+def eksiparis_timeline(request):
+    ekSiparis = EkSiparis.objects.exclude(MsSilindi=True).exclude(Silindi=True).order_by("Sira")
+    raporlar = ekSiparis.values().order_by('Sira')
+    raporList = list(raporlar)
+
+    for i in raporList:
+        # Son bir yıl içindeki üretim raporlarını bul
+        last_year = datetime.datetime.now() - datetime.timedelta(days=365)
+        pres_raporlar = PresUretimRaporu.objects.using('dies') \
+                        .annotate(Sure_float=Cast('Sure', output_field=FloatField())) \
+                        .filter(StokCinsi=i['EkBilletTuru'], PresKodu=i['EkPresKodu'], Tarih__gte=last_year)
+        # Toplam işlenen kg ve toplam süreyi hesapla
+        toplam_kg = pres_raporlar.aggregate(toplam_kg=Sum('IslemGoren_Kg'))['toplam_kg'] or 0
+        toplam_sure = pres_raporlar.aggregate(toplam_sure=Sum('Sure_float'))['toplam_sure'] or 0
+
+        # Ortalama hızı hesapla (kg/saat cinsinden)
+        ortalama_hiz = toplam_kg / toplam_sure if toplam_sure != 0 else 0
+
+        # Ek siparişin süresini hesapla
+        if ortalama_hiz != 0:
+            i['OrtalamaHiz'] = ortalama_hiz
+            i['TahminiSure'] = str(math.ceil(i['EkKg'] / ortalama_hiz)) + " dk"
+        else:
+            i['OrtalamaHiz'] = 0
+            i['TahminiSure'] = 0
+
+    data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
 def eksiparis_hammadde(request):
     ekSiparis = EkSiparis.objects.exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
     raporlar = ekSiparis.values('EkBilletTuru')\
@@ -979,13 +1012,13 @@ def eksiparis_hammadde(request):
     raporList = list(raporlar.order_by('-Net'))
     for i in raporList:
         pres_raporlar = PresUretimRaporu.objects.using('dies') \
-                        .filter(StokCinsi=i['EkBilletTuru'], PresKodu='4500-1', Tarih__gte='2023-05-01', Tarih__lt='2024-05-02')\
+                        .annotate(Sure_float=Cast('Sure', output_field=FloatField())) \
+                        .filter(StokCinsi=i['EkBilletTuru'])\
                         .order_by("KartNo")
         orta_araisi = pres_raporlar.aggregate(
             fire=(1 - (Sum(F('IslemGoren_Kg')) / Sum(F('ToplamBilletKg'))))
-        )['fire']
+        )['fire'] or 0
         i['Brut'] = math.ceil(i['Net'] / (1 - orta_araisi))
-
     data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
@@ -1000,21 +1033,19 @@ def eksiparis_yuzey(request):
 
 def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
-    #for i in params:
-        #print("Key and Value pair are ({}) = ({})".format(i, params[i]))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
     offset, limit = calculate_pagination(page, size)
     
-    siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).extra(
-        select={
-            "TopTenKg": "(SELECT SUM(TeniferKalanOmurKg) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
-            "AktifKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0 AND View020_KalipListe.TeniferKalanOmurKg>= 0))",
-            "ToplamKalipSayisi":"(SELECT COUNT(KalipNo) FROM View020_KalipListe WHERE (View020_KalipListe.ProfilNo = View051_ProsesDepoListesi.ProfilNo AND View020_KalipListe.AktifPasif='Aktif' AND View020_KalipListe.Hatali=0))"
-        },
-    )
-    
+    siparis = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']).annotate(
+        AktifKalip=Subquery(
+            KalipMs.objects.filter(
+                ProfilNo=OuterRef('ProfilNo'), AktifPasif='Aktif', Hatali=False, TeniferKalanOmurKg__gte=0
+            ).values('ProfilNo').annotate(count_die=Count('KalipNo')).values('count_die')
+        )
+    ).order_by('Kimlik')
+
     q={}
     w={}
     sipFields = ["ProfilNo", "FirmaAdi", "GirenKg", "Kg", "GirenAdet", "Adet", "PlanlananMm", "Mm", "KondusyonTuru", "SiparisTamam", "SonTermin", "BilletTuru", "TopTenKg"]
@@ -1026,39 +1057,34 @@ def eksiparis_list(request):
             else:
                 q = filter_method(i, q)
     ekSiparis = EkSiparis.objects.filter(**q).exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
-    ekSiparisList = list(ekSiparis.values()[offset:limit])
-    siparis2 = siparis.filter(**w)
-    
-    #filterladıklarım aşağıdaki if içinde siliniyor nasıl yapmam lazım?
-    for e in ekSiparisList:
-        if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
-            a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
-            if a.MsSilindi != True:
-                a.MsSilindi = True
-                a.save()
-            ekSiparisList.remove(e)
-        else:
-            siparis1 = siparis2.get(Kimlik = e['SipKimlik'])
-            e['EkTermin'] = format_date(e['EkTermin'])
-            e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
-            e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
-            if siparis1:
-                e['ProfilNo'] = siparis1.ProfilNo
-                e['FirmaAdi'] = siparis1.FirmaAdi
-                e['GirenKg'] = siparis1.GirenKg
-                e['Kg'] = siparis1.Kg
-                e['GirenAdet'] = siparis1.GirenAdet
-                e['Adet'] = siparis1.Adet
-                e['PlanlananMm'] = siparis1.PlanlananMm
-                e['Mm'] = siparis1.Siparismm
-                e['KondusyonTuru'] = siparis1.KondusyonTuru
-                e['SiparisTamam'] = siparis1.SiparisTamam
-                e['SonTermin'] = format_date(siparis1.SonTermin)
-                e['TopTenKg'] = siparis1.TopTenKg
-                
+    siparis = siparis.filter(**w)
+
+    sip_filter = list(siparis.values_list('Kimlik', flat=True))
+    ek_siparis_list = list(ekSiparis.filter(SipKimlik__in=sip_filter)[offset:limit].values())
+
+    for e in ek_siparis_list:
+        siparis1 = siparis.get(Kimlik=e['SipKimlik'])
+        e['EkTermin'] = format_date(e['EkTermin'])
+        e['SipKartNo'] = f"{e['SipKartNo']}-{e['EkNo']}"
+        e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
+        e.update({
+            'ProfilNo': siparis1.ProfilNo,
+            'FirmaAdi': siparis1.FirmaAdi,
+            'GirenKg': siparis1.GirenKg,
+            'Kg': siparis1.Kg,
+            'GirenAdet': siparis1.GirenAdet,
+            'Adet': siparis1.Adet,
+            'PlanlananMm': siparis1.PlanlananMm,
+            'Mm': siparis1.Siparismm,
+            'KondusyonTuru': siparis1.KondusyonTuru,
+            'SiparisTamam': siparis1.SiparisTamam,
+            'SonTermin': format_date(siparis1.SonTermin),
+            'AktifKalip': siparis1.AktifKalip
+        })
+
     ek_count = ekSiparis.count()
     lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
-    lastData['data'] = ekSiparisList
+    lastData['data'] = ek_siparis_list
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 

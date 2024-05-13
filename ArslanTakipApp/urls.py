@@ -59,6 +59,7 @@ urlpatterns = [
     path('eksiparis/acil', views.eksiparis_acil),
     path('eksiparis/hammadde', views.eksiparis_hammadde),
     path('eksiparis/yuzey', views.eksiparis_yuzey),
+    path('eksiparis/timeline', views.eksiparis_timeline),
     path('kalipfirini/', login_required(views.KalipFirinView.as_view())),
     path('kalipfirini/meydan', views.kalipfirini_meydan),
 #     path('kalipfirini/goz', views.kalipfirini_goz),

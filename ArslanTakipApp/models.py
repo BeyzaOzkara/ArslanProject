@@ -154,6 +154,7 @@ class PresUretimRaporu(models.Model):
     Durum = models.CharField(null=True)
     IslemGoren_Kg = models.FloatField(null=True)
     ToplamBilletKg = models.FloatField(null=True)
+    Sure = models.DecimalField(null=True, max_digits=18, decimal_places=2)
     
     class Meta:
         managed = False

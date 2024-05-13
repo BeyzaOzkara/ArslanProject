@@ -37,6 +37,7 @@
       <div class="row">
         <div id="hammaddeTable"></div>
         <div id="yuzeyTable"></div>
+        <div id="sureTable"></div>
       </div>
     </div>
   </div>
@@ -120,6 +121,19 @@
       return "<i class='fa fa-circle'></i>";
   };
 
+  var sureTable =new Tabulator("#sureTable", {
+    maxHeight:"400px",
+    layout:"fitDataFill",
+    placeholder:"Sipariş Süre",
+    ajaxURL:"/eksiparis/timeline",
+    columns: [
+      {title:"Kart No", field: "SipKartNo"},
+      {title:"Billet Türü", field: "EkBilletTuru"},
+      {title:"Pres Kodu", field: "EkPresKodu"},
+      {title:"Sure", field: "TahminiSure"}
+    ]
+  });
+
   var hammaddeTable =new Tabulator("#hammaddeTable", {
     maxHeight:"400px",
     layout:"fitDataFill",
@@ -161,7 +175,7 @@
         {formatter:handleIcon, headerMenu:headerMenu, hozAlign:"center", title:"", headerSort:false, frozen:true, width:50, minWidth:50},
         {title:"Kart No", field:"SipKartNo", headerFilter:"input"},
         {title:"Silindi", field:"Silindi", visible:false, headerFilter:"input"},
-        {title:"Profil No", field:"ProfilNo", headerFilter:"input"}, //, headerFilterFunc:"="
+        {title:"Profil No", field:"ProfilNo", headerFilter:"input"},
         // ne kadar üretim yapılmış nasıl hesaplanacak?
         // ek sipariş eklenme gününü tut, pres üretim raporunda o tarihten sonra, o profil noda yapılan üretimler??
         // data-max = ek kg ve ek kalan kgye göre progress olabilir tamamlandı tamamlanmadı yeşil renk bloke kırmızı renk
