@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import logging
 import re
 import base64, binascii, zlib
@@ -29,7 +29,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
-from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery, FloatField, F
+from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery, FloatField, F, DateTimeField, TimeField, DurationField, IntegerField
 from django.db.models.functions import Cast
 from django.db import transaction 
 from channels.layers import get_channel_layer
@@ -43,6 +43,7 @@ from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
 from mailer import send_mail
+from django.db.models.functions import ExtractHour, ExtractMinute
 # Create your views here.
 
 
@@ -377,16 +378,15 @@ def kalip_rapor(request):
             elif i["type"] == "=":
                 q[i['field']] = i['value']
     
-        query = PresUretimRaporu.objects.using('dies').annotate(toplam_sure=Cast(Sum('Sure'), FloatField())).all()
-        query = query.filter(**q).order_by('-Tarih') 
+        query = PresUretimRaporu.objects.using('dies').filter(**q) \
+        .values('PresKodu', 'Tarih', 'BaslamaSaati', 'BitisSaati', 'HataAciklama', 'Durum').order_by('-Tarih')
 
-        g = list(query.values()[offset:limit])
+        g = list(query[offset:limit])
         for c in g:
             if c['Tarih'] != None:
                 c['Tarih'] = format_date(c['Tarih']) + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
                 c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
                 c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
-            #print(c)
         kalip_count = query.count()
         lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
         lastData['data'] = g
@@ -887,11 +887,9 @@ def siparis_child(request, pNo):
     kalip = KalipMs.objects.using('dies').values('KalipNo','UreticiFirma', 'TeniferKalanOmurKg', 'UretimToplamKg', 'PresKodu', 'Capi')
     child = kalip.filter(ProfilNo=pNo, AktifPasif="Aktif", Hatali=0)
     location_list = Location.objects.values()
-    #print()
     gonder = list(child)
     for c in gonder:
         pkodu = PresUretimRaporu.objects.using('dies') \
-                        .annotate(toplam_sure=Cast(Sum('Sure'), FloatField())) \
                         .filter(KalipNo=c["KalipNo"]).order_by("-Tarih", "-BitisSaati").values("PresKodu","Tarih", "BitisSaati")
         k = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
         if pkodu:
@@ -915,7 +913,6 @@ def siparis_presKodu(request, pNo):
 
     kalipPresKodu = list(child.order_by().values_list('PresKodu', flat=True).distinct())
     uRaporuPresKodu = list(PresUretimRaporu.objects.using('dies')
-                        .annotate(toplam_sure=Cast(Sum('Sure'), FloatField())) \
                         .filter(KalipNo__in = kalipNoList).order_by().values_list('PresKodu', flat=True).distinct())
     uRaporuPresKodu = [x.strip(' ') for x in uRaporuPresKodu]
 
@@ -980,20 +977,21 @@ def eksiparis_timeline(request):
     raporlar = ekSiparis.values().order_by('Sira')
     raporList = list(raporlar)
 
+    last_year = datetime.datetime.now() - datetime.timedelta(days=365)
+    pres_raporlar = PresUretimRaporu.objects.using('dies') \
+                    .filter(Tarih__gte=last_year, IslemGoren_Kg__gt=0) \
+                    .values('StokCinsi', 'PresKodu') \
+                    .annotate(toplam_sure=Cast(Sum('Sure', default=0), FloatField()),
+                            toplam_kg=Sum('IslemGoren_Kg', default=0))
+    # pres_raporlar_map = {(rapor['StokCinsi'], rapor['PresKodu']): {'toplam_kg': rapor['toplam_kg'], 'toplam_sure': rapor['toplam_sure']} for rapor in pres_raporlar}
+    # data = pres_raporlar_map.get(key, {'toplam_kg': 0, 'toplam_sure': 0})
+    # key = (i['EkBilletTuru'], i['EkPresKodu'])
     for i in raporList:
-        # Son bir yıl içindeki üretim raporlarını bul
-        last_year = datetime.datetime.now() - datetime.timedelta(days=365)
-        pres_raporlar = PresUretimRaporu.objects.using('dies') \
-                        .annotate(Sure_float=Cast('Sure', output_field=FloatField())) \
-                        .filter(StokCinsi=i['EkBilletTuru'], PresKodu=i['EkPresKodu'], Tarih__gte=last_year)
-        # Toplam işlenen kg ve toplam süreyi hesapla
-        toplam_kg = pres_raporlar.aggregate(toplam_kg=Sum('IslemGoren_Kg'))['toplam_kg'] or 0
-        toplam_sure = pres_raporlar.aggregate(toplam_sure=Sum('Sure_float'))['toplam_sure'] or 0
-
-        # Ortalama hızı hesapla (kg/saat cinsinden)
+        query = pres_raporlar.get(StokCinsi=i['EkBilletTuru'], PresKodu=i['EkPresKodu'])
+        toplam_kg = query['toplam_kg']
+        toplam_sure = query['toplam_sure']
         ortalama_hiz = toplam_kg / toplam_sure if toplam_sure != 0 else 0
 
-        # Ek siparişin süresini hesapla
         if ortalama_hiz != 0:
             i['OrtalamaHiz'] = ortalama_hiz
             i['TahminiSure'] = str(math.ceil(i['EkKg'] / ortalama_hiz)) + " dk"
@@ -1010,10 +1008,11 @@ def eksiparis_hammadde(request):
                         .annotate(Net=Sum('EkKg'))\
                         .order_by('EkBilletTuru')
     ek_raporlar = raporlar.order_by('-Net')
+    last_year = datetime.datetime.now() - datetime.timedelta(days=365)
     billet_types = [r['EkBilletTuru'] for r in ek_raporlar]
 
     pres_raporlar = PresUretimRaporu.objects.using('dies')\
-                        .filter(StokCinsi__in=billet_types)\
+                        .filter(StokCinsi__in=billet_types, Tarih__gte=last_year)\
                         .values('StokCinsi')\
                         .annotate(TotalIslemGorenKg=Sum('IslemGoren_Kg'), TotalBilletKg=Sum('ToplamBilletKg'))
     pres_data_map = {item['StokCinsi']: item for item in pres_raporlar}
