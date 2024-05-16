@@ -48,6 +48,8 @@ urlpatterns = [
     path('kalip/deletecomment/<str:cId>', views.kalip_comments_delete, name='kalipCommentDelete'),
     path('qr/', views.qrKalite, name='qr'),
     path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
+    path('siparis2/', views.siparis2_list),
+    path('siparis2/child', views.siparis2_child),
     path('siparis/', login_required(views.SiparisView.as_view())),
     path('siparis/list', views.siparis_list),
     path('siparis/max', views.siparis_max),

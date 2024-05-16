@@ -27,6 +27,7 @@ from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimR
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.paginator import Paginator
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
 from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery, FloatField, F, DateTimeField, TimeField, DurationField, IntegerField
@@ -663,6 +664,117 @@ def qrDeneme(request):
 class SiparisView(generic.TemplateView):
     template_name = 'ArslanTakipApp/siparisList.html'
 
+class Siparis2View(generic.TemplateView):
+    template_name = 'ArslanTakipApp/siparisDeneme.html'
+
+def annotate_siparis2():
+    return SiparisList.objects.using('dies').filter(
+        Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')) \
+    .values('ProfilNo', 'FirmaAdi') \
+    .annotate(
+        ToplamSiparisKg=Sum('GirenKg'),
+        ToplamKalanKg=Sum('Kg'),
+        TopTenKg=Subquery(
+            KalipMs.objects.using('dies').filter(
+                ProfilNo=OuterRef('ProfilNo'),
+                AktifPasif='Aktif',
+                Hatali=0,
+                TeniferKalanOmurKg__gte=0
+            ).values('ProfilNo').annotate(
+                total=Sum('TeniferKalanOmurKg')
+            ).values('total')[:1]
+        ),
+        AktifKalipSayisi=Subquery(
+            KalipMs.objects.using('dies').filter(
+                ProfilNo=OuterRef('ProfilNo'),
+                AktifPasif='Aktif',
+                Hatali=0,
+                TeniferKalanOmurKg__gte=0
+            ).values('ProfilNo').annotate(
+                cnt=Count('*')
+            ).values('cnt')[:1]
+        ),
+        ToplamKalipSayisi=Subquery(
+            KalipMs.objects.using('dies').filter(
+                ProfilNo=OuterRef('ProfilNo'),
+                AktifPasif='Aktif',
+                Hatali=0
+            ).values('ProfilNo').annotate(
+                cnt=Count('*')
+            ).values('cnt')[:1]
+        )
+    ).order_by('ProfilNo', 'FirmaAdi')
+
+def siparis2_list(request):
+    siparis = annotate_siparis2()
+    siparisValues = siparis.values('ProfilNo', 'FirmaAdi', 'ToplamSiparisKg', 'ToplamKalanKg', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi')
+    paginator = Paginator(siparisValues, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    for p in page_obj:
+        p['ToplamSiparisKg'] = locale.format_string("%.0f", math.ceil(p['ToplamSiparisKg']), grouping=True)
+        p['ToplamKalanKg'] = locale.format_string("%.0f", math.ceil(p['ToplamKalanKg']), grouping=True)
+        p['TopTenKg'] = locale.format_string("%.0f", math.ceil(p['TopTenKg']), grouping=True)
+        p['KalipSayisi'] = f"{p['AktifKalipSayisi']} / {p['ToplamKalipSayisi']}"
+
+    current_page = page_obj.number
+    total_pages = paginator.num_pages
+    page_range = list(range(max(current_page - 3, 1), min(current_page + 4, total_pages + 1)))
+
+    context = {
+        'page_obj': page_obj,
+        'page_range': page_range,
+    }
+    return render(request, 'ArslanTakipApp/siparisDeneme.html', context)
+
+def siparis3_list(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    size = params.get("size", 10)  # Default size to 10
+    offset, limit = calculate_pagination(params.get("page", 1), size)
+    filter_list = params.get("filter", [])
+    # sorter_List = params.get("sL", [])
+
+    siparis = annotate_siparis2()
+
+    if len(filter_list)>0:
+        for i in filter_list:
+            print(i)
+    else:
+        siparis = siparis.exclude(SiparisTamam='BLOKE')
+
+    siparisList = list(siparis.values('ProfilNo', 'FirmaAdi', 'ToplamSiparisKg', 'ToplamKalanKg', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi'))[offset:limit]
+    for s in siparisList:
+        s['ToplamSiparisKg'] = locale.format_string("%.0f", math.ceil(s['ToplamSiparisKg']), grouping=True)
+        s['ToplamKalanKg'] = locale.format_string("%.0f", math.ceil(s['ToplamKalanKg']), grouping=True)
+        s['TopTenKg'] = locale.format_string("%.0f", math.ceil(s['TopTenKg']), grouping=True)
+        s['KalipSayisi'] = f"{s['AktifKalipSayisi']} / {s['ToplamKalipSayisi']}"
+    
+    sip_count = siparis.count()
+    lastData= {'last_page': math.ceil(sip_count/size), 'data': []}
+    lastData['data'] = siparisList
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+def siparis2_child(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    profilNo = params.get("pNo", "")
+    firmaAdi = params.get("fAdi", "")
+
+    siparisler = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')). \
+        filter(ProfilNo=profilNo, FirmaAdi=firmaAdi)
+    siparisList = list(siparisler.values())
+
+    for s in siparisList:
+        s['GirenKg'] = locale.format_string("%.0f", s['GirenKg'], grouping=True)
+        s['Kg'] = locale.format_string("%.0f", s['Kg'], grouping=True)
+        if s['SiparisTamam'] == 'BLOKE':
+            s['BlokeDurum'] = False
+        else: s['BlokeDurum'] = True
+
+    data = json.dumps(siparisList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
 # Helper function for aggregation and formatting
 def aggregate_and_format(queryset, field):
     max_val = math.ceil(queryset.aggregate(Max(field))[f'{field}__max'])
@@ -727,7 +839,6 @@ def format_item(a):
     a += b
     return a
     
-
 def aggregate_in_parallel(queryset, fields):
     with ThreadPoolExecutor() as executor:
         future_to_field = {executor.submit(aggregate_and_format, queryset, field): field for field in fields}
@@ -771,20 +882,14 @@ def handle_siparis_tamam_filter(field, value):
         return (field, value)
 
 def siparis_list(request):
-    #validation for when params is missing or malformatted
     params = json.loads(unquote(request.GET.get('params', '{}')))
-    for i in params:
-        value = params[i]
-        #print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params.get("size", 10)  # Default size to 10
     offset, limit = calculate_pagination(params.get("page", 1), size)
     filter_list = params.get("filter", [])
     sorter_List = params.get("sL", [])
     hesap = params.get("h", {})
     
-    # Step 1: Initial Query and Annotation
-    s = annotate_siparis()
-    
+    s = annotate_siparis() # toplam ve aktif kalıp sayısı, toplam kalan tenifer ömrü kg
     q={}
     e ={}
 
@@ -976,6 +1081,7 @@ def eksiparis_timeline(request):
     ekSiparis = EkSiparis.objects.exclude(MsSilindi=True).exclude(Silindi=True).order_by("Sira")
     raporlar = ekSiparis.values().order_by('Sira')
     raporList = list(raporlar)
+    # print(f"raporlar: {raporlar}")
 
     last_year = datetime.datetime.now() - datetime.timedelta(days=365)
     pres_raporlar = PresUretimRaporu.objects.using('dies') \
@@ -986,6 +1092,9 @@ def eksiparis_timeline(request):
     # pres_raporlar_map = {(rapor['StokCinsi'], rapor['PresKodu']): {'toplam_kg': rapor['toplam_kg'], 'toplam_sure': rapor['toplam_sure']} for rapor in pres_raporlar}
     # data = pres_raporlar_map.get(key, {'toplam_kg': 0, 'toplam_sure': 0})
     # key = (i['EkBilletTuru'], i['EkPresKodu'])
+    shifts = []
+    current_shift = []
+    current_shift_duration = 0
     for i in raporList:
         query = pres_raporlar.get(StokCinsi=i['EkBilletTuru'], PresKodu=i['EkPresKodu'])
         toplam_kg = query['toplam_kg']
@@ -993,11 +1102,23 @@ def eksiparis_timeline(request):
         ortalama_hiz = toplam_kg / toplam_sure if toplam_sure != 0 else 0
 
         if ortalama_hiz != 0:
-            i['OrtalamaHiz'] = ortalama_hiz
             i['TahminiSure'] = str(math.ceil(i['EkKg'] / ortalama_hiz)) + " dk"
         else:
-            i['OrtalamaHiz'] = 0
             i['TahminiSure'] = 0
+
+        ek_siparis_duration = int(i['TahminiSure'].split()[0])
+        if current_shift_duration + ek_siparis_duration <= 720: # bir vardiya 720 dk 8-20 şeklinde ise, 8-8 ise 1440 dk olacak.
+            current_shift.append(i)
+            current_shift_duration += ek_siparis_duration
+        else:
+            break
+            # shifts.append(current_shift)
+            # current_shift = [i]
+            # current_shift_duration = ek_siparis_duration
+    
+    # if current_shift:
+    #     shifts.append(current_shift)
+    print(current_shift)
 
     data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)

@@ -1,0 +1,136 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <style>
+
+  </style>
+{% endblock %}
+
+{% block content %}
+<h1>Sipariş Listesi</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Profil No</th>
+                <th>Firma Adı</th>
+                <th>Sipariş Kg</th>
+                <th>Kalan Kg</th>
+                <th>Tenifer Kalan Ömür Kg</th>
+                <th>Kalıp Sayısı</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for siparis in page_obj %}
+                <tr onclick="showDetails('{{ siparis.ProfilNo }}', '{{ siparis.FirmaAdi }}')">
+                    <td>{{ siparis.ProfilNo }}</td>
+                    <td>{{ siparis.FirmaAdi }}</td>
+                    <td>{{ siparis.ToplamSiparisKg }}</td>
+                    <td>{{ siparis.ToplamKalanKg }}</td>
+                    <td>{{ siparis.TopTenKg }}</td>
+                    <td>{{ siparis.KalipSayisi }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination-container">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item first">
+                <a class="page-link" href="?page=1" aria-label="First" style="color: #96B6C5;">İlk</a>
+            </li>
+            <li class="page-item prev">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous" style="color: #96B6C5;">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            {% for page_number in page_range %}
+                {% if page_number == page_obj.number %}
+                <li class="page-item current">
+                    <span class="page-link current">{{ page_number }}</span>
+                </li>
+                {% else %}
+                <li class="page-item numbers">
+                    <a class="page-link" href="?page={{ page_number }}" style="color: #96B6C5;">{{ page_number }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="color: #96B6C5;">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="color: #96B6C5;">Son</a>
+                </li>
+                
+            {% endif %}
+        </ul>
+    </div>
+    <div id="detaylar"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showDetails(profilNo, firmaAdi) {
+        const params = {
+            pNo: profilNo,
+            fAdi: firmaAdi
+        }
+        $.ajax({
+            url: `/siparis2/child`,
+            method: 'GET',
+            data: { params: JSON.stringify(params)},
+            dataType: 'json',
+                success: function (responseData) {
+                console.log(responseData);
+            },
+            error: function (error) {
+                console.error('Error loading data:', error);
+            }
+        });
+        
+    }
+
+// function loadPage() {
+//     // const params = {
+//     //     page: page,
+//     //     size: itemsPerPage,
+//     //     filter: filter,
+//     //     sL:sorterList,
+//     // };
+//     $.ajax({
+//         url: `/siparis2/list`,
+//         method: 'GET',
+//         // data: { params: JSON.stringify(params)},
+//         dataType: 'json',
+//         success: function (responseData) {
+//           console.log(responseData);
+//         },
+//         error: function (error) {
+//           console.error('Error loading data:', error);
+//         }
+//     });
+// }
+
+// loadPage();
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}
