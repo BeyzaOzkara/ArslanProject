@@ -747,7 +747,11 @@ def siparis3_list(request):
     for s in siparisList:
         s['ToplamSiparisKg'] = locale.format_string("%.0f", math.ceil(s['ToplamSiparisKg']), grouping=True)
         s['ToplamKalanKg'] = locale.format_string("%.0f", math.ceil(s['ToplamKalanKg']), grouping=True)
-        s['TopTenKg'] = locale.format_string("%.0f", math.ceil(s['TopTenKg']), grouping=True)
+        if s['TopTenKg'] != None:
+            s['TopTenKg'] = locale.format_string("%.0f", math.ceil(s['TopTenKg']), grouping=True)
+        else: s['TopTenKg'] = 0
+        if s['AktifKalipSayisi'] == None: s['AktifKalipSayisi'] = 0
+        if s['ToplamKalipSayisi'] == None: s['ToplamKalipSayisi'] = 0
         s['KalipSayisi'] = f"{s['AktifKalipSayisi']} / {s['ToplamKalipSayisi']}"
     
     sip_count = siparis.count()
