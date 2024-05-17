@@ -543,6 +543,15 @@
                 <label for="planlananPresKodu">Pres Kodu: </label>
                 <select name="presKodu" id="planlananPresKodu">
                   <option value="" selected disabled>Seçiniz</option>
+                  <option value="1100-1">1100-1</option>
+                  <option value="1100-2">1100-2</option>
+                  <option value="1100-3">1100-3</option>
+                  <option value="1200-1">1200-1</option>
+                  <option value="1600-1">1600-1</option>
+                  <option value="1600-2">1600-2</option>
+                  <option value="2750-1">2750-1</option>
+                  <option value="4000-1">4000-1</option>
+                  <option value="4500-1">4500-1</option>
                 </select>
               </div>
             </div>
@@ -579,22 +588,6 @@
 
 {% block extra_js %}
 <script>
-
-  const eklenenler = (sipKimlik) => {
-    $.ajax({
-      url: `/siparis/eksorgu/${sipKimlik}`,
-      method: 'GET',
-      dataType: 'json',
-      success: function (eklenenData) {
-          $.each(eklenenData, function(key, value) {
-           // $('#planlananPresKodu').append('<option value=' + value + '>' + value + '</option>');
-          });
-      },
-      error: function (error) {
-          console.error('Error loading eklenenler:', error);
-      }
-    });
-  };
   
   var deleteIcon = function(cell, formatterParams, onRendered){ 
       return "<i class='fa fa-trash'></i>";
@@ -913,30 +906,7 @@ addInputChangeHandler('#topten2', '#range_3', 'to', min3);
       document.getElementById('sipKimlik').value = sipKimlik.value;
       document.getElementById('ProfilGramaj').value = profilGramaj.value;
 
-      loadPresKodu(profilNoTD.innerHTML);
       $('#siparisEkleModal').modal('show'); 
-
-    };
-
-    $('#siparisEkleModal').on('hidden.bs.modal', function() {
-      $('#planlananPresKodu').find('option').remove().end().append('<option value="">Seçiniz</option>');
-    });
-
-    const loadPresKodu = (profilNo) => {
-      $.ajax({
-      url: `/siparis/presKodu/${profilNo}`,
-      method: 'GET',
-      dataType: 'json',
-      success: function (presData) {
-          //$("#planlananPresKodu").attr('disabled', false);
-          $.each(presData, function(key, value) {
-            $('#planlananPresKodu').append('<option value=' + value + '>' + value + '</option>');
-          });
-      },
-      error: function (error) {
-          console.error('Error loading pres kodu data:', error);
-      }
-      });
 
     };
 

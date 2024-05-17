@@ -49,6 +49,13 @@
 
 {% block extra_js %}
 <script>
+
+// var editCheck = function(cell) {
+//     var data = cell.getRow().getData();
+//     console.log(data.PresKodu)
+//     return data.PresKodu == "1100-2";
+// }
+
 function showDetails(profilNo, firmaAdi, rowNo, element) {
     const params = {
         pNo: profilNo,
@@ -60,22 +67,26 @@ function showDetails(profilNo, firmaAdi, rowNo, element) {
         data: { params: JSON.stringify(params)},
         dataType: 'json',
             success: function (responseData) {
-            console.log(responseData);
             const expandableRow = element.next('.expandable-body');
             expandableRow.toggleClass('d-none');
 
             const tabulatorContainer = expandableRow.find('.tabulator-container');
-            console.log(tabulatorContainer);
             const tabulatorId = `tab${rowNo}`;
 
             if (!tabulatorContainer.data('initialized')) {
                 tabulatorContainer.attr('id', tabulatorId);
 
+                var visibCheck= function(cell) {
+                    return cell.getRow().isSelected();
+                }
                 const tabulatorTable = new Tabulator(`#${tabulatorId}`, {
                     data: responseData,
                     layout: "fitDataFill",
                     columns: [
-                        { title: "BLOKE", field: "BlokeDurum"},
+                    { title: "EKLE", field: "edit", formatter: 'rowSelection', editable: (cell) => false, cellClick: (_, cell)=> cell.getRow().toggleSelect()},
+                        { title: "BLOKE", field: "BlokeDurum", formatter:"tickCross", formatterParams:{
+                            allowEmpty:true, allowTruthy:true, tickElement:"<i class='fa fa-check'></i>", crossElement:"<i class='fa fa-times'></i>",
+                        }},
                         { title: "KART NO", field: "KartNo" },
                         { title: "BİLLET", field: "BilletTuru" },
                         { title: "PRES KODU", field: "PresKodu" },
@@ -84,10 +95,15 @@ function showDetails(profilNo, firmaAdi, rowNo, element) {
                         { title: "KALAN KG", field: "Kg" },
                         { title: "UZUN BOY", field: "Siparismm" },
                         { title: "KISA BOY", field: "PlanlananMm" },
-                        { title: "TERMİN", field: "SonTermin" },
+                        { title: "TERMİN", field: "SonTermin", editor:"date", editable:(cell) => cell.getRow().isSelected()},
+                        { title: "İSTENİLEN KG", field: "EkKg", editor:"input", editable:(cell) => cell.getRow().isSelected()},
+                        { title: "İSTENİLEN ADET", field: "EkAdet", editor:"input", editable:(cell) => cell.getRow().isSelected() },
                     ]
                 });
                 tabulatorContainer.data('initialized', true);
+                tabulatorContainer.on("cellEdited", function(cell){
+                    console.log(cell);
+                });
             }
         },
         error: function (error) {
