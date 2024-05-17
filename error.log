@@ -29498,3 +29498,55 @@ Traceback (most recent call last):
                                                  ^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: must be real number, not NoneType
 [35;1mHTTP GET /siparis3/list?params=%7B%22page%22%3A1%2C%22size%22%3A100%7D 500 [1.38, 127.0.0.1:52056][0m
+Internal Server Error: /siparis3/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 759, in siparis3_list
+    s['SonTermin'] = format_date(s['SonTermin'])
+                                 ~^^^^^^^^^^^^^
+KeyError: 'SonTermin'
+[35;1mHTTP GET /siparis3/list?params=%7B%22page%22%3A1%2C%22size%22%3A5%7D 500 [1.74, 127.0.0.1:55424][0m
+Internal Server Error: /siparis3/list
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 759, in siparis3_list
+    s['SonTermin'] = format_date(s['SonTermin'])
+                                 ~^^^^^^^^^^^^^
+KeyError: 'SonTermin'
+[35;1mHTTP GET /siparis3/list?params=%7B%22page%22%3A1%2C%22size%22%3A5%7D 500 [1.25, 127.0.0.1:55423][0m

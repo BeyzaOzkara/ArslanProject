@@ -13,6 +13,8 @@
 
 {% block stylesheets %}
   {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+  
   <style>
 
   </style>
@@ -47,7 +49,7 @@
 
 {% block extra_js %}
 <script>
-function showDetails(profilNo, firmaAdi, element) {
+function showDetails(profilNo, firmaAdi, rowNo, element) {
     const params = {
         pNo: profilNo,
         fAdi: firmaAdi
@@ -61,6 +63,32 @@ function showDetails(profilNo, firmaAdi, element) {
             console.log(responseData);
             const expandableRow = element.next('.expandable-body');
             expandableRow.toggleClass('d-none');
+
+            const tabulatorContainer = expandableRow.find('.tabulator-container');
+            console.log(tabulatorContainer);
+            const tabulatorId = `tab${rowNo}`;
+
+            if (!tabulatorContainer.data('initialized')) {
+                tabulatorContainer.attr('id', tabulatorId);
+
+                const tabulatorTable = new Tabulator(`#${tabulatorId}`, {
+                    data: responseData,
+                    layout: "fitDataFill",
+                    columns: [
+                        { title: "BLOKE", field: "BlokeDurum"},
+                        { title: "KART NO", field: "KartNo" },
+                        { title: "BİLLET", field: "BilletTuru" },
+                        { title: "PRES KODU", field: "PresKodu" },
+                        { title: "KONDÜSYON", field: "KondusyonTuru" },
+                        { title: "SİPARİŞ KG", field: "GirenKg" },
+                        { title: "KALAN KG", field: "Kg" },
+                        { title: "UZUN BOY", field: "Siparismm" },
+                        { title: "KISA BOY", field: "PlanlananMm" },
+                        { title: "TERMİN", field: "SonTermin" },
+                    ]
+                });
+                tabulatorContainer.data('initialized', true);
+            }
         },
         error: function (error) {
             console.error('Error loading data:', error);
@@ -99,7 +127,7 @@ function updateTable(data) {
 
     data.forEach(item => {
         const row = `
-            <tr class="main-row" data-profilno="${item.ProfilNo}" data-firmaadi="${item.FirmaAdi}">
+            <tr class="main-row" data-profilno="${item.ProfilNo}" data-rowno="${item.rowNo}" data-firmaadi="${item.FirmaAdi}">
                 <td>${item.ProfilNo}</td>
                 <td>${item.FirmaAdi}</td>
                 <td>${item.ToplamSiparisKg}</td>
@@ -109,7 +137,7 @@ function updateTable(data) {
             </tr>
             <tr class="expandable-body d-none">
                 <td colspan="6">
-                    <p style="display: none;"></p>
+                    <div class="tabulator-container"></div>
                 </td>
             </tr>
         `;
@@ -119,7 +147,8 @@ function updateTable(data) {
     $('.main-row').on('click', function () {
         const profilNo = $(this).data('profilno');
         const firmaAdi = $(this).data('firmaadi');
-        showDetails(profilNo, firmaAdi, $(this));
+        const rowNo = $(this).data('rowno');
+        showDetails(profilNo, firmaAdi, rowNo, $(this));
     });
 }
 
@@ -229,5 +258,6 @@ loadPage(currentPage);
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 
 {% endblock %}

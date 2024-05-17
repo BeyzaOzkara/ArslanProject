@@ -744,7 +744,10 @@ def siparis3_list(request):
         siparis = siparis.exclude(SiparisTamam='BLOKE')
 
     siparisList = list(siparis.values('ProfilNo', 'FirmaAdi', 'ToplamSiparisKg', 'ToplamKalanKg', 'TopTenKg', 'AktifKalipSayisi', 'ToplamKalipSayisi'))[offset:limit]
+    rowNo = 0
     for s in siparisList:
+        rowNo += 1
+        s['rowNo'] = rowNo
         s['ToplamSiparisKg'] = locale.format_string("%.0f", math.ceil(s['ToplamSiparisKg']), grouping=True)
         s['ToplamKalanKg'] = locale.format_string("%.0f", math.ceil(s['ToplamKalanKg']), grouping=True)
         if s['TopTenKg'] != None:
@@ -767,7 +770,7 @@ def siparis2_child(request):
 
     siparisler = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')). \
         filter(ProfilNo=profilNo, FirmaAdi=firmaAdi)
-    siparisList = list(siparisler.values())
+    siparisList = list(siparisler.values().order_by('SonTermin'))
 
     for s in siparisList:
         s['GirenKg'] = locale.format_string("%.0f", s['GirenKg'], grouping=True)
@@ -775,6 +778,7 @@ def siparis2_child(request):
         if s['SiparisTamam'] == 'BLOKE':
             s['BlokeDurum'] = False
         else: s['BlokeDurum'] = True
+        s['SonTermin'] = format_date(s['SonTermin'])
 
     data = json.dumps(siparisList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
