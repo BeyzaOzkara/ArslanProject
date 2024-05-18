@@ -28,9 +28,8 @@
 
 <div class="container col-lg-12">
   <h1 class="col-lg-11" style="text-align: center;">Arslan Alüminyum Üretim Planı</h1>
-  <h2 class="col-lg-11" style="text-align: center;">YAPIM AŞAMASINDA (design)</h2>
   <div class="card">
-    <button type="button" id="btnAcilListeDuzenle" class="btn btn-info" >Planlama Listesi Düzenle</button>
+    <button type="button" id="btnAcilListeDuzenle" class="btn btn-info" >PLANLAMA LİSTESİ DÜZENLE</button>
   </div>
   <div class="card">
     <div class="card-body">
@@ -61,6 +60,25 @@
         </div>
         <div class="modal-footer">
           <button type="button" id="btnAcilListeKaydet" class="btn btn-primary">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="kalipSokmeModal" tabindex="-1" aria-labelledby="kalipSokmeModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kalıp Sökme Sebebi</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% csrf_token %}
+          <input class="form-control" id="ekSiparisKalipSokmeSebebi"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnKalipSokmeKaydet" class="btn btn-primary">Kaydet</button>
         </div>
       </div>
     </div>
@@ -120,6 +138,46 @@
   var handleIcon = function(cell, formatterParams, onRendered){ 
       return "<i class='fa fa-circle'></i>";
   };
+  var kalipIcon = function(cell, formatterParams, onRendered){ 
+    let data = cell.getData();
+    let kalip = data.KalipSokmeDurum;
+    let id = data.id;
+    let kalipbutton = `<button type='button' class='btn btn-primary'>ÜRETİME BAŞLA</button>`
+    if (kalip==1) {
+      kalipbutton = `<button type='button' class='btn btn-danger'>ÜRETİMİ BİTİR</button>`
+    }
+    else if (kalip==2) {
+      kalipbutton = ``
+    }
+    else if (kalip==3) {
+      kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})'>ÜRETİME BAŞLA</button>`
+    }
+    return kalipbutton;
+  };
+
+  var uretimeBasla = function(id) {
+    const params = {
+      sId: id,
+    }
+    $.ajax({
+      url: `/eksiparis/uretim`,
+      method: 'GET',
+      data: { params: JSON.stringify(params)},
+      dataType: 'json',
+          success: function (response) {
+            let message = response.message;
+            if (message != "") {
+              alert(message);
+            }
+            else {
+              $('#kalipSokmeModal').show();
+            }
+          },
+          error: function (error) {
+            console.error('Error loading data:', error);
+        }
+    })
+  }
 
   var sureTable =new Tabulator("#sureTable", {
     maxHeight:"400px",
@@ -190,8 +248,7 @@
         {title:"Sipariş Kg", field:"GirenKg", headerFilter:"input"},
         {title:"Sipariş Kalan", field:"Kg", headerFilter:"input"},
         {title:"Kondüsyon Türü", field:"KondusyonTuru", headerFilter:"input"},
-        {title:"Toplam Kalan Tenifer", field:"TopTenKg", visible:false, headerFilter:"input"},
-        {title:"Kim Tarafından", field:"KimTarafindan", headerFilter:"input"},
+        {formatter:kalipIcon, hozAlign:"center", title:"", headerSort:false, frozen:true},
     ],
   });
 

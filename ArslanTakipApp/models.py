@@ -112,7 +112,7 @@ class KalipMs(models.Model):
     Bolster = models.CharField(null=True)
     KalipCevresi = models.FloatField(null=True)
     KaliteOkey = models.IntegerField(null=True)
-    UreticiFirma = models.CharField(null=True)
+    UreticiFirma = models.CharField(null=True) 
     TeniferOmruMt = models.FloatField(null=True)
     TeniferOmruKg = models.FloatField(null=True)
     TeniferKalanOmurKg = models.FloatField(null=True)
@@ -203,6 +203,8 @@ class EkSiparis(models.Model):
     EkDurumu = models.FloatField(null=True)
     EkAdet = models.IntegerField(null=True)
     EkYuzeyOzelligi = models.CharField(null=True)
+    KalipSokmeSebebi = models.CharField(null=True, blank=True)
+    ProfilNo = models.CharField(null=True, blank=True)
     
     class Meta:
         verbose_name="EkSiparis"
