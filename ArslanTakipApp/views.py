@@ -1098,6 +1098,12 @@ firinlar = {
     '2750-1': '1085', '4000-1': '1081', '4500-1': '1106'
 }
 
+meydanlar = {
+    '1100-1': '551', '1100-2': '789', '1100-3': '799',
+    '1200-1': '556', '1600-1': '569', '1600-2': '804',
+    '2750-1': '809', '4000-1': '817', '4500-1': '1105'
+}
+
 def kalipPresCheck(sId):
     eksiparis = EkSiparis.objects.get(id=sId)
     pNo = eksiparis.ProfilNo
@@ -1147,9 +1153,25 @@ def eksiparis_uretim(request):
     elif len(kaliplar) > 1: #birden fazla o profil noda kalıp var ise hangi kalıplar olduğunu gönder, modalda göster. seçilen kalıbı o prese kaydet.
         response = JsonResponse({'message': "", 'kaliplar':kaliplar})
     elif len(kaliplar) < 1:
-        response = JsonResponse({'message': f"Fırında {pNo} no'lu kalıp bulunmamaktadır."})
+        response = JsonResponse({'message': f"Fırında {pNo} no'lu kalıp bulunmamaktadır."}) # kalıp olmayan durumlarda buton yok zaten bunu göstermeye gerek yok. ya da burda dursun sayfa yenilenmezse ve 
+        # ilk başta fırında olan kalıp sonradan başka yere gönderilirse burada yakalamış oluruz.
 
     return response
+
+def eksiparis_uretimbitir(request):
+    params = json.loads(unquote(request.GET.get('params')))
+    presKodu = params["presKodu"]
+    meydan = meydanlar(presKodu)
+    die = DiesLocation.objects.get(kalipVaris_id = presler[presKodu])
+    Hareket.objects.create(
+        kalipKonum_id=die.kalipVaris.id,
+        kalipVaris_id=meydan,
+        kalipNo=die.kalipNo,
+        kimTarafindan_id=request.user.id
+    )
+
+    return JsonResponse({'message': f"{die.kalipNo} no'lu kalıp başarıyla meydana gönderildi."})
+
 
 def eksiparis_timeline(request):
     ekSiparis = EkSiparis.objects.exclude(MsSilindi=True).exclude(Silindi=True).order_by("Sira")
@@ -1237,15 +1259,8 @@ def eksiparis_list(request):
     page = params["page"]
     filter_list = params["filter"]
     offset, limit = calculate_pagination(page, size)
-    # presKodu bazlı getirilecek
-    siparis = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']).annotate(
-        AktifKalip=Subquery(
-            KalipMs.objects.filter(
-                ProfilNo=OuterRef('ProfilNo'), AktifPasif='Aktif', Hatali=False, TeniferKalanOmurKg__gte=0
-            ).values('ProfilNo').annotate(count_die=Count('KalipNo')).values('count_die')
-        )
-    ).order_by('Kimlik')
-
+    # presKodu bazlı getirilecek pres operatörlerine sadece o pres için olan siparişleri görme yetkisi verilecek.
+    
     q={}
     w={}
     sipFields = ["ProfilNo", "FirmaAdi", "GirenKg", "Kg", "GirenAdet", "Adet", "PlanlananMm", "Mm", "KondusyonTuru", "SiparisTamam", "SonTermin", "BilletTuru", "TopTenKg"]
@@ -1257,7 +1272,13 @@ def eksiparis_list(request):
             else:
                 q = filter_method(i, q)
     ekSiparis = EkSiparis.objects.filter(**q).exclude(MsSilindi = True).exclude(Silindi = True).order_by("Sira")
-    siparis = siparis.filter(**w)
+    siparis = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']).annotate(
+        AktifKalip=Subquery(
+            KalipMs.objects.filter(
+                ProfilNo=OuterRef('ProfilNo'), AktifPasif='Aktif', Hatali=False, TeniferKalanOmurKg__gte=0
+            ).values('ProfilNo').annotate(count_die=Count('KalipNo')).values('count_die')
+        )
+    ).filter(**w).order_by('Kimlik')
 
     sip_filter = list(siparis.values_list('Kimlik', flat=True))
     ek_siparis_list = list(ekSiparis.filter(SipKimlik__in=sip_filter)[offset:limit].values())

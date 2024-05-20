@@ -50,7 +50,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Planlama Listesi Düzenle</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -81,7 +81,26 @@
           <button type="button" id="btnKalipSokmeKaydet" class="btn btn-primary">Kaydet</button>
         </div>
       </div>
+  </div>
+  <div class="modal fade" id="kaliplarModal" tabindex="-1" aria-labelledby="kaliplarModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Fırındaki Kalıplar</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% csrf_token %}
+          <select name="kalipSelect" id="kalipSelect">
+            <option value="">Kalıp Seçiniz</option>
+          </select>
+          <button type="button" class="btn btn-primary">Üretime Başla</button>
+        </div>
+      </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -142,9 +161,10 @@
     let data = cell.getData();
     let kalip = data.KalipSokmeDurum;
     let id = data.id;
+    let presKodu = data.EkPresKodu;
     let kalipbutton = `<button type='button' class='btn btn-primary'>ÜRETİME BAŞLA</button>`
     if (kalip==1) {
-      kalipbutton = `<button type='button' class='btn btn-danger'>ÜRETİMİ BİTİR</button>`
+      kalipbutton = `<button type='button' class='btn btn-danger' onclick='uretimiBitir(${presKodu})'>ÜRETİMİ BİTİR</button>`
     }
     else if (kalip==2) {
       kalipbutton = ``
@@ -170,11 +190,34 @@
               alert(message);
             }
             else {
-              $('#kalipSokmeModal').show();
+              $.each(response.kaliplar, function(key, value) {
+                  $('#kalipSelect').append('<option value=' + value.id + '>' + value.Isim + '</option>');
+              });
+              $('#kaliplarModal').show(); // birden fazla kalıp olan durumlarda modal açılsın ve kalıp seçilsin.
             }
           },
           error: function (error) {
             console.error('Error loading data:', error);
+        }
+    })
+  }
+
+  var uretimiBitir = function(presKodu) {
+    const params = {
+      presKodu: presKodu,
+    }
+    $.ajax({
+      url: `/eksiparis/uretimbitir`,
+      method: 'GET',
+      data: { params: JSON.stringify(params)},
+      dataType: 'json',
+          success: function (response) {
+            let message = response.message;
+            alert(message);
+            window.location.reload();
+          },
+          error: function (error) {
+            console.error('Error finishing production:', error);
         }
     })
   }
