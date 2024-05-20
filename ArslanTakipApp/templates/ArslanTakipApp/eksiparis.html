@@ -161,7 +161,6 @@
   };
   var kalipIcon = function(cell, formatterParams, onRendered){ 
     let data = cell.getData();
-    console.log(data)
     let kalip = data.KalipSokmeDurum;
     let id = data.id;
     let pKodu = data.EkPresKodu;
@@ -192,8 +191,11 @@
             let message = response.message;
             if (message != "") {
               alert(message);
+              window.location.reload();
             }
             else {
+              $('#kalipSelect').empty();
+              $('#kalipSelect').append('<option value="" disabled selected>Kalıp Seçiniz</option>');
               $.each(response.kaliplar, function(key, value) {
                   $('#kalipSelect').append('<option value=' + value + '>' + value + '</option>');
               });
@@ -231,7 +233,8 @@
   $('#btnKalipUretim').click(function() {
       $('#kaliplarModal').modal('hide');
       let sId = $('#sId').data('sid');
-      uretimeBasla(id=sId, kNo="");
+      let kNo = $('#kalipSelect').find(":selected").val();
+      uretimeBasla(id=sId, kNo=kNo);
   });
 
   var sureTable =new Tabulator("#sureTable", {

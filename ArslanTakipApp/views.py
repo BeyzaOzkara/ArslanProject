@@ -1172,7 +1172,6 @@ def eksiparis_uretim(request):
 def eksiparis_uretimbitir(request):
     params = json.loads(unquote(request.GET.get('params')))
     presKodu = params["presKodu"]
-    print(presKodu)
     meydan = meydanlar[presKodu]
     die = DiesLocation.objects.get(kalipVaris_id = presler[presKodu])
     Hareket.objects.create(
@@ -1203,22 +1202,24 @@ def eksiparis_timeline(request):
     current_shift = []
     current_shift_duration = 0
     for i in raporList:
-        query = pres_raporlar.get(StokCinsi=i['EkBilletTuru'], PresKodu=i['EkPresKodu'])
-        toplam_kg = query['toplam_kg']
-        toplam_sure = query['toplam_sure']
-        ortalama_hiz = toplam_kg / toplam_sure if toplam_sure != 0 else 0
+        query = pres_raporlar.filter(StokCinsi=i['EkBilletTuru'], PresKodu=i['EkPresKodu'])
+        if query:
+            query = query[0]
+            toplam_kg = query['toplam_kg']
+            toplam_sure = query['toplam_sure']
+            ortalama_hiz = toplam_kg / toplam_sure if toplam_sure != 0 else 0
 
-        if ortalama_hiz != 0:
-            i['TahminiSure'] = str(math.ceil(i['EkKg'] / ortalama_hiz)) + " dk"
-        else:
-            i['TahminiSure'] = 0
+            if ortalama_hiz != 0:
+                i['TahminiSure'] = str(math.ceil(i['EkKg'] / ortalama_hiz)) + " dk"
+            else:
+                i['TahminiSure'] = 0
 
-        ek_siparis_duration = int(i['TahminiSure'].split()[0])
-        if current_shift_duration + ek_siparis_duration <= 720: # bir vardiya 720 dk 8-20 şeklinde ise, 8-8 ise 1440 dk olacak.
-            current_shift.append(i)
-            current_shift_duration += ek_siparis_duration
-        else:
-            break
+            ek_siparis_duration = int(i['TahminiSure'].split()[0])
+            if current_shift_duration + ek_siparis_duration <= 720: # bir vardiya 720 dk 8-20 şeklinde ise, 8-8 ise 1440 dk olacak.
+                current_shift.append(i)
+                current_shift_duration += ek_siparis_duration
+            else:
+                break
             # shifts.append(current_shift)
             # current_shift = [i]
             # current_shift_duration = ek_siparis_duration
