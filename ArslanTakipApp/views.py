@@ -1132,30 +1132,41 @@ def kalipPresCheck(sId):
 def eksiparis_uretim(request):
     params = json.loads(unquote(request.GET.get('params')))
     sId = params["sId"] #siparişteki pres koduna göre o presin fırınlarında siparişteki profil noya uygun kalıp varsa listele
-
+    kalipNo = params["kalipNo"]
     eksiparis = EkSiparis.objects.get(id=sId)
     pNo = eksiparis.ProfilNo
     pKodu = eksiparis.EkPresKodu
-    firinId = firinlar[pKodu]
-    gozler = Location.objects.filter(locationRelationID=firinId)
-    kalipList = DiesLocation.objects.filter(kalipVaris__in=gozler).values_list('kalipNo', flat=True)
-    kaliplar = KalipMs.objects.using('dies').filter(KalipNo__in= list(kalipList), ProfilNo=pNo).values_list('KalipNo', flat=True)
 
-    if len(kaliplar) == 1: #bir taneyse hemen üretime al ve cevap olarak hangi kalıbın prese eklendiğini döndür
-        k = DiesLocation.objects.get(kalipNo=kaliplar[0])
+    if kalipNo == "":
+        firinId = firinlar[pKodu]
+        gozler = Location.objects.filter(locationRelationID=firinId)
+        kalipList = DiesLocation.objects.filter(kalipVaris__in=gozler).values_list('kalipNo', flat=True)
+        kaliplar = KalipMs.objects.using('dies').filter(KalipNo__in= list(kalipList), ProfilNo=pNo).values_list('KalipNo', flat=True)
+
+        if len(kaliplar) == 1: #bir taneyse hemen üretime al ve cevap olarak hangi kalıbın prese eklendiğini döndür
+            k = DiesLocation.objects.get(kalipNo=kaliplar[0])
+            Hareket.objects.create(
+                kalipKonum_id=k.kalipVaris.id,
+                kalipVaris_id=presler[pKodu],
+                kalipNo=kaliplar[0],
+                kimTarafindan_id=request.user.id
+            )
+            response = JsonResponse({'message': f"{kaliplar[0]} No'lu kalıp başarıyla gönderildi."})
+        elif len(kaliplar) > 1: #birden fazla o profil noda kalıp var ise hangi kalıplar olduğunu gönder, modalda göster. seçilen kalıbı o prese kaydet.
+            data = list(kaliplar)
+            response = JsonResponse({'message': "", 'kaliplar':data})
+        elif len(kaliplar) < 1:
+            response = JsonResponse({'message': f"Fırında {pNo} No'lu kalıp bulunmamaktadır."}) # kalıp olmayan durumlarda buton yok zaten bunu göstermeye gerek yok. ya da burda dursun sayfa yenilenmezse ve 
+            # ilk başta fırında olan kalıp sonradan başka yere gönderilirse burada yakalamış oluruz.
+    else:
+        k = DiesLocation.objects.get(kalipNo=kalipNo)
         Hareket.objects.create(
             kalipKonum_id=k.kalipVaris.id,
             kalipVaris_id=presler[pKodu],
-            kalipNo=kaliplar[0],
+            kalipNo=kalipNo,
             kimTarafindan_id=request.user.id
         )
-        response = JsonResponse({'message': f"{kaliplar[0]} no'lu kalıp başarıyla gönderildi."})
-    elif len(kaliplar) > 1: #birden fazla o profil noda kalıp var ise hangi kalıplar olduğunu gönder, modalda göster. seçilen kalıbı o prese kaydet.
-        response = JsonResponse({'message': "", 'kaliplar':kaliplar})
-    elif len(kaliplar) < 1:
-        response = JsonResponse({'message': f"Fırında {pNo} no'lu kalıp bulunmamaktadır."}) # kalıp olmayan durumlarda buton yok zaten bunu göstermeye gerek yok. ya da burda dursun sayfa yenilenmezse ve 
-        # ilk başta fırında olan kalıp sonradan başka yere gönderilirse burada yakalamış oluruz.
-
+        response = JsonResponse({'message': f"{kalipNo} No'lu kalıp ile üretim başladı."})
     return response
 
 def eksiparis_uretimbitir(request):

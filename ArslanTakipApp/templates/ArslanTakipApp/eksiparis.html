@@ -93,10 +93,12 @@
         </div>
         <div class="modal-body">
           {% csrf_token %}
-          <select name="kalipSelect" id="kalipSelect">
+          <select name="kalipSelect" id="kalipSelect" class="form-control">
             <option value="">Kalıp Seçiniz</option>
           </select>
-          <button type="button" class="btn btn-primary">Üretime Başla</button>
+          <hr>
+          <button type="button" class="btn btn-primary" id="btnKalipUretim">Üretime Başla</button>
+          <input type="hidden" name="sId" id="sId" data-sid="0" style="display: none;">
         </div>
       </div>
     </div>
@@ -175,9 +177,10 @@
     return kalipbutton;
   };
 
-  var uretimeBasla = function(id) {
+  var uretimeBasla = function(id, kNo="") {
     const params = {
       sId: id,
+      kalipNo: kNo,
     }
     $.ajax({
       url: `/eksiparis/uretim`,
@@ -191,9 +194,10 @@
             }
             else {
               $.each(response.kaliplar, function(key, value) {
-                  $('#kalipSelect').append('<option value=' + value.id + '>' + value.Isim + '</option>');
+                  $('#kalipSelect').append('<option value=' + value + '>' + value + '</option>');
               });
-              $('#kaliplarModal').show(); // birden fazla kalıp olan durumlarda modal açılsın ve kalıp seçilsin.
+              $('#sId').attr('data-sid', id);
+              $('#kaliplarModal').modal('show'); // birden fazla kalıp olan durumlarda modal açılsın ve kalıp seçilsin.
             }
           },
           error: function (error) {
@@ -221,6 +225,12 @@
         }
     })
   }
+
+  $('#btnKalipUretim').click(function() {
+      $('#kaliplarModal').modal('hide');
+      let sId = $('#sId').data('sid');
+      uretimeBasla(id=sId, kNo="");
+  });
 
   var sureTable =new Tabulator("#sureTable", {
     maxHeight:"400px",
