@@ -1172,6 +1172,7 @@ def eksiparis_uretim(request):
 def eksiparis_uretimbitir(request):
     params = json.loads(unquote(request.GET.get('params')))
     presKodu = params["presKodu"]
+    print(presKodu)
     meydan = meydanlar[presKodu]
     die = DiesLocation.objects.get(kalipVaris_id = presler[presKodu])
     Hareket.objects.create(

@@ -161,12 +161,13 @@
   };
   var kalipIcon = function(cell, formatterParams, onRendered){ 
     let data = cell.getData();
+    console.log(data)
     let kalip = data.KalipSokmeDurum;
     let id = data.id;
-    let presKodu = data.EkPresKodu;
+    let pKodu = data.EkPresKodu;
     let kalipbutton = `<button type='button' class='btn btn-primary'>ÜRETİME BAŞLA</button>`
     if (kalip==1) {
-      kalipbutton = `<button type='button' class='btn btn-danger' onclick='uretimiBitir(${presKodu})'>ÜRETİMİ BİTİR</button>`
+      kalipbutton = `<button type='button' class='btn btn-danger' data-pres='${pKodu}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
     }
     else if (kalip==2) {
       kalipbutton = ``
@@ -206,9 +207,10 @@
     })
   }
 
-  var uretimiBitir = function(presKodu) {
+  var uretimiBitir = function(e) {
+    let pKodu = $(e).data('pres');
     const params = {
-      presKodu: presKodu,
+      presKodu: pKodu,
     }
     $.ajax({
       url: `/eksiparis/uretimbitir`,
