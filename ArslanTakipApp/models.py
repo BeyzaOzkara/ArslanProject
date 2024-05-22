@@ -216,8 +216,10 @@ class EkSiparisKalip(models.Model):
     KalipNo = models.CharField(null=True, blank=True)
     Durum = models.CharField(null=True, blank=True)
     HataKodu = models.CharField(null=True, blank=True)
+    Uretim = models.CharField(null=True, blank=True)
     UretimBitirmeSebebi = models.CharField(null=True, blank=True)
     UretimBitirmeSebebiAciklama = models.CharField(null=True ,blank=True)
+    Tarih = models.DateTimeField(auto_now=True, null=True)
 
 class LivePresFeed(models.Model):
     MakineKodu = models.CharField(null=True)

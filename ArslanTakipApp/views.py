@@ -1180,6 +1180,11 @@ def eksiparis_uretim(request): # Üretime Başla
                 kalipNo=kaliplar[0],
                 kimTarafindan_id=request.user.id
             )
+            EkSiparisKalip.objects.create(
+                EkSiparisBilgi_id = sId,
+                KalipNo = kalipNo,
+                Uretim = "Basla",
+            )
             response = JsonResponse({'message': f"{kaliplar[0]} No'lu kalıp başarıyla gönderildi."})
         elif len(kaliplar) > 1: #birden fazla o profil noda kalıp var ise hangi kalıplar olduğunu gönder, modalda göster. seçilen kalıbı o prese kaydet.
             data = list(kaliplar)
@@ -1194,6 +1199,11 @@ def eksiparis_uretim(request): # Üretime Başla
             kalipVaris_id=presler[pKodu],
             kalipNo=kalipNo,
             kimTarafindan_id=request.user.id
+        )
+        EkSiparisKalip.objects.create(
+            EkSiparisBilgi_id = sId,
+            KalipNo = kalipNo,
+            Uretim = "Basla",
         )
         response = JsonResponse({'message': f"{kalipNo} No'lu kalıp ile üretim başladı."})
     return response
@@ -1216,6 +1226,7 @@ def eksiparis_uretimbitir(request): # Üretim Bitir Kaydet
     EkSiparisKalip.objects.create(
         EkSiparisBilgi_id = req['EkSiparisId'],
         KalipNo = kalipNo,
+        Uretim = "Bitir",
         HataKodu = req.get('HataKodu', None),
         UretimBitirmeSebebi = req['uretimBitirmeSebebi'],
         UretimBitirmeSebebiAciklama = req['kalipAciklama'],
