@@ -68,19 +68,32 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Kalıp Sökme Sebebi</h5>
+          <h5 class="modal-title">Üretimi Bitir</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           {% csrf_token %}
-          <input class="form-control" id="ekSiparisKalipSokmeSebebi"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" id="btnKalipSokmeKaydet" class="btn btn-primary">Kaydet</button>
+          <div class="row ml-1 mr-1"> 
+            <select name="uretimBitirmeSebebi" id="uretimBitirmeSebebi" data-pkodu="" class="form-control col-lg-5">
+              <option value="" disabled selected>Bitirme Sebebi</option>
+              <option value="Kalıbı Sök" onclick="">Kalıbı Sök</option>
+              <option value="Kalıbı Fırına At">Kalıbı Fırına At</option>
+            </select>
+            <select name="kalipAciklama" id="kalipAciklama" class="form-control col-lg-7">
+              <option value="" disabled selected>Açıklama</option>
+            </select>
+          </div>
+          <div class="row ml-1 mr-1 mt-1">
+            <select name="kalipGozleri" id="kalipGozleri" class="form-control" style="display: none;">
+            </select>
+          </div>
+          <hr>
+          <button type="button" id="btnKalipSokmeKaydet" data-sid="" class="btn btn-primary" disabled>Kaydet</button>
         </div>
       </div>
+    </div>
   </div>
   <div class="modal fade" id="kaliplarModal" tabindex="-1" aria-labelledby="kaliplarModalLabel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -102,7 +115,6 @@
         </div>
       </div>
     </div>
-  </div>
   </div>
 </div>
 
@@ -166,7 +178,7 @@
     let pKodu = data.EkPresKodu;
     let kalipbutton = `<button type='button' class='btn btn-primary'>ÜRETİME BAŞLA</button>`
     if (kalip==1) {
-      kalipbutton = `<button type='button' class='btn btn-danger' data-pres='${pKodu}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
+      kalipbutton = `<button type='button' class='btn btn-danger' data-pkodu='${pKodu}' data-sid='${id}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
     }
     else if (kalip==2) {
       kalipbutton = ``
@@ -174,8 +186,28 @@
     else if (kalip==3) {
       kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})'>ÜRETİME BAŞLA</button>`
     }
+    else if (kalip==4) {
+      kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})' disabled>ÜRETİME BAŞLA</button>`
+    }
     return kalipbutton;
   };
+
+  function checkButtonStatus() {
+    const visibleSelects = $('select').filter(':visible');
+    let allSelected = true;
+    
+    visibleSelects.each(function() {
+      if ($(this).val() === null || $(this).val() === "") {
+        allSelected = false;
+        return false;
+      }
+    });
+
+    // Enable or disable the button based on the condition
+    $('#btnKalipSokmeKaydet').prop('disabled', !allSelected);
+  };
+
+  $('#uretimBitirmeSebebi, #kalipAciklama, #kalipGozleri').on('change', checkButtonStatus);
 
   var uretimeBasla = function(id, kNo="") {
     const params = {
@@ -209,32 +241,103 @@
     })
   }
 
-  var uretimiBitir = function(e) {
-    let pKodu = $(e).data('pres');
-    const params = {
-      presKodu: pKodu,
-    }
-    $.ajax({
-      url: `/eksiparis/uretimbitir`,
-      method: 'GET',
-      data: { params: JSON.stringify(params)},
-      dataType: 'json',
-          success: function (response) {
-            let message = response.message;
-            alert(message);
-            window.location.reload();
-          },
-          error: function (error) {
-            console.error('Error finishing production:', error);
-        }
-    })
-  }
-
   $('#btnKalipUretim').click(function() {
       $('#kaliplarModal').modal('hide');
       let sId = $('#sId').data('sid');
       let kNo = $('#kalipSelect').find(":selected").val();
       uretimeBasla(id=sId, kNo=kNo);
+  });
+
+  var uretimiBitir = function(e) { // üretimi bitire tıklandığında modal açılacak ve bitirme sebebi işaretlenecek.
+    let pKodu = $(e).data('pkodu');
+    let sId = $(e).data('sid');
+    $('#uretimBitirmeSebebi').attr('data-pKodu', pKodu);
+    $('#btnKalipSokmeKaydet').attr('data-sid', sId);
+    $('#kalipSokmeModal').modal('show');
+  };
+
+  var uretimiBitirSend = function() {
+    
+    const gonderData = new FormData();
+    gonderData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    const visibleSelects = $('select').filter(':visible');
+
+    visibleSelects.each(function() {
+      if ($(this).attr('id') == "kalipAciklama") {
+        if ($('#uretimBitirmeSebebi').val() === "Kalıbı Sök") {
+          gonderData.append($(this).attr('id'), $('#kalipAciklama option:selected').text());
+          gonderData.append('HataKodu', $(this).val());
+        }
+        else {
+          gonderData.append($(this).attr('id'), $(this).val());
+        }
+      }
+      else {
+        gonderData.append($(this).attr('id'), $(this).val());
+      }
+    });
+    gonderData.append('EkSiparisId', $('#btnKalipSokmeKaydet').data('sid'));
+    gonderData.append('EkSiparisPresKodu', $('#uretimBitirmeSebebi').data('pkodu'));
+    $.ajax({
+      url: '/eksiparis/uretimbitir',
+      method: 'POST',
+      data: gonderData,
+      contentType: false,
+      processData: false,
+      success: function(resonse) {
+        // Handle success
+        $('#kalipSokmeModal').modal('hide');
+        alert('Success:', response.message);
+        window.location.reload();
+      },
+      error: function(error) {
+        // Handle error
+        console.error('Error:', error);
+      }
+    });
+  };
+  $('#btnKalipSokmeKaydet').on('click', uretimiBitirSend);
+
+  $('#uretimBitirmeSebebi').on('change', function(){
+    let selected = this.value;
+    let pKodu = $(this).data('pkodu');
+    $('#kalipAciklama').empty();
+    $('#kalipAciklama').append('<option value="" disabled selected>Açıklama</option>');
+    $('#kalipGozleri').hide();
+    const params = {
+      secim: selected,
+      pres: pKodu,
+    }
+    $.ajax({
+      url:`/eksiparis/selectgetir`,
+      method: 'GET',
+      data: { params: JSON.stringify(params) },
+      dataType: 'json',
+      success: function(response) {
+        if (selected == "Kalıbı Sök") {
+          $.each(response.data, function(key, value) {
+              $('#kalipAciklama').append('<option value=' + value.HataKodu + '>' + value.HataTuru + '</option>');
+          });
+        }
+        else if (selected == "Kalıbı Fırına At") {
+          $.each(response.data, function(key, value) {
+              $('#kalipAciklama').append('<option value=' + value.Sebep + '>' + value.Sebep + '</option>');
+          });
+          $('#kalipGozleri').empty();
+          $('#kalipGozleri').append('<option value="" disabled selected>Fırın Gözü Seçiniz</option>');
+          $.each(response.gozler, function(key, value) {
+              $('#kalipGozleri').append('<option value=' + value.id + '>' + value.locationName + '</option>');
+          });
+          $('#kalipGozleri').show();
+        // gözleri getir
+        }
+        checkButtonStatus();
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+    
   });
 
   var sureTable =new Tabulator("#sureTable", {

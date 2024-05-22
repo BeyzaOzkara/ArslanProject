@@ -150,6 +150,8 @@ class PresUretimRaporu(models.Model):
     Gerceklesen = models.FloatField(null=True)
     BaslamaSaati = models.DateTimeField(null=True)
     BitisSaati = models.DateTimeField(null=True)
+    HataKodu = models.IntegerField(null=True, blank=True)
+    HataTuru = models.CharField(null=True, blank=True)
     HataAciklama = models.CharField(null=True)
     Durum = models.CharField(null=True)
     IslemGoren_Kg = models.FloatField(null=True)
@@ -203,13 +205,19 @@ class EkSiparis(models.Model):
     EkDurumu = models.FloatField(null=True)
     EkAdet = models.IntegerField(null=True)
     EkYuzeyOzelligi = models.CharField(null=True)
-    KalipSokmeSebebi = models.CharField(null=True, blank=True)
     ProfilNo = models.CharField(null=True, blank=True)
-    
+     
     class Meta:
         verbose_name="EkSiparis"
         verbose_name_plural="EkSiparisler"
 
+class EkSiparisKalip(models.Model):
+    EkSiparisBilgi = models.ForeignKey(EkSiparis, on_delete=models.DO_NOTHING, null=True, blank=True)
+    KalipNo = models.CharField(null=True, blank=True)
+    Durum = models.CharField(null=True, blank=True)
+    HataKodu = models.CharField(null=True, blank=True)
+    UretimBitirmeSebebi = models.CharField(null=True, blank=True)
+    UretimBitirmeSebebiAciklama = models.CharField(null=True ,blank=True)
 
 class LivePresFeed(models.Model):
     MakineKodu = models.CharField(null=True)

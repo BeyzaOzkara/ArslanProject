@@ -23,7 +23,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification
+from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1104,6 +1104,30 @@ meydanlar = {
     '2750-1': '809', '4000-1': '817', '4500-1': '1105'
 }
 
+gozler = {
+    '1100-1': [548, 549], '1100-2': [777, 778, 779, 780, 781, 782], '1100-3': [791, 792, 793, 794, 795, 796],
+    '1200-1': [552, 553, 554], '1600-1': [562, 563, 564, 565, 566, 567], '1600-2': [801, 802],
+    '2750-1': [805, 806, 807], '4000-1': [810, 811, 812, 813, 814, 815], '4500-1': [1109, 1110, 1111, 1112, 1113, 1114, 1115, 1116, 1119, 1120]
+}
+
+hatalar = [{'HataKodu': 101, 'HataTuru': 'Uygun'}, {'HataKodu': 102, 'HataTuru': 'Ölçü Bozuk'}, {'HataKodu': 103, 'HataTuru': 'Ekstrüzyon İzi'}, 
+        {'HataKodu': 104, 'HataTuru': 'Çizgi Var'}, {'HataKodu': 105, 'HataTuru': 'Kulak Düşük'}, {'HataKodu': 106, 'HataTuru': 'Isı Farkı İzi'}, 
+        {'HataKodu': 107, 'HataTuru': 'Sıyırma Yapıyor'}, {'HataKodu': 108, 'HataTuru': 'Çizgi Yaptı'}, {'HataKodu': 109, 'HataTuru': 'Pislik Geldi Yırttı'}, 
+        {'HataKodu': 110, 'HataTuru': 'Yüzeyde Kırılmalar Var'}, {'HataKodu': 111, 'HataTuru': 'Yüzeyde Dalgalanmalar var'}, {'HataKodu': 112, 'HataTuru': 'Boy Farkı Var'}, 
+        {'HataKodu': 113, 'HataTuru': 'Hava Kabarcığı'}, {'HataKodu': 114, 'HataTuru': 'Bombe'}, {'HataKodu': 115, 'HataTuru': 'Dönüklük'}, 
+        {'HataKodu': 116, 'HataTuru': "90'ı Açı Bozuk"}, {'HataKodu': 117, 'HataTuru': 'Yüzey Bozuk'}, {'HataKodu': 118, 'HataTuru': 'Yüzey Bozuldu'}, 
+        {'HataKodu': 119, 'HataTuru': 'Et Kalınlığı Düşük'}, {'HataKodu': 120, 'HataTuru': 'Et Kalınlığı Fazla'}, {'HataKodu': 121, 'HataTuru': 'Arka Parçaya Sürtüyor'}, 
+        {'HataKodu': 122, 'HataTuru': 'Bolstere Sürtüyor'}, {'HataKodu': 123, 'HataTuru': 'Kalıp Kırıldı'}, {'HataKodu': 124, 'HataTuru': 'İçe Kasıyor'}, 
+        {'HataKodu': 125, 'HataTuru': 'Dışa Kasıyor'}, {'HataKodu': 126, 'HataTuru': 'Yukarı Kasıyor'}, {'HataKodu': 127, 'HataTuru': 'Set var'}, 
+        {'HataKodu': 128, 'HataTuru': 'Dirençli Kalıp (Yüksek Barda Çıkıyor )'}, {'HataKodu': 129, 'HataTuru': 'Damar Var'}, {'HataKodu': 130, 'HataTuru': 'Dalgalı'}, 
+        {'HataKodu': 131, 'HataTuru': 'Çökük İçe'}, {'HataKodu': 132, 'HataTuru': 'Zıvana Kaçık'}, {'HataKodu': 133, 'HataTuru': 'Günyesi Bozuk'}, 
+        {'HataKodu': 134, 'HataTuru': 'Boy Kurtarmadı'}, {'HataKodu': 136, 'HataTuru': 'Kalıp Tıkandı'}, {'HataKodu': 137, 'HataTuru': 'Kalıp Doldu'}, 
+        {'HataKodu': 138, 'HataTuru': 'Kulak Düşük'}, {'HataKodu': 139, 'HataTuru': 'Kulak Kalkık'}, {'HataKodu': 140, 'HataTuru': 'Isı Hatası'}, 
+        {'HataKodu': 141, 'HataTuru': 'Eloksal Sonrsı İz Var'}, {'HataKodu': 142, 'HataTuru': 'Kasıntı Var Son Kısmında'}, {'HataKodu': 143, 'HataTuru': 'Kalıp Resmi Hatalı'}, 
+        {'HataKodu': 145, 'HataTuru': 'Hatalı Verilen Kalıp'}, {'HataKodu': 146, 'HataTuru': 'Boy Farkı Var'}, {'HataKodu': 147, 'HataTuru': 'Kalıp Kırıldı'}, 
+        {'HataKodu': 149, 'HataTuru': 'Kulak Kalkık'}, {'HataKodu': 150, 'HataTuru': 'Test İmalat'}, {'HataKodu': 151, 'HataTuru': 'Gramaj Düşük'}, 
+        {'HataKodu': 152, 'HataTuru': 'Gramaj Yüksek'}, {'HataKodu': 153, 'HataTuru': 'Hız Verince Sıyırma Yapıyor'}, {'HataKodu': 154, 'HataTuru': 'Dalga yapmaya başladı'}, {'HataKodu': 180, 'HataTuru': 'Alaşım Yanlış'}]
+
 def kalipPresCheck(sId):
     eksiparis = EkSiparis.objects.get(id=sId)
     pNo = eksiparis.ProfilNo
@@ -1118,6 +1142,11 @@ def kalipPresCheck(sId):
             if die and die.ProfilNo == pNo: # siparişin kalıbı mı
                 return 1 # üretimi bitir
             else:
+                gozler = Location.objects.filter(locationRelationID=firinId)
+                kalipList = DiesLocation.objects.filter(kalipVaris__in=gozler).values_list('kalipNo', flat=True)
+                kaliplar = KalipMs.objects.using('dies').filter(KalipNo__in= list(kalipList), ProfilNo=pNo).values_list('KalipNo', flat=True)
+                if len(kaliplar) >= 1:
+                    return 4
                 return 2 # boş
         else: # fırında uyumlu kalıp var mı
             gozler = Location.objects.filter(locationRelationID=firinId)
@@ -1129,7 +1158,7 @@ def kalipPresCheck(sId):
     except Location.DoesNotExist:
         return None
     
-def eksiparis_uretim(request):
+def eksiparis_uretim(request): # Üretime Başla
     params = json.loads(unquote(request.GET.get('params')))
     sId = params["sId"] #siparişteki pres koduna göre o presin fırınlarında siparişteki profil noya uygun kalıp varsa listele
     kalipNo = params["kalipNo"]
@@ -1169,20 +1198,60 @@ def eksiparis_uretim(request):
         response = JsonResponse({'message': f"{kalipNo} No'lu kalıp ile üretim başladı."})
     return response
 
-def eksiparis_uretimbitir(request):
-    params = json.loads(unquote(request.GET.get('params')))
-    presKodu = params["presKodu"]
-    meydan = meydanlar[presKodu]
-    die = DiesLocation.objects.get(kalipVaris_id = presler[presKodu])
+def eksiparis_uretimbitir(request): # Üretim Bitir Kaydet
+    req = request.POST
+    kalipNo = DiesLocation.objects.filter(kalipVaris__id=presler[req['EkSiparisPresKodu']]).values_list('kalipNo', flat=True)
+    if req['uretimBitirmeSebebi'] == "Kalıbı Sök": #meydana gnder
+        kalipVaris = meydanlar[req['EkSiparisPresKodu']]
+    elif req['uretimBitirmeSebebi'] == "Kalıbı Fırına At": #göze gönder
+        kalipVaris = req['kalipGozleri']
+
     Hareket.objects.create(
-        kalipKonum_id=die.kalipVaris.id,
-        kalipVaris_id=meydan,
-        kalipNo=die.kalipNo,
+        kalipKonum_id=presler[req['EkSiparisPresKodu']],
+        kalipVaris_id=kalipVaris,
+        kalipNo=kalipNo,
         kimTarafindan_id=request.user.id
     )
 
-    return JsonResponse({'message': f"{die.kalipNo} no'lu kalıp başarıyla meydana gönderildi."})
+    EkSiparisKalip.objects.create(
+        EkSiparisBilgi_id = req['EkSiparisId'],
+        KalipNo = kalipNo,
+        HataKodu = req.get('HataKodu', None),
+        UretimBitirmeSebebi = req['uretimBitirmeSebebi'],
+        UretimBitirmeSebebiAciklama = req['kalipAciklama'],
+    )
+    return JsonResponse({'message': "İşlem Başarıyla Gerçekleştirildi."})
 
+def eksiparis_selectgetir(request): # Üretim Bitirme Sebebine Göre Açıklamalar
+    params = json.loads(unquote(request.GET.get('params')))
+    secim = params["secim"]
+    pres = params["pres"]
+    if secim == "Kalıbı Sök": #Kalıbı Sök seçilmiş. Açıklamaları getir.
+        hataList = [{'HataKodu': 101, 'HataTuru': 'Uygun'}, {'HataKodu': 102, 'HataTuru': 'Ölçü Bozuk'}, {'HataKodu': 103, 'HataTuru': 'Ekstrüzyon İzi'}, 
+        {'HataKodu': 104, 'HataTuru': 'Çizgi Var'}, {'HataKodu': 105, 'HataTuru': 'Kulak Düşük'}, {'HataKodu': 106, 'HataTuru': 'Isı Farkı İzi'}, 
+        {'HataKodu': 107, 'HataTuru': 'Sıyırma Yapıyor'}, {'HataKodu': 108, 'HataTuru': 'Çizgi Yaptı'}, {'HataKodu': 109, 'HataTuru': 'Pislik Geldi Yırttı'}, 
+        {'HataKodu': 110, 'HataTuru': 'Yüzeyde Kırılmalar Var'}, {'HataKodu': 111, 'HataTuru': 'Yüzeyde Dalgalanmalar var'}, {'HataKodu': 112, 'HataTuru': 'Boy Farkı Var'}, 
+        {'HataKodu': 113, 'HataTuru': 'Hava Kabarcığı'}, {'HataKodu': 114, 'HataTuru': 'Bombe'}, {'HataKodu': 115, 'HataTuru': 'Dönüklük'}, 
+        {'HataKodu': 116, 'HataTuru': "90'ı Açı Bozuk"}, {'HataKodu': 117, 'HataTuru': 'Yüzey Bozuk'}, {'HataKodu': 118, 'HataTuru': 'Yüzey Bozuldu'}, 
+        {'HataKodu': 119, 'HataTuru': 'Et Kalınlığı Düşük'}, {'HataKodu': 120, 'HataTuru': 'Et Kalınlığı Fazla'}, {'HataKodu': 121, 'HataTuru': 'Arka Parçaya Sürtüyor'}, 
+        {'HataKodu': 122, 'HataTuru': 'Bolstere Sürtüyor'}, {'HataKodu': 123, 'HataTuru': 'Kalıp Kırıldı'}, {'HataKodu': 124, 'HataTuru': 'İçe Kasıyor'}, 
+        {'HataKodu': 125, 'HataTuru': 'Dışa Kasıyor'}, {'HataKodu': 126, 'HataTuru': 'Yukarı Kasıyor'}, {'HataKodu': 127, 'HataTuru': 'Set var'}, 
+        {'HataKodu': 128, 'HataTuru': 'Dirençli Kalıp (Yüksek Barda Çıkıyor )'}, {'HataKodu': 129, 'HataTuru': 'Damar Var'}, {'HataKodu': 130, 'HataTuru': 'Dalgalı'}, 
+        {'HataKodu': 131, 'HataTuru': 'Çökük İçe'}, {'HataKodu': 132, 'HataTuru': 'Zıvana Kaçık'}, {'HataKodu': 133, 'HataTuru': 'Günyesi Bozuk'}, 
+        {'HataKodu': 134, 'HataTuru': 'Boy Kurtarmadı'}, {'HataKodu': 136, 'HataTuru': 'Kalıp Tıkandı'}, {'HataKodu': 137, 'HataTuru': 'Kalıp Doldu'}, 
+        {'HataKodu': 138, 'HataTuru': 'Kulak Düşük'}, {'HataKodu': 139, 'HataTuru': 'Kulak Kalkık'}, {'HataKodu': 140, 'HataTuru': 'Isı Hatası'}, 
+        {'HataKodu': 141, 'HataTuru': 'Eloksal Sonrsı İz Var'}, {'HataKodu': 142, 'HataTuru': 'Kasıntı Var Son Kısmında'}, {'HataKodu': 143, 'HataTuru': 'Kalıp Resmi Hatalı'}, 
+        {'HataKodu': 145, 'HataTuru': 'Hatalı Verilen Kalıp'}, {'HataKodu': 146, 'HataTuru': 'Boy Farkı Var'}, {'HataKodu': 147, 'HataTuru': 'Kalıp Kırıldı'}, 
+        {'HataKodu': 149, 'HataTuru': 'Kulak Kalkık'}, {'HataKodu': 150, 'HataTuru': 'Test İmalat'}, {'HataKodu': 151, 'HataTuru': 'Gramaj Düşük'}, 
+        {'HataKodu': 152, 'HataTuru': 'Gramaj Yüksek'}, {'HataKodu': 153, 'HataTuru': 'Hız Verince Sıyırma Yapıyor'}, {'HataKodu': 154, 'HataTuru': 'Dalga yapmaya başladı'}, {'HataKodu': 180, 'HataTuru': 'Alaşım Yanlış'}]
+
+        response = JsonResponse({'data': hataList})
+    elif secim == "Kalıbı Fırına At":
+        optionList = [{'Sebep': 'Arıza'}, {'Sebep': 'Vardiya Sonu'}]
+        gozList = list(Location.objects.filter(id__in = gozler[pres]).values())
+        response = JsonResponse({'data': optionList, 'gozler': gozList})
+    
+    return response
 
 def eksiparis_timeline(request):
     ekSiparis = EkSiparis.objects.exclude(MsSilindi=True).exclude(Silindi=True).order_by("Sira")
