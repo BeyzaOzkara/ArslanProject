@@ -285,13 +285,11 @@
       contentType: false,
       processData: false,
       success: function(resonse) {
-        // Handle success
         $('#kalipSokmeModal').modal('hide');
         alert('Success:', response.message);
         window.location.reload();
       },
       error: function(error) {
-        // Handle error
         console.error('Error:', error);
       }
     });

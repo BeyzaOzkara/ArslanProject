@@ -1036,7 +1036,6 @@ def siparis_presKodu(request, pNo):
 
 def siparis_ekle(request):
     if request.method == "POST":
-        print(request.POST)
         e = EkSiparis.objects.all()
         siparis = SiparisList.objects.using('dies').all()
         siparisGet = siparis.get(Kimlik = request.POST['sipKimlik'])
@@ -1128,7 +1127,7 @@ hatalar = [{'HataKodu': 101, 'HataTuru': 'Uygun'}, {'HataKodu': 102, 'HataTuru':
         {'HataKodu': 149, 'HataTuru': 'Kulak Kalkık'}, {'HataKodu': 150, 'HataTuru': 'Test İmalat'}, {'HataKodu': 151, 'HataTuru': 'Gramaj Düşük'}, 
         {'HataKodu': 152, 'HataTuru': 'Gramaj Yüksek'}, {'HataKodu': 153, 'HataTuru': 'Hız Verince Sıyırma Yapıyor'}, {'HataKodu': 154, 'HataTuru': 'Dalga yapmaya başladı'}, {'HataKodu': 180, 'HataTuru': 'Alaşım Yanlış'}]
 
-def kalipPresCheck(sId):
+def kalipPresCheck(sId): # EkSiparisKalip kontrol edilsin ona göre butonlar getirilsin.
     eksiparis = EkSiparis.objects.get(id=sId)
     pNo = eksiparis.ProfilNo
     pKodu = eksiparis.EkPresKodu
@@ -1191,7 +1190,7 @@ def eksiparis_uretim(request): # Üretime Başla
             response = JsonResponse({'message': "", 'kaliplar':data})
         elif len(kaliplar) < 1:
             response = JsonResponse({'message': f"Fırında {pNo} No'lu kalıp bulunmamaktadır."}) # kalıp olmayan durumlarda buton yok zaten bunu göstermeye gerek yok. ya da burda dursun sayfa yenilenmezse ve 
-            # ilk başta fırında olan kalıp sonradan başka yere gönderilirse burada yakalamış oluruz.
+            # ilk başta fırında olan kalıp sonradan başka yere gönderilirse burada yakalamış oluruz. 
     else:
         k = DiesLocation.objects.get(kalipNo=kalipNo)
         Hareket.objects.create(
@@ -1346,6 +1345,10 @@ def eksiparis_yuzey(request):
     data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+def checkKalip(id):
+    ek_siparis_instance = EkSiparis.objects.get(id=id)
+    return ek_siparis_instance.production_started()
+
 def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     size = params["size"]
@@ -1394,8 +1397,8 @@ def eksiparis_list(request):
             'SonTermin': format_date(siparis1.SonTermin),
             'AktifKalip': siparis1.AktifKalip,
             'KalipSokmeDurum': kalipPresCheck(e['id']),
+            'UretimDurum' : checkKalip(e['id']), 
         })
-        
     ek_count = ekSiparis.count()
     lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
     lastData['data'] = ek_siparis_list
@@ -1509,7 +1512,6 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
             gozCapacity = gonder.capacity
 
             if gozCapacity == None:
-                print("None burda")
                 k = DiesLocation.objects.get(kalipNo = kalipNo)
                 if k.kalipVaris.id != gonder:
                     hareket = Hareket()
@@ -1829,7 +1831,7 @@ def yudas_list(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     for i in params:
         value = params[i]
-        print("Key and Value pair are ({}) = ({})".format(i, value))
+        # print("Key and Value pair are ({}) = ({})".format(i, value))
 
     size = params.get("size", 7)  # Default size to 7
     page = params.get("page", 1)  # Default page to 1
@@ -2133,11 +2135,6 @@ def format_row(row):
 def yudaDetail(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-
-    # if yudaFiles.filter(FileTitle = "Şartname").exists():
-    #     fi = UploadFile.objects.get(Q(FileModel = "YudaForm") & Q(FileModelId = yId) & Q(FileTitle = 'Şartname'))
-    #     print(fi.File.path)
-    #     yudaDetailSvg(request, fi.File.path)
         
     yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
     yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
@@ -2525,7 +2522,6 @@ def yudaCopy(request, yId):
     yudaData = json.dumps(yudaList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return render(request, 'ArslanTakipApp/yudaCopy.html', {'yuda_json':yudaData, 'files_json':files})
 
-
 class DeletedYudasView(generic.TemplateView):
     template_name = 'ArslanTakipApp/deletedYudas.html'
 
@@ -2587,7 +2583,6 @@ def deletedYudas_list(request):
                 elif yuda_onay.OnayDurumu is False:
                     o['durumlar'][group] = 'danger'
             else: o['durumlar'][group] = 'warning'
-    print(yudaList)
         
     yudas_count = filtered_yudas.count()
     last_page = math.ceil(yudas_count / size)
@@ -2679,7 +2674,6 @@ def notifReadAll(request):
 
     return response
 
-
 # Her bir özelliği kontrol etmek için yazdırın değişiklikler doğru mu kontrol et aynı şeyi birden fazla 
 """ for field in changeYuda._meta.fields:
     print(f"{field.name}: {getattr(changeYuda, field.name)}") """
@@ -2696,3 +2690,170 @@ def getParentComments(ref, mId):
     
     return filteredComments
 
+class UretimPlanlamaView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/uretimPlani.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pres_kodu = '1600-2'
+        sip = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        sip = sip.filter(PresKodu=pres_kodu)
+        distinct_values = {
+            'siparisler': sip.values_list('KartNo', flat=True).distinct(),
+            'profiller': sip.values_list('ProfilNo', flat=True).distinct(),
+            'firmalar': sip.values_list('FirmaAdi', flat=True).distinct(),
+            'billetler': sip.values_list('BilletTuru', flat=True).distinct(),
+            'kondusyonlar': sip.values_list('KondusyonTuru', flat=True).distinct(),
+            'yuzeyler': sip.values_list('YuzeyOzelligi', flat=True).distinct(),
+            'gramajlar': sip.values_list('Profil_Gramaj', flat=True).distinct(),
+        }
+
+        context_data = {field: json.dumps(list(values)) for field, values in distinct_values.items()}
+        context.update(context_data)
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        pres_kodu = '1600-2' # kullanıcıdan alınacak
+        kriterData = json.loads(data['kriterData'])
+        if not kriterData:
+            return JsonResponse({"error": "Missing data."}, status=400)
+        
+        order_plan = self.production_plan(pres_kodu, kriterData)
+        order_plan = self.transform_plan(order_plan)
+
+        return JsonResponse({'order_plan': order_plan})
+
+    def production_plan(self, pres_kodu, kriterler):
+        sip = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        orders = sip.filter(PresKodu=pres_kodu, Kg__gt=0)
+
+        exclude_list = [item['kriter'] for item in kriterler if item['type'] == 'Hariç Tut']
+        priority_list = [item['kriter'] for item in kriterler if item['type'] == 'Öncelik']
+        limit_list = [item for item in kriterler if item['type'] == 'Limit']
+
+        transformations = {
+            'Sipariş': 'KartNo',
+            'Billet': 'BilletTuru',
+            'Firma': 'FirmaAdi',
+            'Kondüsyon': 'KondusyonTuru',
+            'Profil': 'ProfilNo',
+            'Gramaj': 'Profil_Gramajı',
+            'Termin Başlangıç': 'SonTermin__gte',
+            'Termin Bitiş': 'SonTermin__lte',
+        }
+
+        def transform_element(element):
+            for key, value in transformations.items():
+                if key in element:
+                    return element.replace(key, value)
+            return element
+
+        for item in exclude_list:
+            pairs = item.split(", ")
+            e_conditions = {}
+            for pair in pairs:
+                field, value = pair.split(": ", 1)
+                field = transform_element(field)
+                if field == 'SonTermin__gte' or field == 'SonTermin__lte':
+                    value = datetime.datetime.strptime(value, '%d/%m/%y').strftime('%Y-%m-%d')
+                e_conditions[field] = value
+            orders = orders.exclude(**e_conditions)
+
+        # Initialize the order plan and planned_kg
+        order_plan = []
+        planned_kg = 0
+        limit_order = []
+        # Process limits and add minimum amounts to planned_kg
+        for item in limit_list:
+            pairs = item['kriter'].split(", ")
+            l_conditions = {}
+            for pair in pairs:
+                field, value = pair.split(": ", 1)
+                field = transform_element(field)
+                if field == 'SonTermin__gte' or field == 'SonTermin__lte':
+                    value = datetime.datetime.strptime(value, '%d/%m/%y').strftime('%Y-%m-%d')
+                l_conditions[field] = value
+            min_kg = float(item['min']) if item['min'] else 0
+            max_kg = float(item['max']) if item['max'] else float('inf')
+            limited_orders = orders.filter(**l_conditions).order_by('SonTermin')
+
+            current_kg = 0
+            for order in limited_orders:
+                for order in limited_orders:
+                    if current_kg >= min_kg:
+                        break
+                    if current_kg + order.Kg <= min_kg:
+                        add_kg = order.Kg
+                    else:
+                        add_kg = min_kg - current_kg
+                    current_kg += add_kg
+                    planned_kg += add_kg
+                    order_plan.append({
+                        'press_code': pres_kodu,
+                        'production_date': datetime.datetime.now().date(),
+                        'order': order.Kimlik,
+                        'planned_kg': add_kg,
+                        'fixed_production': True
+                    })
+        
+        for item in priority_list:
+            pairs = item.split(", ")
+            p_conditions = {}
+            for pair in pairs:
+                field, value = pair.split(": ", 1)
+                field = transform_element(field)
+                if field == 'SonTermin__gte' or field == 'SonTermin__lte':
+                    value = datetime.datetime.strptime(value, '%d/%m/%y').strftime('%Y-%m-%d')
+                p_conditions[field] = value
+            priority_orders = orders.filter(**p_conditions)
+            
+            for order in priority_orders:
+                if planned_kg + order.Kg <= 13000:
+                    planned_kg += order.Kg
+                    order_plan.append({
+                        'press_code': pres_kodu,
+                        'production_date': datetime.datetime.now().date(),
+                        'order': order.Kimlik,
+                        'planned_kg': order.Kg,
+                        'fixed_production': False
+                    })
+                else:
+                    remaining_kg = 13000 - planned_kg
+                    if remaining_kg > 0:
+                        order_plan.append({
+                            'press_code': pres_kodu,
+                            'production_date': datetime.datetime.now().date(),
+                            'order': order.Kimlik,
+                            'planned_kg': remaining_kg,
+                            'fixed_production': False
+                        })
+                        planned_kg += remaining_kg
+                    break
+            
+            for i in limit_order:
+                order_plan.append(i)
+
+        return order_plan
+
+    def transform_plan(self, plan):
+        siparis = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        
+        for o in plan:
+            kimlik = o['order']
+            s = siparis.get(Kimlik=kimlik)
+            o['KartNo'] = s.KartNo
+            o['Firma'] = s.FirmaAdi
+            o['Profil'] = s.ProfilNo
+            o['Billet'] = s.BilletTuru
+            o['Yuzey'] = s.YuzeyOzelligi
+            o['Kondusyon'] = s.KondusyonTuru
+            o['Gramaj'] = s.Profil_Gramaj
+
+        return plan
+            
+            

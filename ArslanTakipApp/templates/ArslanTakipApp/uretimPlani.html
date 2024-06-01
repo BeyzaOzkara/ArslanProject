@@ -1,0 +1,702 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %} ">
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<style>
+  .custom-radio {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .custom-radio input[type="radio"] {
+    display: none;
+  }
+  
+  .radio-label {
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    cursor: pointer;
+    margin-bottom: 0;
+    transition: background-color 0.3s ease-in-out;
+    height: 50px;
+  }
+  
+  .radio-circle {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffcc00;
+    border-radius: 50%;
+    margin-right: 10px;
+    transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  }
+  
+  .radio-text {
+    font-size: 1rem;
+    color: #fff;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .custom-radio input[type="radio"]:checked + .radio-label {
+    background-color: #ffcc00;
+  }
+  
+  .custom-radio input[type="radio"]:checked + .radio-label .radio-circle {
+    border-color: #fff;
+    background-color: #ffcc00;
+  }
+  
+  .custom-radio input[type="radio"]:checked + .radio-label .radio-text {
+    color: #64748b;
+  }
+  
+  .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .input-base {
+    height: 50px;
+    padding: 0 1rem;
+    font-size: 15px;
+    border: 1px solid #5e4dcd;
+    background-color: transparent;
+  }
+
+  .select2 {
+    max-width: 295px;
+  }
+  
+  .select2-selection__rendered {
+    line-height: 50px !important;
+    background-color: transparent;
+  }
+  .select2-container .select2-selection--single {
+    height: 50px !important;
+    width: 295px !important;
+    padding: 0 1rem !important;
+    font-size: 15px !important;
+    border: 1px solid #5e4dcd !important;
+    border-radius: 0 6px 6px 0;
+    background-color: transparent !important;
+  }
+
+  .input-group-text {
+    height: 50px;
+    padding: 0 1rem;
+    font-size: 15px;
+    border: 1px solid #5e4dcd;
+    background-color: transparent;
+  }
+
+  .text1 {
+    border-radius: 0 0 0 0;
+  }
+
+  .text2 {
+    border-radius: 0 6px 6px 0;
+  }
+  
+  .input {
+    max-width: 300px;
+    width: 294px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .input2 {
+    max-width: 230px;
+  }
+
+  .input3 {
+    max-width: 100px;
+  }
+
+  .min {
+    max-width: 100px;
+    border-radius: 6px 6px 6px 6px;
+  }
+
+  .max {
+    max-width: 100px;
+    border-radius: 6px 6px 6px 6px;
+  }
+  
+  .field-label {
+    height: 50px;
+    padding: 0 .5em;
+    border: none;
+    border-radius: 6px 0 0 6px;
+    background-color: #5e4dcd;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color .3s ease-in-out;
+  }
+  
+  .field-label:hover {
+    background-color: #5e5dcd;
+  }
+  
+  .input:focus, .input:focus-visible {
+    border-color: #3898EC;
+    outline: none;
+  }
+  </style>
+  
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid col-lg-12">
+<h1> Üretim Planı Deneme Sayfası</h1>
+<div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-lg-6">
+          <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill" href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home" aria-selected="true" style="font-weight: bold;">AÇIKLAMA</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="exclude-tab" data-toggle="pill" href="#exclude-tab-pane" role="tab" aria-controls="exclude-tab-pane" aria-selected="false" style="font-weight: bold;">HARİÇ TUT</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="priority-tab" data-toggle="pill" href="#priority-tab-pane" role="tab" aria-controls="priority-tab-pane" aria-selected="false" style="font-weight: bold;">ÖNCELİK</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="limit-tab" data-toggle="pill" href="#limit-tab-pane" role="tab" aria-controls="limit-tab-pane" aria-selected="false" style="font-weight: bold;">LİMİTLER</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="custom-content-below-tabContent">
+            <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+              <br>
+              <p>Öncelik -> Planda öncelik verilecekler.</p><br>
+              <p>Hariç Tut -> Planda olması istenmeyenler.</p><br>
+              <p>Limitler -> Gün içerisinde üretilecek min-max istenenler.</p><br>
+            </div>
+            <div class="tab-pane fade" id="exclude-tab-pane" name="Exclude" role="tabpanel" aria-labelledby="exclude-tab">
+              <div class="container-fluid">
+                <div class="custom-radio mt-3">
+                  <div class="row">
+                    <div class="col-md-10 mt-3">
+                    <div class="input-group">
+                      <input type="radio" id="eradio-1" name="exclude">
+                      <label class="radio-label field-label" for="eradio-1">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Sipariş Numarası</span>
+                      </label>
+                      <select class="input-base input select2 siparis" id="ESiparisNo" name="Sipariş" disabled>
+                        <option selected="selected" disabled>Kart No</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-2" name="exclude">
+                      <label class="radio-label field-label" for="eradio-2">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Firma Adı</span>
+                      </label>
+                      <select class="input-base input select2 firma" id="EFirmaAdi" name="Firma"  disabled>
+                        <option selected="selected" disabled>Firma</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-3" name="exclude">
+                      <label class="radio-label field-label" for="eradio-3">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Profil Numarası</span>
+                      </label>
+                      <select class="input-base input select2 profil" id="EProfilNo" name="Profil" disabled>
+                        <option selected="selected" disabled>Profil</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-4" name="exclude">
+                      <label class="radio-label field-label" for="eradio-4">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Billet Türü</span>
+                      </label>
+                      <select class="input-base input select2 billet" id="EBilletTuru" name="Billet" disabled>
+                        <option selected="selected" disabled>Billet</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-5" name="exclude">
+                      <label class="radio-label field-label" for="eradio-5">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Kondüsyon</span>
+                      </label>
+                      <select class="input-base input select2 kondusyon" id="EKondusyon" name="Kondüsyon" disabled>
+                        <option selected="selected" disabled>Kondüsyon</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-6" name="exclude">
+                      <label class="radio-label field-label" for="eradio-6">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Yüzey Özelliği</span>
+                      </label>
+                      <select class="input-base input select2 yuzey" id="EYuzey" name="Yüzey" disabled>
+                        <option selected="selected" disabled>Yüzey Özelliği</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-7" name="exclude">
+                      <label class="radio-label field-label" for="eradio-7">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Gramaj</span>
+                      </label>
+                      <select class="input-base input select2 gramaj" id="EGramaj" name="Gramaj" disabled>
+                        <option selected="selected" disabled>Gramaj</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="eradio-8" name="exclude">
+                      <label class="radio-label field-label" for="eradio-8">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Termin</span>
+                      </label>
+                      <input type="text" class="input-base input3 daterangeinput" name="Termin Başlangıç" id="ETerminBaslangic" placeholder="Başlangıç" disabled>
+                      <div class="input-group-text text1"><i class="fa fa-calendar"></i></div>
+                      <input type="text" class="input-base input3 daterangeinput" name="Termin Bitiş" id="ETerminBitis" placeholder="Bitiş" disabled>
+                      <div class="input-group-text text2"><i class="fa fa-calendar"></i></div>
+                    </div>
+                    </div>
+                    <div class="col-md-1 mt-3">
+                      <button class="btn btn-primary" id="btnExcludeAnd">Ve</button>
+                      <hr>
+                      <button class="btn btn-primary" id="btnExcludeEkle" data-type="Hariç Tut">Ekle</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="priority-tab-pane" name="Priority" role="tabpanel" aria-labelledby="priority-tab">
+              <div class="container-fluid">
+                <div class="custom-radio mt-3">
+                  <div class="row">
+                    <div class="col-md-10 mt-3">
+                    <div class="input-group">
+                      <input type="radio" id="pradio-1" name="priority">
+                      <label class="radio-label field-label" for="pradio-1">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Sipariş Numarası</span>
+                      </label>
+                      <select class="input-base input select2 siparis" id="PSiparisNo" name="Sipariş" disabled>
+                        <option selected="selected" disabled>Kart No</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="pradio-2" name="priority">
+                      <label class="radio-label field-label" for="pradio-2">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Firma Adı</span>
+                      </label>
+                      <select class="input-base input select2 firma" id="PFirmaAdi" name="Firma"  disabled>
+                        <option selected="selected" disabled>Firma</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                    <input type="radio" id="pradio-3" name="priority">
+                    <label class="radio-label field-label" for="pradio-3">
+                      <div class="radio-circle"></div>
+                      <span class="radio-text">Profil Numarası</span>
+                    </label>
+                    <select class="input-base input select2 profil" id="PProfilNo" name="Profil" disabled>
+                      <option selected="selected" disabled>Profil</option>
+                    </select>
+                    </div>
+                    <div class="input-group">
+                    <input type="radio" id="pradio-4" name="priority">
+                    <label class="radio-label field-label" for="pradio-4">
+                      <div class="radio-circle"></div>
+                      <span class="radio-text">Billet Türü</span>
+                    </label>
+                    <select class="input-base input select2 billet" id="PBilletTuru" name="Billet" disabled>
+                      <option selected="selected" disabled>Billet</option>
+                    </select>
+                    </div>
+                    <div class="input-group">
+                    <input type="radio" id="pradio-5" name="priority">
+                    <label class="radio-label field-label" for="pradio-5">
+                      <div class="radio-circle"></div>
+                      <span class="radio-text">Kondüsyon</span>
+                    </label>
+                    <select class="input-base input select2 kondusyon" id="PKondusyon" name="Kondüsyon" disabled>
+                      <option selected="selected" disabled>Kondüsyon</option>
+                    </select>
+                    </div>
+                    <div class="input-group">
+                    <input type="radio" id="pradio-6" name="priority">
+                    <label class="radio-label field-label" for="pradio-6">
+                      <div class="radio-circle"></div>
+                      <span class="radio-text">Yüzey Özelliği</span>
+                    </label>
+                    <select class="input-base input select2 yuzey" id="PYuzey" name="Yüzey" disabled>
+                      <option selected="selected" disabled>Yüzey Özelliği</option>
+                    </select>
+                    </div>
+                    <div class="input-group">
+                    <input type="radio" id="pradio-7" name="priority">
+                    <label class="radio-label field-label" for="pradio-7">
+                      <div class="radio-circle"></div>
+                      <span class="radio-text">Gramaj</span>
+                    </label>
+                    <select class="input-base input select2 gramaj" id="PGramaj" name="Gramaj" disabled>
+                      <option selected="selected" disabled>Gramaj</option>
+                    </select>
+                    </div>
+                    <div class="input-group">
+                    <input type="radio" id="pradio-8" name="priority">
+                    <label class="radio-label field-label" for="pradio-8">
+                      <div class="radio-circle"></div>
+                      <span class="radio-text">Termin</span>
+                    </label>
+                    <input type="text" class="input-base input3 daterangeinput" name="Termin Başlangıç" id="PTerminBaslangic" placeholder="Başlangıç" disabled>
+                    <div class="input-group-text text1"><i class="fa fa-calendar"></i></div>
+                    <input type="text" class="input-base input3 daterangeinput" name="Termin Bitiş" id="PTerminBitis" placeholder="Bitiş" disabled>
+                    <div class="input-group-text text2"><i class="fa fa-calendar"></i></div>
+                    </div>
+                    </div>
+                    <div class="col-md-1 mt-3">
+                      <button class="btn btn-primary" id="btnPriorityEkle" data-type="Öncelik">Ekle</button> <!-- sağ tarafa dayamayı unutma -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="limit-tab-pane" name="Limit" role="tabpanel" aria-labelledby="limit-tab">
+              <div class="container-fluid">
+                <div class="custom-radio mt-3">
+                  <div class="row">
+                    <div class="col-md-10 mt-3">
+                    <div class="input-group">
+                      <input type="radio" id="lradio-1" name="limits">
+                      <label class="radio-label field-label" for="lradio-1">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Sipariş Numarası</span>
+                      </label>
+                      <select class="input-base input select2 siparis" id="LSiparis" name="Siparis" disabled>
+                        <option selected="selected" disabled>Kart No</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-2" name="limits">
+                      <label class="radio-label field-label" for="lradio-2">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Firma Adı</span>
+                      </label>
+                      <select class="input-base input select2 firma" id="LFirmaAdi" name="Firma"  disabled>
+                        <option selected="selected" disabled>Firma</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-3" name="limits">
+                      <label class="radio-label field-label" for="lradio-3">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Profil Numarası</span>
+                      </label>
+                      <select class="input-base input select2 profil" id="LProfilNo" name="Profil" disabled>
+                        <option selected="selected" disabled>Profil</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-4" name="limits">
+                      <label class="radio-label field-label" for="lradio-4">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Billet Türü</span>
+                      </label>
+                      <select class="input-base input select2 billet" id="LBilletTuru" name="Billet" disabled>
+                        <option selected="selected" disabled>Billet</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-5" name="limits">
+                      <label class="radio-label field-label" for="lradio-5">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Kondüsyon</span>
+                      </label>
+                      <select class="input-base input select2 kondusyon" id="LKondusyon" name="Kondüsyon" disabled>
+                        <option selected="selected" disabled>Kondüsyon</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-6" name="limits">
+                      <label class="radio-label field-label" for="lradio-6">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Yüzey Özelliği</span>
+                      </label>
+                      <select class="input-base input select2 yuzey" id="LYuzey" name="Yüzey" disabled>
+                        <option selected="selected" disabled>Yüzey Özelliği</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-7" name="limits">
+                      <label class="radio-label field-label" for="lradio-7">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Gramaj</span>
+                      </label>
+                      <select class="input-base input select2 gramaj" id="LGramaj" name="Gramaj" disabled>
+                        <option selected="selected" disabled>Gramaj</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <input type="radio" id="lradio-8" name="limits">
+                      <label class="radio-label field-label" for="lradio-8">
+                        <div class="radio-circle"></div>
+                        <span class="radio-text">Termin</span>
+                      </label>
+                      <input type="text" class="input-base input3 daterangeinput" name="LTerminBaslangic" id="LTerminBaslangic" placeholder="Başlangıç" disabled>
+                      <div class="input-group-text text1"><i class="fa fa-calendar"></i></div>
+                      <input type="text" class="input-base input3 daterangeinput" name="LTerminBitis" id="LTerminBitis" placeholder="Bitiş" disabled>
+                      <div class="input-group-text text2"><i class="fa fa-calendar"></i></div>
+                    </div>
+                    </div>
+                    <div class="col-md-1 mt-3">
+                      <input type="number" class="input-base min" id="LMin" name="Min" placeholder="min(kg)" autocomplete="off" disabled>
+                      <input type="number" class="input-base max" id="LMax" name="Max" placeholder="max(kg)" autocomplete="off" disabled>
+                      <hr>
+                      <button class="btn btn-primary" id="btnLimitVe">Ve</button>
+                      <hr>
+                      <button class="btn btn-primary" id="btnLimitEkle" data-type="Limit">Ekle</button> <!-- sağ tarafa dayamayı unutma -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6" style="padding-top: 10px;">
+          <div class="custom-radio mt-5">
+            <div id="kriterTabulator"></div>
+            <button class="btn btn-primary" id="btnPlanOlustur">Plan Oluştur</button>
+          </div>
+        </div>
+      </div>
+      <div class="tab-custom-content">
+        <div class="custom-radio mt-5">
+          <div id="planTabulator"></div>
+        </div>
+      </div>
+    </div>
+    <!-- /.card -->
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var siparisler = JSON.parse('{{ siparisler | escapejs }}');
+    var profiller = JSON.parse('{{ profiller | escapejs }}');
+    var firmalar = JSON.parse('{{ firmalar|escapejs }}');
+    var billetler = JSON.parse('{{ billetler | escapejs }}');
+    var kondusyonlar = JSON.parse('{{ kondusyonlar | escapejs }}');
+    var yuzeyler = JSON.parse('{{ yuzeyler|escapejs }}');
+    var gramajlar = JSON.parse('{{ gramajlar | escapejs }}');
+
+    populateDropdown("select.siparis", siparisler);
+    populateDropdown("select.profil", profiller);
+    populateDropdown("select.firma", firmalar);
+    populateDropdown("select.billet", billetler);
+    populateDropdown("select.kondusyon", kondusyonlar);
+    populateDropdown("select.yuzey", yuzeyler);
+    populateDropdown("select.gramaj", gramajlar);
+
+    function populateDropdown(selector, data) {
+        var selects = document.querySelectorAll(selector);
+        selects.forEach(function(select) {
+            for (var i = 0; i < data.length; i++) {
+                var option = document.createElement("option");
+                option.text = data[i];
+                option.value = data[i];
+                select.add(option);
+            }
+        });
+    }
+  });
+
+  var deleteIcon = function(cell, formatterParams, onRendered){ 
+      return "<i class='fa fa-trash'></i>";
+  };
+  var kriterTable = new Tabulator("#kriterTabulator", {
+    layout:"fitColumns",
+    data:[],
+    movableRows:true,
+    height:"506px",
+    columns:[
+        {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+        {title:"Tür", field:"type", width:120},
+        {title:"Kriter", field:"kriter"},
+        {title:"Min", field:"min"},
+        {title:"Max", field:"max", width:100},
+        {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+          var data = cell.getData();
+          cell.getRow().delete();}
+        }
+    ],
+  });
+
+  var planTable = new Tabulator("#planTabulator", {
+    layout:"fitColumns",
+    data:[],
+    movableRows:true,
+    height:"506px",
+    columns:[
+        {rowHandle:true, formatter:"handle", headerSort:false, frozen:true, width:30, minWidth:30},
+        {title:"Pres", field:"press_code", width:120},
+        {title:"Kart No", field:"KartNo"},
+        {title:"Firma", field:"Firma"},
+        {title:"Profil", field:"Profil"},
+        {title:"Billet", field:"Billet"},
+        {title:"Kondüsyon", field:"Kondusyon"},
+        {title:"Yüzey", field:"Yuzey"},
+        {title:"Gramaj", field:"Gramaj"},
+        {title:"Planlanan Miktar", field:"planned_kg"},
+        {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+          var data = cell.getData();
+          cell.getRow().delete();}
+        }
+    ],
+  });
+
+  $('.select2').select2({
+    theme: 'bootstrap4',
+    width: '300px',
+  });
+
+  $('.daterangeinput').daterangepicker({
+    singleDatePicker: true,
+    "locale": {
+      "format": "DD-MM-YYYY",
+      "separator": " | ",
+      "applyLabel": "Uygula",
+      "cancelLabel": "İptal Et",
+      "fromLabel": "From",
+      "toLabel": "To",
+      "customRangeLabel": "Custom",
+      "weekLabel": "H",
+      "daysOfWeek": [
+          "Pa",
+          "Pt",
+          "Sa",
+          "Ça",
+          "Pe",
+          "Cu",
+          "Ct"
+      ],
+      "monthNames": [
+          "Ocak",
+          "Şubat",
+          "Mart",
+          "Nisan",
+          "Mayıs",
+          "Haziran",
+          "Temmuz",
+          "Ağustos",
+          "Eylül",
+          "Ekim",
+          "Kasım",
+          "Aralık"
+      ],
+      "firstDay": 1,
+    },
+    "autoUpdateInput": false,
+  });
+
+  $('.daterangeinput').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('DD/MM/YY'));
+  });
+
+  $('input[type=radio]').change(function() {
+    if($(this).is(':checked')){
+      $(this).closest('.custom-radio').find('.input-base').prop('disabled', true);
+      $(this).closest('.input-group').find('.input-base').prop('disabled', false);
+    }
+    if($(this).closest('.tab-pane').attr('name')=="Limit") {
+      minDeger = $("#LMin").prop('disabled', false);
+      maxDeger = $("#LMax").prop('disabled', false);
+    }
+  });
+
+  $('#btnExcludeEkle, #btnPriorityEkle, #btnLimitEkle').click(function(){
+    let kriter="";
+    let minDeger="";
+    let maxDeger= "";
+    let type= $(this).data('type');
+    $(this).closest('.custom-radio').find('.input-base:not(:disabled)').each(function() {
+      if ($(this).attr('id') != "LMin" && $(this).attr('id') != "LMax") {
+        if ($(this).val() && $(this).val() != "") {
+          if (kriter != "") {kriter+=", ";}
+          kriter += $(this).attr('name') + ": " + $(this).val();
+        };
+      }
+    });
+
+    if (type=="Limit") {
+      if ($("#LMin").val().trim() !== "" || $("#LMax").val().trim() !== "") {
+        minDeger = $("#LMin").val();
+        maxDeger = $("#LMax").val();
+      } else { // Both min and max are empty, so do not add a row
+        return;
+      }
+    }
+    
+    if (kriter != "") {
+      var dataRow = {type:type, kriter:kriter, min:minDeger, max:maxDeger};
+      kriterTable.addData([dataRow], true);
+    }; // limitlerdeki min max için nasıl
+  });
+
+  $('#btnPlanOlustur').click(function(){
+    // check if the tabulator data is not empty
+    // if not empty than post the data
+    let data = kriterTable.getData();
+    const kriterData = new FormData();
+    kriterData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    kriterData.append("kriterData", JSON.stringify(data));
+    if (data.length > 0) {
+      $.ajax({
+          url: '/uretimplanlama',
+          type: 'POST',
+          data: kriterData,
+          contentType: false,
+          processData: false,
+          success: function(response) {
+              console.log(response);
+              planTable.setData(response.order_plan);
+          },
+          error: function(error) {
+            alert('Plan oluşturulamadı. '+error);
+          }
+      });
+    } else {
+        alert("Lütfen kriter ekleyiniz.");
+    }
+  });
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+
+{% endblock %}

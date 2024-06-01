@@ -210,6 +210,15 @@ class EkSiparis(models.Model):
     class Meta:
         verbose_name="EkSiparis"
         verbose_name_plural="EkSiparisler"
+    
+    def production_started(self):
+        """
+        Check if production has started for this EkSiparis.
+        """
+        last_eksiparis_kalip = self.eksipariskalip_set.last()  # Get the latest EkSiparisKalip entry
+        if last_eksiparis_kalip:
+            return last_eksiparis_kalip.Uretim == "Basla"
+        return False
 
 class EkSiparisKalip(models.Model):
     EkSiparisBilgi = models.ForeignKey(EkSiparis, on_delete=models.DO_NOTHING, null=True, blank=True)
