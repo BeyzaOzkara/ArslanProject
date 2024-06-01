@@ -561,12 +561,12 @@
         {title:"Pres", field:"press_code", width:120},
         {title:"Kart No", field:"KartNo"},
         {title:"Firma", field:"Firma"},
-        {title:"Profil", field:"Profil"},
-        {title:"Billet", field:"Billet"},
+        {title:"Profil", field:"Profil", bottomCalc:"unique"},
+        {title:"Billet", field:"Billet", bottomCalc:"unique"},
         {title:"Kondüsyon", field:"Kondusyon"},
         {title:"Yüzey", field:"Yuzey"},
         {title:"Gramaj", field:"Gramaj"},
-        {title:"Planlanan Miktar", field:"planned_kg"},
+        {title:"Planlanan Miktar", field:"planned_kg", bottomCalc: "sum"},
         {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
           var data = cell.getData();
           cell.getRow().delete();}

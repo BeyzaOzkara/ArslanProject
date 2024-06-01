@@ -2725,12 +2725,12 @@ class UretimPlanlamaView(generic.TemplateView):
         
         order_plan = self.production_plan(pres_kodu, kriterData)
         order_plan = self.transform_plan(order_plan)
-
+        print(order_plan)
         return JsonResponse({'order_plan': order_plan})
 
     def production_plan(self, pres_kodu, kriterler):
         sip = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        orders = sip.filter(PresKodu=pres_kodu, Kg__gt=0)
+        orders = sip.filter(PresKodu=pres_kodu, Kg__gt=0).order_by("SonTermin")
 
         exclude_list = [item['kriter'] for item in kriterler if item['type'] == 'Hariç Tut']
         priority_list = [item['kriter'] for item in kriterler if item['type'] == 'Öncelik']
@@ -2780,7 +2780,7 @@ class UretimPlanlamaView(generic.TemplateView):
                 l_conditions[field] = value
             min_kg = float(item['min']) if item['min'] else 0
             max_kg = float(item['max']) if item['max'] else float('inf')
-            limited_orders = orders.filter(**l_conditions).order_by('SonTermin')
+            limited_orders = orders.filter(**l_conditions)
 
             current_kg = 0
             for order in limited_orders:
@@ -2793,7 +2793,7 @@ class UretimPlanlamaView(generic.TemplateView):
                         add_kg = min_kg - current_kg
                     current_kg += add_kg
                     planned_kg += add_kg
-                    order_plan.append({
+                    limit_order.append({
                         'press_code': pres_kodu,
                         'production_date': datetime.datetime.now().date(),
                         'order': order.Kimlik,
@@ -2837,6 +2837,31 @@ class UretimPlanlamaView(generic.TemplateView):
             
             for i in limit_order:
                 order_plan.append(i)
+
+        if planned_kg < 13000:
+            remaining_orders = orders.exclude(Kimlik__in=[item['order'] for item in order_plan])
+            for order in remaining_orders:
+                if planned_kg + order.Kg <= 13000:
+                    planned_kg += order.Kg
+                    order_plan.append({
+                        'press_code': pres_kodu,
+                        'production_date': datetime.datetime.now().date(),
+                        'order': order.Kimlik,
+                        'planned_kg': order.Kg,
+                        'fixed_production': False
+                    })
+                else:
+                    remaining_kg = 13000 - planned_kg
+                    if remaining_kg > 0:
+                        order_plan.append({
+                            'press_code': pres_kodu,
+                            'production_date': datetime.datetime.now().date(),
+                            'order': order.Kimlik,
+                            'planned_kg': remaining_kg,
+                            'fixed_production': False
+                        })
+                        planned_kg += remaining_kg
+                    break
 
         return order_plan
 
