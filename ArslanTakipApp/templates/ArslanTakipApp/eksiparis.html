@@ -31,7 +31,7 @@
   <div class="card">
     <button type="button" id="btnAcilListeDuzenle" class="btn btn-info" >PLANLAMA LİSTESİ DÜZENLE</button>
   </div>
-  <div class="card">
+  <!-- <div class="card">
     <div class="card-body">
       <div class="row">
         <div id="hammaddeTable"></div>
@@ -39,7 +39,7 @@
         <div id="sureTable"></div>
       </div>
     </div>
-  </div>
+  </div> -->
   <div class="card">
     <div class="card-body">
         <div id="ekSiparisTable"></div>
@@ -338,41 +338,41 @@
     
   });
 
-  var sureTable =new Tabulator("#sureTable", {
-    maxHeight:"400px",
-    layout:"fitDataFill",
-    placeholder:"Sipariş Süre",
-    ajaxURL:"/eksiparis/timeline",
-    columns: [
-      {title:"Kart No", field: "SipKartNo"},
-      {title:"Billet Türü", field: "EkBilletTuru"},
-      {title:"Pres Kodu", field: "EkPresKodu"},
-      {title:"Sure", field: "TahminiSure"}
-    ]
-  });
+  // var sureTable =new Tabulator("#sureTable", {
+  //   maxHeight:"400px",
+  //   layout:"fitDataFill",
+  //   placeholder:"Sipariş Süre",
+  //   ajaxURL:"/eksiparis/timeline",
+  //   columns: [
+  //     {title:"Kart No", field: "SipKartNo"},
+  //     {title:"Billet Türü", field: "EkBilletTuru"},
+  //     {title:"Pres Kodu", field: "EkPresKodu"},
+  //     {title:"Sure", field: "TahminiSure"}
+  //   ]
+  // });
 
-  var hammaddeTable =new Tabulator("#hammaddeTable", {
-    maxHeight:"400px",
-    layout:"fitDataFill",
-    placeholder:"Sipariş Hammadde",
-    ajaxURL:"/eksiparis/hammadde",
-    columns: [
-      {title:"Billet Türü", field: "EkBilletTuru"},
-      {title:"Brüt", field: "Brut"},
-      {title:"Net", field: "Net"}
-    ]
-  });
+  // var hammaddeTable =new Tabulator("#hammaddeTable", {
+  //   maxHeight:"400px",
+  //   layout:"fitDataFill",
+  //   placeholder:"Sipariş Hammadde",
+  //   ajaxURL:"/eksiparis/hammadde",
+  //   columns: [
+  //     {title:"Billet Türü", field: "EkBilletTuru"},
+  //     {title:"Brüt", field: "Brut"},
+  //     {title:"Net", field: "Net"}
+  //   ]
+  // });
   
-  var yuzeyTable =new Tabulator("#yuzeyTable", {
-    maxHeight:"400px",
-    layout:"fitDataFill",
-    placeholder:"Sipariş Hammadde",
-    ajaxURL:"/eksiparis/yuzey",
-    columns: [
-      {title:"Yüzey Özelliği", field: "EkYuzeyOzelligi"},
-      {title:"Net", field: "Net"},
-    ]
-  });
+  // var yuzeyTable =new Tabulator("#yuzeyTable", {
+  //   maxHeight:"400px",
+  //   layout:"fitDataFill",
+  //   placeholder:"Sipariş Hammadde",
+  //   ajaxURL:"/eksiparis/yuzey",
+  //   columns: [
+  //     {title:"Yüzey Özelliği", field: "EkYuzeyOzelligi"},
+  //     {title:"Net", field: "Net"},
+  //   ]
+  // });
 
   var ekSiparisTable = new Tabulator("#ekSiparisTable", {
     height:"650px",
