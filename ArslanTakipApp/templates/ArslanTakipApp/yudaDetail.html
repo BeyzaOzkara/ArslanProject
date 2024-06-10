@@ -229,11 +229,36 @@
   var selectedFiles = [];
 
   document.addEventListener("DOMContentLoaded", function () {
-    var kalipNoEkleButton = document.getElementById("kalipNoEkle");
-    kalipNoEkleButton.addEventListener("click", function () {
-        kalipNoEkleButton.style.display = "none";
-        // Show textInputSection
+    $('#kalipNoEkleBtn').click(function() {
         $('#textInputSection').show();
+        $(this).hide();
+    });
+
+    $('#saveKalipNo').click(function() {
+        const kalipNo = $('#kalipNoInput').val();
+        const yudaId = $(this).data('id');
+        // ajax ile kalipNoyu gönder yudaya kaydet
+        $.ajax({
+            type: 'POST',
+            url: '/yudakalipno',
+            data: {
+                'kalip_no': kalipNo,
+                'yuda_id': yudaId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    window.location.reload();  // Kaydetme başarılı olursa sayfayı yenile
+                } else {
+                    alert('Kayıt sırasında bir hata oluştu: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Kayıt sırasında bir hata oluştu: ' + error);
+            }
+        });
+
+
     });
   })
 
@@ -265,12 +290,12 @@
     var i = data[0]; 
     const yudaHeader = $('<div class="card-header"></div>').html(`
         <h3 class="card-title"> ${i.YudaNo}</h3>
-        {% if satis %}
-        <h3 class="card-title">
-            <button type="button" class="btn btn-tool" style="font-weight: bold; color:blue" id="kalipNoEkle" onclick="kalipNoEkle()">
-                KALIP NUMARASI EKLE
-            </button>
-        </h3>
+        {% if kalip_onay %}
+        <button id="kalipNoEkleBtn" class="btn btn-primary">Kalıp No Ekle</button>
+        <div class="row mt-2 card-title" id="textInputSection" style="display:none;">
+            <input type="text" id="kalipNoInput" class="form-control col-lg-6 ml-1" placeholder="Kalıp Numarası Giriniz">
+            <button type="button" class="btn btn-primary" id="saveKalipNo" data-id="${i.id}">Kaydet</button>
+        </div>
         {% endif %}
         <div class="row" id="textInputSection" style="display:none;">
             <input type="text" id="kalipNoInput" class="form-control col-lg-2 ml-1" placeholder="Kalıp Numarası Giriniz">

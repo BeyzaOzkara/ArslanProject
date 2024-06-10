@@ -2165,6 +2165,20 @@ def yudaDetail(request, yId):
     # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim, 'kalip_onay':kalip_onay})
 
+def yudaDetail_kalipno(request):
+    kalip_no = request.POST.get('kalip_no')
+    yuda_id = request.POST.get('yuda_id')
+    print(kalip_no)
+    
+    try:
+        yuda = YudaForm.objects.get(id=yuda_id)
+        print(yuda)
+        # yuda.YeniKalipNo = kalip_no
+        # yuda.save()
+        return JsonResponse({'status': 'success'})
+    except YudaForm.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Yuda bulunamadı'})
+
 def yudaDetail2(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
