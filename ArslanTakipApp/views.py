@@ -2148,13 +2148,22 @@ def yudaDetail(request, yId):
 
     onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
     retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
-    if not YudaOnay.objects.filter(Yuda_id = yId, Group = request.user.groups.first()).first():
+    user_group = request.user.groups.first()
+    if not YudaOnay.objects.filter(Yuda_id = yId, Group = user_group).first():
         secim =""
     else:
-        secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
+        secim = YudaOnay.objects.get(Yuda_id = yId, Group = user_group).OnayDurumu
     
+    satis_onay = YudaOnay.objects.filter(Q(Group=19) | Q(Group=20),Yuda_id=yId,OnayDurumu=True).exists()
+    if satis_onay and yudaDetails[0]['YeniKalipNo'] != None:
+        satis_onay == False
+    
+    kaliphane_grup = request.user.groups.filter(name='Kaliphane Bolumu').exists()
+    kaliphane_onay = YudaOnay.objects.filter(Group__name='Kaliphane Bolumu', Yuda_id=yId, OnayDurumu=True).exists()
+
+    kalip_onay = satis_onay and kaliphane_grup and kaliphane_onay
     # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
-    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
+    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim, 'kalip_onay':kalip_onay})
 
 def yudaDetail2(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
@@ -2725,7 +2734,6 @@ class UretimPlanlamaView(generic.TemplateView):
         
         order_plan = self.production_plan(pres_kodu, kriterData)
         order_plan = self.transform_plan(order_plan)
-        print(order_plan)
         return JsonResponse({'order_plan': order_plan})
 
     def production_plan(self, pres_kodu, kriterler):
@@ -2880,5 +2888,4 @@ class UretimPlanlamaView(generic.TemplateView):
             o['Gramaj'] = s.Profil_Gramaj
 
         return plan
-            
             

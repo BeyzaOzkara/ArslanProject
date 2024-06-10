@@ -228,6 +228,15 @@
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var selectedFiles = [];
 
+  document.addEventListener("DOMContentLoaded", function () {
+    var kalipNoEkleButton = document.getElementById("kalipNoEkle");
+    kalipNoEkleButton.addEventListener("click", function () {
+        kalipNoEkleButton.style.display = "none";
+        // Show textInputSection
+        $('#textInputSection').show();
+    });
+  })
+
   
   $(function () {
     // Summernote
@@ -253,9 +262,20 @@
   function LoadDetail() {
 
     cardYuda.empty();  // Önceki verileri temizle
-    var i = data[0];
+    var i = data[0]; 
     const yudaHeader = $('<div class="card-header"></div>').html(`
         <h3 class="card-title"> ${i.YudaNo}</h3>
+        {% if satis %}
+        <h3 class="card-title">
+            <button type="button" class="btn btn-tool" style="font-weight: bold; color:blue" id="kalipNoEkle" onclick="kalipNoEkle()">
+                KALIP NUMARASI EKLE
+            </button>
+        </h3>
+        {% endif %}
+        <div class="row" id="textInputSection" style="display:none;">
+            <input type="text" id="kalipNoInput" class="form-control col-lg-2 ml-1" placeholder="Kalıp Numarası Giriniz">
+            <button type="button" class="btn btn-primary" id="saveKalipNo">Kaydet</button>
+        </div>
         <div class="card-tools">
           <h5 class="card-title">Tarih:  ${i.Tarih} </h5>
           <h5 class="card-title mr-2 ml-2"> | </h5>
@@ -454,45 +474,6 @@
 
   };
 
-
-  // function dxfModalAc() {
-  //   $.ajax({
-  //       url: '/yudaDetailSvg',
-  //       type: 'GET',
-  //       success: function(data) {
-  //         var svgC = `${data.svg}`
-  //         // $('#g').html(svgC);
-  //         var printedInfoHtml = `
-  //             <div class="printed-info">
-  //                 <p>${data.printed_info.kalip_tip}</p>
-  //             `;
-  //         if (data.printed_info.zivana != 0){
-  //           printedInfoHtml += `
-  //                   <p>Zıvana Sayısı: ${data.printed_info.zivana}</p>`};
-  //         printedInfoHtml += `
-  //                   <p>Kesit Alanı: ${data.printed_info.section_area.toFixed(2)} mm²</p>
-  //                   <p>Gramaj: ${data.printed_info.gramaj.toFixed(2)} kg/m</p>
-  //                   <p>Dış Çevre: ${data.printed_info.outer_perimeter.toFixed(2)} mm</p>
-  //                   <p>İç Çevre: ${data.printed_info.inner_perimeter.toFixed(2)} mm</p>
-  //                   <p>Şekil Faktörü: ${data.printed_info.shape_factor.toFixed(2)}</p>
-  //               </div>`;
-  //           $('.printed-info-container').html(printedInfoHtml);
-
-  //         // Show the modal
-  //         $('#dxfKesitModal').modal('show');
-  //       },
-  //       error: function(xhr, status, error) {
-  //         console.error('Error fetching SVG content:', error);
-  //       }
-  //     }); 
-
-  // }
-
-
-  // function dosyaFunc(e) { //<ul class="list-unstyled dosyalar hide" id="digerDos"></ul> hide ekle
-  //   $(e).next('ul').toggle();
-  // };
-
   function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
 
@@ -673,7 +654,6 @@
         yorumCol.append(commentElement);
     });
   };
-
 
   function deleteComment(cId) {
     let con = confirm("Silmek istediğinize emin misiniz?");
