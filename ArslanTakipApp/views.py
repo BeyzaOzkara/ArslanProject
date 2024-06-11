@@ -2945,6 +2945,7 @@ class UretimPlanlamaView(generic.TemplateView):
             o['KartNo'] = s.KartNo
             o['Firma'] = s.FirmaAdi
             o['Billet'] = s.BilletTuru
+            o['Profil'] = s.ProfilNo
             o['Yuzey'] = s.YuzeyOzelligi
             o['Kondusyon'] = s.KondusyonTuru
             o['Gramaj'] = s.Profil_Gramaj
