@@ -2753,6 +2753,8 @@ class UretimPlanlamaView(generic.TemplateView):
     def production_plan(self, pres_kodu, kriterler):
         sip = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         orders = sip.filter(PresKodu=pres_kodu, Kg__gt=0).order_by("SonTermin")
+        kaliplar = KalipMs.objects.using('dies').filter(AktifPasif='Aktif', Hatali=False, TeniferKalanOmurKg__gt=0).exclude(Silindi=1)
+        kapasiteler = {kalip.ProfilNo: kalip.TeniferKalanOmurKg * 0.85 for kalip in kaliplar}
 
         exclude_list = [item['kriter'] for item in kriterler if item['type'] == 'Hariç Tut']
         priority_list = [item['kriter'] for item in kriterler if item['type'] == 'Öncelik']
@@ -2785,7 +2787,7 @@ class UretimPlanlamaView(generic.TemplateView):
                     value = datetime.datetime.strptime(value, '%d/%m/%y').strftime('%Y-%m-%d')
                 e_conditions[field] = value
             orders = orders.exclude(**e_conditions)
-
+        
         # Initialize the order plan and planned_kg
         order_plan = []
         planned_kg = 0
@@ -2823,6 +2825,7 @@ class UretimPlanlamaView(generic.TemplateView):
                         'fixed_production': True
                     })
         
+        pri_ids = []
         for item in priority_list:
             pairs = item.split(", ")
             p_conditions = {}
@@ -2833,7 +2836,8 @@ class UretimPlanlamaView(generic.TemplateView):
                     value = datetime.datetime.strptime(value, '%d/%m/%y').strftime('%Y-%m-%d')
                 p_conditions[field] = value
             priority_orders = orders.filter(**p_conditions)
-            
+            pri_ids += [pri.Kimlik for pri in priority_orders]
+
             for order in priority_orders:
                 if planned_kg + order.Kg <= 13000:
                     planned_kg += order.Kg
@@ -2859,6 +2863,51 @@ class UretimPlanlamaView(generic.TemplateView):
             
             for i in limit_order:
                 order_plan.append(i)
+
+
+        # pri_query = orders.filter(Kimlik__in = pri_ids)
+        # non_pri_query = orders.exclude(Kimlik__in = pri_ids).order_by('SonTermin')
+        # gunluk_max_uretim = 13000
+
+        # def planlama(sips):
+        #     nonlocal planned_kg
+        #     for siparis in sips:
+        #         kalan_miktar = siparis.Kg
+        #         kalip_uretim = {}
+        #         for kalip in kaliplar:
+        #             if siparis.ProfilNo == kalip.ProfilNo and planned_kg < gunluk_max_uretim:
+        #                 uretim_miktari = min(kalip.TeniferKalanOmurKg * 0.85, kalan_miktar, gunluk_max_uretim - planned_kg)
+        #                 if uretim_miktari > 0:
+        #                     if kalip.KalipNo in kalip_uretim:
+        #                         kalip_uretim[kalip.KalipNo] += uretim_miktari
+        #                     else:
+        #                         kalip_uretim[kalip.KalipNo] = uretim_miktari
+        #                     kalan_miktar -= uretim_miktari
+        #                     planned_kg += uretim_miktari
+        #                 if planned_kg >= gunluk_max_uretim:
+        #                     break
+        #         if kalip_uretim:
+        #             order_plan.append({
+        #                 'press_code': pres_kodu,
+        #                 'order': siparis.Kimlik,
+        #                 'production_date': datetime.datetime.now().date(),
+        #                 'Profil': siparis.ProfilNo,
+        #                 'uretim_detaylari': kalip_uretim,
+        #             })
+        #         if kalan_miktar > 0 and planned_kg < gunluk_max_uretim:
+        #             order_plan.append({
+        #                 'press_code': pres_kodu,
+        #                 'order': siparis.Kimlik,
+        #                 'production_date': datetime.datetime.now().date(),
+        #                 'Profil': siparis.ProfilNo,
+        #                 'uretim_detaylari': {'Kalan': kalan_miktar},  # Kalan miktar bir sonraki güne taşınacak
+        #             })
+
+        # planlama(pri_query)
+        # print(order_plan)
+        # if planned_kg < gunluk_max_uretim:
+        #     planlama(non_pri_query)
+        #     print(f"order: {order_plan}")
 
         if planned_kg < 13000:
             remaining_orders = orders.exclude(Kimlik__in=[item['order'] for item in order_plan])
@@ -2895,11 +2944,11 @@ class UretimPlanlamaView(generic.TemplateView):
             s = siparis.get(Kimlik=kimlik)
             o['KartNo'] = s.KartNo
             o['Firma'] = s.FirmaAdi
-            o['Profil'] = s.ProfilNo
             o['Billet'] = s.BilletTuru
             o['Yuzey'] = s.YuzeyOzelligi
             o['Kondusyon'] = s.KondusyonTuru
             o['Gramaj'] = s.Profil_Gramaj
+            o['SonTermin'] = s.SonTermin.strftime("%d-%m-%Y")
 
         return plan
             

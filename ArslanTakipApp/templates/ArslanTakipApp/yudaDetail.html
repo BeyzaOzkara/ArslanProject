@@ -260,7 +260,7 @@
 
 
     });
-  })
+  });
 
   
   $(function () {
@@ -287,13 +287,14 @@
   function LoadDetail() {
 
     cardYuda.empty();  // Önceki verileri temizle
-    var i = data[0]; 
+    var i = data[0];
     const yudaHeader = $('<div class="card-header"></div>').html(`
-        <h3 class="card-title"> ${i.YudaNo}</h3>
+        <h3 class="card-title mr-2"> ${i.YudaNo}</h3>
+        
         {% if kalip_onay %}
         <button id="kalipNoEkleBtn" class="btn btn-primary">Kalıp No Ekle</button>
         <div class="row mt-2 card-title" id="textInputSection" style="display:none;">
-            <input type="text" id="kalipNoInput" class="form-control col-lg-6 ml-1" placeholder="Kalıp Numarası Giriniz">
+            <input type="text" id="kalipNoInput" class="form-control col-lg-6 mr-1" placeholder="Kalıp Numarası Giriniz">
             <button type="button" class="btn btn-primary" id="saveKalipNo" data-id="${i.id}">Kaydet</button>
         </div>
         {% endif %}
