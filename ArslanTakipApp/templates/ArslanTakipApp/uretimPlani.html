@@ -183,6 +183,9 @@
           </ul>
           <div class="tab-content" id="custom-content-below-tabContent">
             <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+              <select class="input-base select2 press_code" id="press_code" name="PresKodu">
+                <option selected="selected" disabled>Pres Kodu Seçiniz</option>
+              </select>
               <br>
               <p style="font-weight: bold;">Öncelik -> </p><p>Planda öncelik verilecekler. (Kart Numarası dışında bir kriter seçildiyse siparişler o kritere göre filtrelenip son termin sırasına göre eklenir.)</p><br>
               <p style="font-weight: bold;">Hariç Tut -> </p><p>Planda olması istenmeyenler.</p><br>
@@ -502,34 +505,49 @@
 {% block extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    var siparisler = JSON.parse('{{ siparisler | escapejs }}');
-    var profiller = JSON.parse('{{ profiller | escapejs }}');
-    var firmalar = JSON.parse('{{ firmalar|escapejs }}');
-    var billetler = JSON.parse('{{ billetler | escapejs }}');
-    var kondusyonlar = JSON.parse('{{ kondusyonlar | escapejs }}');
-    var yuzeyler = JSON.parse('{{ yuzeyler|escapejs }}');
-    var gramajlar = JSON.parse('{{ gramajlar | escapejs }}');
+    var press_codes = JSON.parse('{{ press_codes | escapejs }}'); // Add this line to get press codes
+    populateDropdown("select.press_code", press_codes);
+  });
 
-    populateDropdown("select.siparis", siparisler);
-    populateDropdown("select.profil", profiller);
-    populateDropdown("select.firma", firmalar);
-    populateDropdown("select.billet", billetler);
-    populateDropdown("select.kondusyon", kondusyonlar);
-    populateDropdown("select.yuzey", yuzeyler);
-    populateDropdown("select.gramaj", gramajlar);
-
-    function populateDropdown(selector, data) {
+  function populateDropdown(selector, data) {
         var selects = document.querySelectorAll(selector);
         selects.forEach(function(select) {
-            for (var i = 0; i < data.length; i++) {
-                var option = document.createElement("option");
-                option.text = data[i];
-                option.value = data[i];
-                select.add(option);
-            }
+          var disabledOption = select.querySelector('option[disabled]');
+          select.innerHTML = ''; // Clear existing options
+
+          // Re-add the disabled option if it existed
+          if (disabledOption) {
+              select.add(disabledOption);
+          }
+          for (var i = 0; i < data.length; i++) {
+              var option = document.createElement("option");
+              option.text = data[i];
+              option.value = data[i];
+              select.add(option);
+          }
         });
     }
-  });
+  $('.press_code').change(function() {
+        var press_code = $(this).val();
+        if (press_code) {
+            $.ajax({
+                url: '/get_data_by_press_code',
+                data: {
+                    'press_code': press_code
+                },
+                success: function(data) {
+                    populateDropdown(".siparis", data.siparisler);
+                    populateDropdown(".profil", data.profiller);
+                    populateDropdown(".firma", data.firmalar);
+                    populateDropdown(".billet", data.billetler);
+                    populateDropdown(".kondusyon", data.kondusyonlar);
+                    populateDropdown(".yuzey", data.yuzeyler);
+                    populateDropdown(".gramaj", data.gramajlar);
+                }
+            });
+        }
+    });
+  
 
   var deleteIcon = function(cell, formatterParams, onRendered){ 
       return "<i class='fa fa-trash'></i>";
@@ -671,6 +689,12 @@
     const kriterData = new FormData();
     kriterData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     kriterData.append("kriterData", JSON.stringify(data));
+    let pres_kodu = $('.press_code').val(); // Get the selected press code   
+    if (!pres_kodu) {
+        alert("Lütfen pres kodu seçiniz.");
+        return;
+    }
+    kriterData.append("pres_kodu", pres_kodu);
     if (data.length > 0) {
       $.ajax({
           url: '/uretimplanlama',
@@ -679,7 +703,6 @@
           contentType: false,
           processData: false,
           success: function(response) {
-              console.log(response);
               planTable.setData(response.order_plan);
           },
           error: function(error) {

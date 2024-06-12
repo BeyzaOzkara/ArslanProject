@@ -2722,26 +2722,46 @@ class UretimPlanlamaView(generic.TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pres_kodu = '1600-2'
         sip = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        sip = sip.filter(PresKodu=pres_kodu)
+
         distinct_values = {
-            'siparisler': sip.values_list('KartNo', flat=True).distinct(),
-            'profiller': sip.values_list('ProfilNo', flat=True).distinct(),
-            'firmalar': sip.values_list('FirmaAdi', flat=True).distinct(),
-            'billetler': sip.values_list('BilletTuru', flat=True).distinct(),
-            'kondusyonlar': sip.values_list('KondusyonTuru', flat=True).distinct(),
-            'yuzeyler': sip.values_list('YuzeyOzelligi', flat=True).distinct(),
-            'gramajlar': sip.values_list('Profil_Gramaj', flat=True).distinct(),
+            'press_codes': sip.values_list('PresKodu', flat=True).distinct(),
         }
 
         context_data = {field: json.dumps(list(values)) for field, values in distinct_values.items()}
         context.update(context_data)
         return context
+
+    def get(self, request, *args, **kwargs):
+        if 'press_code' in request.GET:
+            return self.get_data_by_press_code(request)
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+    
+    def get_data_by_press_code(self, request):
+        press_code = request.GET.get('press_code')
+        sip = SiparisList.objects.using('dies').filter(
+            Q(Adet__gt=0) & 
+            ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & 
+            Q(Adet__gte=1)) & 
+            Q(BulunduguYer='TESTERE') & 
+            Q(PresKodu=press_code)
+        ).exclude(SiparisTamam='BLOKE')
+
+        data = {
+            'siparisler': list(sip.values_list('KartNo', flat=True).distinct()),
+            'profiller': list(sip.values_list('ProfilNo', flat=True).distinct()),
+            'firmalar': list(sip.values_list('FirmaAdi', flat=True).distinct()),
+            'billetler': list(sip.values_list('BilletTuru', flat=True).distinct()),
+            'kondusyonlar': list(sip.values_list('KondusyonTuru', flat=True).distinct()),
+            'yuzeyler': list(sip.values_list('YuzeyOzelligi', flat=True).distinct()),
+            'gramajlar': list(sip.values_list('Profil_Gramaj', flat=True).distinct()),
+        }
+        return JsonResponse(data)
     
     def post(self, request, *args, **kwargs):
         data = request.POST
-        pres_kodu = '1600-2' # kullanıcıdan alınacak
+        pres_kodu = data.get('pres_kodu') # kullanıcıdan alınacak
         kriterData = json.loads(data['kriterData'])
         if not kriterData:
             return JsonResponse({"error": "Missing data."}, status=400)
@@ -2762,7 +2782,7 @@ class UretimPlanlamaView(generic.TemplateView):
 
         transformations = {
             'Sipariş': 'KartNo',
-            'Yuzey': 'YuzeyOzelligi',
+            'Yüzey': 'YuzeyOzelligi',
             'Billet': 'BilletTuru',
             'Firma': 'FirmaAdi',
             'Kondüsyon': 'KondusyonTuru',
@@ -2905,7 +2925,6 @@ class UretimPlanlamaView(generic.TemplateView):
         #             })
 
         # planlama(pri_query)
-        # print(order_plan)
         # if planned_kg < gunluk_max_uretim:
         #     planlama(non_pri_query)
         #     print(f"order: {order_plan}")

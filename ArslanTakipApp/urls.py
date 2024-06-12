@@ -93,4 +93,6 @@ urlpatterns = [
     path('deletedYudas/list', views.deletedYudas_list),
     path('yudaDeleteCancel/<str:yId>', views.yudaDeleteCancel),
     path('uretimplanlama', views.UretimPlanlamaView.as_view()),
+    path('get_data_by_press_code/', views.UretimPlanlamaView.as_view(), name='get_data_by_press_code'),
+
 ]
