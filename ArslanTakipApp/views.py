@@ -2762,6 +2762,7 @@ class UretimPlanlamaView(generic.TemplateView):
 
         transformations = {
             'Sipariş': 'KartNo',
+            'Yuzey': 'YuzeyOzelligi',
             'Billet': 'BilletTuru',
             'Firma': 'FirmaAdi',
             'Kondüsyon': 'KondusyonTuru',
