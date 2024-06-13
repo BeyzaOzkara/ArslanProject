@@ -156,6 +156,33 @@
     border-color: #3898EC;
     outline: none;
   }
+
+  #loader {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+  }
+
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   </style>
   
 {% endblock %}
@@ -492,6 +519,8 @@
       </div>
       <div class="tab-custom-content">
         <div class="custom-radio mt-5">
+          <div id="loader"></div>
+          <button class="btn btn-primary" id="download-xlsx">Excel</button>
           <div id="planTabulator"></div>
         </div>
       </div> <!-- loading indicator gerekli -->
@@ -678,8 +707,8 @@
     
     if (kriter != "") {
       var dataRow = {type:type, kriter:kriter, min:minDeger, max:maxDeger};
-      kriterTable.addData([dataRow], true);
-    }; // limitlerdeki min max için nasıl
+      kriterTable.addData([dataRow], false);
+    }; 
   });
 
   $('#btnPlanOlustur').click(function(){
@@ -689,13 +718,17 @@
     const kriterData = new FormData();
     kriterData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     kriterData.append("kriterData", JSON.stringify(data));
-    let pres_kodu = $('.press_code').val(); // Get the selected press code   
+    let pres_kodu = $('.press_code').val(); // Get the selected press code
     if (!pres_kodu) {
         alert("Lütfen pres kodu seçiniz.");
         return;
     }
     kriterData.append("pres_kodu", pres_kodu);
     if (data.length > 0) {
+      document.querySelector('#planTabulator').scrollIntoView({
+        behavior: 'smooth',
+      });
+      document.getElementById("loader").style.display = "block";
       $.ajax({
           url: '/uretimplanlama',
           type: 'POST',
@@ -703,15 +736,21 @@
           contentType: false,
           processData: false,
           success: function(response) {
-              planTable.setData(response.order_plan);
+            planTable.setData(response.order_plan);
+            document.getElementById("loader").style.display = "none";
           },
           error: function(error) {
             alert('Plan oluşturulamadı. '+error);
+            document.getElementById("loader").style.display = "none";
           }
       });
     } else {
         alert("Lütfen kriter ekleyiniz.");
-    }
+    };
+  });
+
+  document.getElementById("download-xlsx").addEventListener("click", function(){
+    planTable.download("xlsx", "uretimplani.xlsx", {sheetName:"Üretim Planı"});
   });
 
 </script>
@@ -723,5 +762,6 @@
 <script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
 <script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 <script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
 
 {% endblock %}

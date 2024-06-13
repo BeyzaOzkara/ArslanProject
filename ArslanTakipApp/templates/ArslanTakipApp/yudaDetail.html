@@ -61,6 +61,19 @@
       stroke:none
     }
 
+    @media print {
+      body {
+        visibility: hidden;
+      }
+      #yudaCard {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+    }
+
+
   </style>
 {% endblock %}
 

@@ -2774,8 +2774,8 @@ class UretimPlanlamaView(generic.TemplateView):
         sip = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         orders = sip.filter(PresKodu=pres_kodu, Kg__gt=0).order_by("SonTermin")
         kaliplar = KalipMs.objects.using('dies').filter(AktifPasif='Aktif', Hatali=False, TeniferKalanOmurKg__gt=0).exclude(Silindi=1)
-        kapasiteler = {kalip.ProfilNo: kalip.TeniferKalanOmurKg * 0.85 for kalip in kaliplar}
-
+        kapasiteler = {kalip.KalipNo: kalip.TeniferKalanOmurKg * 0.85 for kalip in kaliplar}
+        
         exclude_list = [item['kriter'] for item in kriterler if item['type'] == 'Hariç Tut']
         priority_list = [item['kriter'] for item in kriterler if item['type'] == 'Öncelik']
         limit_list = [item for item in kriterler if item['type'] == 'Limit']
@@ -2826,6 +2826,7 @@ class UretimPlanlamaView(generic.TemplateView):
             min_kg = float(item['min']) if item['min'] else 0
             max_kg = float(item['max']) if item['max'] else float('inf')
             limited_orders = orders.filter(**l_conditions)
+            print(f"l_conditions: {l_conditions}, min: {min_kg},, max: {max_kg}")
 
             current_kg = 0
             for order in limited_orders:
@@ -2838,6 +2839,7 @@ class UretimPlanlamaView(generic.TemplateView):
                         add_kg = min_kg - current_kg
                     current_kg += add_kg
                     planned_kg += add_kg
+
                     limit_order.append({
                         'press_code': pres_kodu,
                         'production_date': datetime.datetime.now().date(),
@@ -2845,7 +2847,7 @@ class UretimPlanlamaView(generic.TemplateView):
                         'planned_kg': add_kg,
                         'fixed_production': True
                     })
-        
+            
         pri_ids = []
         for item in priority_list:
             pairs = item.split(", ")
@@ -2858,7 +2860,7 @@ class UretimPlanlamaView(generic.TemplateView):
                 p_conditions[field] = value
             priority_orders = orders.filter(**p_conditions)
             pri_ids += [pri.Kimlik for pri in priority_orders]
-
+            
             for order in priority_orders:
                 if planned_kg + order.Kg <= 13000:
                     planned_kg += order.Kg
@@ -2881,9 +2883,9 @@ class UretimPlanlamaView(generic.TemplateView):
                         })
                         planned_kg += remaining_kg
                     break
-            
-            for i in limit_order:
-                order_plan.append(i)
+                
+            for li in limit_order:
+                order_plan.append(li)
 
 
         # pri_query = orders.filter(Kimlik__in = pri_ids)
@@ -2928,6 +2930,9 @@ class UretimPlanlamaView(generic.TemplateView):
         # if planned_kg < gunluk_max_uretim:
         #     planlama(non_pri_query)
         #     print(f"order: {order_plan}")
+        if len(priority_list) < 1:
+            for li in limit_order:
+                order_plan.append(li)
 
         if planned_kg < 13000:
             remaining_orders = orders.exclude(Kimlik__in=[item['order'] for item in order_plan])
