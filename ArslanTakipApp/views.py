@@ -2787,7 +2787,7 @@ class UretimPlanlamaView(generic.TemplateView):
             'Firma': 'FirmaAdi',
             'Kondüsyon': 'KondusyonTuru',
             'Profil': 'ProfilNo',
-            'Gramaj': 'Profil_Gramajı',
+            'Gramaj': 'Profil_Gramaj',
             'Termin Başlangıç': 'SonTermin__gte',
             'Termin Bitiş': 'SonTermin__lte',
         }
