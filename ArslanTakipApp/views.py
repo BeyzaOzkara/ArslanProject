@@ -589,7 +589,7 @@ def qrKalite(request):
         credentials = Credentials(email, password)
         ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 
-        config = Configuration(server=ews_url, credentials=credentials)
+        config = Configuration(server=ews_url, credentials=credentials, verify_ssl=False)
         # Connect to the Exchange server
         account = Account(
             primary_smtp_address=email,
