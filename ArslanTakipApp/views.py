@@ -580,6 +580,29 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
+        
+        # Define your credentials
+        email = 'yazilim@arslanaluminyum.com'
+        password = 'rHE7Je'
+
+        # Create a credentials object
+        credentials = Credentials(email, password)
+
+        # Connect to the Exchange server
+        account = Account(email, credentials=credentials, autodiscover=True)
+
+        # Access the inbox
+        inbox = account.inbox
+
+        # Fetch the latest emails
+        for item in inbox.all().order_by('-datetime_received')[:10]:
+            print(item)
+            print('Subject:', item.subject)
+            print('From:', item.sender.email_address)
+            print('Received:', item.datetime_received)
+            print('Body:', item.body)
+            print('-' * 50)
+
         """ path = request.get_full_path()
         print(path)
         print(path.rsplit('/', 1)[-1]) """
@@ -2978,3 +3001,4 @@ class UretimPlanlamaView(generic.TemplateView):
 
         return plan
             
+from exchangelib import Credentials, Account
