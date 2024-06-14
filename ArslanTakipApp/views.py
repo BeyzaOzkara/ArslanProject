@@ -587,9 +587,17 @@ def qrKalite(request):
 
         # Create a credentials object
         credentials = Credentials(email, password)
+        ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 
+        config = Configuration(server=ews_url, credentials=credentials)
         # Connect to the Exchange server
-        account = Account(email, credentials=credentials, autodiscover=True)
+        account = Account(
+            primary_smtp_address=email,
+            credentials=credentials,
+            config=config,
+            autodiscover=False,
+            access_type=DELEGATE
+        )
 
         # Access the inbox
         inbox = account.inbox
@@ -3001,4 +3009,4 @@ class UretimPlanlamaView(generic.TemplateView):
 
         return plan
             
-from exchangelib import Credentials, Account
+from exchangelib import DELEGATE, Configuration, Credentials, Account
