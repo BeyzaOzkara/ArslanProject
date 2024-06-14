@@ -585,8 +585,8 @@ def qrKalite(request):
         from email.header import decode_header
 
         # Your email credentials
-        username = "yazilim@arslanaluminyum.com"
-        password = "rHE7Je"
+        username = "ai"
+        password = "Arslan123."
 
         # Connect to the server
         imap = imaplib.IMAP4_SSL("192.168.200.30")
