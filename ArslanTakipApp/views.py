@@ -589,7 +589,7 @@ def qrKalite(request):
         password = "Arslan123."
 
         # Connect to the server
-        imap = imaplib.IMAP4_SSL(host="192.168.200.30", port=143)
+        imap = imaplib.IMAP4(host="192.168.200.30", port=143)
 
         # Log in
         imap.login(username, password)
