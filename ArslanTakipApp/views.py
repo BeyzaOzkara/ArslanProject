@@ -2,6 +2,7 @@ from collections import OrderedDict, defaultdict
 import csv
 import logging
 import re
+import ssl
 import base64, binascii, zlib
 import datetime
 import concurrent.futures
@@ -25,6 +26,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
+import urllib3
 from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip
 from django.template import loader
 import json
@@ -648,16 +650,16 @@ def qrKalite(request):
 
         # Create a credentials object
         credentials = Credentials(email, password)
-        ews_url ='https://webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com'
+        ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 
-        config = Configuration(server=ews_url, credentials=credentials)
+        config = Configuration(service_endpoint=ews_url, credentials=credentials)
         # Connect to the Exchange server
         account = Account(
             primary_smtp_address=email,
             credentials=credentials,
             config=config,
             autodiscover=False,
-            access_type=DELEGATE
+            access_type=DELEGATE,
         )
 
         # Access the inbox
