@@ -1,4 +1,5 @@
 from collections import OrderedDict, defaultdict
+import csv
 import logging
 import re
 import base64, binascii, zlib
@@ -11,6 +12,7 @@ from itertools import groupby
 import time
 import math
 from urllib.parse import unquote
+from django.apps import apps
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -580,68 +582,67 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
-        import imaplib
-        import email
-        from email.header import decode_header
+        # import imaplib
+        # import email
+        # from email.header import decode_header
 
-        # Your email credentials
-        username = "ai"
-        password = "Arslan123."
+        # # Your email credentials
+        # username = "yazilim@arslanaluminyum.com"
+        # password = "rHE7Je"
 
-        # Connect to the server
-        imap = imaplib.IMAP4(host="192.168.200.30", port=587)
+        # # Connect to the server
+        # imap = imaplib.IMAP4(host="192.168.200.30", port=443)
 
-        # Log in
-        imap.login(username, password)
+        # # Log in
+        # imap.login(username, password)
 
-        # Select the mailbox you want to search in
-        imap.select("inbox")
+        # # Select the mailbox you want to search in
+        # imap.select("inbox")
 
-        # Search for emails from a specific department
-        status, messages = imap.search(None, 'FROM', '"feridecakir@arslanaluminyum.com"')
+        # # Search for emails from a specific department
+        # status, messages = imap.search(None, 'FROM', '"feridecakir@arslanaluminyum.com"')
 
-        # Convert messages to a list of email IDs
-        email_ids = messages[0].split()
+        # # Convert messages to a list of email IDs
+        # email_ids = messages[0].split()
 
-        for email_id in email_ids:
-            # Fetch the email by ID
-            res, msg = imap.fetch(email_id, "(RFC822)")
-            for response in msg:
-                if isinstance(response, tuple):
-                    # Parse the email content
-                    msg = email.message_from_bytes(response[1])
-                    # Decode the email subject
-                    subject, encoding = decode_header(msg["Subject"])[0]
-                    if isinstance(subject, bytes):
-                        # If it's a bytes type, decode to str
-                        subject = subject.decode(encoding if encoding else "utf-8")
-                    # Print the subject
-                    print("Subject:", subject)
-                    # Print the sender's email address
-                    print("From:", msg.get("From"))
+        # for email_id in email_ids:
+        #     # Fetch the email by ID
+        #     res, msg = imap.fetch(email_id, "(RFC822)")
+        #     for response in msg:
+        #         if isinstance(response, tuple):
+        #             # Parse the email content
+        #             msg = email.message_from_bytes(response[1])
+        #             # Decode the email subject
+        #             subject, encoding = decode_header(msg["Subject"])[0]
+        #             if isinstance(subject, bytes):
+        #                 # If it's a bytes type, decode to str
+        #                 subject = subject.decode(encoding if encoding else "utf-8")
+        #             # Print the subject
+        #             print("Subject:", subject)
+        #             # Print the sender's email address
+        #             print("From:", msg.get("From"))
 
-                    # If the email message is multipart
-                    if msg.is_multipart():
-                        # Iterate over email parts
-                        for part in msg.walk():
-                            # Extract content type of the email
-                            content_type = part.get_content_type()
-                            content_disposition = str(part.get("Content-Disposition"))
-                            try:
-                                # Get the email body
-                                body = part.get_payload(decode=True).decode()
-                                print("Body:", body)
-                            except:
-                                pass
-                    else:
-                        # Extract content type of the email
-                        content_type = msg.get_content_type()
-                        # Get the email body
-                        body = msg.get_payload(decode=True).decode()
-                        print("Body:", body)
+        #             # If the email message is multipart
+        #             if msg.is_multipart():
+        #                 # Iterate over email parts
+        #                 for part in msg.walk():
+        #                     # Extract content type of the email
+        #                     content_type = part.get_content_type()
+        #                     content_disposition = str(part.get("Content-Disposition"))
+        #                     try:
+        #                         # Get the email body
+        #                         body = part.get_payload(decode=True).decode()
+        #                         print("Body:", body)
+        #                     except:
+        #                         pass
+        #             else:
+        #                 # Extract content type of the email
+        #                 content_type = msg.get_content_type()
+        #                 # Get the email body
+        #                 body = msg.get_payload(decode=True).decode()
+        #                 print("Body:", body)
 
-        
-        """# Define your credentials
+        # Define your credentials
         email = 'yazilim@arslanaluminyum.com'
         password = 'rHE7Je'
 
@@ -669,7 +670,7 @@ def qrKalite(request):
             print('From:', item.sender.email_address)
             print('Received:', item.datetime_received)
             print('Body:', item.body)
-            print('-' * 50)"""
+            print('-' * 50)
 
         """ path = request.get_full_path()
         print(path)
@@ -711,11 +712,6 @@ def qrKalite(request):
             "type" : "deneme",
             "no": "denemee"
         }
-
-    # location = Location.objects.all()
-    # group = Group.objects.get(name="KalipTamYetki")
-    # for l in location:
-    #     assign_perm("dg_view_location", group, l)
     
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
@@ -2226,7 +2222,7 @@ def format_row(row):
 def yudaDetail(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-        
+    
     yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
     yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -2818,7 +2814,6 @@ class UretimPlanlamaView(generic.TemplateView):
         distinct_values = {
             'press_codes': sip.values_list('PresKodu', flat=True).distinct(),
         }
-
         context_data = {field: json.dumps(list(values)) for field, values in distinct_values.items()}
         context.update(context_data)
         return context

@@ -35235,3 +35235,1176 @@ Traceback (most recent call last):
     raise self.abort("unexpected response: %r" % resp)
 imaplib.IMAP4.abort: unexpected response: b'220 EXCH2016.arslanaluminyum.com Microsoft ESMTP MAIL Service ready at Fri, 14 Jun 2024 16:04:06 +0300'
 [35;1mHTTP GET /qr/ 500 [0.07, 127.0.0.1:54069][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="192.168.200.30", port=993)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 851, in create_connection
+    raise exceptions[0]
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+[35;1mHTTP GET /qr/ 500 [2.12, 127.0.0.1:54155][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="192.168.200.30", port=143)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 851, in create_connection
+    raise exceptions[0]
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+[35;1mHTTP GET /qr/ 500 [2.14, 127.0.0.1:54404][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="192.168.200.30", port=993)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 851, in create_connection
+    raise exceptions[0]
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+[35;1mHTTP GET /qr/ 500 [2.13, 127.0.0.1:54421][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="192.168.200.30", port=587)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 205, in __init__
+    self._connect()
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 247, in _connect
+    self.welcome = self._get_response()
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1104, in _get_response
+    raise self.abort("unexpected response: %r" % resp)
+imaplib.IMAP4.abort: unexpected response: b'220 EXCH2016.arslanaluminyum.com Microsoft ESMTP MAIL Service ready at Fri, 14 Jun 2024 16:14:50 +0300'
+[35;1mHTTP GET /qr/ 500 [0.07, 127.0.0.1:54437][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="192.168.200.30", port=632)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 851, in create_connection
+    raise exceptions[0]
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+[35;1mHTTP GET /qr/ 500 [2.13, 127.0.0.1:54512][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\encodings\idna.py", line 163, in encode
+    raise UnicodeError("label empty or too long")
+UnicodeError: label empty or too long
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="https://webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com", port=632)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 827, in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeError: encoding with 'idna' codec failed (UnicodeError: label empty or too long)
+[35;1mHTTP GET /qr/ 500 [0.08, 127.0.0.1:56130][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 592, in qrKalite
+    imap = imaplib.IMAP4(host="192.168.200.30", port=632)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 851, in create_connection
+    raise exceptions[0]
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 836, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Hedef makine etkin olarak reddettiðinden baðlantý kurulamadý
+[35;1mHTTP GET /qr/ 500 [2.12, 127.0.0.1:60416][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 242, in get_session
+    session = self._session_pool.get(block=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\queue.py", line 168, in get
+    raise Empty
+_queue.Empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 210, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0x000001DE1190C290>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001DE1190C290>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 87, in get_service_authtype
+    r = s.post(
+        ^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001DE1190C290>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 654, in qrKalite
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 346, in _get_response
+    session = self.protocol.get_session()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 246, in get_session
+    self.increase_poolsize()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 212, in increase_poolsize
+    self._session_pool.put(self.create_session(), block=False)
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 318, in create_session
+    if self.auth_type == NTLM and self.credentials.type == self.credentials.EMAIL:
+       ^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 119, in auth_type
+    self.config.auth_type = self.get_auth_type()
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 470, in get_auth_type
+    return get_service_authtype(protocol=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 101, in get_service_authtype
+    raise TransportError(str(e)) from e
+exchangelib.errors.TransportError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001DE1190C290>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+[35;1mHTTP GET /qr/ 500 [25.19, 127.0.0.1:61630][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 652, in qrKalite
+    config = Configuration(server=ews_url, credentials=credentials, verify=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Configuration.__init__() got an unexpected keyword argument 'verify'
+[35;1mHTTP GET /qr/ 500 [0.06, 127.0.0.1:65142][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 242, in get_session
+    session = self._session_pool.get(block=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\queue.py", line 168, in get
+    raise Empty
+_queue.Empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 210, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0x0000017AED9AE010>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000017AED9AE010>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 87, in get_service_authtype
+    r = s.post(
+        ^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000017AED9AE010>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 654, in qrKalite
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 346, in _get_response
+    session = self.protocol.get_session()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 246, in get_session
+    self.increase_poolsize()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 212, in increase_poolsize
+    self._session_pool.put(self.create_session(), block=False)
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 318, in create_session
+    if self.auth_type == NTLM and self.credentials.type == self.credentials.EMAIL:
+       ^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 119, in auth_type
+    self.config.auth_type = self.get_auth_type()
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 470, in get_auth_type
+    return get_service_authtype(protocol=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 101, in get_service_authtype
+    raise TransportError(str(e)) from e
+exchangelib.errors.TransportError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000017AED9AE010>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+[35;1mHTTP GET /qr/ 500 [25.14, 127.0.0.1:59601][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 677, in qrKalite
+    export_siparis_list_csv()
+TypeError: export_siparis_list_csv() missing 1 required positional argument: 'request'
+[35;1mHTTP GET /qr/ 500 [0.06, 127.0.0.1:63573][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 242, in get_session
+    session = self._session_pool.get(block=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\queue.py", line 168, in get
+    raise Empty
+_queue.Empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 210, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0x0000023192E13390>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000023192E13390>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 87, in get_service_authtype
+    r = s.post(
+        ^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000023192E13390>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 688, in qrKalite
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 346, in _get_response
+    session = self.protocol.get_session()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 246, in get_session
+    self.increase_poolsize()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 212, in increase_poolsize
+    self._session_pool.put(self.create_session(), block=False)
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 318, in create_session
+    if self.auth_type == NTLM and self.credentials.type == self.credentials.EMAIL:
+       ^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 119, in auth_type
+    self.config.auth_type = self.get_auth_type()
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 470, in get_auth_type
+    return get_service_authtype(protocol=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 101, in get_service_authtype
+    raise TransportError(str(e)) from e
+exchangelib.errors.TransportError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000023192E13390>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+[35;1mHTTP GET /qr/ 500 [26.10, 127.0.0.1:63585][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 242, in get_session
+    session = self._session_pool.get(block=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\queue.py", line 168, in get
+    raise Empty
+_queue.Empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 210, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0x000001C75DF93050>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001C75DF93050>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 87, in get_service_authtype
+    r = s.post(
+        ^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001C75DF93050>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 655, in qrKalite
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 346, in _get_response
+    session = self.protocol.get_session()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 246, in get_session
+    self.increase_poolsize()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 212, in increase_poolsize
+    self._session_pool.put(self.create_session(), block=False)
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 318, in create_session
+    if self.auth_type == NTLM and self.credentials.type == self.credentials.EMAIL:
+       ^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 119, in auth_type
+    self.config.auth_type = self.get_auth_type()
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 470, in get_auth_type
+    return get_service_authtype(protocol=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 101, in get_service_authtype
+    raise TransportError(str(e)) from e
+exchangelib.errors.TransportError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001C75DF93050>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+[35;1mHTTP GET /qr/ 500 [25.27, 127.0.0.1:65090][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 242, in get_session
+    session = self._session_pool.get(block=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\queue.py", line 168, in get
+    raise Empty
+_queue.Empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 210, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0x000001FD599D7490>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001FD599D7490>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 87, in get_service_authtype
+    r = s.post(
+        ^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001FD599D7490>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 655, in qrKalite
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 346, in _get_response
+    session = self.protocol.get_session()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 246, in get_session
+    self.increase_poolsize()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 212, in increase_poolsize
+    self._session_pool.put(self.create_session(), block=False)
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 318, in create_session
+    if self.auth_type == NTLM and self.credentials.type == self.credentials.EMAIL:
+       ^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 119, in auth_type
+    self.config.auth_type = self.get_auth_type()
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 470, in get_auth_type
+    return get_service_authtype(protocol=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 101, in get_service_authtype
+    raise TransportError(str(e)) from e
+exchangelib.errors.TransportError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/mapi/emsmdb/?MailboxId=10666502-1c0c-43c8-ad1b-275feb5b97fa@arslanaluminyum.com/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001FD599D7490>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+[35;1mHTTP GET /qr/ 500 [25.22, 127.0.0.1:50115][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 242, in get_session
+    session = self._session_pool.get(block=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\queue.py", line 168, in get
+    raise Empty
+_queue.Empty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 203, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 790, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 491, in _make_request
+    raise new_e
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 467, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 1096, in _validate_conn
+    conn.connect()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 611, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connection.py", line 210, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: <urllib3.connection.HTTPSConnection object at 0x000001E74B226C50>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\connectionpool.py", line 844, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/EWS/Exchange.asmx/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001E74B226C50>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 87, in get_service_authtype
+    r = s.post(
+        ^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/EWS/Exchange.asmx/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001E74B226C50>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 655, in qrKalite
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 346, in _get_response
+    session = self.protocol.get_session()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 246, in get_session
+    self.increase_poolsize()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 212, in increase_poolsize
+    self._session_pool.put(self.create_session(), block=False)
+                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 318, in create_session
+    if self.auth_type == NTLM and self.credentials.type == self.credentials.EMAIL:
+       ^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 119, in auth_type
+    self.config.auth_type = self.get_auth_type()
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 470, in get_auth_type
+    return get_service_authtype(protocol=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\transport.py", line 101, in get_service_authtype
+    raise TransportError(str(e)) from e
+exchangelib.errors.TransportError: HTTPSConnectionPool(host='https', port=443): Max retries exceeded with url: //webmail.arslanaluminyum.com/EWS/Exchange.asmx/EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001E74B226C50>: Failed to resolve 'https' ([Errno 11001] getaddrinfo failed)"))
+[35;1mHTTP GET /qr/ 500 [25.16, 127.0.0.1:61248][0m
