@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from email_utils import send_email, read_emails, listen_for_emails
+from .email_utils import send_email, read_emails, listen_for_emails
 
 # Mail gönderme ve okuma ayarları
 username = 'ai@arslanaluminyum.com'
