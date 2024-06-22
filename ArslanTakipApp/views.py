@@ -644,36 +644,37 @@ def qrKalite(request):
         #                 body = msg.get_payload(decode=True).decode()
         #                 print("Body:", body)
 
-        # Define your credentials
-        email = 'yazilim@arslanaluminyum.com'
-        password = 'rHE7Je'
+        # # Define your credentials
+        # email = 'yazilim@arslanaluminyum.com'
+        # password = 'rHE7Je'
 
-        # Create a credentials object
-        credentials = Credentials(email, password)
-        ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
+        # # Create a credentials object
+        # credentials = Credentials(email, password)
+        # ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 
-        config = Configuration(service_endpoint=ews_url, credentials=credentials)
-        # Connect to the Exchange server
-        account = Account(
-            primary_smtp_address=email,
-            credentials=credentials,
-            config=config,
-            autodiscover=False,
-            access_type=DELEGATE,
-        )
+        # config = Configuration(service_endpoint=ews_url, credentials=credentials)
+        # # Connect to the Exchange server
+        # account = Account(
+        #     primary_smtp_address=email,
+        #     credentials=credentials,
+        #     config=config,
+        #     autodiscover=False,
+        #     access_type=DELEGATE,
+        # )
 
-        # Access the inbox
-        inbox = account.inbox
+        # # Access the inbox
+        # inbox = account.inbox
 
-        # Fetch the latest emails
-        for item in inbox.all().order_by('-datetime_received')[:10]:
-            print(item)
-            print('Subject:', item.subject)
-            print('From:', item.sender.email_address)
-            print('Received:', item.datetime_received)
-            print('Body:', item.body)
-            print('-' * 50)
+        # # Fetch the latest emails
+        # for item in inbox.all().order_by('-datetime_received')[:10]:
+        #     print(item)
+        #     print('Subject:', item.subject)
+        #     print('From:', item.sender.email_address)
+        #     print('Received:', item.datetime_received)
+        #     print('Body:', item.body)
+        #     print('-' * 50)
 
+    
         """ path = request.get_full_path()
         print(path)
         print(path.rsplit('/', 1)[-1]) """

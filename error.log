@@ -36684,3 +36684,33 @@ Traceback (most recent call last):
     raise TransportError(str(e)) from e
 exchangelib.errors.TransportError: HTTPSConnectionPool(host='webmail.arslan.com', port=443): Max retries exceeded with url: /EWS/Exchange.asmx (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000026D3F844D50>: Failed to resolve 'webmail.arslan.com' ([Errno 11001] getaddrinfo failed)"))
 [35;1mHTTP GET /qr/ 500 [0.27, 127.0.0.1:56807][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 655, in qrKalite
+    config = Configuration(service_endpoint=ews_url, credentials=credentials, verify=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Configuration.__init__() got an unexpected keyword argument 'verify'
+[35;1mHTTP GET /qr/ 500 [0.07, 127.0.0.1:64439][0m
+[35;1mHTTP GET / 500 [0.49, 127.0.0.1:53284][0m
+[35;1mHTTP GET /favicon.ico 500 [0.98, 127.0.0.1:53284][0m
+[35;1mHTTP GET /qr/ 500 [0.41, 127.0.0.1:53284][0m
+[35;1mHTTP GET /favicon.ico 500 [0.99, 127.0.0.1:53284][0m
