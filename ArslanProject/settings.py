@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.humanize',
     'guardian',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -184,6 +185,27 @@ EMAIL_TLS_VERSION = 'TLSv1.2'
 EMAIL_PORT = 587
 EMAIL_TIMEOUT = None
 DEFAULT_FROM_EMAIL = 'yazilim@arslanaluminyum.com'
+
+# Celery configurations
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Istanbul'
+
+# Django Celery Results configuration
+CELERY_RESULT_BACKEND = 'django-db'
+
+# Celery Beat Configuration
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'check-email-every-minute': {
+        'task': 'your_app.tasks.start_email_listener',
+        'schedule': crontab(minute='*/1'),
+    },
+}
 
 logger = logging.getLogger('django.email')
 logger.setLevel(logging.DEBUG)
