@@ -249,7 +249,6 @@ class Termik(models.Model):
     ProgramSet = models.CharField(null=True)
     BatchNo = models.CharField(null=True)
 
-
 class YudaForm(models.Model):
     YudaNo = models.CharField(null=True, blank=True)
     YeniKalipNo = models.CharField(null=True, blank=True)
@@ -386,4 +385,9 @@ class Notification(models.Model):
     is_marked = models.BooleanField(default=False, null=True, blank=True)
     col_marked = models.CharField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    
+
+class LastProcessEmail(models.Model):
+    email_id = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return self.email_id

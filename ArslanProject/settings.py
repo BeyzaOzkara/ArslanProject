@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.humanize',
     'guardian',
+    'django_celery_beat',
     'django_celery_results',
 ]
 
@@ -202,7 +203,7 @@ from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
     'check-email-every-minute': {
-        'task': 'your_app.tasks.start_email_listener',
+        'task': 'ArslanTakipApp.tasks.start_email_listener',
         'schedule': crontab(minute='*/1'),
     },
 }

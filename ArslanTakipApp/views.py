@@ -675,6 +675,7 @@ def qrKalite(request):
             print('Received:', item.datetime_received)
             print('Body:', item.body)
             print('-' * 50)
+            
 
     
         """ path = request.get_full_path()
@@ -714,7 +715,6 @@ def qrKalite(request):
 
     # return render(request, 'ArslanTakipApp/qrKalite.html', context)
         context = {
-            "type" : deneme,
             "no": "denemee"
         }
     
@@ -983,6 +983,9 @@ def handle_siparis_tamam_filter(field, value):
 
 def siparis_list(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
+    for i in params:
+        value = params[i]
+        print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params.get("size", 10)  # Default size to 10
     offset, limit = calculate_pagination(params.get("page", 1), size)
     filter_list = params.get("filter", [])
@@ -992,7 +995,7 @@ def siparis_list(request):
     s = annotate_siparis() # toplam ve aktif kalıp sayısı, toplam kalan tenifer ömrü kg
     q={}
     e ={}
-
+    
     if len(filter_list)>0:
         q, exclude_cond = apply_filters(s, filter_list)
         if exclude_cond:
