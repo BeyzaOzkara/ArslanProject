@@ -644,7 +644,6 @@ def qrKalite(request):
         #                 # Get the email body
         #                 body = msg.get_payload(decode=True).decode()
         #                 print("Body:", body)
-
         check_new_emails()
         # # Define your credentials
         # email = 'yazilim@arslanaluminyum.com'

@@ -117,12 +117,10 @@ def check_new_emails():
         latest_email_id = new_emails[0].id
         for email in reversed(new_emails): #subject'e göre bakalım
             if email.subject == 'k':
-                # print(f'Yeni e-posta - Gönderen: {email.sender.email_address}, Konu: {email.subject}')
-                try:
-                    movements = parse_die_movement(email.body)
-                    save_movements(movements)
-                except Exception as e:
-                    logger.error(f"An error occurred while processing email: {e}")
+                print(f'Yeni e-posta - Gönderen: {email.sender.email_address}, Konu: {email.subject}')
+                movements = parse_die_movement(email.body)
+                print(movements)
+                save_movements(movements)
         
         # Save the ID of the last processed email
         try:
@@ -159,22 +157,33 @@ def parse_die_movement(email_body):
         logger.error(f"An error occurred while parsing the email body: {e}")
         return []
 
+presler = {
+    '1600 PRES':542, '1200 PRES':543, '1100 PRES':544, '4000 PRES':570, 
+    '2750 PRES':571, '1600-2 PRES':572, 'YENİ 1100':573, '4500 PRES':1105
+}
+
 def save_movements(movements):
     for press_code, die_numbers in movements:
         for die_number in die_numbers:
+            print(die_number)
             try:
-                last_location = DiesLocation.objects.get(KalipNo=die_number).kalipVaris
-                Hareket.objects.create(
-                    kalipNo=die_number,
-                    kalipKonum=last_location,
-                    kalipVaris=Location.objects.get(locationName__contains=press_code),
-                    kimTarafindan=User.object.get(id=57),
-                )
+                last_location = DiesLocation.objects.get(kalipNo=die_number).kalipVaris.id
+                print(last_location) # eğer bulunamazsa sonuna R eklenip öyle aransın
             except DiesLocation.DoesNotExist:
                 logger.error(f"DiesLocation does not exist for KalipNo={die_number}")
+                try:
+                    last_location = DiesLocation.objects.get(kalipNo=die_number+" R").kalipVaris.id
+                    die_number = die_number + " R"
+                except DiesLocation.DoesNotExist:
+                    logger.error(f"DiesLocation does not exist for KalipNo={die_number+' R'}")
+            try:
+                Hareket.objects.create(
+                    kalipNo=die_number,
+                    kalipKonum_id=last_location,
+                    kalipVaris_id=presler[press_code],
+                    kimTarafindan_id=57,
+                )
             except Location.DoesNotExist:
                 logger.error(f"Location does not exist for press_code={press_code}")
-            except User.DoesNotExist:
-                logger.error(f"User does not exist with id=57")
             except Exception as e:
                 logger.error(f"An error occurred while saving movement: {e}")
