@@ -4,6 +4,8 @@ from exchangelib import Credentials, Account, Message, DELEGATE, HTMLBody, Confi
 from .models import DiesLocation, LastProcessEmail, Hareket, Location
 from django.contrib.auth.models import User
 import logging
+from django.db.models import Func, F, Value
+from django.db.models.functions import Replace
 
 logger = logging.getLogger(__name__)
 
@@ -165,21 +167,28 @@ presler = {
 def save_movements(movements):
     for press_code, die_numbers in movements:
         for die_number in die_numbers:
-            print(die_number)
+            stripped_die_number = die_number.replace(" ", "")
             try:
-                last_location = DiesLocation.objects.get(kalipNo=die_number).kalipVaris.id
-                print(last_location) # eğer bulunamazsa sonuna R eklenip öyle aransın
+                # last_location = DiesLocation.objects.get(kalipNo__iregex=rf'^{stripped_die_number}$').kalipVaris
+                kalip_queryset = DiesLocation.objects.annotate(
+                    kalipNo_no_spaces=Replace(
+                        Replace(
+                            F('kalipNo'),
+                            Value(' '),
+                            Value('')
+                        ),
+                        Value('\t'),  # In case there are tab characters
+                        Value('')
+                    )
+                )
+                last_location = kalip_queryset.get(kalipNo_no_spaces=stripped_die_number).kalipVaris
             except DiesLocation.DoesNotExist:
-                logger.error(f"DiesLocation does not exist for KalipNo={die_number}")
-                try:
-                    last_location = DiesLocation.objects.get(kalipNo=die_number+" R").kalipVaris.id
-                    die_number = die_number + " R"
-                except DiesLocation.DoesNotExist:
-                    logger.error(f"DiesLocation does not exist for KalipNo={die_number+' R'}")
+                logger.error(f"DiesLocation does not exist for KalipNo={stripped_die_number}. Attempting to save with ' R'.")
+                last_location = None
             try:
                 Hareket.objects.create(
                     kalipNo=die_number,
-                    kalipKonum_id=last_location,
+                    kalipKonum=last_location,
                     kalipVaris_id=presler[press_code],
                     kimTarafindan_id=57,
                 )

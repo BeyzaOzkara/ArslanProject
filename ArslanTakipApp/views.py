@@ -34,8 +34,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
-from django.db.models import Q, Sum, Max, Count, Case, When, ExpressionWrapper, fields, OuterRef, Subquery, FloatField, F, DateTimeField, TimeField, DurationField, IntegerField
-from django.db.models.functions import Cast
+from django.db.models import Q, Sum, Max, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
+from django.db.models.functions import Cast, Replace
 from django.db import transaction 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -644,7 +644,33 @@ def qrKalite(request):
         #                 # Get the email body
         #                 body = msg.get_payload(decode=True).decode()
         #                 print("Body:", body)
-        check_new_emails()
+        # check_new_emails()
+        die_number = '13520-188  R'
+        kalipNo_no_spaces = die_number.replace(" ", "")
+
+        # Annotate the queryset to add a field with spaces removed from kalipNo
+        kalip_queryset = DiesLocation.objects.annotate(
+            kalipNo_no_spaces=Replace(
+                Replace(
+                    F('kalipNo'),
+                    Value(' '),
+                    Value('')
+                ),
+                Value('\t'),  # In case there are tab characters
+                Value('')
+            )
+        )
+
+        # Filter based on the processed kalipNo
+        filtered_kalip = kalip_queryset.filter(kalipNo_no_spaces=kalipNo_no_spaces)
+
+        # If you want to get the kalipVaris_id
+        if filtered_kalip.exists():
+            kalip_varis_id = filtered_kalip.first().kalipVaris_id
+        else:
+            kalip_varis_id = None
+
+        print(kalip_varis_id)
         # # Define your credentials
         # email = 'yazilim@arslanaluminyum.com'
         # password = 'rHE7Je'
