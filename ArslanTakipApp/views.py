@@ -645,7 +645,7 @@ def qrKalite(request):
         #                 body = msg.get_payload(decode=True).decode()
         #                 print("Body:", body)
         # check_new_emails()
-        die_number = '13520-188  R'
+        die_number = '13520-188   R '
         kalipNo_no_spaces = die_number.replace(" ", "")
 
         # Annotate the queryset to add a field with spaces removed from kalipNo

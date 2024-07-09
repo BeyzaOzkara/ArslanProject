@@ -181,7 +181,16 @@ def save_movements(movements):
                         Value('')
                     )
                 )
-                last_location = kalip_queryset.get(kalipNo_no_spaces=stripped_die_number).kalipVaris
+                filtered_kalip = kalip_queryset.filter(kalipNo_no_spaces=stripped_die_number)
+                if filtered_kalip.exists():
+                    last_location = filtered_kalip.first().kalipVaris
+                else:
+                    r_number = stripped_die_number + " R"
+                    r_die = kalip_queryset.filter(kalipNo_no_spaces=r_number)
+                    if r_die.exists():
+                        last_location = r_die.first().kalipVaris
+                    else:
+                        last_location = None
             except DiesLocation.DoesNotExist:
                 logger.error(f"DiesLocation does not exist for KalipNo={stripped_die_number}. Attempting to save with ' R'.")
                 last_location = None
