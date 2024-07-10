@@ -40,3 +40,7 @@ DiesLocation does not exist for KalipNo=13520-196
 DiesLocation does not exist for KalipNo=13520-187
 DiesLocation does not exist for KalipNo=13520-216
 DiesLocation does not exist for KalipNo=13520-180
+Error processing kalip_no 13520-180 R: '1600-1'
+Error processing kalip_no 13520-196 R: '1600-1'
+Error processing kalip_no 13520-180 R: '1100-1'
+Error processing kalip_no 13520-196 R: '1100-1'

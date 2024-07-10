@@ -1,7 +1,9 @@
+from collections import defaultdict
+import re
 import time
 from bs4 import BeautifulSoup
 from exchangelib import Credentials, Account, Message, DELEGATE, HTMLBody, Configuration, Folder
-from .models import DiesLocation, LastProcessEmail, Hareket, Location
+from .models import DiesLocation, LastProcessEmail, Hareket, Location, KalipMs
 from django.contrib.auth.models import User
 import logging
 from django.db.models import Func, F, Value
@@ -120,9 +122,12 @@ def check_new_emails():
         for email in reversed(new_emails): #subject'e göre bakalım
             if email.subject == 'k':
                 print(f'Yeni e-posta - Gönderen: {email.sender.email_address}, Konu: {email.subject}')
+                # print(email.body)
                 movements = parse_die_movement(email.body)
-                print(movements)
-                save_movements(movements)
+                print(f'movements: {movements}')
+                wrong_numbers, saved_numbers = save_move(movements)
+                print(f'wrong_numbers: {wrong_numbers}, saved_numbers: {saved_numbers}')
+                # maili atan kişiye başarılı ve başarısız olan kalıp numaralarını mail at.
         
         # Save the ID of the last processed email
         try:
@@ -134,25 +139,22 @@ def parse_die_movement(email_body):
     try:
         soup = BeautifulSoup(email_body, 'html.parser')
         movements = []
-
-        # Find all press codes with the specified color and background
-        press_codes = soup.find_all('span', style=lambda value: value and 'color:red' in value and 'background:yellow' in value)
+        # Find the table in the HTML content
+        table = soup.find('table', class_='MsoNormalTable')
         
-        for press_code in press_codes:
-            die_numbers = []
-            # Find the next siblings which are die numbers
-            sibling = press_code.parent.find_next_sibling('p')
-            while sibling:
-                if sibling.name == 'p' and not sibling.find('span', style=lambda value: value and 'color:red' in value and 'background:yellow' in value):
-                    text = sibling.get_text(strip=True)
-                    if text:  # Check if the text is not empty
-                        die_numbers.append(text)
-                elif sibling.find('span', style=lambda value: value and 'color:red' in value and 'background:yellow' in value):
-                    break
-                sibling = sibling.find_next_sibling()
+        if table:
+            rows = table.find_all('tr')
             
-            if die_numbers:
-                movements.append((press_code.get_text(strip=True), die_numbers))
+            # Skip the header row
+            for row in rows[1:]:
+                cols = row.find_all('td')
+                
+                # Extract press code and kalip numbers
+                if len(cols) >= 2:
+                    press_code = cols[0].get_text(strip=True)
+                    kalip_numbers = cols[1].get_text(strip=True)
+                    kalip_numbers = re.sub(r'\s+', ' ', kalip_numbers).strip()
+                    movements.append({'press_code': press_code, 'kalip_numbers': kalip_numbers})
 
         return movements
     except Exception as e:
@@ -160,48 +162,87 @@ def parse_die_movement(email_body):
         return []
 
 presler = {
-    '1600 PRES':542, '1200 PRES':543, '1100 PRES':544, '4000 PRES':570, 
-    '2750 PRES':571, '1600-2 PRES':572, 'YENİ 1100':573, '4500 PRES':1105
+    '1600-1':542, '1200':543, '1100-1':544, '4000':570, 
+    '2750':571, '1600-2':572, 'Y1100':573, '4500':1105
 }
 
-def save_movements(movements):
-    for press_code, die_numbers in movements:
-        for die_number in die_numbers:
-            stripped_die_number = die_number.replace(" ", "")
-            try:
-                # last_location = DiesLocation.objects.get(kalipNo__iregex=rf'^{stripped_die_number}$').kalipVaris
-                kalip_queryset = DiesLocation.objects.annotate(
-                    kalipNo_no_spaces=Replace(
-                        Replace(
-                            F('kalipNo'),
-                            Value(' '),
+def save_move(movements):
+    wrong_numbers = defaultdict(list)
+    saved_numbers = defaultdict(list)
+    try:
+        kalipms_queryset = KalipMs.objects.using('dies').annotate(
+                        kalipNo_spaces=Replace(
+                            Replace(
+                                F('KalipNo'),
+                                Value(' '),
+                                Value('')
+                            ),
+                            Value('\t'),  # In case there are tab characters
                             Value('')
-                        ),
-                        Value('\t'),  # In case there are tab characters
-                        Value('')
+                        )
                     )
-                )
-                filtered_kalip = kalip_queryset.filter(kalipNo_no_spaces=stripped_die_number)
-                if filtered_kalip.exists():
-                    last_location = filtered_kalip.first().kalipVaris
-                else:
-                    r_number = stripped_die_number + " R"
-                    r_die = kalip_queryset.filter(kalipNo_no_spaces=r_number)
-                    if r_die.exists():
-                        last_location = r_die.first().kalipVaris
-                    else:
-                        last_location = None
-            except DiesLocation.DoesNotExist:
-                logger.error(f"DiesLocation does not exist for KalipNo={stripped_die_number}. Attempting to save with ' R'.")
-                last_location = None
-            try:
-                Hareket.objects.create(
-                    kalipNo=die_number,
-                    kalipKonum=last_location,
-                    kalipVaris_id=presler[press_code],
-                    kimTarafindan_id=57,
-                )
-            except Location.DoesNotExist:
-                logger.error(f"Location does not exist for press_code={press_code}")
-            except Exception as e:
-                logger.error(f"An error occurred while saving movement: {e}")
+        dies_location_queryset = DiesLocation.objects.annotate(
+                                kalipNo_no_spaces=Replace(
+                                    Replace(
+                                        F('kalipNo'),
+                                        Value(' '),
+                                        Value('')
+                                    ),
+                                    Value('\t'),  # In case there are tab characters
+                                    Value('')
+                                )
+                            )
+        for movement in movements:
+            press_code = movement['press_code']
+            kalip_numbers = movement['kalip_numbers']
+            
+            # Check if kalip numbers is not empty
+            if kalip_numbers:
+                kalip_list = kalip_numbers.split(',')
+                for kalip_no in kalip_list:
+                    original_kalip_no = kalip_no.strip()
+                    kalip_no = original_kalip_no
+                    try:
+                        kalip_ms = kalipms_queryset.filter(KalipNo=kalip_no).first()
+                        
+                        if not kalip_ms:
+                            kalip_ms = kalipms_queryset.filter(KalipNo=kalip_no + " R").first()
+                            if kalip_ms:
+                                kalip_no = kalip_no + " R"
+
+                        if not kalip_ms:
+                            wrong_numbers[press_code].append(original_kalip_no)
+                            continue
+
+                        # Check last location in DiesLocation
+                        dies_location = dies_location_queryset.filter(kalipNo=kalip_no).first()
+                        
+                        if dies_location:
+                            last_location = dies_location.kalipVaris
+                        else:
+                            last_location = None
+
+                        Hareket.objects.create(
+                            kalipNo=kalip_no,
+                            kalipKonum=last_location,
+                            kalipVaris_id=presler[press_code],
+                            kimTarafindan_id=57,
+                        )
+
+                        saved_numbers[press_code].append(kalip_no)
+                    except Exception as e:
+                        logger.error(f"Error processing kalip_no {kalip_no}: {e}")
+    except Exception as e:
+        logger.error(f"Error in save_move function: {e}")
+
+    formatted_wrong_numbers = [
+        {'press_code': press_code, 'kalip_numbers': ', '.join(kalip_nos)}
+        for press_code, kalip_nos in wrong_numbers.items()
+    ]
+    print(f"saved_numbers: {saved_numbers}")
+    formatted_saved_numbers = [
+        {'press_code': press_code, 'kalip_numbers': ', '.join(kalip_nos)}
+        for press_code, kalip_nos in saved_numbers.items()
+    ]
+
+    return formatted_wrong_numbers, formatted_saved_numbers

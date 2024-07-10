@@ -644,33 +644,7 @@ def qrKalite(request):
         #                 # Get the email body
         #                 body = msg.get_payload(decode=True).decode()
         #                 print("Body:", body)
-        # check_new_emails()
-        die_number = '13520-188   R '
-        kalipNo_no_spaces = die_number.replace(" ", "")
-
-        # Annotate the queryset to add a field with spaces removed from kalipNo
-        kalip_queryset = DiesLocation.objects.annotate(
-            kalipNo_no_spaces=Replace(
-                Replace(
-                    F('kalipNo'),
-                    Value(' '),
-                    Value('')
-                ),
-                Value('\t'),  # In case there are tab characters
-                Value('')
-            )
-        )
-
-        # Filter based on the processed kalipNo
-        filtered_kalip = kalip_queryset.filter(kalipNo_no_spaces=kalipNo_no_spaces)
-
-        # If you want to get the kalipVaris_id
-        if filtered_kalip.exists():
-            kalip_varis_id = filtered_kalip.first().kalipVaris_id
-        else:
-            kalip_varis_id = None
-
-        print(kalip_varis_id)
+        check_new_emails()
         # # Define your credentials
         # email = 'yazilim@arslanaluminyum.com'
         # password = 'rHE7Je'
