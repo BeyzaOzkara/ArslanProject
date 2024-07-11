@@ -12,8 +12,8 @@ from django.db.models.functions import Replace
 logger = logging.getLogger(__name__)
 
 def send_email(to_address, subject, body):
-    email = 'yazilim@arslanaluminyum.com'
-    password = 'rHE7Je'
+    email = 'ai@arslanaluminyum.com'
+    password = 'Arslan123.'
     credentials = Credentials(email, password)
     ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
     # Kimlik bilgileri ve hesap oluşturma
@@ -92,8 +92,8 @@ def listen_for_emails(username, password, server, check_interval=60):
         time.sleep(check_interval)  # Belirtilen süre kadar bekle (saniye cinsinden)
 
 def check_new_emails():
-    email = 'yazilim@arslanaluminyum.com'
-    password = 'rHE7Je'
+    email = 'ai@arslanaluminyum.com'
+    password = 'Arslan123.'
     credentials = Credentials(email, password)
     ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 
