@@ -11,12 +11,27 @@ from django.db.models.functions import Replace
 
 logger = logging.getLogger(__name__)
 
-def send_email(username, password, to_address, subject, body, server):
+def send_email(to_address, subject, body):
+    email = 'yazilim@arslanaluminyum.com'
+    password = 'rHE7Je'
+    credentials = Credentials(email, password)
+    ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
     # Kimlik bilgileri ve hesap oluşturma
-    credentials = Credentials(username, password)
-    config = Configuration(server=server, credentials=credentials)
-    account = Account(primary_smtp_address=username, config=config, autodiscover=False, access_type=DELEGATE)
-
+    try:
+        config = Configuration(service_endpoint=ews_url, credentials=credentials)
+        # Connect to the Exchange server
+        account = Account(
+            primary_smtp_address=email,
+            credentials=credentials,
+            config=config,
+            autodiscover=False,
+            access_type=DELEGATE,
+        )
+    except Exception as e:
+        logger.error(f"An error occurred while setting up the email account: {e}")
+        
+        return
+    
     # E-posta mesajını oluşturma
     message = Message(
         account=account,
@@ -128,6 +143,7 @@ def check_new_emails():
                 wrong_numbers, saved_numbers = save_move(movements)
                 print(f'wrong_numbers: {wrong_numbers}, saved_numbers: {saved_numbers}')
                 # maili atan kişiye başarılı ve başarısız olan kalıp numaralarını mail at.
+                send_results(email.sender.email_address, wrong_numbers, saved_numbers)
         
         # Save the ID of the last processed email
         try:
@@ -218,6 +234,9 @@ def save_move(movements):
                         dies_location = dies_location_queryset.filter(kalipNo=kalip_no).first()
                         
                         if dies_location:
+                            if dies_location.kalipVaris_id == presler[press_code]:
+                                saved_numbers[press_code].append(kalip_no)
+                                continue
                             last_location = dies_location.kalipVaris
                         else:
                             last_location = None
@@ -239,10 +258,71 @@ def save_move(movements):
         {'press_code': press_code, 'kalip_numbers': ', '.join(kalip_nos)}
         for press_code, kalip_nos in wrong_numbers.items()
     ]
-    print(f"saved_numbers: {saved_numbers}")
     formatted_saved_numbers = [
         {'press_code': press_code, 'kalip_numbers': ', '.join(kalip_nos)}
         for press_code, kalip_nos in saved_numbers.items()
     ]
 
     return formatted_wrong_numbers, formatted_saved_numbers
+
+def send_results(to_email, wrong_numbers, saved_numbers):
+    subject = "Kalıp Hareketleri"
+
+    # Create the HTML email content
+    html = f"""
+    <html>
+    <head>
+    <style>
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+        }}
+        table, th, td {{
+            border: 1px solid black;
+        }}
+        th, td {{
+            padding: 10px;
+            text-align: left;
+        }}
+        th {{
+            background-color: #f2f2f2;
+        }}
+    </style>
+    </head>
+    <body>
+        <h2>Başarılı Gönderilenler</h2>
+        <table>
+            <tr>
+                <th>Pres</th>
+                <th>Kalıp Numaraları</th>
+            </tr>"""
+
+    for item in saved_numbers:
+        html += f"""
+            <tr>
+                <td>{item['press_code']}</td>
+                <td>{item['kalip_numbers']}</td>
+            </tr>"""
+
+    html += """
+        </table>
+        <h2>Başarısız Numaralar</h2>
+        <table>
+            <tr>
+                <th>Pres</th>
+                <th>Kalıp Numaraları</th>
+            </tr>"""
+
+    for item in wrong_numbers:
+        html += f"""
+            <tr>
+                <td>{item['press_code']}</td>
+                <td>{item['kalip_numbers']}</td>
+            </tr>"""
+
+    html += """
+        </table>
+    </body>
+    </html>"""
+
+    send_email(to_email, subject, html)
