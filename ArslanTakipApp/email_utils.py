@@ -135,9 +135,8 @@ def check_new_emails():
     if new_emails:
         latest_email_id = new_emails[0].id
         for email in reversed(new_emails): #subject'e göre bakalım
-            if email.subject == 'k':
+            if email.subject == 'KALIP TRANSFERİ':
                 print(f'Yeni e-posta - Gönderen: {email.sender.email_address}, Konu: {email.subject}')
-                # print(email.body)
                 movements = parse_die_movement(email.body)
                 print(f'movements: {movements}')
                 wrong_numbers, saved_numbers = save_move(movements)
