@@ -3073,4 +3073,3 @@ class UretimPlanlamaView(generic.TemplateView):
 
         return plan
             
-from exchangelib import DELEGATE, Configuration, Credentials, Account

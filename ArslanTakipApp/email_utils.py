@@ -178,7 +178,9 @@ def parse_die_movement(email_body):
 
 presler = {
     '1600-1':542, '1200':543, '1100-1':544, '4000':570, 
-    '2750':571, '1600-2':572, 'Y1100':573, '4500':1105
+    '2750':571, '1600-2':572, 'Y1100':573, '4500':1105,
+    '1.Fab. Kalıp Hazırlama': 545, '2.Fab. Kalıp Hazırlama': 574,
+    'Kalıp Arşivi': 575, 'Kalıp Depo':1132,
 }
 
 def save_move(movements):
