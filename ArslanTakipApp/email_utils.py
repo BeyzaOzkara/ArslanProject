@@ -159,17 +159,24 @@ def parse_die_movement(email_body):
         
         if table:
             rows = table.find_all('tr')
-            
-            # Skip the header row
+            header_row = rows[0]
+            headers = [cell.get_text(strip=True) for cell in header_row.find_all('td')]
+
+            # Initialize a dictionary to store the numbers for each header
+            movement_dict = {header: [] for header in headers}
+
+            # Process data rows
             for row in rows[1:]:
                 cols = row.find_all('td')
-                
-                # Extract press code and kalip numbers
-                if len(cols) >= 2:
-                    press_code = cols[0].get_text(strip=True)
-                    kalip_numbers = cols[1].get_text(strip=True)
-                    kalip_numbers = re.sub(r'\s+', ' ', kalip_numbers).strip()
-                    movements.append({'press_code': press_code, 'kalip_numbers': kalip_numbers})
+                for index, col in enumerate(cols):
+                    kalip_numbers = col.get_text(separator=',', strip=True)
+                    if kalip_numbers:
+                        movement_dict[headers[index]].append(kalip_numbers)
+
+            # Convert movement_dict to the required format
+            for header, numbers in movement_dict.items():
+                if numbers:
+                    movements.append({'press_code': header, 'kalip_numbers': ', '.join(numbers)})
 
         return movements
     except Exception as e:

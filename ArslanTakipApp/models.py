@@ -391,3 +391,55 @@ class LastProcessEmail(models.Model):
 
     def __str__(self):
         return self.email_id
+    
+class UnitOfMeasure(models.Model):
+    name = models.CharField(max_length=250, null=True, blank=True)
+    abbreviation = models.CharField(max_length=250, null=True, blank=True)
+    type = models.CharField(max_length=250, null=True, blank=True)
+    conversion_factor = models.IntegerField(null=True, blank=True)
+    base_uom = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    precision = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name="Birim"
+        verbose_name_plural="Birimler"
+
+class Personel(models.Model): # bölümü eklemeli miyim
+    first_name = models.CharField(max_length=250, null=True, blank=True)
+    last_name = models.CharField(max_length=250, null=True, blank=True)
+    email = models.CharField(max_length=250, null=True, blank=True)
+    department = models.CharField(max_length=250, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_joined = models.DateField(null=True, blank=True)
+
+    class Meta:
+        verbose_name='Personel'
+        verbose_name_plural='Personeller'
+
+# class WorkCenter(models.Model):
+#     name = models.CharField(max_length=250, null=True, blank=True)
+#     capacity = models.FloatField(null=True, blank=True)
+#     personel_count = models.IntegerField(null=True, blank=True)
+#     setup_time = models.FloatField(null=True, blank=True)
+#     cleanup_time = models.FloatField(null=True, blank=True)
+
+#     def __str__(self):
+#         return self.name
+    
+# class Operation(models.Model):
+#     operation_name = models.CharField(max_length=250, null=True, blank=True)
+#     work_center = models.ForeignKey(WorkCenter, on_delete=models.CASCADE, null=True, blank=True)
+#     operation_time = models.FloatField(null=True, blank=True)
+
+#     def __str__(self):
+#         return self.operation_name
+    
+# class Product(models.Model):
+#     product_name = models.CharField(max_length=250, null=True, blank=True)
+#     product_type = models.CharField(null=True, blank=True)
+#     unit_of_measure = models.ForeignKey(UnitOfMeasure, on_delete=models.CASCADE, null=True, blank=True)
+    
