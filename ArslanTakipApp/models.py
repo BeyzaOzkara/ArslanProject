@@ -140,6 +140,7 @@ class KalipMs(models.Model):
 class PresUretimRaporu(models.Model):
     KalipNo = models.CharField(primary_key=True)
     KartNo = models.IntegerField(null=True)
+    PresTestereNo = models.IntegerField(null=True)
     Tarih = models.DateTimeField(null=True)
     Operator = models.CharField(null=True)
     StokKodu = models.CharField(null=True)
@@ -391,6 +392,9 @@ class LastProcessEmail(models.Model):
 
     def __str__(self):
         return self.email_id
+    
+class LastCheckedUretimRaporu(models.Model):
+    PresTestereNo = models.IntegerField(null=True)
     
 class UnitOfMeasure(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)
