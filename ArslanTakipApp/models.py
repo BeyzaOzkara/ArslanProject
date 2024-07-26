@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group
 # Create your models here.
 class Location(models.Model):
     locationName = models.CharField(max_length=255, verbose_name="Lokasyon İsmi")
+    presKodu = models.CharField(max_length=250, null=True, blank=True)
     locationRelationID = models.ForeignKey("self", on_delete=models.CASCADE, blank =True, null=True)
     isPhysical = models.BooleanField(verbose_name="Fiziksel Bir Konum mu?")
     capacity = models.IntegerField(null=True, blank=True)
@@ -390,6 +391,7 @@ class Notification(models.Model):
 class UretimBasilanBillet(models.Model):
     Siralama = models.IntegerField(null=True, blank=True)
     KalipNo = models.CharField(max_length=250, null=True, blank=True)
+    PresKodu = models.CharField(max_length=20, null=True, blank=True)
 
     class Meta:
         managed = False

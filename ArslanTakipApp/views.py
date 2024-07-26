@@ -585,114 +585,48 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
-        # import imaplib
-        # import email
-        # from email.header import decode_header
+        birinci_fab = ['1100-1', '1200-1', '1600-1', '4500-1']
+    ikinci_fab = ['1100-2', '1100-3', '1600-2', '2750-1', '4000-1']
+    # '1.Fabrika Kalıp Hazırlama': 545, '2.Fabrika Kalıp Hazırlama': 574
 
-        # # Your email credentials
-        # username = "yazilim@arslanaluminyum.com"
-        # password = "rHE7Je"
+    pres_uretim = list(UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama', 'KalipNo', 'PresKodu'))
 
-        # # Connect to the server
-        # imap = imaplib.IMAP4(host="192.168.200.30", port=443)
+    last_checked, created = LastCheckedUretimRaporu.objects.get_or_create(id=1)
+    last_checked_siralama = last_checked.Siralama
 
-        # # Log in
-        # imap.login(username, password)
+    if last_checked_siralama:
+        last_index = next((i for i, entry in enumerate(pres_uretim) if entry['Siralama'] == last_checked_siralama), -1)
+        new_rapors = pres_uretim[last_index +1:]
+    else:
+        new_rapors = pres_uretim
 
-        # # Select the mailbox you want to search in
-        # imap.select("inbox")
+    if new_rapors:
+        last_checked.Siralama = new_rapors[-1]['Siralama']
+        last_checked.save()
 
-        # # Search for emails from a specific department
-        # status, messages = imap.search(None, 'FROM', '"feridecakir@arslanaluminyum.com"')
-
-        # # Convert messages to a list of email IDs
-        # email_ids = messages[0].split()
-
-        # for email_id in email_ids:
-        #     # Fetch the email by ID
-        #     res, msg = imap.fetch(email_id, "(RFC822)")
-        #     for response in msg:
-        #         if isinstance(response, tuple):
-        #             # Parse the email content
-        #             msg = email.message_from_bytes(response[1])
-        #             # Decode the email subject
-        #             subject, encoding = decode_header(msg["Subject"])[0]
-        #             if isinstance(subject, bytes):
-        #                 # If it's a bytes type, decode to str
-        #                 subject = subject.decode(encoding if encoding else "utf-8")
-        #             # Print the subject
-        #             print("Subject:", subject)
-        #             # Print the sender's email address
-        #             print("From:", msg.get("From"))
-
-        #             # If the email message is multipart
-        #             if msg.is_multipart():
-        #                 # Iterate over email parts
-        #                 for part in msg.walk():
-        #                     # Extract content type of the email
-        #                     content_type = part.get_content_type()
-        #                     content_disposition = str(part.get("Content-Disposition"))
-        #                     try:
-        #                         # Get the email body
-        #                         body = part.get_payload(decode=True).decode()
-        #                         print("Body:", body)
-        #                     except:
-        #                         pass
-        #             else:
-        #                 # Extract content type of the email
-        #                 content_type = msg.get_content_type()
-        #                 # Get the email body
-        #                 body = msg.get_payload(decode=True).decode()
-        #                 print("Body:", body)
-        # check_new_emails()
-        # # Define your credentials
-        # email = 'yazilim@arslanaluminyum.com'
-        # password = 'rHE7Je'
-
-        # # Create a credentials object
-        # credentials = Credentials(email, password)
-        # ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
-
-        # config = Configuration(service_endpoint=ews_url, credentials=credentials)
-        # # Connect to the Exchange server
-        # account = Account(
-        #     primary_smtp_address=email,
-        #     credentials=credentials,
-        #     config=config,
-        #     autodiscover=False,
-        #     access_type=DELEGATE,
-        # )
-
-        # # Access the inbox
-        # inbox = account.inbox
-
-        # deneme = []
-        # # Fetch the latest emails
-        # for item in inbox.all().order_by('-datetime_received')[:10]:
-        #     print(item)
-        #     deneme.append(item)
-        #     print('Subject:', item.subject)
-        #     print('From:', item.sender.email_address)
-        #     print('Received:', item.datetime_received)
-        #     print('Body:', item.body)
-        #     print('-' * 50)
-
-        pres_uretim = list(UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama'))
-
-        last_checked, created = LastCheckedUretimRaporu.objects.get_or_create(id=1)
-        last_checked_siralama = last_checked.Siralama
-
-        if last_checked_siralama:
-            last_index = next((i for i, entry in enumerate(pres_uretim) if entry['Siralama'] == last_checked_siralama), -1)
-            new_rapors = pres_uretim[last_index +1:]
-        else:
-            new_rapors = pres_uretim
-
-        if new_rapors:
-            last_checked.Siralama = new_rapors[-1]['Siralama']
-            last_checked.save()
-        else:
-            print("yeni rapor bulunmamaktadır.")
+        for n in new_rapors:
+            if n['KalipNo'] != '':
+                if n['PresKodu'] in birinci_fab:
+                    print(f"birinci: {n}")
+                    varis = 545
+                elif n['PresKodu'] in ikinci_fab:
+                    print(f"ikinci: {n}")
+                    varis = 574
+                else:
+                    continue
+                # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
+                last_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first().id
+                print(last_location)
+                # Hareket.objects.create(
+                #         kalipNo=n['KalipNo'],
+                #         kalipKonum=last_location,
+                #         kalipVaris_id=varis,
+                #         kimTarafindan_id=57,
+                #     )
+            else:
+                continue
+    else:
+        print("yeni rapor bulunmamaktadır.")
 
 
     
@@ -732,9 +666,9 @@ def qrKalite(request):
     #     }
 
     # return render(request, 'ArslanTakipApp/qrKalite.html', context)
-        context = {
-            "no": "denemee"
-        }
+    context = {
+        "no": "denemee"
+    }
     
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
