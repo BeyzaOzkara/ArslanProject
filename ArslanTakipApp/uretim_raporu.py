@@ -27,10 +27,10 @@ def check_new_rapor():
             if n['KalipNo'] != '':
                 if n['PresKodu'] in birinci_fab:
                     print(f"birinci: {n}")
-                    varis = 545
+                    varis = 547
                 elif n['PresKodu'] in ikinci_fab:
                     print(f"ikinci: {n}")
-                    varis = 574
+                    varis = 766
                 else:
                     continue
                 try:
