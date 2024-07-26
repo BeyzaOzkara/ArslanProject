@@ -387,6 +387,14 @@ class Notification(models.Model):
     col_marked = models.CharField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+class UretimBasilanBillet(models.Model):
+    Siralama = models.IntegerField(null=True, blank=True)
+    KalipNo = models.CharField(max_length=250, null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'UretimBasilanBillet'
+
 class LastProcessEmail(models.Model):
     email_id = models.CharField(max_length=255, null=True)
 
@@ -394,7 +402,7 @@ class LastProcessEmail(models.Model):
         return self.email_id
     
 class LastCheckedUretimRaporu(models.Model):
-    PresTestereNo = models.IntegerField(null=True)
+    Siralama = models.IntegerField(null=True)
     
 class UnitOfMeasure(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)

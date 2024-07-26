@@ -27,7 +27,7 @@ from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
 import urllib3
-from .models import Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip
+from .models import LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -644,7 +644,7 @@ def qrKalite(request):
         #                 # Get the email body
         #                 body = msg.get_payload(decode=True).decode()
         #                 print("Body:", body)
-        check_new_emails()
+        # check_new_emails()
         # # Define your credentials
         # email = 'yazilim@arslanaluminyum.com'
         # password = 'rHE7Je'
@@ -676,6 +676,23 @@ def qrKalite(request):
         #     print('Received:', item.datetime_received)
         #     print('Body:', item.body)
         #     print('-' * 50)
+
+        pres_uretim = list(UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama'))
+
+        last_checked, created = LastCheckedUretimRaporu.objects.get_or_create(id=1)
+        last_checked_siralama = last_checked.Siralama
+
+        if last_checked_siralama:
+            last_index = next((i for i, entry in enumerate(pres_uretim) if entry['Siralama'] == last_checked_siralama), -1)
+            new_rapors = pres_uretim[last_index +1:]
+        else:
+            new_rapors = pres_uretim
+
+        if new_rapors:
+            last_checked.Siralama = new_rapors[-1]['Siralama']
+            last_checked.save()
+        else:
+            print("yeni rapor bulunmamaktadır.")
 
 
     
