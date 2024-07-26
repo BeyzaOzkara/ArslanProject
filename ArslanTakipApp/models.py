@@ -254,6 +254,7 @@ class Termik(models.Model):
 class YudaForm(models.Model):
     YudaNo = models.CharField(null=True, blank=True)
     YeniKalipNo = models.CharField(null=True, blank=True)
+    OnayDurumu = models.CharField(null=True, blank=True)
     ProjeYoneticisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_projeyoneticisi", blank=True, null =True)
     YudaAcanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_acankisi", blank=True, null =True)
     Tarih = models.DateTimeField(null=True, blank=True)

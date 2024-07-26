@@ -4,7 +4,7 @@ from .models import LastCheckedUretimRaporu, UretimBasilanBillet, Hareket, Locat
 logger = logging.getLogger(__name__)
 
 def check_new_rapor():
-    birinci_fab = ['1100-1', '1200-1', '1600-1', '4500-1']
+    birinci_fab = ['1100-1', '1200-1', '1600-1']
     ikinci_fab = ['1100-2', '1100-3', '1600-2', '2750-1', '4000-1']
     # '1.Fabrika Kalıp Hazırlama': 545, '2.Fabrika Kalıp Hazırlama': 574
 

@@ -585,56 +585,6 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
-        birinci_fab = ['1100-1', '1200-1', '1600-1', '4500-1']
-    ikinci_fab = ['1100-2', '1100-3', '1600-2', '2750-1', '4000-1']
-    # '1.Fabrika Kalıp Hazırlama': 545, '2.Fabrika Kalıp Hazırlama': 574
-
-    pres_uretim = list(UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama', 'KalipNo', 'PresKodu'))
-
-    last_checked, created = LastCheckedUretimRaporu.objects.get_or_create(id=1)
-    last_checked_siralama = last_checked.Siralama
-
-    if last_checked_siralama:
-        last_index = next((i for i, entry in enumerate(pres_uretim) if entry['Siralama'] == last_checked_siralama), -1)
-        new_rapors = pres_uretim[last_index +1:]
-    else:
-        new_rapors = pres_uretim
-
-    if new_rapors:
-        last_checked.Siralama = new_rapors[-1]['Siralama']
-        last_checked.save()
-
-        for n in new_rapors:
-            if n['KalipNo'] != '':
-                if n['PresKodu'] in birinci_fab:
-                    print(f"birinci: {n}")
-                    varis = 545
-                elif n['PresKodu'] in ikinci_fab:
-                    print(f"ikinci: {n}")
-                    varis = 574
-                else:
-                    continue
-                print("burda")
-                # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
-                last_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first().id
-                print(last_location)
-                try:
-                    # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
-
-                    Hareket.objects.create(
-                        kalipNo=n['KalipNo'],
-                        kalipKonum=last_location,
-                        kalipVaris_id=varis,
-                        kimTarafindan_id=57,
-                    )
-                except Exception as e:
-                    print(f"Error processing {n['Siralama']}: {e}")
-                    logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
-            else:
-                continue
-    else:
-        print("yeni rapor bulunmamaktadır.")
-
 
     
         """ path = request.get_full_path()
@@ -673,9 +623,9 @@ def qrKalite(request):
     #     }
 
     # return render(request, 'ArslanTakipApp/qrKalite.html', context)
-    context = {
-        "no": "denemee"
-    }
+        context = {
+            "no": "denemee"
+        }
     
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
@@ -1922,6 +1872,7 @@ def yudas_list(request):
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
         for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:
+            print(group)
             yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
             if yuda_onay:
                 if yuda_onay.OnayDurumu is True:
