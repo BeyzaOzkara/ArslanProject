@@ -1,4 +1,7 @@
+import logging
 from .models import LastCheckedUretimRaporu, UretimBasilanBillet, Hareket, Location, DiesLocation
+
+logger = logging.getLogger(__name__)
 
 def check_new_rapor():
     birinci_fab = ['1100-1', '1200-1', '1600-1', '4500-1']
@@ -42,6 +45,7 @@ def check_new_rapor():
                         )
                 except Exception as e:
                     print(f"Error processing {n['Siralama']}: {e}")
+                    logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
             else:
                 continue
     else:
