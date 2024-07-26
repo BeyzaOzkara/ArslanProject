@@ -614,15 +614,22 @@ def qrKalite(request):
                     varis = 574
                 else:
                     continue
+                print("burda")
                 # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
                 last_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first().id
                 print(last_location)
-                # Hareket.objects.create(
-                #         kalipNo=n['KalipNo'],
-                #         kalipKonum=last_location,
-                #         kalipVaris_id=varis,
-                #         kimTarafindan_id=57,
-                #     )
+                try:
+                    # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
+
+                    Hareket.objects.create(
+                        kalipNo=n['KalipNo'],
+                        kalipKonum=last_location,
+                        kalipVaris_id=varis,
+                        kimTarafindan_id=57,
+                    )
+                except Exception as e:
+                    print(f"Error processing {n['Siralama']}: {e}")
+                    logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
             else:
                 continue
     else:

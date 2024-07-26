@@ -35,14 +35,14 @@ def check_new_rapor():
                     continue
                 try:
                     # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
-                    last_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first().id
+                    last_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first()
 
                     Hareket.objects.create(
-                            kalipNo=n['KalipNo'],
-                            kalipKonum=last_location,
-                            kalipVaris_id=varis,
-                            kimTarafindan_id=57,
-                        )
+                        kalipNo=n['KalipNo'],
+                        kalipKonum=last_location,
+                        kalipVaris_id=varis,
+                        kimTarafindan_id=57,
+                    )
                 except Exception as e:
                     print(f"Error processing {n['Siralama']}: {e}")
                     logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
