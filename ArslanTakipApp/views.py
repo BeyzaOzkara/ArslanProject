@@ -1683,6 +1683,7 @@ def yuda_kaydet(request):
             y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
             y.YudaAcanKisi = request.user
             y.Tarih = datetime.datetime.now()
+            y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
 
             for key, value in request.POST.items(): 
                 if hasattr(y, key):
@@ -1872,7 +1873,6 @@ def yudas_list(request):
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
         for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:
-            print(group)
             yuda_onay = YudaOnay.objects.filter(Yuda=o['id'], Group__name=group+' Bolumu').first()
             if yuda_onay:
                 if yuda_onay.OnayDurumu is True:
@@ -2350,7 +2350,6 @@ def yudaDetailAnket(request):
     if user_group is None:
         return JsonResponse({'error': 'User does not belong to any predefined group'}, status=400)
 
-        
     # groups.first() şeklinde yapmak çok sağlıklı olmayabilir.
     # Update or create YudaOnay entry
     try:
@@ -2368,7 +2367,23 @@ def yudaDetailAnket(request):
                 Yuda_id=yudaId,
                 OnayDurumu=secim
             )
+        
+        allowed_groups = [group.name for group, perms in get_groups_with_perms(yuda, attach_perms=True).items() if 'gorme_yuda' in perms]
+        yuda = YudaForm.objects.get(id=yudaId)
 
+        if yuda.OnayDurumu != "Reddedildi":
+            if secim:
+                if user_group.name == 'Kaliphane Bolumu':
+                    yuda.OnayDurumu = 'Mekanik İşlem onayı bekleniyor' if 'Mekanik Islem Bolumu' in allowed_groups else 'Satış onayı bekleniyor'
+                elif user_group.name == 'Mekanik Islem Bolumu':
+                    if 'Yurt Disi Satis Bolumu' in allowed_groups or 'Yurt Ici Satis Bolumu' in allowed_groups:
+                        yuda.OnayDurumu = 'Satış onayı bekleniyor'
+                elif user_group.name in ['Yurt Disi Satis Bolumu', 'Yurt Ici Satis Bolumu']:
+                    yuda.OnayDurumu = 'Onaylandı'
+            elif not secim and user_group.name in ['Kaliphane Bolumu', 'Mekanik Islem Bolumu', 'Yurt Disi Satis Bolumu', 'Yurt Ici Satis Bolumu']:
+                yuda.OnayDurumu = 'Reddedildi'
+
+            yuda.save()
         # Calculate counts for true and false votes for the Yuda_id
         onay_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=True).count()
         ret_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).count()

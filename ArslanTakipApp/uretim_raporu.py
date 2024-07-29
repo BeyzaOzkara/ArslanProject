@@ -1,5 +1,5 @@
 import logging
-from .models import LastCheckedUretimRaporu, UretimBasilanBillet, Hareket, Location, DiesLocation
+from .models import LastCheckedUretimRaporu, UretimBasilanBillet, Hareket, Location, KalipMs
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +34,9 @@ def check_new_rapor():
                 try:
                     # last_location = DiesLocation.objects.filter(KalipNo = n['KalipNo']).first()
                     last_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first()
-
+                    kalip = KalipMs.objects.using('dies').filter(KalipNo=n['KalipNo']).first()
                     Hareket.objects.create(
-                        kalipNo=n['KalipNo'],
+                        kalipNo=kalip.KalipNo,
                         kalipKonum=last_location,
                         kalipVaris_id=varis,
                         kimTarafindan_id=57,
