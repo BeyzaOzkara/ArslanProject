@@ -15,7 +15,7 @@ def check_new_rapor():
 
     if last_checked_siralama:
         last_index = next((i for i, entry in enumerate(pres_uretim) if entry['Siralama'] == last_checked_siralama), -1)
-        new_rapors = pres_uretim[last_index +1:]
+        new_rapors = pres_uretim[last_index + 1:] if last_index != -1 else pres_uretim
     else:
         new_rapors = pres_uretim
 
@@ -26,10 +26,8 @@ def check_new_rapor():
         for n in new_rapors:
             if n['KalipNo'] != '':
                 if n['PresKodu'] in birinci_fab:
-                    print(f"birinci: {n}")
                     varis = 547
                 elif n['PresKodu'] in ikinci_fab:
-                    print(f"ikinci: {n}")
                     varis = 766
                 else:
                     continue
