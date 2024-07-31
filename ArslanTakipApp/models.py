@@ -301,6 +301,17 @@ class YudaOnay(models.Model):
     Tarih = models.DateField(auto_now=True, null=True, blank=True)
     OnayDurumu = models.BooleanField(null=True, blank=True)
 
+class YudaOnayDurum(models.Model):
+    yuda_id = models.IntegerField(null=True, blank=True)
+    kaliphane_onay_durumu = models.IntegerField(null=True, blank=True)
+    satis_onay_durumu = models.IntegerField(null=True, blank=True)
+    mekanik_islem_onay_durumu = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View1_YudaDurum4'
+
+
 class Yuda(models.Model):
     """ IstekYapanBolum = models.CharField(null=True, blank=True)
     IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor

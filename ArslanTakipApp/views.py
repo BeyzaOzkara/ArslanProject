@@ -27,7 +27,7 @@ from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
 import urllib3
-from .models import LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip
+from .models import LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -2315,6 +2315,28 @@ def yudaDCDelete(request, cId):
         response.status_code = 500 #server error
     return response
 
+def determine_onay_durumu(durumlar):
+    kaliphane = durumlar.get('kaliphane')
+    mekanik = durumlar.get('mekanik')
+    satis = durumlar.get('satis')
+
+    if kaliphane == 3 or mekanik == 3 or satis == 3:
+        return 'Reddedildi'
+    if kaliphane == 1:
+        return 'Kalıphane Onayı Bekleniyor'
+    elif kaliphane == 2 and mekanik == 0 and satis == 1:
+        return 'Satış Onayı Bekleniyor'
+    elif kaliphane == 2 and mekanik == 0 and satis == 2:
+        return 'Onaylandı'
+    elif kaliphane == 2 and mekanik == 1:
+        return 'Mekanik İşlem Onayı Bekleniyor'
+    elif kaliphane == 2 and mekanik == 2 and satis == 1:
+        return 'Satis Onayi Bekleniyor'
+    elif kaliphane == 2 and mekanik == 2 and satis == 2:
+        return 'Onaylandı'
+    
+    return 'Bilinmeyen Durum'
+
 def yudaDetailAnket(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     yudaId = params.get("yId")
@@ -2368,52 +2390,18 @@ def yudaDetailAnket(request):
                 OnayDurumu=secim
             )
         
-        allowed_groups = [group.name for group, perms in get_groups_with_perms(yuda, attach_perms=True).items() if 'gorme_yuda' in perms]
         yuda = YudaForm.objects.get(id=yudaId)
-
-        kaliphane_voted = YudaOnay.objects.filter(Yuda_id=yudaId, Group__name='Kaliphane Bolumu')
-        mekanik_voted = YudaOnay.objects.filter(Yuda_id=yudaId, Group__name='Mekanik Islem Bolumu')
-        satis_voted = YudaOnay.objects.filter(Yuda_id=yudaId, Group__name__in=['Yurt Disi Satis Bolumu', 'Yurt Ici Satis Bolumu'])
-
-        kaliphane_exists = kaliphane_voted.exists()
-        mekanik_exists = mekanik_voted.exists()
-        satis_exists = satis_voted.exists()
-        rejected_groups = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).values_list('Group__name', flat=True)
-
-
-        if secim:
-            if user_group.name == 'Kaliphane Bolumu':
-                if 'Mekanik Islem Bolumu' in allowed_groups and not mekanik_exists:
-                    yuda.OnayDurumu = 'Mekanik İşlem Onayı Bekleniyor'
-                elif not satis_exists:
-                    yuda.OnayDurumu = 'Satış onayı bekleniyor'
-                elif kaliphane_exists and satis_exists:  
-                    if kaliphane_voted[0]['OnayDurumu'] and satis_voted[0]['OnayDurumu']:
-                        if 'Mekanik Islem Bolumu' in allowed_groups and mekanik_exists:
-                            if mekanik_voted[0]['OnayDurumu']:
-                                yuda.OnayDurumu = 'Onaylandı'
-            elif user_group.name == 'Mekanik Islem Bolumu':
-                if kaliphane_exists:
-                    if 'Yurt Disi Satis Bolumu' in allowed_groups or 'Yurt Ici Satis Bolumu' in allowed_groups and not satis_exists:
-                        yuda.OnayDurumu = 'Satış Onayı Bekleniyor'
-                    else:
-                        if yuda.OnayDurumu != 'Reddedildi':
-                            yuda.OnayDurumu = 'Onaylandı'
-                else:
-                    yuda.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
-            elif user_group.name in ['Yurt Disi Satis Bolumu', 'Yurt Ici Satis Bolumu']:
-                if not kaliphane_exists:
-                    yuda.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
-                elif 'Mekanik Islem Bolumu' in allowed_groups and not mekanik_exists:
-                    yuda.OnayDurumu = 'Mekanik İşlem Onayı Bekleniyor'
-                else:
-                    if yuda.OnayDurumu != 'Reddedildi':
-                        yuda.OnayDurumu = 'Onaylandı'
-        else:
-            if user_group.name in ['Kaliphane Bolumu', 'Mekanik Islem Bolumu', 'Yurt Disi Satis Bolumu', 'Yurt Ici Satis Bolumu']:
-                yuda.OnayDurumu = 'Reddedildi'
-
+        yuda_onay_durumu = YudaOnayDurum.objects.get(yuda_id=yudaId)
+        
+        kh_durum = yuda_onay_durumu.kaliphane_onay_durumu # değer 1 ise null, 2 ise True, 3 ise False
+        satis_durum = yuda_onay_durumu.satis_onay_durumu # değer 1 ise null, 2 ise True, 3 ise False
+        mekanik_durum = yuda_onay_durumu.mekanik_islem_onay_durumu # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
+        durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
+        
+        onay_durumu = determine_onay_durumu(durumlar)
+        yuda.OnayDurumu = onay_durumu
         yuda.save()
+
         # Calculate counts for true and false votes for the Yuda_id
         onay_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=True).count()
         ret_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).count()
