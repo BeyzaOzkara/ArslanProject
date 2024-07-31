@@ -10,7 +10,7 @@ def check_new_rapor():
 
     pres_uretim = list(UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama', 'KalipNo', 'PresKodu'))
 
-    last_checked, created = LastCheckedUretimRaporu.objects.get_or_create(id=1)
+    last_checked, created = LastCheckedUretimRaporu.objects.latest()
     last_checked_siralama = last_checked.Siralama
 
     if last_checked_siralama:
@@ -20,8 +20,9 @@ def check_new_rapor():
         new_rapors = pres_uretim
 
     if new_rapors:
-        last_checked.Siralama = new_rapors[-1]['Siralama']
-        last_checked.save()
+        LastCheckedUretimRaporu.objects.create(
+            Siralama = new_rapors[-1]['Siralama']
+        )
 
         for n in new_rapors:
             if n['KalipNo'] != '':
