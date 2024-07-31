@@ -585,7 +585,7 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
-
+        
     
         """ path = request.get_full_path()
         print(path)

@@ -37558,3 +37558,269 @@ Traceback (most recent call last):
                                                            ^^^^^^^
 UnboundLocalError: cannot access local variable 'context' where it is not associated with a value
 [35;1mHTTP GET /qr/ 500 [15.84, 127.0.0.1:63135][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 593, in qrKalite
+    last_checked= LastCheckedUretimRaporu.objects.latest()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1045, in latest
+    return self.reverse()._earliest(*fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1020, in _earliest
+    raise ValueError(
+ValueError: earliest() and latest() require either fields as positional arguments or 'get_latest_by' in the model's Meta.
+[35;1mHTTP GET /qr/ 500 [0.15, 127.0.0.1:54770][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 604, in qrKalite
+    Siralama = new_raports.latest().Siralama
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1045, in latest
+    return self.reverse()._earliest(*fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1020, in _earliest
+    raise ValueError(
+ValueError: earliest() and latest() require either fields as positional arguments or 'get_latest_by' in the model's Meta.
+[35;1mHTTP GET /qr/ 500 [0.21, 127.0.0.1:59552][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 604, in qrKalite
+    Siralama = new_raports.latest('Siralama').Siralama
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'Siralama'
+[35;1mHTTP GET /qr/ 500 [0.16, 127.0.0.1:61989][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\mssql\base.py", line 621, in execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.ProgrammingError: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 601, in qrKalite
+    print(new_raports.values())
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 374, in __repr__
+    data = list(self[: REPR_OUTPUT_SIZE + 1])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 398, in __iter__
+    self._fetch_all()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\query.py", line 208, in __iter__
+    for row in compiler.results_iter(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\compiler.py", line 1513, in results_iter
+    results = self.execute_sql(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\mssql\base.py", line 621, in execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[35;1mHTTP GET /qr/ 500 [0.34, 127.0.0.1:56810][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 604, in qrKalite
+    Siralama = new_raports.latest('Siralama').Siralama
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'Siralama'
+[35;1mHTTP GET /qr/ 500 [0.23, 127.0.0.1:57393][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 605, in qrKalite
+    Siralama = new_raports.latest('Siralama').Siralama
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'Siralama'
+[35;1mHTTP GET /qr/ 500 [0.21, 127.0.0.1:52139][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 605, in qrKalite
+    Siralama = new_raports.latest('Siralama').Siralama
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'Siralama'
+[35;1mHTTP GET /qr/ 500 [0.23, 127.0.0.1:53845][0m
+Internal Server Error: /qr/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 602, in qrKalite
+    print(new_raports.values('Siralama').latest('Siralama').Siralama)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'Siralama'
+[35;1mHTTP GET /qr/ 500 [0.23, 127.0.0.1:62308][0m

@@ -8,23 +8,22 @@ def check_new_rapor():
     ikinci_fab = ['1100-2', '1100-3', '1600-2', '2750-1', '4000-1']
     # '1.Fabrika Kalıp Hazırlama': 545, '2.Fabrika Kalıp Hazırlama': 574
 
-    pres_uretim = list(UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama', 'KalipNo', 'PresKodu'))
-
-    last_checked, created = LastCheckedUretimRaporu.objects.latest()
+    pres_uretim = UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama', 'KalipNo', 'PresKodu')
+    last_checked= LastCheckedUretimRaporu.objects.latest('Siralama')
     last_checked_siralama = last_checked.Siralama
 
-    if last_checked_siralama:
-        last_index = next((i for i, entry in enumerate(pres_uretim) if entry['Siralama'] == last_checked_siralama), -1)
-        new_rapors = pres_uretim[last_index + 1:] if last_index != -1 else pres_uretim
-    else:
-        new_rapors = pres_uretim
 
-    if new_rapors:
+    if last_checked_siralama:
+        new_raports = pres_uretim.filter(Siralama__gt = last_checked_siralama)
+    else:
+        new_raports = pres_uretim
+        
+    if new_raports:
         LastCheckedUretimRaporu.objects.create(
-            Siralama = new_rapors[-1]['Siralama']
+            Siralama = new_raports.latest('Siralama')['Siralama']
         )
 
-        for n in new_rapors:
+        for n in new_raports:
             if n['KalipNo'] != '':
                 if n['PresKodu'] in birinci_fab:
                     varis = 547
@@ -41,6 +40,7 @@ def check_new_rapor():
                         kalipKonum=last_location,
                         kalipVaris_id=varis,
                         kimTarafindan_id=57,
+                        aciklama = n['Siralama']
                     )
                 except Exception as e:
                     print(f"Error processing {n['Siralama']}: {e}")

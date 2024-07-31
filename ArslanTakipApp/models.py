@@ -88,6 +88,7 @@ class Hareket(models.Model):
     kalipVaris = models.ForeignKey(Location, on_delete=models.CASCADE, null =True, related_name="kalip_varis", verbose_name="Kalıp Varış")
     hareketTarihi = models.DateTimeField(auto_now=True, null=True)
     kimTarafindan = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Kim Tarafından")
+    aciklama = models.CharField(null=True, blank=True)
 
     class Meta:
         verbose_name="Hareket"
@@ -406,6 +407,7 @@ class LastProcessEmail(models.Model):
     
 class LastCheckedUretimRaporu(models.Model):
     Siralama = models.IntegerField(null=True)
+    TarihSaat = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     
 class UnitOfMeasure(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)
