@@ -58,3 +58,63 @@ An error occurred while processing the 569486: Cannot assign "542": "Hareket.kal
 An error occurred while processing the 569487: Cannot assign "570": "Hareket.kalipKonum" must be a "Location" instance.
 An error occurred while processing the 569488: Cannot assign "570": "Hareket.kalipKonum" must be a "Location" instance.
 An error occurred while processing the 569489: Cannot assign "572": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570225: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570226: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570239: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570240: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570246: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570249: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570250: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570251: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570252: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570253: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570225: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570226: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570239: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570240: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570246: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570249: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570250: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570251: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570252: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570253: Cannot resolve keyword 'KalipNo' into field. Choices are: hareketTarihi, kalipNo, kalipVaris, kalipVaris_id
+An error occurred while processing the 570225: Field 'id' expected a number but got <Location: 2750 TON PRES>.
+An error occurred while processing the 570226: Cannot assign "<DiesLocation: DiesLocation object (10064-12)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570239: Cannot assign "<DiesLocation: DiesLocation object (10511-15)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570240: Cannot assign "<DiesLocation: DiesLocation object (13520-199 R)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570246: Cannot assign "<DiesLocation: DiesLocation object (3626-109)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570249: Field 'id' expected a number but got <Location: 1600 TON PRES 2>.
+An error occurred while processing the 570250: Cannot assign "<DiesLocation: DiesLocation object (6895-7)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570251: Cannot assign "<DiesLocation: DiesLocation object (12613-2)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570252: Cannot assign "<DiesLocation: DiesLocation object (5914-4)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570253: Cannot assign "<DiesLocation: DiesLocation object (5914-4)>": "Hareket.kalipKonum" must be a "Location" instance.
+An error occurred while processing the 570225: 'NoneType' object has no attribute 'id'
+An error occurred while processing the 570226: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570239: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570240: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570246: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570249: 'NoneType' object has no attribute 'id'
+An error occurred while processing the 570250: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570251: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570252: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570253: 'DiesLocation' object has no attribute 'id'
+An error occurred while processing the 570225: 'NoneType' object has no attribute 'kalipVaris'
+An error occurred while processing the 570226: Field 'id' expected a number but got <Location: 2750 TON PRES>.
+An error occurred while processing the 570239: Field 'id' expected a number but got <Location: 2750 TON PRES>.
+An error occurred while processing the 570240: Field 'id' expected a number but got <Location: 1200 TON PRES>.
+An error occurred while processing the 570246: Field 'id' expected a number but got <Location: YENÝ 1100 TON PRESLER>.
+An error occurred while processing the 570249: 'NoneType' object has no attribute 'kalipVaris'
+An error occurred while processing the 570250: Field 'id' expected a number but got <Location: 1600 TON PRES>.
+An error occurred while processing the 570251: Field 'id' expected a number but got <Location: 1600 TON PRES 2>.
+An error occurred while processing the 570252: Field 'id' expected a number but got <Location: 1600 TON PRES>.
+An error occurred while processing the 570253: Field 'id' expected a number but got <Location: 1600 TON PRES>.
+An error occurred while processing the 570225: Field 'id' expected a number but got <Location: 2750 TON PRES>.
+An error occurred while processing the 570226: Field 'id' expected a number but got <Location: 2750 TON PRES>.
+An error occurred while processing the 570239: Field 'id' expected a number but got <Location: 2750 TON PRES>.
+An error occurred while processing the 570240: Field 'id' expected a number but got <Location: 1200 TON PRES>.
+An error occurred while processing the 570246: Field 'id' expected a number but got <Location: YENÝ 1100 TON PRESLER>.
+An error occurred while processing the 570249: Field 'id' expected a number but got <Location: 1600 TON PRES 2>.
+An error occurred while processing the 570250: Field 'id' expected a number but got <Location: 1600 TON PRES>.
+An error occurred while processing the 570251: Field 'id' expected a number but got <Location: 1600 TON PRES 2>.
+An error occurred while processing the 570252: Field 'id' expected a number but got <Location: 1600 TON PRES>.
+An error occurred while processing the 570253: Field 'id' expected a number but got <Location: 1600 TON PRES>.
