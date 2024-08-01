@@ -405,6 +405,7 @@ class UretimBasilanBillet(models.Model):
     Siralama = models.IntegerField(null=True, blank=True)
     KalipNo = models.CharField(max_length=250, null=True, blank=True)
     PresKodu = models.CharField(max_length=20, null=True, blank=True)
+    Sure = models.IntegerField(null=True, blank=True)
 
     class Meta:
         managed = False
