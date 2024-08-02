@@ -107,58 +107,6 @@ def format_date_time(date):
 def format_date(date):
     return date.strftime("%d-%m-%Y")
 
-def guncelle(i, b, u):
-    for j in b:
-        if i == 'KalipNo':
-            k = KalipMs.objects.using('dies').get(KalipNo = j[0])
-            kalip = Kalip()
-            kalip.KalipNo = k.KalipNo
-            kalip.ProfilNo = k.ProfilNo
-            kalip.Kimlik = k.Kimlik
-            kalip.FirmaKodu = k.FirmaKodu
-            kalip.FirmaAdi = k.FirmaAdi
-            kalip.Cinsi = k.Cinsi
-            kalip.Miktar = k.Miktar
-            kalip.Capi = k.Capi
-            kalip.UretimTarihi = k.UretimTarihi
-            kalip.GozAdedi = k.GozAdedi
-            kalip.Silindi = k.Silindi
-            kalip.SilinmeSebebi =k.SilinmeSebebi
-            kalip.Bolster = k.Bolster
-            kalip.KalipCevresi = k.KalipCevresi
-            kalip.KaliteOkey = k.KaliteOkey
-            kalip.UreticiFirma = k.UreticiFirma
-            kalip.TeniferOmruMt = k.TeniferOmruMt
-            kalip.TeniferOmruKg = k.TeniferOmruKg
-            kalip.TeniferKalanOmurKg = k.TeniferKalanOmurKg
-            kalip.TeniferNo = k.TeniferNo
-            kalip.SonTeniferTarih = k.SonTeniferTarih
-            kalip.SonTeniferKg = k.SonTeniferKg
-            kalip.SonTeniferSebebi = k.SonTeniferSebebi
-            kalip.SonUretimTarih = k.SonUretimTarih
-            kalip.SonUretimGr = k.SonUretimGr
-            kalip.UretimTenSonrasiKg = k.UretimTenSonrasiKg
-            kalip.UretimToplamKg = k.UretimToplamKg
-            kalip.ResimGramaj = k.ResimGramaj
-            kalip.KalipAciklama = k.KalipAciklama
-            kalip.SikayetVar = k.SikayetVar
-            kalip.KaliteAciklama = k.KaliteAciklama
-            kalip.AktifPasif = k.AktifPasif
-            kalip.Hatali = k.Hatali
-            kalip.PresKodu  = k.PresKodu
-            kalip.PaketBoyu = k.PaketBoyu
-            kalip.ResimDizini = k.ResimDizini
-            kalip.kalipLocation_id = 48
-            
-            kalip.save()
-            print("kalip saved")
-        else:
-            print(i)
-            u[i] = j[1]
-            Kalip.objects.filter(KalipNo = j[0]).update(**u)
-            print("updated")
-    return True
-
 def hareketSave(dieList, lRec, dieTo, request):
     for i in dieList:
         k = DiesLocation.objects.get(kalipNo = i)
@@ -269,8 +217,20 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
 
         if len(filter_list)>0:
             for i in filter_list: # bir lokasyona tıklandığında o lokasyon ve altında kalan her lokasyon içindeki kalıp sayısı dönsün
-                if i["type"] == "like":
-                    q[i['field']+"__startswith"] = i['value']
+                if i["type"] == "like": # eğer birden fazla yazılırsa startswith yerine = kullanılacak bulamadığı kalıplara ise 20 karakter olana kadar boşluk ekleyip deneyecek
+                    if not "," in i['value']:
+                        q[i['field']+"__startswith"] = i['value']
+                    else:
+                        value_list = i['value'].split(",")
+                        matched_items = []
+                        for item in value_list:
+                            item = item.strip()
+                            matched = query.filter(kalipNo=item)
+                            if not matched.exists():
+                                item = item.ljust(20)
+                                matched = query.filter(kalipNo=item)
+                            matched_items.extend(matched.values_list('kalipNo', flat=True))
+                        q['kalipNo__in'] = matched_items
                 elif i["type"] == "=":
                     loca = loc.values().get(id = i['value'])
                     if loca['isPhysical']: 
