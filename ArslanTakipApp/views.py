@@ -325,6 +325,7 @@ def kalip_liste(request):
     lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
     lastData['data'] = g
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    print(data)
     return HttpResponse(data)
 
 def kalip_rapor(request):
@@ -545,60 +546,7 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
-        birinci_fab = ['1100-1', '1200-1', '1600-1']
-        ikinci_fab = ['1100-2', '1100-3', '1600-2', '2750-1', '4000-1']
-
-        pres_uretim = UretimBasilanBillet.objects.using('dies').order_by('Siralama').values('Siralama', 'KalipNo', 'PresKodu').exclude(Sure__lte=10)
-        last_checked= LastCheckedUretimRaporu.objects.latest('Siralama')
-        last_checked_siralama = last_checked.Siralama
-
-        # aynı kalıpların aynı gün içerisinde tekrarlama sorunlarını ortadan kaldırmak için Süreyi kısıtlayabiliriz.
-        if last_checked_siralama:
-            new_raports = pres_uretim.filter(Siralama__gt = last_checked_siralama)
-        else:
-            new_raports = pres_uretim
-
-        if new_raports:
-            LastCheckedUretimRaporu.objects.create(
-                Siralama = new_raports.latest('Siralama')['Siralama']
-            )
-
-            for n in new_raports:
-                if n['KalipNo'] != '':
-                    if n['PresKodu'] in birinci_fab:
-                        varis = 547
-                    elif n['PresKodu'] in ikinci_fab:
-                        varis = 766
-                    else:
-                        continue
-                    try:
-                        kalip = KalipMs.objects.using('dies').filter(KalipNo=n['KalipNo']).first()
-                        last_location = DiesLocation.objects.filter(kalipNo = n['KalipNo']).first()
-                        if not last_location:
-                            last_location = DiesLocation.objects.filter(kalipNo = n['KalipNo']+"               ").first()
-                        pres_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first()
-                        if last_location and (last_location.kalipVaris != pres_location):
-                            Hareket.objects.create(
-                                kalipNo=kalip.KalipNo,
-                                kalipKonum=last_location.kalipVaris,
-                                kalipVaris=pres_location,
-                                kimTarafindan_id=57,
-                                aciklama = 'pres uretim raporu hazırlık'
-                            )
-                        Hareket.objects.create(
-                            kalipNo=kalip.KalipNo,
-                            kalipKonum=pres_location,
-                            kalipVaris_id=varis,
-                            kimTarafindan_id=57,
-                            aciklama = n['Siralama']
-                        )
-                    except Exception as e:
-                        print(f"Error processing {n['Siralama']}: {e}")
-                        logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
-                else:
-                    continue
-        else:
-            print("yeni rapor bulunmamaktadır.")
+        
     
         """ path = request.get_full_path()
         print(path)
@@ -1147,7 +1095,7 @@ hatalar = [{'HataKodu': 101, 'HataTuru': 'Uygun'}, {'HataKodu': 102, 'HataTuru':
 def kalipPresCheck(sId): # EkSiparisKalip kontrol edilsin ona göre butonlar getirilsin.
     eksiparis = EkSiparis.objects.get(id=sId)
     pNo = eksiparis.ProfilNo
-    pKodu = eksiparis.EkPresKodu
+    pKodu = eksiparis.PresKodu
     presId = presler[pKodu]
     firinId = firinlar[pKodu]
     try:
@@ -1366,12 +1314,209 @@ def checkKalip(id):
     ek_siparis_instance = EkSiparis.objects.get(id=id)
     return ek_siparis_instance.production_started()
 
+class eksiparisDenemeView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/eksiparisdeneme.html'
+
+def check_eksiparis(request):
+    user_id = request.user.id
+    user_pres_dict = {1: '4500-1', 2: '4500-1'}  # Example mapping; adjust as needed
+    pres_grubu = user_pres_dict.get(user_id)
+
+    exists = EkSiparis.objects.filter(PresGrubu=pres_grubu, Aktif=True).exists()
+    print(exists)
+
+    return JsonResponse({'exists': exists})
+
+def eksiparis_get_data(request):
+    params = json.loads(unquote(request.GET.get('params')))
+    size = params["size"]
+    page = params["page"]
+    filter_list = params["filter"]
+    offset, limit = calculate_pagination(page, size)
+
+    user_id = request.user.id
+    user_pres_dict = {1: '4500-1', 2: '4500-1'}
+    pres_grubu = user_pres_dict[user_id]
+    
+    siparis_query = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE'])
+    eksiparis_query = EkSiparis.objects.all()
+    pres_eksiparis = eksiparis_query.filter(PresGrubu=pres_grubu, Aktif=True).exclude(MsSilindi=True)
+
+    if pres_eksiparis.exists():
+        pres_eksiparis_paginate = list(pres_eksiparis.values()[offset:limit])
+        for e in pres_eksiparis_paginate:
+            try:
+                if siparis_query.filter(Kimlik = e['Kimlik']).exists() == False :
+                    a = eksiparis_query.get(id=e['id'])
+                    if a.MsSilindi != True:
+                        a.MsSilindi = True
+                        a.save()
+                    pres_eksiparis_paginate.remove(e)
+                    continue
+                sip = siparis_query.get(Kimlik=e['Kimlik'])
+                e['KartNo']= f"{e['KartNo']}-{e['EkNo']}"
+                e['Termin']= format_date(e['Termin'])
+                e['EkKg']= e['Kg']
+                e['EkAdet']= e['Adet']
+                e['EkBilletTuru']= e['BilletTuru']
+                e['KalanSiparisKg']= sip.Kg
+                e['PlanlananMm']= sip.PlanlananMm
+                e['Mm']= sip.Siparismm
+                e['FirmaAdi']= sip.FirmaAdi
+                e['KondusyonTuru']= sip.KondusyonTuru
+                e['SonTermin']= format_date(sip.SonTermin)
+                e['KalipSokmeDurum']= kalipPresCheck(e['id'])
+                e['UretimDurum'] = checkKalip(e['id'])
+            except SiparisList.DoesNotExist:
+                # Handle case where SiparisList entry does not exist
+                pass
+    else:
+        pres_eksiparis = siparis_query.filter(PresKodu=pres_grubu)
+        pres_eksiparis_paginate= list(pres_eksiparis.values()[offset:limit])
+        for s in pres_eksiparis_paginate:
+            s['SonTermin']= format_date(s['SonTermin'])
+            s['KalanKg']= s['Kg']
+            s['KalanAdet']= s['Adet']
+            s['Mm']= s['Siparismm']
+
+    ek_count = pres_eksiparis.count()
+    last_data = {'last_page': math.ceil(ek_count / size), 'data': pres_eksiparis_paginate}
+
+    return JsonResponse(last_data, safe=False, json_dumps_params={'indent': 2})
+
+    # return JsonResponse(data, safe=False)
+
+def eksiparis_save_data(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        is_siparis_list = data.get('isSiparisList', False)
+        items = data.get('data', [])
+        fark = data.get('fark', [])
+        silinenler = data.get('silinenler', [])
+        
+        pres_grubu = '4500-1'
+        e = EkSiparis.objects.filter(PresGrubu=pres_grubu, Aktif=True)
+
+        if is_siparis_list:
+            # Handle SiparisList data
+            for item in items:
+                kimlik = item.get('Kimlik')
+                if kimlik in silinenler:
+                    # Skip items marked for deletion
+                    continue
+                siparis = SiparisList.objects.using('dies').filter(Kimlik=item.get('Kimlik')).first()
+                if siparis:
+                    eksiparis = EkSiparis()
+                    if not e.filter(KartNo = item.get('KartNo')):
+                        eksiparis.EkNo = 1
+                    else: 
+                        lastEk = e.filter(KartNo = item.get('KartNo')).order_by('EkNo').latest('EkNo')
+                        eksiparis.EkNo = lastEk.EkNo +1
+                    eksiparis.KartNo = item.get('KartNo')
+                    eksiparis.Kimlik = item.get('Kimlik')
+                    eksiparis.ProfilNo = item.get('ProfilNo')
+                    eksiparis.PresKodu = item.get('PresKodu')
+                    eksiparis.KimTarafindan = request.user
+                    eksiparis.Termin = datetime.datetime.strptime(item.get('SonTermin'), '%d-%m-%Y').strftime('%Y-%m-%d')
+                    eksiparis.BilletTuru = item.get('BilletTuru')
+                    eksiparis.Kg = item.get('KalanKg')
+                    eksiparis.Adet = item.get('KalanAdet')
+                    eksiparis.YuzeyOzelligi = item.get('YuzeyOzelligi')
+                    eksiparis.PresGrubu = pres_grubu
+                    eksiparis.Aktif = True
+                    eksiparis.Sira = e.count()+1
+                    eksiparis.save()
+        else:
+            # Handle EkSiparis data
+            for item in items:
+                eksiparis_id = item.get('id')
+                if eksiparis_id in silinenler:
+                    # Update Silindi field for deleted items
+                    eksiparis = EkSiparis.objects.filter(id=eksiparis_id).first()
+                    if eksiparis:
+                        eksiparis.Silindi = True
+                        eksiparis.save()
+                else:
+                    eksiparis = EkSiparis.objects.filter(id=item.get('id')).first()
+                    if not eksiparis:
+                        eksiparis = EkSiparis()
+                    eksiparis.PresKodu = item.get('PresKodu')
+                    eksiparis.Termin = datetime.datetime.strptime(item.get('Termin'), '%d-%m-%Y').strftime('%Y-%m-%d')
+                    eksiparis.Kg = item.get('EkKg')
+                    eksiparis.Adet = item.get('EkAdet')
+                    eksiparis.BilletTuru = item.get('EkBilletTuru')
+                    eksiparis.YuzeyOzelligi = item.get('YuzeyOzelligi')
+                    for f in fark:
+                        print(f)
+                        ek = EkSiparis.objects.get(id=f['id'])
+                        ek.Sira = f['Sira']
+                        ek.save()
+                    eksiparis.save()
+        
+        return HttpResponse(status=200)
+    
+    return HttpResponse(status=400)
+
+
 def eksiparis_list(request):
     params = json.loads(unquote(request.GET.get('params')))
     size = params["size"]
     page = params["page"]
     filter_list = params["filter"]
     offset, limit = calculate_pagination(page, size)
+    # q = {}
+
+    # user_id = request.user.id
+    # user_pres_dict = {1: '4500-1', 2: '4500-1'}
+    # user_pres = user_pres_dict[user_id]
+
+    # eksiparis_query = EkSiparis.objects.all()
+    # siparis_all_query = SiparisList.objects.using('dies').all()
+    # pres_eksiparis = eksiparis_query.filter(PresGrubu=user_pres)
+    # eksiparisler = []
+    # order_field = "Sira"
+    # exclude_field = "MsSilindi"
+
+    # if pres_eksiparis.exists():
+    #     eksiparisler = pres_eksiparis.exclude(MsSilindi = True).exclude(Silindi = True)
+    # else:
+    #     siparis_query = siparis_all_query.filter(PresKodu=user_pres)
+    #     eksiparisler = siparis_query
+    #     order_field = "SonTermin"
+
+    # if len(filter_list)>0:
+    #     for i in filter_list:
+    #         q = filter_method(i, q)
+    
+    # ekSiparis = eksiparisler.filter(**q).order_by(order_field)
+    # ek_siparis_list = list(ekSiparis[offset:limit].values())
+
+    # for e in ek_siparis_list:
+    #     siparis1 = siparis_all_query.get(Kimlik=e['Kimlik'])
+    #     e['Termin'] = format_date(e['Termin'])
+    #     e['KartNo'] = f"{e['KartNo']}-{e['EkNo']}"
+    #     e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
+    #     e.update({
+    #         'FirmaAdi': siparis1.FirmaAdi,
+    #         'GirenKg': siparis1.GirenKg,
+    #         'Kg': siparis1.Kg,
+    #         'GirenAdet': siparis1.GirenAdet,
+    #         'Adet': siparis1.Adet,
+    #         'PlanlananMm': siparis1.PlanlananMm,
+    #         'Mm': siparis1.Siparismm,
+    #         'KondusyonTuru': siparis1.KondusyonTuru,
+    #         'SiparisTamam': siparis1.SiparisTamam,
+    #         'SonTermin': format_date(siparis1.SonTermin),
+    #         'AktifKalip': siparis1.AktifKalip,
+    #         'KalipSokmeDurum': kalipPresCheck(e['id']),
+    #         'UretimDurum' : checkKalip(e['id']), 
+    #     })
+    # ek_count = ekSiparis.count()
+    # lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
+    # lastData['data'] = ek_siparis_list
+    # data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    # return HttpResponse(data)
+
     # presKodu bazlı getirilecek pres operatörlerine sadece o pres için olan siparişleri görme yetkisi verilecek.
     
     q={}
@@ -1394,12 +1539,12 @@ def eksiparis_list(request):
     ).filter(**w).order_by('Kimlik')
 
     sip_filter = list(siparis.values_list('Kimlik', flat=True))
-    ek_siparis_list = list(ekSiparis.filter(SipKimlik__in=sip_filter)[offset:limit].values())
+    ek_siparis_list = list(ekSiparis.filter(Kimlik__in=sip_filter)[offset:limit].values())
 
     for e in ek_siparis_list:
-        siparis1 = siparis.get(Kimlik=e['SipKimlik'])
-        e['EkTermin'] = format_date(e['EkTermin'])
-        e['SipKartNo'] = f"{e['SipKartNo']}-{e['EkNo']}"
+        siparis1 = siparis.get(Kimlik=e['Kimlik'])
+        e['EkTermin'] = format_date(e['Termin'])
+        e['SipKartNo'] = f"{e['KartNo']}-{e['EkNo']}"
         e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
         e.update({
             'FirmaAdi': siparis1.FirmaAdi,
@@ -1435,16 +1580,16 @@ def eksiparis_acil(request): # planlama listesi düzenleme
     ekSiparisList = list(ekSiparis.values())
 
     for e in ekSiparisList:
-        if siparis.filter(Kimlik = e['SipKimlik']).exists() == False :
-            a = ekSiparis.get(SipKimlik = e['SipKimlik'], EkNo = e['EkNo'])
+        if siparis.filter(Kimlik = e['Kimlik']).exists() == False :
+            a = ekSiparis.get(SipKimlik = e['Kimlik'], EkNo = e['EkNo'])
             if a.MsSilindi != True:
                 a.MsSilindi = True
                 a.save()
             ekSiparisList.remove(e)
         else:
-            siparis1 = siparis.get(Kimlik = e['SipKimlik'])
-            e['EkTermin'] = format_date(e['EkTermin'])
-            e['SipKartNo'] = str(e['SipKartNo']) + "-" +str(e['EkNo'])
+            siparis1 = siparis.get(Kimlik = e['Kimlik'])
+            e['EkTermin'] = format_date(e['Termin'])
+            e['SipKartNo'] = str(e['KartNo']) + "-" +str(e['EkNo'])
             e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
             if siparis1:
                 e['ProfilNo'] = siparis1.ProfilNo

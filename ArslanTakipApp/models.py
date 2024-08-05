@@ -194,21 +194,23 @@ class SiparisList(models.Model):
 
 class EkSiparis(models.Model):
     EkNo = models.IntegerField(null=True)
-    SipKartNo = models.IntegerField(null=True)
-    SipKimlik = models.IntegerField(null=True)
-    EkPresKodu = models.CharField(null=True)
-    EkTermin = models.DateTimeField(null=True)
-    EkBilletTuru = models.CharField(null=True, blank=True)
-    EkKg = models.FloatField(null=True, verbose_name="Ek Kg")
-    EkKalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
+    KartNo = models.IntegerField(null=True)
+    Kimlik = models.IntegerField(null=True)
+    PresKodu = models.CharField(null=True)
+    Termin = models.DateTimeField(null=True)
+    BilletTuru = models.CharField(null=True, blank=True)
+    Kg = models.FloatField(null=True, verbose_name="Ek Kg")
+    KalankG = models.FloatField(null=True, verbose_name="Ek Kalan Kg")
     KimTarafindan = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     Silindi = models.BooleanField(null=True)
     MsSilindi = models.BooleanField(null=True)
     Sira = models.IntegerField(null=True)
-    EkDurumu = models.FloatField(null=True)
-    EkAdet = models.IntegerField(null=True)
-    EkYuzeyOzelligi = models.CharField(null=True)
+    Durumu = models.FloatField(null=True)
+    Adet = models.IntegerField(null=True)
+    YuzeyOzelligi = models.CharField(null=True)
     ProfilNo = models.CharField(null=True, blank=True)
+    PresGrubu = models.CharField(null=True, blank=True)
+    Aktif = models.BooleanField(null=True, blank=True)
      
     class Meta:
         verbose_name="EkSiparis"

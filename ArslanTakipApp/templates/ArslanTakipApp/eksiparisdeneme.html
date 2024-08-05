@@ -1,0 +1,287 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container col-12">
+    <div id="tabulator-table"></div>
+    <button id="save-btn" class="btn btn-success mt-2">Kaydet</button>
+    <div class="modal fade" id="kalipSokmeModal" tabindex="-1" aria-labelledby="kalipSokmeModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Üretimi Bitir</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {% csrf_token %}
+              <div class="row ml-1 mr-1"> 
+                <select name="uretimBitirmeSebebi" id="uretimBitirmeSebebi" data-pkodu="" class="form-control col-lg-5">
+                  <option value="" disabled selected>Bitirme Sebebi</option>
+                  <option value="Kalıbı Sök" onclick="">Kalıbı Sök</option>
+                  <option value="Kalıbı Fırına At">Kalıbı Fırına At</option>
+                </select>
+                <select name="kalipAciklama" id="kalipAciklama" class="form-control col-lg-7">
+                  <option value="" disabled selected>Açıklama</option>
+                </select>
+              </div>
+              <div class="row ml-1 mr-1 mt-1">
+                <select name="kalipGozleri" id="kalipGozleri" class="form-control" style="display: none;">
+                </select>
+              </div>
+              <hr>
+              <button type="button" id="btnKalipSokmeKaydet" data-sid="" class="btn btn-primary" disabled>Kaydet</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal fade" id="kaliplarModal" tabindex="-1" aria-labelledby="kaliplarModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Fırındaki Kalıplar</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            {% csrf_token %}
+            <select name="kalipSelect" id="kalipSelect" class="form-control">
+            <option value="">Kalıp Seçiniz</option>
+            </select>
+            <hr>
+            <button type="button" class="btn btn-primary" id="btnKalipUretim">Üretime Başla</button>
+            <input type="hidden" name="sId" id="sId" data-sid="0" style="display: none;">
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var silinenler = [];
+
+        // Define icon formatters
+        const handleIcon = (cell, formatterParams, onRendered) => "<i class='fa fa-circle'></i>";
+        var deleteIcon = (cell, formatterParams, onRendered) => "<i class='fa fa-trash'></i>";
+
+        const kalipIcon = (cell, formatterParams, onRendered) => { 
+            let data = cell.getData();
+            let kalip = data.KalipSokmeDurum;
+            let id = data.id;
+            let pKodu = data.PresKodu;
+            let kalipbutton = `<button type='button' class='btn btn-primary'>ÜRETİME BAŞLA</button>`
+            if (kalip==1) {
+            kalipbutton = `<button type='button' class='btn btn-danger' data-pkodu='${pKodu}' data-sid='${id}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
+            }
+            else if (kalip==2) {
+            kalipbutton = ``
+            }
+            else if (kalip==3) {
+            kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})'>ÜRETİME BAŞLA</button>`
+            }
+            else if (kalip==4) {
+            kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})' disabled>ÜRETİME BAŞLA</button>`
+            }
+            return kalipbutton;
+        };
+
+        // Fetch data from the server
+        // function fetchData() {
+        //     return $.ajax({
+        //         url: '/eksiparis_get_data',
+        //         method: 'GET',
+        //         dataType: 'json'
+        //     });
+        // };
+        var uretimiBitir = function(e) { // üretimi bitire tıklandığında modal açılacak ve bitirme sebebi işaretlenecek.
+            let pKodu = $(e).data('pkodu');
+            let sId = $(e).data('sid');
+            $('#uretimBitirmeSebebi').attr('data-pKodu', pKodu);
+            $('#btnKalipSokmeKaydet').attr('data-sid', sId);
+            $('#kalipSokmeModal').modal('show');
+        };
+
+        const presKoduChoices = [
+            { id: '1100-1', name: '1100-1' },
+            { id: '1100-2', name: '1100-2' },
+            { id: '1100-3', name: '1100-3' },
+            { id: '1600-1', name: '1600-1' },
+            { id: '1600-2', name: '1600-2' },
+            { id: '2750-1', name: '2750-1' },
+            { id: '4000-1', name: '4000-1' },
+            { id: '4500-1', name: '4500-1' },
+        ];
+
+        // Create columns dynamically based on fetched data
+        function createColumns(exist) {
+            let columns = [];
+            console.log(columns)
+            if (!exist) {
+                // Create columns for SiparisList
+                columns = [
+                    {formatter: "rownum", align: "center", width: 50},
+                    {title: "Move", field: "move", formatter: handleIcon, hozAlign: "center", width: 50, minWidth: 50, headerSort: false, frozen: true},
+                    {title: "Kart No", field: "KartNo", headerFilter: "input"},
+                    {title: "Profil No", field: "ProfilNo", headerFilter: "input"},
+                    {title: "Pres Kodu", field: "PresKodu", headerFilter: "input", editor: "select", editorParams: {
+                        values: presKoduChoices.reduce((acc, choice) => {
+                            acc[choice.id] = choice.name;
+                            return acc;
+                        }, {})
+                    }},
+                    {title: "Kalan Kg", field: "KalanKg", headerFilter: "input", editor:"input"},
+                    {title: "Kalan Adet", field: "KalanAdet", headerFilter: "input", editor:"input"},
+                    {title: "Planlanan Mm", field: "PlanlananMm", headerFilter: "input"},
+                    {title: "Mm", field: "Mm", headerFilter: "input"},
+                    {title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
+                    {title: "Billet Türü", field: "BilletTuru", headerFilter: "input", editor:"input"},
+                    {title: "Yüzey Özelliği", field: "YuzeyOzelligi", headerFilter: "input"},
+                    {title: "Termin", field: "SonTermin", headerFilter: "input", editor:"date"},
+                    {title: "Kondüsyon Türü", field: "KondusyonTuru", headerFilter: "input"},
+                    {title: "", field: "sil", formatter: deleteIcon, hozAlign: "center", width: 40, headerSort: false,cellClick: function (e, cell) {
+                        var row = cell.getRow();
+                        var ekNo = cell.getData().Kimlik;
+                        if (!silinenler.includes(ekNo)){
+                            silinenler.push(ekNo);
+                            row.getElement().style.backgroundColor= '#C08261'
+                            //üstünü çiz? silinenlerin rengi değişebilir?
+                        }
+                        else{
+                            var index = silinenler.indexOf(ekNo);
+                            if (index > -1){
+                                silinenler.splice(index,1);
+                                row.getElement().style.backgroundColor= ''
+                            }
+                        }
+                        //üstünü çiz kaydete bastıktan sonrra silinmesi için post
+                    }},
+                ];
+            } else {
+                // Create columns for EkSiparis
+                columns = [
+                    {formatter: "rownum", align: "center", width: 50},
+                    {title: "", field: "move", formatter: handleIcon, hozAlign: "center", width: 50, minWidth: 50, headerSort: false, frozen: true},
+                    {title: "Kart No", field: "KartNo", headerFilter: "input"},
+                    {title: "Profil No", field: "ProfilNo", headerFilter: "input"},
+                    {title: "Termin", field: "Termin", headerFilter: "input", editor:"date"},
+                    {title: "Kg", field: "EkKg", headerFilter: "input", editor:"input"},
+                    {title: "Adet", field: "EkAdet", headerFilter: "input", editor:"input"},
+                    {title: "Billet Türü", field: "EkBilletTuru", headerFilter: "input", editor:"input"},
+                    {title: "Yüzey Özelliği", field: "YuzeyOzelligi", headerFilter: "input"},
+                    {title: "Kondüsyon Türü", field: "KondusyonTuru", headerFilter: "input"},
+                    {title: "Firma Adı", field: "FirmaAdi", headerFilter: "input"},
+                    {title: "Son Termin", field: "SonTermin", headerFilter: "input"},
+                    {title: "", field: "sil", formatter: deleteIcon, hozAlign: "center", width: 40, headerSort: false,cellClick: function (e, cell) {
+                        var row = cell.getRow();
+                        var ekNo = cell.getData().id;
+                        if (!silinenler.includes(ekNo)){
+                            silinenler.push(ekNo);
+                            row.getElement().style.backgroundColor= '#C08261'
+                        }
+                        else{
+                            var index = silinenler.indexOf(ekNo);
+                            if (index > -1){
+                                silinenler.splice(index,1);
+                                row.getElement().style.backgroundColor= ''
+                            }
+                        }
+                    }},
+                    {formatter:kalipIcon, hozAlign:"center", title:"", headerSort:false, frozen:true},
+                ];
+            }
+
+            return columns;
+        }
+
+        var movedData = {}
+        // Initialize Tabulator
+        function initializeTable(columns) {
+            new Tabulator("#tabulator-table", {
+                height: "600px",
+                layout: "fitColumns",
+                columns:columns,
+                movableRows: true,
+                ajaxURL: "/eksiparis_get_data",
+                ajaxURLGenerator:function(url, config, params){
+                    return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+                },
+                progressiveLoad:"scroll",
+                paginationMode:"remote",
+                filterMode:"remote",
+                paginationSize:30,
+                popupContainer:true,
+                rowClick: function(e, row){
+                    console.log("row clicked")
+                }, 
+            });
+        }
+
+        $.ajax({
+            url: '/check_eksiparis',
+            method: 'GET',
+            success: function(response) {
+                const columns = createColumns(response.exists);
+                initializeTable(columns);
+            }
+        });
+        
+
+        // Save data back to the server
+        $('#save-btn').click(function () {
+            const table =  Tabulator.findTable('#tabulator-table')[0];
+            const data = table.getData();
+            const isSiparisList = data.length > 0 && data[0].hasOwnProperty('Kimlik');
+            $.ajax({
+                url: '/eksiparis_save_data/',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    data:data,
+                    isSiparisList: isSiparisList,
+                    silinenler: silinenler,
+                    fark: fark,
+                }),
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    alert('Data saved successfully!');
+                },
+                error: function (error) {
+                    alert('Error saving data: ' + error.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+{% endblock %}

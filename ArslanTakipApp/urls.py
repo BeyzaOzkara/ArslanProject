@@ -94,5 +94,9 @@ urlpatterns = [
     path('yudaDeleteCancel/<str:yId>', views.yudaDeleteCancel),
     path('uretimplanlama', views.UretimPlanlamaView.as_view()),
     path('get_data_by_press_code/', views.UretimPlanlamaView.as_view(), name='get_data_by_press_code'),
+    path('eksiparisdeneme/', login_required(views.eksiparisDenemeView.as_view())),
+    path('eksiparis_get_data/', views.eksiparis_get_data, name='eksiparis_get_data'),
+    path('eksiparis_save_data/', views.eksiparis_save_data, name='eksiparis_save_data'),
+    path('check_eksiparis/', views.check_eksiparis, name='check_eksiparis'),
 
 ]
