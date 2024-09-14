@@ -61,7 +61,7 @@ var tableLoc = new Tabulator("#location-tree-table", {
     ],
 });
 
-var loc =0; //Location içindeki kalıplar filtrele
+var loc =0; // Location içindeki kalıplar filtrele
 tableLoc.on("rowClick", (e, rows) =>{
     var rdata = rows.getData().id;
     var rda = JSON.stringify(rdata);
@@ -71,10 +71,9 @@ tableLoc.on("rowClick", (e, rows) =>{
     }
     else if(loc != rda){
         loc = rda;
-        tableKalip.setFilter([,
-                  { field: 'kalipVaris_id', type: '=', value: loc },
-               ]);
-    }
+        tableKalip.setFilter([{ field: 'kalipVaris_id', type: '=', value: loc }]);
+        tableHareket.setFilter([{ field: 'id', type: 'like', value: rda }]);
+    } 
 });
 
 tableLoc.on("headerClick", function(e, column){

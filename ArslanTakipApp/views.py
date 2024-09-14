@@ -325,7 +325,6 @@ def kalip_liste(request):
     lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
     lastData['data'] = g
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    print(data)
     return HttpResponse(data)
 
 def kalip_rapor(request):
@@ -386,7 +385,7 @@ def get_viewed_users(request, cId):
         return HttpResponseBadRequest("Invalid request method.")
 
 #gelen id başka konumların parenti ise altındakileri listele??
-def location_hareket(request):
+def location_hareket1(request):
     params = json.loads(unquote(request.GET.get('params')))
     size = params["size"]
     page = params["page"]
@@ -396,32 +395,37 @@ def location_hareket(request):
     lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
 
     if len(filter_list)>0:
-        hareketK = filter_list[0]['value']
-        hareketQuery = Hareket.objects.all()
-        location_list = Location.objects.values()
-        hareketQuery = list(hareketQuery.values().filter(kalipNo=hareketK).order_by("-hareketTarihi"))
-        kalip_l = list(DiesLocation.objects.filter(kalipNo=hareketK).values())
-        users = User.objects.values()
-        harAr = []
-        for h in hareketQuery:
-            har ={}
-            har['id'] = h['id']
-            har['kalipNo'] = kalip_l[0]['kalipNo']
-            try:
-                har['kalipKonum'] =list(location_list.filter(id=list(location_list.filter(id=h['kalipKonum_id']))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=h['kalipKonum_id']))[0]["locationName"]
-            except:
-                try:
-                    har['kalipKonum'] = list(location_list.filter(id=h['kalipKonum_id']))[0]["locationName"]
-                except:
-                    har['kalipKonum'] = ""
-            try:
-                har['kalipVaris'] =list(location_list.filter(id=list(location_list.filter(id=h['kalipVaris_id']))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
-            except:
-                har['kalipVaris'] = list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
-            har['kimTarafindan'] = get_user_full_name(int(h['kimTarafindan_id']))
-            har['hareketTarihi'] = format_date_time_s(h['hareketTarihi'])
-            harAr.append(har)
-        hareket_count = len(harAr)
+        for i in filter_list:
+            if i['type'] == '=':
+                hareketK = i['value']
+                hareketQuery = Hareket.objects.all()
+                location_list = Location.objects.values()
+                hareketQuery = list(hareketQuery.values().filter(kalipNo=hareketK).order_by("-hareketTarihi"))
+                kalip_l = list(DiesLocation.objects.filter(kalipNo=hareketK).values())
+                harAr = []
+                for h in hareketQuery:
+                    har ={}
+                    har['id'] = h['id']
+                    har['kalipNo'] = kalip_l[0]['kalipNo']
+                    try:
+                        har['kalipKonum'] =list(location_list.filter(id=list(location_list.filter(id=h['kalipKonum_id']))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=h['kalipKonum_id']))[0]["locationName"]
+                    except:
+                        try:
+                            har['kalipKonum'] = list(location_list.filter(id=h['kalipKonum_id']))[0]["locationName"]
+                        except:
+                            har['kalipKonum'] = ""
+                    try:
+                        har['kalipVaris'] =list(location_list.filter(id=list(location_list.filter(id=h['kalipVaris_id']))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
+                    except:
+                        har['kalipVaris'] = list(location_list.filter(id=h['kalipVaris_id']))[0]["locationName"]
+                    har['kimTarafindan'] = get_user_full_name(int(h['kimTarafindan_id']))
+                    har['hareketTarihi'] = format_date_time_s(h['hareketTarihi'])
+                    harAr.append(har)
+                hareket_count = len(harAr)
+            elif i['type'] == 'like': # konuma tıklandığındaki setfilter 
+                # tıklanan konum idsini alıp o konumdaki ve o konuma bağlı diğer konumlardaki bütün kalıp hareketlerini getir
+                konumId = i['value']
+
 
         lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
         lastData['data'] = list(harAr[(page-1)*size:page*size])
@@ -429,6 +433,77 @@ def location_hareket(request):
     #print(lastData)
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
+
+def filter_locations2(locations, target_id, depth=1):
+    filtered_ids = []
+    location_dict = {location['id']: location for location in locations}
+
+    def collect_ids(location_id, current_depth):
+        if current_depth < 0:
+            return
+        for location in locations:
+            if location['locationRelationID_id'] == int(location_id):
+                if location['isPhysical']:
+                    filtered_ids.append(location['id'])
+                collect_ids(location['id'], current_depth - 1)
+
+    collect_ids(target_id, depth)
+    print(f"ids: {filtered_ids}")
+    return filtered_ids
+
+def location_hareket(request):
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    size = params.get("size", 30)
+    page = params.get("page", 1)
+    filter_list = params.get("filter", [])
+
+    hareket_count = 0
+    lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
+    harAr = []
+
+    if filter_list:
+        for i in filter_list:
+            if i['type'] == '=':
+                hareketK = i['value']
+                hareket_query = Hareket.objects.filter(kalipNo=hareketK).select_related('kalipKonum', 'kalipVaris', 'kimTarafindan').order_by("-hareketTarihi")
+
+            elif i['type'] == 'like':
+                konumId = i['value']
+                locations = list(get_objects_for_user(request.user, "ArslanTakipApp.gonder_view_location", klass=Location).values().order_by('id'))
+                child_location_ids = filter_locations(locations, konumId, depth=4) # Adjust depth if needed
+                hareket_query = Hareket.objects.filter(
+                    kalipKonum_id__in=child_location_ids
+                ).select_related('kalipKonum', 'kalipVaris', 'kimTarafindan').order_by("-hareketTarihi")
+
+            hareket_count = hareket_query.count()
+            hareket_query = hareket_query[(page-1)*size:page*size]
+            for h in hareket_query:
+                kalipKonumName = ""
+                kalipVarisName = ""
+                
+                if h.kalipKonum:
+                    kalipKonumName = f"{h.kalipKonum.locationRelationID.locationName} <BR>└ {h.kalipKonum.locationName}" if h.kalipKonum.locationRelationID else h.kalipKonum.locationName
+
+                if h.kalipVaris:
+                    kalipVarisName = f"{h.kalipVaris.locationRelationID.locationName} <BR>└ {h.kalipVaris.locationName}" if h.kalipVaris.locationRelationID else h.kalipVaris.locationName
+
+                har = {
+                    'id': h.id,
+                    'kalipNo': h.kalipNo,
+                    'kalipKonum': kalipKonumName,
+                    'kalipVaris': kalipVarisName,
+                    'kimTarafindan': get_user_full_name(h.kimTarafindan_id),
+                    'hareketTarihi': format_date_time_s(h.hareketTarihi),
+                }
+                harAr.append(har)
+    
+    paginated_data = harAr
+    lastData = {
+        'last_page': math.ceil(hareket_count/size),
+        'data': paginated_data
+    }
+
+    return JsonResponse(lastData)
 
 def kalip(request):
     return render(request, 'ArslanTakipApp/kalip.html')
@@ -1338,52 +1413,55 @@ def eksiparis_get_data(request):
     user_pres_dict = {1: '4500-1', 2: '4500-1'}
     pres_grubu = user_pres_dict[user_id]
     
-    siparis_query = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE'])
+    siparis_query = SiparisList.objects.using('dies').filter(
+        Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']
+    ).only('Kimlik', 'Kg', 'PlanlananMm', 'Siparismm', 'FirmaAdi', 'KondusyonTuru', 'SonTermin')
+
     eksiparis_query = EkSiparis.objects.all()
     pres_eksiparis = eksiparis_query.filter(PresGrubu=pres_grubu, Aktif=True).exclude(MsSilindi=True)
 
     if pres_eksiparis.exists():
         pres_eksiparis_paginate = list(pres_eksiparis.values()[offset:limit])
+        siparis_kimliks = {e['Kimlik'] for e in pres_eksiparis_paginate}
+        siparis_dict = {s.Kimlik: s for s in siparis_query.filter(Kimlik__in=siparis_kimliks)}
+
         for e in pres_eksiparis_paginate:
-            try:
-                if siparis_query.filter(Kimlik = e['Kimlik']).exists() == False :
-                    a = eksiparis_query.get(id=e['id'])
-                    if a.MsSilindi != True:
-                        a.MsSilindi = True
-                        a.save()
-                    pres_eksiparis_paginate.remove(e)
-                    continue
-                sip = siparis_query.get(Kimlik=e['Kimlik'])
-                e['KartNo']= f"{e['KartNo']}-{e['EkNo']}"
-                e['Termin']= format_date(e['Termin'])
-                e['EkKg']= e['Kg']
-                e['EkAdet']= e['Adet']
-                e['EkBilletTuru']= e['BilletTuru']
-                e['KalanSiparisKg']= sip.Kg
-                e['PlanlananMm']= sip.PlanlananMm
-                e['Mm']= sip.Siparismm
-                e['FirmaAdi']= sip.FirmaAdi
-                e['KondusyonTuru']= sip.KondusyonTuru
-                e['SonTermin']= format_date(sip.SonTermin)
-                e['KalipSokmeDurum']= kalipPresCheck(e['id'])
-                e['UretimDurum'] = checkKalip(e['id'])
-            except SiparisList.DoesNotExist:
-                # Handle case where SiparisList entry does not exist
-                pass
+            sip = siparis_dict.get(e['Kimlik'])
+            if not sip:
+                a = eksiparis_query.get(id=e['id'])
+                if not a.MsSilindi:
+                    a.MsSilindi = True
+                    a.save()
+                pres_eksiparis_paginate.remove(e)
+                continue
+
+            e.update({
+                'KartNo': f"{e['KartNo']}-{e['EkNo']}",
+                'Termin': format_date(e['Termin']),
+                'KalanSiparisKg': sip.Kg,
+                'PlanlananMm': sip.PlanlananMm,
+                'Mm': sip.Siparismm,
+                'FirmaAdi': sip.FirmaAdi,
+                'KondusyonTuru': sip.KondusyonTuru,
+                'SonTermin': format_date(sip.SonTermin),
+                'KalipSokmeDurum': kalipPresCheck(e['id']),
+                'UretimDurum': checkKalip(e['id']),
+            })
     else:
         pres_eksiparis = siparis_query.filter(PresKodu=pres_grubu)
-        pres_eksiparis_paginate= list(pres_eksiparis.values()[offset:limit])
+        pres_eksiparis_paginate = list(pres_eksiparis.values()[offset:limit])
         for s in pres_eksiparis_paginate:
-            s['SonTermin']= format_date(s['SonTermin'])
-            s['KalanKg']= s['Kg']
-            s['KalanAdet']= s['Adet']
-            s['Mm']= s['Siparismm']
+            s.update({
+                'SonTermin': format_date(s['SonTermin']),
+                'KalanKg': s['Kg'],
+                'KalanAdet': s['Adet'],
+                'Mm': s['Siparismm'],
+            })
 
     ek_count = pres_eksiparis.count()
     last_data = {'last_page': math.ceil(ek_count / size), 'data': pres_eksiparis_paginate}
 
     return JsonResponse(last_data, safe=False, json_dumps_params={'indent': 2})
-
     # return JsonResponse(data, safe=False)
 
 def eksiparis_save_data(request):
