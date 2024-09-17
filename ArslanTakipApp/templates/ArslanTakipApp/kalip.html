@@ -524,11 +524,9 @@ function updateInfoElements(kal) {
         "infoSonTenTarihi": kal.SonTeniferTarih, "infoTeniferNo": kal.TeniferNo, "infoCap": kal.Capi + " mm", "infoPaket": kal.PaketBoyu + " mm",
     };
 
-    for (const key in elementMappings) {
-        if (elementMappings.hasOwnProperty(key)) {
-            document.getElementById(key).innerText = elementMappings[key];
-        }
-    }
+    Object.entries(elementMappings).forEach(([selector, value]) => {
+        document.querySelector("#" + selector).textContent = value;
+    });
 
     const rdizin = kal.ResimDizini.replace(/\s/g, '') + "Teknik1.jpg";
     const rdizin2 = kal.ResimDizini.replace(/\s/g, '') + "Teknik2.jpg";
@@ -677,11 +675,16 @@ function createFileLink(cf) {
 };
 
 function createImagePreview(cf) {
-    var format_array = ["img", "jpg", "PNG", "png"]
+    var format_array = ["img", "jpg", "PNG", "png"];
+    var video_format_array = ["mp4"];
     var file_format = /[^.]*$/.exec(cf.File)[0];
     var fileHtml ="";
     if (format_array.indexOf(file_format) > -1) {
         fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
+    }
+    if (video_format_array.indexOf(file_format) > -1) {
+        console.log("burda")
+        fileHtml = `<div class="gallery__item"><source src="/media/${cf.File}" type="video/${file_format}"></div>`;
     }
     return fileHtml;
 }
@@ -795,7 +798,7 @@ function createReplyElement(reply) {
     var isViewed = reply.Is_Viewed;
     const readElement = createReadButton(reply.id);
     let iconColor = "black";
-    if (reply.All_Viewed) {color = "#4FB6EC"}
+    if (reply.All_Viewed) {color = "#4FB6EC"};
     const iconElement = $(`<span><a role="button" class="btn btn-light btn-sm" onclick="iconClick(${reply.id})" data-toggle="tooltip" title="Görüntüleyenler" href=""><i class="fa fa-check iconelement" style="color:${iconColor}" name="iconElement" aria-hidden="true"></i></a></span>`);
     var elementToAppend = isViewed ? iconElement : readElement;
     replyElement.append(elementToAppend, createReplyButton(reply.id));
