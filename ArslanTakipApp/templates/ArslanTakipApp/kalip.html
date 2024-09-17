@@ -684,7 +684,9 @@ function createImagePreview(cf) {
     }
     if (video_format_array.indexOf(file_format) > -1) {
         console.log("burda")
-        fileHtml = `<div class="gallery__item"><source src="/media/${cf.File}" type="video/${file_format}"></div>`;
+        fileHtml = `<div class="gallery__item">
+            <video width="320" height="240" controls>
+            <source src="/media/${cf.File}" type="video/${file_format}"></video></div>`;
     }
     return fileHtml;
 }
