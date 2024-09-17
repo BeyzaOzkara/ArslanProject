@@ -576,6 +576,8 @@ var tableKalip = new Tabulator("#kalipListe-table", {
                 document.getElementById("presURaporListe-table").style.display = 'block';
                 kal = cell.getData();
                 updateInfoElements(kal);
+                document.getElementById("dieComment").style.display = 'none';
+                document.getElementById("diePostComment").style.display = 'none';
             },
             },
             {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
