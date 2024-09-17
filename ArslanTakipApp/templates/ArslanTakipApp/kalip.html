@@ -683,9 +683,7 @@ function createImagePreview(cf) {
         fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
     }
     if (video_format_array.indexOf(file_format) > -1) {
-        console.log("burda")
-        fileHtml = `<div class="gallery__item">
-            <video width="320" height="240" controls>
+        fileHtml = `<div class="gallery__item"><video width="320" height="240" controls>
             <source src="/media/${cf.File}" type="video/${file_format}"></video></div>`;
     }
     return fileHtml;
@@ -983,7 +981,9 @@ function yorumPaylas(kId="", cId=""){
             processData: false,
             success: function(response) {
                 alert("Paylaşım başarılı.");
-                $('#yorumText').summernote('code', '');
+                $(`#yorumText${cId}`).summernote('code', '');
+                $(`#fileTitles${cId}`).empty();
+                $(`#fileInput${cId}`).empty();
                 getComments(JSON.parse(response.data));
             },
             error: function(response) {
