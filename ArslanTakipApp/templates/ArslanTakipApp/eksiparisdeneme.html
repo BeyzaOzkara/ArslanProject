@@ -94,20 +94,20 @@
             let pKodu = data.PresKodu;
             let kalipbutton = `<button type='button' class='btn btn-primary'>ÜRETİME BAŞLA</button>`
             if (kalip==1) {
-            kalipbutton = `<button type='button' class='btn btn-danger' data-pkodu='${pKodu}' data-sid='${id}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
+                kalipbutton = `<button type='button' class='btn btn-danger' data-pkodu='${pKodu}' data-sid='${id}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
             }
             else if (kalip==2) {
-            kalipbutton = ``
+                kalipbutton = ``
             }
             else if (kalip==3) {
-            kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})'>ÜRETİME BAŞLA</button>`
+                kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})'>ÜRETİME BAŞLA</button>`
             }
             else if (kalip==4) {
-            kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})' disabled>ÜRETİME BAŞLA</button>`
+                kalipbutton = `<button type='button' class='btn btn-primary' onclick='uretimeBasla(${id})' disabled>ÜRETİME BAŞLA</button>`
             }
             return kalipbutton;
         };
-
+        
         // Fetch data from the server
         // function fetchData() {
         //     return $.ajax({
@@ -138,12 +138,10 @@
         // Create columns dynamically based on fetched data
         function createColumns(exist) {
             let columns = [];
-            console.log(columns)
             if (!exist) {
                 // Create columns for SiparisList
                 columns = [
                     {formatter: "rownum", align: "center", width: 50},
-                    {title: "Move", field: "move", formatter: handleIcon, hozAlign: "center", width: 50, minWidth: 50, headerSort: false, frozen: true},
                     {title: "Kart No", field: "KartNo", headerFilter: "input"},
                     {title: "Profil No", field: "ProfilNo", headerFilter: "input"},
                     {title: "Pres Kodu", field: "PresKodu", headerFilter: "input", editor: "select", editorParams: {
@@ -166,8 +164,7 @@
                         var ekNo = cell.getData().Kimlik;
                         if (!silinenler.includes(ekNo)){
                             silinenler.push(ekNo);
-                            row.getElement().style.backgroundColor= '#C08261'
-                            //üstünü çiz? silinenlerin rengi değişebilir?
+                            row.getElement().style.backgroundColor= '#C08261';
                         }
                         else{
                             var index = silinenler.indexOf(ekNo);
@@ -183,7 +180,6 @@
                 // Create columns for EkSiparis
                 columns = [
                     {formatter: "rownum", align: "center", width: 50},
-                    {title: "", field: "move", formatter: handleIcon, hozAlign: "center", width: 50, minWidth: 50, headerSort: false, frozen: true},
                     {title: "Kart No", field: "KartNo", headerFilter: "input"},
                     {title: "Profil No", field: "ProfilNo", headerFilter: "input"},
                     {title: "Termin", field: "Termin", headerFilter: "input", editor:"date"},
@@ -224,7 +220,7 @@
                 layout: "fitColumns",
                 columns:columns,
                 movableRows: true,
-                ajaxURL: "/eksiparis_get_data",
+                ajaxURL: "/uretim_kalip_firin",
                 ajaxURLGenerator:function(url, config, params){
                     return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
                 },
@@ -262,7 +258,7 @@
                     data:data,
                     isSiparisList: isSiparisList,
                     silinenler: silinenler,
-                    fark: fark,
+                    // fark: fark,
                 }),
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'

@@ -98,5 +98,11 @@ urlpatterns = [
     path('eksiparis_get_data/', views.eksiparis_get_data, name='eksiparis_get_data'),
     path('eksiparis_save_data/', views.eksiparis_save_data, name='eksiparis_save_data'),
     path('check_eksiparis/', views.check_eksiparis, name='check_eksiparis'),
+    path('presuretimtakip/', login_required(views.PresUretimTakipView.as_view())),
+    path('uretim_kalip_firin', views.uretim_kalip_firin, name='uretim_kalip_firin'),
+    path('firin_kalip_list/<str:pNo>/', views.firin_kalip_list, name='firin_kalip_list'),
+    path('presuretimbasla', views.presuretimbasla, name='presuretimbasla'),
+    path('presuretimbitir', views.presuretimbitir, name='presuretimbitir'),
+    path('uretim_get_locations', views.uretim_get_locations, name='uretimgetlocations'),
 
 ]

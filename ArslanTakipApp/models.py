@@ -187,10 +187,23 @@ class SiparisList(models.Model):
     Profil_Gramaj = models.FloatField(null=True)
     YuzeyOzelligi = models.CharField(null=True)
 
-
     class Meta:
         managed = False
         db_table = 'View051_ProsesDepoListesi'
+
+class PresUretimTakip(models.Model): # pres operatörü, şarj no vs eklenecek
+    siparis_kimlik = models.IntegerField(null=True, blank=True)
+    kalip_no = models.CharField(null=True, blank=True)
+    pres_kodu = models.CharField(null=True, blank=True)
+    baslangic_datetime = models.DateTimeField(null=True, blank=True)
+    bitis_datetime = models.DateTimeField(null=True, blank=True)
+    finish_reason = models.CharField(null=True, blank=True)
+    destination = models.ForeignKey(Location, on_delete=models.DO_NOTHING, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "PresUretimTakip"
+        verbose_name_plural = "PresUretimTakipler"
+
 
 class EkSiparis(models.Model):
     EkNo = models.IntegerField(null=True)
@@ -312,7 +325,6 @@ class YudaOnayDurum(models.Model):
     class Meta:
         managed = False
         db_table = 'View1_YudaDurum4'
-
 
 class Yuda(models.Model):
     """ IstekYapanBolum = models.CharField(null=True, blank=True)

@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'adminlte3',
     'adminlte3_theme',
     'tabulator',
-    'mailer',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -176,8 +175,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # email configs
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = "mailer.backend.DbBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = "mailer.backend.DbBackend"
 EMAIL_HOST = 'webmail.arslanaluminyum.com'
 EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
 EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
