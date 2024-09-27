@@ -250,10 +250,10 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
             c = kal.get(KalipNo=b['kalipNo']).Hatali
             if c==1:
                 b['Hatali'] = 1
-        #print(a)
+
         kalip_count = query.count()
         lastData= {'last_page': math.ceil(kalip_count/size), 'data': [], 'sayi': sayi}
-        lastData['data'] = a #list(query.values()[(page-1)*size:page*size])
+        lastData['data'] = a
         data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
@@ -288,7 +288,6 @@ def kalip_liste(request):
     query = query.filter(**q).order_by('-UretimTarihi') 
 
     g = list(query.values()[offset:limit])
-
     for c in g:
         if c['UretimTarihi'] != None:
             c['UretimTarihi'] = format_date(c['UretimTarihi'])
@@ -302,6 +301,7 @@ def kalip_liste(request):
             c['Hatali'] = 0
         elif c['Hatali'] == 0:
             c['Hatali'] = 1
+
         try: 
             b = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
         except:
@@ -312,7 +312,16 @@ def kalip_liste(request):
             hareket.kimTarafindan_id = 1
             hareket.save()
             print("Hareket saved")
-        #print(b)
+
+        if c['Silindi'] == 1:
+            print(f"kalip: {c['KalipNo']}")
+            k = DiesLocation.objects.get(kalipNo = c['KalipNo'])
+            Hareket.objects.create(
+                kalipKonum_id=k.kalipVaris.id,
+                kalipVaris_id=1134, #HURDA
+                kalipNo=c['KalipNo'],
+                kimTarafindan_id=request.user.id
+            )
         try:
             c['kalipLocation'] = list(location_list.filter(id=list(location_list.filter(id=b))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=b))[0]["locationName"]
         except:
@@ -1438,7 +1447,6 @@ def uretim_kalip_firin(request):
             p['KalipUretimDurumu'] = 1  # Üretimi Bitir
             p['KalipNo'] = active_production_map.get(p['Kimlik'])
             uretim = True
-   
     total_count = pres_siparis.count()
     last_data = {'last_page': math.ceil(total_count / size), 'data': pres_data_paginate, 'uretim':uretim}
     return JsonResponse(last_data, safe=False, json_dumps_params={'indent': 2})
@@ -1452,19 +1460,19 @@ def presuretimbasla(request):
 
             siparis = SiparisList.objects.using('dies').filter(Kimlik=siparis_kimlik).first()
             if siparis:
-                PresUretimTakip.objects.create(
-                    siparis_kimlik = siparis_kimlik,
-                    kalip_no = kalip_no,
-                    baslangic_datetime = datetime.datetime.now(),
-                    pres_kodu = siparis.PresKodu,
-                )
+                # PresUretimTakip.objects.create(
+                #     siparis_kimlik = siparis_kimlik,
+                #     kalip_no = kalip_no,
+                #     baslangic_datetime = datetime.datetime.now(),
+                #     pres_kodu = siparis.PresKodu,
+                # )
                 kalip = DiesLocation.objects.get(kalipNo=kalip_no)
-                Hareket.objects.create(
-                    kalipKonum_id=kalip.kalipVaris.id,
-                    kalipVaris_id=presler[siparis.PresKodu],
-                    kalipNo=kalip_no,
-                    kimTarafindan_id=request.user.id
-                )
+                # Hareket.objects.create(
+                #     kalipKonum_id=kalip.kalipVaris.id,
+                #     kalipVaris_id=presler[siparis.PresKodu],
+                #     kalipNo=kalip_no,
+                #     kimTarafindan_id=request.user.id
+                # )
                 return JsonResponse({"message": "Üretim başarıyla başlatıldı!"})
             else:
                 return JsonResponse({"message": "Sipariş bulunamadı."})
@@ -1489,16 +1497,16 @@ def presuretimbitir(request):
             takip = PresUretimTakip.objects.filter(siparis_kimlik=siparis_kimlik, pres_kodu=pres_kodu).first()
             if takip:
                 kalip = DiesLocation.objects.get(kalipNo=takip.kalip_no)
-                Hareket.objects.create(
-                    kalipKonum_id=kalip.kalipVaris.id,
-                    kalipVaris_id=presler[pres_kodu],
-                    kalipNo=takip.kalip_no,
-                    kimTarafindan_id=request.user.id
-                )
+                # Hareket.objects.create(
+                #     kalipKonum_id=kalip.kalipVaris.id,
+                #     kalipVaris_id=presler[pres_kodu],
+                #     kalipNo=takip.kalip_no,
+                #     kimTarafindan_id=request.user.id
+                # )
                 takip.bitis_datetime = datetime.datetime.now()
                 takip.finish_reason = reason
                 takip.destination_id = destination
-                takip.save()
+                # takip.save()
             return JsonResponse({"message": "Üretim başarıyla bitirildi!"})
         except Exception as e:
             print(f"Error: {e}")
@@ -1903,7 +1911,7 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
                     hareket.kalipVaris_id = gonder.id
                     hareket.kalipNo = kalipNo
                     hareket.kimTarafindan_id = request.user.id
-                    hareket.save()
+                    # hareket.save()
                     response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
                 else:
                     response = JsonResponse({"error": "Kalıp fırına gönderilemedi."}, status=400)
@@ -1918,7 +1926,7 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
                         hareket.kalipVaris_id = gonder.id
                         hareket.kalipNo = kalipNo
                         hareket.kimTarafindan_id = request.user.id
-                        hareket.save()
+                        # hareket.save()
                         response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
                     else:
                         response = JsonResponse({"error": "Kalıp fırına gönderilemedi."}, status=400)

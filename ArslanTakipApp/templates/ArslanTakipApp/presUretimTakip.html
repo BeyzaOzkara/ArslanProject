@@ -234,6 +234,7 @@
         },
         ajaxResponse: function(url, params, response) {
             uretimFlag = response.uretim;
+            console.log(uretimFlag)
             return response;
         },
         progressiveLoad:"scroll",
@@ -255,7 +256,7 @@
             {title:"Billet Türü", field:"BilletTuru", headerFilter:"input"},
             {title:"Yüzey Özelliği", field:"YuzeyOzelligi", headerFilter:"input"},
             {title:"Kondüsyon", field:"KondusyonTuru", headerFilter:"input"},
-            {title: "Kalıp No", field: "KalipNo", 
+            {title: "Kalıp No", field: "KalipNo", //editor:"list", 
                 editor: function(cell) {
                     return uretimFlag ? false : "list"; // Disable editor if uretim is true
                 },
