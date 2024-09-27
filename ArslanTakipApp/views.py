@@ -1417,7 +1417,7 @@ def uretim_kalip_firin(request):
     tum_siparis = SiparisList.objects.using('dies').filter(
         Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']
     ).only('Kimlik', 'Kg', 'PlanlananMm', 'Siparismm', 'FirmaAdi', 'KondusyonTuru', 'SonTermin')
-    pres_siparis = tum_siparis.filter(PresKodu=pres_grubu, ProfilNo__in=profil_list)
+    pres_siparis = tum_siparis.filter(PresKodu=pres_grubu, ProfilNo__in=profil_list).order_by('SonTermin')
     pres_data_paginate = list(pres_siparis.values()[offset:limit])
 
     location = DiesLocation.objects.filter(kalipVaris_id=pres).first()

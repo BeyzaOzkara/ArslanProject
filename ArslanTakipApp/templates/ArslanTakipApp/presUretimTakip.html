@@ -98,40 +98,6 @@
         })
     };
 
-    // function uretimiBitir(button) {
-    //     const siparisKimlik = $(button).data('sId');
-    //     const presKodu = $(button).data('pKodu');
-
-    //     $('#finishModal').modal('show');
-    //     $('#confirmFinish').off('click').on('click', function() {
-    //         const reason = $('#finishReason').val();
-    //         const destination = $('#finishDestination').val();
-
-    //         // Send the data to the server
-    //         $.ajax({
-    //             url: '/presuretimbitir',
-    //             type: 'POST',
-    //             data: JSON.stringify({
-    //                 kimlik: siparisKimlik,
-    //                 presKodu: presKodu,
-    //                 reason: reason,
-    //                 destination: destination
-    //             }),
-    //             contentType: 'application/json',
-    //             headers: {
-    //                 'X-CSRFToken': '{{ csrf_token }}'
-    //             },
-    //             success: function(response) {
-    //                 alert('Success: ' + response.message);
-    //                 window.location.reload();
-    //             },
-    //             error: function(error) {
-    //                 console.error('Error:', error);
-    //             }
-    //         });
-    //     });
-    // }
-
     function uretimiBitir(button) {
         const siparisKimlik = $(button).data('sid');
         const presKodu = $(button).data('pkodu');
@@ -287,9 +253,8 @@
             {title:"Kalan Kg", field:"Kg", headerFilter:"input"},
             {title:"Kalan Adet", field:"Adet", headerFilter:"input"},
             {title:"Billet Türü", field:"BilletTuru", headerFilter:"input"},
-            {title:"Billet Türü", field:"BilletTuru", headerFilter:"input"},
             {title:"Yüzey Özelliği", field:"YuzeyOzelligi", headerFilter:"input"},
-            {title:"Kondüsyon", field:"KondusyonTuru", headerFilter:"input", visible:false},
+            {title:"Kondüsyon", field:"KondusyonTuru", headerFilter:"input"},
             {title: "Kalıp No", field: "KalipNo", 
                 editor: function(cell) {
                     return uretimFlag ? false : "list"; // Disable editor if uretim is true
