@@ -302,26 +302,6 @@ def kalip_liste(request):
         elif c['Hatali'] == 0:
             c['Hatali'] = 1
 
-        try: 
-            b = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
-        except:
-            b = 48
-            hareket = Hareket()
-            hareket.kalipVaris_id = 48
-            hareket.kalipNo = c['KalipNo']
-            hareket.kimTarafindan_id = 1
-            hareket.save()
-            print("Hareket saved")
-
-        if c['Silindi'] == 1:
-            print(f"kalip: {c['KalipNo']}")
-            k = DiesLocation.objects.get(kalipNo = c['KalipNo'])
-            Hareket.objects.create(
-                kalipKonum_id=k.kalipVaris.id,
-                kalipVaris_id=1134, #HURDA
-                kalipNo=c['KalipNo'],
-                kimTarafindan_id=request.user.id
-            )
         try:
             c['kalipLocation'] = list(location_list.filter(id=list(location_list.filter(id=b))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=b))[0]["locationName"]
         except:
@@ -1460,19 +1440,19 @@ def presuretimbasla(request):
 
             siparis = SiparisList.objects.using('dies').filter(Kimlik=siparis_kimlik).first()
             if siparis:
-                # PresUretimTakip.objects.create(
-                #     siparis_kimlik = siparis_kimlik,
-                #     kalip_no = kalip_no,
-                #     baslangic_datetime = datetime.datetime.now(),
-                #     pres_kodu = siparis.PresKodu,
-                # )
+                PresUretimTakip.objects.create(
+                    siparis_kimlik = siparis_kimlik,
+                    kalip_no = kalip_no,
+                    baslangic_datetime = datetime.datetime.now(),
+                    pres_kodu = siparis.PresKodu,
+                )
                 kalip = DiesLocation.objects.get(kalipNo=kalip_no)
-                # Hareket.objects.create(
-                #     kalipKonum_id=kalip.kalipVaris.id,
-                #     kalipVaris_id=presler[siparis.PresKodu],
-                #     kalipNo=kalip_no,
-                #     kimTarafindan_id=request.user.id
-                # )
+                Hareket.objects.create(
+                    kalipKonum_id=kalip.kalipVaris.id,
+                    kalipVaris_id=presler[siparis.PresKodu],
+                    kalipNo=kalip_no,
+                    kimTarafindan_id=request.user.id
+                )
                 return JsonResponse({"message": "Üretim başarıyla başlatıldı!"})
             else:
                 return JsonResponse({"message": "Sipariş bulunamadı."})
@@ -1497,16 +1477,16 @@ def presuretimbitir(request):
             takip = PresUretimTakip.objects.filter(siparis_kimlik=siparis_kimlik, pres_kodu=pres_kodu).first()
             if takip:
                 kalip = DiesLocation.objects.get(kalipNo=takip.kalip_no)
-                # Hareket.objects.create(
-                #     kalipKonum_id=kalip.kalipVaris.id,
-                #     kalipVaris_id=presler[pres_kodu],
-                #     kalipNo=takip.kalip_no,
-                #     kimTarafindan_id=request.user.id
-                # )
+                Hareket.objects.create(
+                    kalipKonum_id=kalip.kalipVaris.id,
+                    kalipVaris_id=presler[pres_kodu],
+                    kalipNo=takip.kalip_no,
+                    kimTarafindan_id=request.user.id
+                )
                 takip.bitis_datetime = datetime.datetime.now()
                 takip.finish_reason = reason
                 takip.destination_id = destination
-                # takip.save()
+                takip.save()
             return JsonResponse({"message": "Üretim başarıyla bitirildi!"})
         except Exception as e:
             print(f"Error: {e}")
