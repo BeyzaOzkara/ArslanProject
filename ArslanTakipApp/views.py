@@ -50,6 +50,7 @@ from django.utils.dateformat import DateFormat
 from mailer import send_mail
 from django.db.models.functions import ExtractHour, ExtractMinute
 from .email_utils import check_new_emails, send_email
+from django.core.cache import cache
 # Create your views here.
 
 
@@ -1420,18 +1421,23 @@ def uretim_kalip_firin(request):
     active_production_map = {
         p.siparis_kimlik: p.kalip_no for p in active_production
     }
+    active_profil_nos = set(KalipMs.objects.using('dies').filter(
+        KalipNo__in=[active_production_map.get(kimlik) for kimlik in active_siparis_ids]
+    ).values_list('ProfilNo', flat=True))
+    uretim = False
     for p in pres_data_paginate:
         p['SonTermin'] = format_date(p['SonTermin'])
         p['KalipUretimDurumu'] = 3  # Buton yok
-        uretim = False
         if not active_siparis_ids: # presin içinde klaıp var mı onu kontrol et varsa boş buton olacak
-            p['KalipUretimDurumu'] = 2  # Üretime Başla
+            p['KalipUretimDurumu'] = 2  # Üretime Başla 
             if location:
                 p['KalipUretimDurumu'] = 3
         elif p['Kimlik'] in active_siparis_ids:
             p['KalipUretimDurumu'] = 1  # Üretimi Bitir
             p['KalipNo'] = active_production_map.get(p['Kimlik'])
             uretim = True
+        elif p['ProfilNo'] in active_profil_nos:
+            p['KalipUretimDurumu'] = 4 
     total_count = pres_siparis.count()
     last_data = {'last_page': math.ceil(total_count / size), 'data': pres_data_paginate, 'uretim':uretim}
     return JsonResponse(last_data, safe=False, json_dumps_params={'indent': 2})
@@ -1467,8 +1473,20 @@ def presuretimbasla(request):
     return JsonResponse({'message': 'Geçersiz istek metodu.'})
 
 def uretim_get_locations(request):
-    location_tree = location_list(request.user)
-    return JsonResponse(location_tree, safe=False)
+    cache_key = f'location_data_{request.user.id}'
+    data = cache.get(cache_key)
+
+    if data is None:  # If not in cache, fetch from DB
+        location_tree = location_list(request.user)
+        reasons = list(PresUretimRaporu.objects.using('dies')
+                       .exclude(HataTuru=None)
+                       .values_list('HataTuru', flat=True)
+                       .distinct())
+
+        # Cache the data for a reasonable duration
+        cache.set(cache_key, {"locations": location_tree, "reasons": reasons}, timeout=60*5)
+
+    return JsonResponse(data, safe=False)
 
 def presuretimbitir(request):
     if request.method == "POST":

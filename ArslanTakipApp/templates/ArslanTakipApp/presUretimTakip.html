@@ -20,7 +20,7 @@
 {% block content %}
 <div class="container col-12">
     <div id="siparis-table"></div>
-    <div class="modal fade" id="startModal" tabindex="-1" role="dialog" aria-labelledby="finishModalLabel" aria-hidden="true">
+    <div class="modal fade" id="startModal" tabindex="-1" role="dialog" aria-labelledby="startModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -30,7 +30,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    
+                    <div class="form-group">
+                        
+                    </div>
                 </div>
                 <div class="modal-footer"></div>
             </div>
@@ -46,21 +48,20 @@
               </button>
             </div>
             <div class="modal-body">
-              <div class="form-group">
-                <label for="finishReason">Kalıp Sökme Nedeni</label>
-                <textarea class="form-control" id="finishReason" required></textarea>
-              </div>
-              <!-- <div class="form-group">
-                <label for="finishDestination">Kalıp nereye gitsin?</label>
-                <input type="text" class="form-control" id="finishDestination" required />
-              </div> -->
-              <div class="form-group">
-                <label for="finishDestination">Kalıp nereye gitsin?</label>
-                <select class="form-control" id="finishDestination" required>
-                  <option value="">Konum seçiniz...</option>
-                  <!-- Locations will be populated here -->
-                </select>
-              </div>
+                <div class="form-group">
+                    <select name="reasonSelect" id="reasonSelect" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="finishReason">Açıklama</label>
+                    <textarea class="form-control" id="finishReason" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="finishDestination">Kalıp nereye gitsin?</label>
+                    <select class="form-control" id="finishDestination" required>
+                    <option value="">Konum seçiniz...</option>
+                    <!-- Locations will be populated here -->
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
@@ -127,8 +128,9 @@
         $.ajax({
             url: '/uretim_get_locations',
             type: 'GET',
-            success: function(locations) {
-                populateLocationSelect(locations);
+            success: function(response) {
+                populateLocationSelect(response.locations);
+                populateReasonSelect(response.reasons);
             },
             error: function(error) {
                 console.error('Error fetching locations:', error);
@@ -183,6 +185,15 @@
 
         buildOptions(locationTree, select);
     };
+
+    function populateReasonSelect(reasons) {
+        const select = $('#reasonSelect');
+        select.empty();
+        select.append('<option value="">Neden Seçiniz...</option>'); 
+        reasons.forEach(reason => {
+            select.append(`<option value="${reason}">${reason}</option>`);
+        });
+    }
 
     var headerMenu = function(){
         var menu = [];
@@ -242,6 +253,9 @@
         else if (kalip==2) {
             kalipbutton = `<button type='button' class='btn btn-primary' onclick='validateAndStart(this)'>ÜRETİME BAŞLA</button>`
         }
+        else if (kalip==4) {
+            kalipbutton = `<button type='button' class='btn btn-primary' onclick=''>ÜRETİME DEVAM</button>`
+        }
         return kalipbutton;
     };
     var siparisTable = new Tabulator("#siparis-table", {
@@ -254,7 +268,7 @@
         },
         ajaxResponse: function(url, params, response) {
             uretimFlag = response.uretim;
-            console.log(uretimFlag)
+            console.log("BURDA: " + uretimFlag)
             return response;
         },
         progressiveLoad:"scroll",

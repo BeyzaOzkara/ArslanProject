@@ -199,6 +199,7 @@ class PresUretimTakip(models.Model): # pres operatörü, şarj no vs eklenecek
     bitis_datetime = models.DateTimeField(null=True, blank=True)
     finish_reason = models.CharField(null=True, blank=True)
     destination = models.ForeignKey(Location, on_delete=models.DO_NOTHING, null=True, blank=True)
+    billet_boy_adet = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = "PresUretimTakip"
