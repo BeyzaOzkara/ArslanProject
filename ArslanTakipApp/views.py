@@ -302,6 +302,11 @@ def kalip_liste(request):
         elif c['Hatali'] == 0:
             c['Hatali'] = 1
 
+        try: 
+            b = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
+        except:
+            b = 48
+
         try:
             c['kalipLocation'] = list(location_list.filter(id=list(location_list.filter(id=b))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=b))[0]["locationName"]
         except:
