@@ -129,7 +129,7 @@
             url: '/uretim_get_locations',
             type: 'GET',
             success: function(response) {
-                console.log(response)
+                console.log(response);
                 populateLocationSelect(response.locations);
                 populateReasonSelect(response.reasons);
             },

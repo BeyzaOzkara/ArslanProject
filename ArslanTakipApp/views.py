@@ -1436,7 +1436,7 @@ def uretim_kalip_firin(request):
             p['KalipUretimDurumu'] = 1  # Üretimi Bitir
             p['KalipNo'] = active_production_map.get(p['Kimlik'])
             uretim = True
-        elif p['ProfilNo'] in active_profil_nos:
+        elif p['ProfilNo'] in active_profil_nos and p['Kimlik'] not in active_siparis_ids:
             p['KalipUretimDurumu'] = 4 
     total_count = pres_siparis.count()
     last_data = {'last_page': math.ceil(total_count / size), 'data': pres_data_paginate, 'uretim':uretim}
@@ -1474,7 +1474,7 @@ def presuretimbasla(request):
 
 def uretim_get_locations(request):
     cache_key = f'location_data_{request.user.id}'
-    data = cache.get(cache_key)
+    data = cache.get(key=cache_key)
     print(data)
     if data is None:  # If not in cache, fetch from DB
         location_tree = location_list(request.user)
