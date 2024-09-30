@@ -1475,7 +1475,7 @@ def presuretimbasla(request):
 def uretim_get_locations(request):
     cache_key = f'location_data_{request.user.id}'
     data = cache.get(cache_key)
-
+    print(data)
     if data is None:  # If not in cache, fetch from DB
         location_tree = location_list(request.user)
         reasons = list(PresUretimRaporu.objects.using('dies')
