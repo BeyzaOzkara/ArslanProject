@@ -1436,7 +1436,7 @@ def uretim_kalip_firin(request):
             p['KalipUretimDurumu'] = 1  # Üretimi Bitir
             p['KalipNo'] = active_production_map.get(p['Kimlik'])
             uretim = True
-        elif p['ProfilNo'] in active_profil_nos and p['Kimlik'] not in active_siparis_ids:
+        elif p['ProfilNo'] in active_profil_nos and  not p['Kimlik']in active_siparis_ids:
             p['KalipUretimDurumu'] = 4 
     total_count = pres_siparis.count()
     last_data = {'last_page': math.ceil(total_count / size), 'data': pres_data_paginate, 'uretim':uretim}
