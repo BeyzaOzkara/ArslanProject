@@ -203,7 +203,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'check-email-every-minute': {
         'task': 'ArslanTakipApp.tasks.start_email_listener',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/10'),
     },
     'check-rapor': {
         'task': 'ArslanTakipApp.tasks.start_rapor_listener',

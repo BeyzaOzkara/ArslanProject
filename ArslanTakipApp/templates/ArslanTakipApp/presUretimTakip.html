@@ -18,291 +18,63 @@
 {% endblock %}
 
 {% block content %}
-<div class="container col-12">
-    <div id="siparis-table"></div>
-    <div class="modal fade" id="startModal" tabindex="-1" role="dialog" aria-labelledby="startModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Üretime Başla</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="startModalLabel">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        
-                    </div>
-                </div>
-                <div class="modal-footer"></div>
-            </div>
-        </div>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <button type="button" class="btn btn-block btn-primary btn-lg">KALİTE KONTROL</button>
     </div>
-    <div class="modal fade" id="finishModal" tabindex="-1" role="dialog" aria-labelledby="finishModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="finishModalLabel">Üretimi Bitir</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <select name="reasonSelect" id="reasonSelect" class="form-control"></select>
-                </div>
-                <div class="form-group">
-                    <label for="finishReason">Açıklama</label>
-                    <textarea class="form-control" id="finishReason" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="finishDestination">Kalıp nereye gitsin?</label>
-                    <select class="form-control" id="finishDestination" required>
-                    <option value="">Konum seçiniz...</option>
-                    <!-- Locations will be populated here -->
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
-              <button type="button" class="btn btn-primary" id="confirmFinish">Üretimi Bitir</button>
-            </div>
+    <div class="col-md-3 mb-4">
+      <button type="button" class="btn btn-block btn-info btn-lg">SİPARİŞ TAMAM</button>
+    </div>
+    <div class="col-md-3 mb-4">
+      <button type="button" class="btn btn-block btn-success btn-lg">ÜRETİMİ BİTİR</button>
+    </div>
+      <div class="col-md-6 mb-4">
+          <div class="card">
+              <div class="card-header">
+                  <h5>Kart 1</h5> 
+              </div>
+              <div class="card-body">
+                  <p>Teknik Resim...</p>
+              </div>
           </div>
-        </div>
-    </div>
+      </div>
+      <div class="col-md-6 mb-4">
+          <div class="card">
+              <div class="card-header">
+                  <h5>Kart 2</h5>
+              </div>
+              <div class="card-body">
+                  <p>Notlar...</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-6 mb-4">
+          <div class="card">
+              <div class="card-header">
+                  <h5>Kart 3</h5>
+              </div>
+              <div class="card-body">
+                  <p>Pres Üretim Raporları...</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-6 mb-4">
+          <div class="card">
+              <div class="card-header">
+                  <h5>Kart 4</h5>
+              </div>
+              <div class="card-body">
+                  <p>Kalıp Yorumları...</p>
+              </div>
+          </div>
+      </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    function validateAndStart(button) {
-        const row = siparisTable.getRow(button.closest('.tabulator-row'));
-        var data = row.getData();
-        var kalipNo = data.KalipNo;
-
-        if (!kalipNo) {
-            alert('Lütfen bir Kalıp No seçin!');
-            return; // Exit if KalipNo is not selected
-        }
-
-        // Proceed to start production
-        uretimeBasla(data.Kimlik, kalipNo);
-    };
-
-    function uretimeBasla(siparisKimlik, kalipNo) {
-        const data = {
-            kimlik: siparisKimlik,
-            kalip_no: kalipNo
-        };
-
-        $.ajax({
-            url:'/presuretimbasla',
-            type:'POST',
-            data: JSON.stringify(data),
-            contentType: false,
-            processData: false,
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-                alert('Success: '+ response.message);
-                window.location.reload();
-            },
-            error: function(error) {
-                console.error('Error:', error);
-            }
-
-        })
-    };
-
-    function uretimeDevam(kalipNo) {
-
-    }
-
-    function uretimiBitir(button) {
-        const siparisKimlik = $(button).data('sid');
-        const presKodu = $(button).data('pkodu');
-        
-        $('#finishModal').modal('show');
-
-        $.ajax({
-            url: '/uretim_get_locations',
-            type: 'GET',
-            success: function(response) {
-                console.log(response);
-                populateLocationSelect(response.locations);
-                populateReasonSelect(response.reasons);
-            },
-            error: function(error) {
-                console.error('Error fetching locations:', error);
-            }
-        });
-
-        // Set up the modal's confirm button to handle submission
-        $('#confirmFinish').off('click').on('click', function() {
-            const reason = $('#finishReason').val();
-            const destination = $('#finishDestination').val();
-
-            // Send the data to the server
-            $.ajax({
-                url: '/presuretimbitir',
-                type: 'POST',
-                data: JSON.stringify({
-                    kimlik: siparisKimlik,
-                    presKodu: presKodu,
-                    reason: reason,
-                    destination: destination
-                }),
-                contentType: 'application/json',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                success: function(response) {
-                    alert('Success: ' + response.message);
-                    window.location.reload();
-                },
-                error: function(error) {
-                    console.error('Error:', error);
-                }
-            });
-        });
-    }
-    
-    function populateLocationSelect(locations) {
-        const select = $('#finishDestination');
-        select.empty();
-        select.append('<option value="">Konum Seçiniz...</option>'); 
-        const locationTree = JSON.parse(locations);
-
-        function buildOptions(locationTree, select, prefix = '') {
-            locationTree.forEach(loc => {
-                const disabled = loc.isPhysical === false ? 'disabled' : '';
-                select.append(`<option value="${loc.id}" ${disabled}>${prefix}${loc.locationName}</option>`);
-                if (loc._children && loc._children.length > 0) {
-                    buildOptions(loc._children, select, prefix + '-- '); // Indent children
-                }
-            });
-        }
-
-        buildOptions(locationTree, select);
-    };
-
-    function populateReasonSelect(reasons) {
-        const select = $('#reasonSelect');
-        select.empty();
-        select.append('<option value="">Neden Seçiniz...</option>'); 
-        reasons.forEach(reason => {
-            select.append(`<option value="${reason}">${reason}</option>`);
-        });
-    }
-
-    var headerMenu = function(){
-        var menu = [];
-        var columns = this.getColumns();
-
-        for(let column of columns){
-            if (column.getDefinition().title != ""){
-            //create checkbox element using font awesome icons
-                let icon = document.createElement("i");
-                icon.classList.add("fas");
-                
-                icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
-                
-                //build label
-                let label = document.createElement("span");
-                let title = document.createElement("span");
-
-                
-                title.textContent = " " + column.getDefinition().title;
-                label.appendChild(icon);
-                label.appendChild(title);
-
-                //create menu item
-                menu.push({
-                    label:label,
-                    action:function(e){
-                        //prevent menu closing
-                        e.stopPropagation();
-                        //toggle current column visibility
-                        column.toggle();
-
-                        //change menu item icon
-                        if(column.isVisible()){
-                            icon.classList.remove("fa-square");
-                            icon.classList.add("fa-check-square");
-                        }else{
-                            icon.classList.remove("fa-check-square");
-                            icon.classList.add("fa-square");
-                        }
-                    }
-                });
-        }};
-
-        return menu;
-    };
-    const handleIcon = (cell, formatterParams, onRendered) => "<i class='fa fa-circle'></i>";
-    const kalipIcon = (cell, formatterParams, onRendered) => { 
-        // kalıp üretimde mi kontrol et, üretimdeyse Üretimi Bitir butonu, üretimde değilse preste kalıp var mı kontrol et varsa buton yok, yoksa Üretime Başla butonu
-        let data = cell.getData();
-        let kalip = data.KalipUretimDurumu;
-        let id = data.Kimlik;
-        let pKodu = data.PresKodu;
-        let kalipbutton = ``;
-        if (kalip==1) {
-            kalipbutton = `<button type='button' class='btn btn-danger' data-pkodu='${pKodu}' data-sid='${id}' onclick='uretimiBitir(this)'>ÜRETİMİ BİTİR</button>`
-        }
-        else if (kalip==2) {
-            kalipbutton = `<button type='button' class='btn btn-primary' onclick='validateAndStart(this)'>ÜRETİME BAŞLA</button>`
-        }
-        else if (kalip==4) {
-            kalipbutton = `<button type='button' class='btn btn-primary' onclick=''>ÜRETİME DEVAM</button>`
-        }
-        return kalipbutton;
-    };
-    var siparisTable = new Tabulator("#siparis-table", {
-        height:"650px",
-        layout:"fitDataFill",
-        placeholder:"Sipariş Liste",
-        ajaxURL:"/uretim_kalip_firin",
-        ajaxURLGenerator:function(url, config, params){
-            return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
-        },
-        ajaxResponse: function(url, params, response) {
-            uretimFlag = response.uretim;
-            console.log("BURDA: " + uretimFlag)
-            return response;
-        },
-        progressiveLoad:"scroll",
-        paginationMode:"remote",
-        filterMode:"remote",
-        paginationSize:30,
-        popupContainer:true,
-        movableRows: true,
-        columns:[
-            {formatter:handleIcon, headerMenu:headerMenu, hozAlign:"center", title:"", headerSort:false, frozen:true, width:50, minWidth:50},
-            {title:"Kart No", field:"KartNo", headerFilter:"input"},
-            {title:"Profil No", field:"ProfilNo", headerFilter:"input"},
-            {title:"Termin", field:"SonTermin", headerFilter:"input"},
-            {title:"Firma", field:"FirmaAdi", headerFilter:"input", visible:false},
-            {title:"Sipariş Kg", field:"GirenKg", headerFilter:"input", visible:false},
-            {title:"Sipariş Adet", field:"GirenAdet", headerFilter:"input", visible:false},
-            {title:"Kalan Kg", field:"Kg", headerFilter:"input"},
-            {title:"Kalan Adet", field:"Adet", headerFilter:"input"},
-            {title:"Billet Türü", field:"BilletTuru", headerFilter:"input"},
-            {title:"Yüzey Özelliği", field:"YuzeyOzelligi", headerFilter:"input"},
-            {title:"Kondüsyon", field:"KondusyonTuru", headerFilter:"input"},
-            {title: "Kalıp No", field: "KalipNo", //editor:"list", 
-                editor: function(cell) {
-                    return uretimFlag ? false : "list"; // Disable editor if uretim is true
-                },
-                editorParams: function(cell) {
-                    var profil_no = cell.getRow().getData().ProfilNo;
-                    return {valuesURL: "/firin_kalip_list/" + profil_no};
-                }
-            },
-            {formatter:kalipIcon, hozAlign:"center", title:"", headerSort:false, frozen:true},
-        ],
-    });
 
 </script>
 {% endblock %}

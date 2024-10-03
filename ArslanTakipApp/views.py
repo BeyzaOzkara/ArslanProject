@@ -142,7 +142,6 @@ def location(request):
             root_nodes.append(item)
     data = json.dumps(root_nodes)
     gonderData = location_list(request.user)
-    print(gonderData)
     if request.method == "POST":
         try:
             dieList = request.POST.get("dieList")
@@ -1385,7 +1384,7 @@ def eksiparis_yuzey(request):
     return HttpResponse(data)
 
 class PresUretimTakipView(generic.TemplateView):
-    template_name = 'ArslanTakipApp/presUretimTakip.html'
+    template_name = 'ArslanTakipApp/presUretimTakipList.html'
 
 def firin_kalip_list(request, pNo):
     pres_grubu = '4500-1'
@@ -1427,17 +1426,18 @@ def uretim_kalip_firin(request):
     uretim = False
     for p in pres_data_paginate:
         p['SonTermin'] = format_date(p['SonTermin'])
-        p['KalipUretimDurumu'] = 3  # Buton yok
-        if not active_siparis_ids: # presin içinde klaıp var mı onu kontrol et varsa boş buton olacak
-            p['KalipUretimDurumu'] = 2  # Üretime Başla 
-            if location:
-                p['KalipUretimDurumu'] = 3
-        elif p['Kimlik'] in active_siparis_ids:
-            p['KalipUretimDurumu'] = 1  # Üretimi Bitir
-            p['KalipNo'] = active_production_map.get(p['Kimlik'])
-            uretim = True
-        elif p['ProfilNo'] in active_profil_nos and  not p['Kimlik']in active_siparis_ids:
-            p['KalipUretimDurumu'] = 4 
+        p['KalipUretimDurumu'] = 2
+        # p['KalipUretimDurumu'] = 3  # Buton yok
+        # if not active_siparis_ids: # presin içinde klaıp var mı onu kontrol et varsa boş buton olacak
+        #     p['KalipUretimDurumu'] = 2  # Üretime Başla 
+        #     if location:
+        #         p['KalipUretimDurumu'] = 3
+        # elif p['Kimlik'] in active_siparis_ids:
+        #     p['KalipUretimDurumu'] = 1  # Üretimi Bitir
+        #     p['KalipNo'] = active_production_map.get(p['Kimlik'])
+        #     uretim = True
+        # elif p['ProfilNo'] in active_profil_nos and  not p['Kimlik']in active_siparis_ids:
+        #     p['KalipUretimDurumu'] = 4
     total_count = pres_siparis.count()
     last_data = {'last_page': math.ceil(total_count / size), 'data': pres_data_paginate, 'uretim':uretim}
     return JsonResponse(last_data, safe=False, json_dumps_params={'indent': 2})
@@ -1451,20 +1451,21 @@ def presuretimbasla(request):
 
             siparis = SiparisList.objects.using('dies').filter(Kimlik=siparis_kimlik).first()
             if siparis:
-                PresUretimTakip.objects.create(
-                    siparis_kimlik = siparis_kimlik,
-                    kalip_no = kalip_no,
-                    baslangic_datetime = datetime.datetime.now(),
-                    pres_kodu = siparis.PresKodu,
-                )
+                # pres_u = PresUretimTakip.objects.create(
+                #     siparis_kimlik = siparis_kimlik,
+                #     kalip_no = kalip_no,
+                #     baslangic_datetime = datetime.datetime.now(),
+                #     pres_kodu = siparis.PresKodu,
+                # )
                 kalip = DiesLocation.objects.get(kalipNo=kalip_no)
-                Hareket.objects.create(
-                    kalipKonum_id=kalip.kalipVaris.id,
-                    kalipVaris_id=presler[siparis.PresKodu],
-                    kalipNo=kalip_no,
-                    kimTarafindan_id=request.user.id
-                )
-                return JsonResponse({"message": "Üretim başarıyla başlatıldı!"})
+                pres_u_id = 2
+                # Hareket.objects.create(
+                #     kalipKonum_id=kalip.kalipVaris.id,
+                #     kalipVaris_id=presler[siparis.PresKodu],
+                #     kalipNo=kalip_no,
+                #     kimTarafindan_id=request.user.id
+                # )
+                return JsonResponse({"message": "Üretim başarıyla başlatıldı!", "presuretimid": pres_u_id})
             else:
                 return JsonResponse({"message": "Sipariş bulunamadı."})
         except Exception as e:
@@ -1475,7 +1476,6 @@ def presuretimbasla(request):
 def uretim_get_locations(request):
     cache_key = f'location_data_{request.user.id}'
     data = cache.get(key=cache_key)
-    print(data)
     if data is None:  # If not in cache, fetch from DB
         location_tree = location_list(request.user)
         reasons = list(PresUretimRaporu.objects.using('dies')
@@ -1515,6 +1515,12 @@ def presuretimbitir(request):
             print(f"Error: {e}")
             return JsonResponse({'message': 'Bir hata oluştu. Lütfen tekrar deneyin.'})
     return JsonResponse({'message': 'Geçersiz istek metodu.'})
+
+def pres_uretim_takip(request, id):
+    presuretim = get_object_or_404(PresUretimTakip, id=id)
+    print(f"presuretim: {presuretim}")
+    
+    return render(request, 'ArslanTakipApp/presUretimTakip.html')
 
 class eksiparisDenemeView(generic.TemplateView):
     template_name = 'ArslanTakipApp/eksiparisdeneme.html'
