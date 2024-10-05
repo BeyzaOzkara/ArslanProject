@@ -1516,11 +1516,55 @@ def presuretimbitir(request):
             return JsonResponse({'message': 'Bir hata oluştu. Lütfen tekrar deneyin.'})
     return JsonResponse({'message': 'Geçersiz istek metodu.'})
 
+def pres_uretim_takip_rapor(request):
+    params = json.loads(unquote(request.GET.get('params')))
+    size = params["size"]
+    page = params["page"]
+    offset, limit = calculate_pagination(page, size)
+    filter_list = params["filter"]
+    q = {} 
+    kalip_count = 0
+    lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+
+    if len(filter_list)>0:
+        for i in filter_list:
+            if i["type"] == "like":
+                q[i['field']+"__startswith"] = i['value']
+            elif i["type"] == "=":
+                q[i['field']] = i['value']
+    
+        query = PresUretimRaporu.objects.using('dies').filter(**q) \
+        .values('PresKodu', 'Tarih', 'BaslamaSaati', 'BitisSaati', 'HataAciklama', 'Durum').order_by('-Tarih')
+
+        g = list(query[offset:limit])
+        for c in g:
+            if c['Tarih'] != None:
+                c['Tarih'] = format_date(c['Tarih']) + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
+                c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
+                c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
+        kalip_count = query.count()
+        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+        lastData['data'] = g
+
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
 def pres_uretim_takip(request, id):
     presuretim = get_object_or_404(PresUretimTakip, id=id)
-    print(f"presuretim: {presuretim}")
+    kalip = KalipMs.objects.using('dies').filter(KalipNo=presuretim.kalip_no)[0]
+    resim_dizini = kalip.ResimDizini.replace(" ", "")
+    resim_yol = "http://arslan/static" + resim_dizini[13:]
+    teknik1 = resim_yol + "Teknik1.jpg"
+    teknik2 = resim_yol + "Teknik2.jpg"
+
+    yorum = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo)
     
-    return render(request, 'ArslanTakipApp/presUretimTakip.html')
+    context = {
+        'kalip_no': kalip.KalipNo,
+        'teknik1': teknik1,
+        'teknik2': teknik2,
+    }
+    return render(request, 'ArslanTakipApp/presUretimTakip.html', context)
 
 class eksiparisDenemeView(generic.TemplateView):
     template_name = 'ArslanTakipApp/eksiparisdeneme.html'

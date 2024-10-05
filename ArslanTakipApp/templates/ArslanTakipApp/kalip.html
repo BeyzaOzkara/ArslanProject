@@ -528,8 +528,8 @@ function updateInfoElements(kal) {
         document.querySelector("#" + selector).textContent = value;
     });
 
-    const rdizin = kal.ResimDizini.replace(/\s/g, '') + "Teknik1.jpg";
-    const rdizin2 = kal.ResimDizini.replace(/\s/g, '') + "Teknik2.jpg";
+    const rdizin = kal.ResimDizini.replace(/\s+/g, '') + "Teknik1.jpg";
+    const rdizin2 = kal.ResimDizini.replace(/\s+/g, '') + "Teknik2.jpg";
     document.getElementById("TeknikResim").src = "http://arslan/static" + rdizin.slice(13);
     document.getElementById("TeknikA").href = "http://arslan/static" + rdizin.slice(13);
     document.getElementById("TeknikResim2").src = "http://arslan/static" + rdizin2.slice(13);

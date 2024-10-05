@@ -105,5 +105,6 @@ urlpatterns = [
     path('presuretimbitir', views.presuretimbitir, name='presuretimbitir'),
     path('uretim_get_locations', views.uretim_get_locations, name='uretimgetlocations'),
     path('presuretimtakip/<int:id>/', views.pres_uretim_takip, name='pres_uretim_takip'),
+    path('presuretimtakip/rapor', views.pres_uretim_takip_rapor),
 
 ]
