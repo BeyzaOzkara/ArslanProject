@@ -1557,12 +1557,33 @@ def pres_uretim_takip(request, id):
     teknik1 = resim_yol + "Teknik1.jpg"
     teknik2 = resim_yol + "Teknik2.jpg"
 
-    yorum = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo)
+    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo, Silindi=False)
+
+    def build_comment_tree(comments):
+        comment_dict = {comment.id: comment for comment in comments}
+        tree = []
+        
+        # Create a mapping for replies
+        for comment in comments:
+            if comment.ReplyTo is None:  # This is a top-level comment
+                tree.append({'comment': comment, 'replies': []})
+            else:  # This is a reply
+                parent = comment_dict.get(comment.ReplyTo.id)
+                if parent:
+                    for node in tree:
+                        if node['comment'] == parent:
+                            com_dict = {'comment': comment}
+                            node['replies'].append(com_dict)
+                            break
+        return tree
+    
+    comment_tree = build_comment_tree(comments)
     
     context = {
         'kalip_no': kalip.KalipNo,
         'teknik1': teknik1,
         'teknik2': teknik2,
+        'comment_tree': comment_tree,
     }
     return render(request, 'ArslanTakipApp/presUretimTakip.html', context)
 

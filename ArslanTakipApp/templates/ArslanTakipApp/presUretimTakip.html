@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% load static %}
+{% load comment_tags %}
 
 {% block title %}
   Pres Üretim Takip
@@ -86,10 +87,15 @@
       <div class="col-md-6 mb-4">
           <div class="card">
               <div class="card-header">
-                  <h5>Kart 4</h5>
+                  <h5>Kalıp Yorumları</h5>
               </div>
               <div class="card-body">
-                  <p>Kalıp Yorumları...</p>
+                
+                <div id="commentCol">
+                    {% for node in comment_tree %}
+                        {% render_comment node %}
+                    {% endfor %}
+                </div>
               </div>
           </div>
       </div>

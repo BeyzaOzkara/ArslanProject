@@ -1,0 +1,59 @@
+{% load comment_tags %}
+<style>
+    .nested-replies {
+        margin-top: 5px;
+        margin-left: 20px; /* Adjust the indentation level as needed */
+    }
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
+    .overflow {
+        display: block;
+        white-space: nowrap;
+        width: 120px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
+    #photos{
+        width:100%;
+        height:100%;
+    }
+    img {
+        width:100%;
+        height:100%;
+    }
+</style>
+<div class="post" id="comment-{{ node.comment.id }}">
+    <div class="user-block">
+        <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+        <span class="username" style="color: blue;">{{ node.comment.KullaniciAdi }}</span>
+        <span class="description">{{ node.comment.Tarih }}</span>
+    </div>
+    <p>{{ node.comment.Aciklama }}</p>
+    
+    {% if node.comment.cfiles %}
+        <div class="gallery">
+            {% for cf in node.comment.cfiles %}
+                <img src="/media/{{ cf.File }}" alt="{{ cf.File }}" />
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <span>
+        <a role="button" class="ml-2" style="color: green" data-toggle="collapse" href="#replyComment{{ node.comment.id }}">cevapla</a>
+    </span>
+
+    <div class="collapse mt-2" id="replyComment{{ node.comment.id }}">
+        <!-- Reply form can go here -->
+    </div>
+
+    {% if node.replies %}
+        <div class="nested-replies">
+            {% for reply in node.replies %}
+                {% render_comment reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
