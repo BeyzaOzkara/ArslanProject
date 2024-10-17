@@ -1557,27 +1557,51 @@ def pres_uretim_takip(request, id):
     teknik1 = resim_yol + "Teknik1.jpg"
     teknik2 = resim_yol + "Teknik2.jpg"
 
-    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo, Silindi=False)
+    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
 
     def build_comment_tree(comments):
         comment_dict = {comment.id: comment for comment in comments}
         tree = []
-        
-        # Create a mapping for replies
+
         for comment in comments:
-            if comment.ReplyTo is None:  # This is a top-level comment
-                tree.append({'comment': comment, 'replies': []})
-            else:  # This is a reply
-                parent = comment_dict.get(comment.ReplyTo.id)
-                if parent:
-                    for node in tree:
-                        if node['comment'] == parent:
-                            com_dict = {'comment': comment}
-                            node['replies'].append(com_dict)
-                            break
+            comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
+            if comment.Silindi == True:
+                if comments.filter(ReplyTo_id=comment.id):
+                    comment.Aciklama = "Yorum silindi."
+                    tree.append({'comment': comment, 'replies': []})
+            else:
+                if comment.ReplyTo is None:  # Top-level comment
+                    tree.append({'comment': comment, 'replies': []})
+                else:  # This is a reply
+                    parent = comment_dict.get(comment.ReplyTo.id)
+                    if parent:
+                        for node in tree:
+                            if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
+                                com_dict = {'comment': comment}
+                                node['replies'].append(com_dict)
+                                break
         return tree
+    # def build_comment_tree(comments):
+    #     comment_dict = {comment.id: comment for comment in comments}
+    #     tree = []
+        
+    #     for comment in comments:
+    #         comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
+    #         if comment.ReplyTo is None:  # This is a top-level comment
+    #             tree.append({'comment': comment, 'replies': []})
+    #         else:  # This is a reply
+    #             parent = comment_dict.get(comment.ReplyTo.id)
+    #             if parent:
+    #                 for node in tree:
+    #                     if node['comment'] == parent:
+    #                         com_dict = {'comment': comment}
+    #                         node['replies'].append(com_dict)
+    #                         break
+    #     return tree
     
     comment_tree = build_comment_tree(comments)
+    print(f"count: {comments.count()}")
+    print(comment_tree)
     
     context = {
         'kalip_no': kalip.KalipNo,
@@ -1985,7 +2009,7 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
                     hareket.kalipVaris_id = gonder.id
                     hareket.kalipNo = kalipNo
                     hareket.kimTarafindan_id = request.user.id
-                    # hareket.save()
+                    hareket.save()
                     response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
                 else:
                     response = JsonResponse({"error": "Kalıp fırına gönderilemedi."}, status=400)
@@ -2000,7 +2024,7 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
                         hareket.kalipVaris_id = gonder.id
                         hareket.kalipNo = kalipNo
                         hareket.kimTarafindan_id = request.user.id
-                        # hareket.save()
+                        hareket.save()
                         response = JsonResponse({"message": "Kalıp Fırına Eklendi!"})
                     else:
                         response = JsonResponse({"error": "Kalıp fırına gönderilemedi."}, status=400)

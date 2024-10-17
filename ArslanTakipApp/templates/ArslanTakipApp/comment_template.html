@@ -1,36 +1,13 @@
 {% load comment_tags %}
-<style>
-    .nested-replies {
-        margin-top: 5px;
-        margin-left: 20px; /* Adjust the indentation level as needed */
-    }
-    .custom-file-input ~ .custom-file-label::after {
-        content: "Gözat";
-    }
-    .overflow {
-        display: block;
-        white-space: nowrap;
-        width: 120px; 
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .fiv-cla, .fiv-viv, .fiv-sqo { font-size: 3.5em; }
-    #photos{
-        width:100%;
-        height:100%;
-    }
-    img {
-        width:100%;
-        height:100%;
-    }
-</style>
 <div class="post" id="comment-{{ node.comment.id }}">
     <div class="user-block">
         <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
         <span class="username" style="color: blue;">{{ node.comment.KullaniciAdi }}</span>
-        <span class="description">{{ node.comment.Tarih }}</span>
+        <span class="description">{{ node.comment.Tarih|date:"d-m-Y H:s" }}</span>
     </div>
-    <p>{{ node.comment.Aciklama }}</p>
+    <div id="p{{node.comment.id}}">
+       {{ node.comment.Aciklama|safe }}
+    </div>
     
     {% if node.comment.cfiles %}
         <div class="gallery">
@@ -56,4 +33,3 @@
         </div>
     {% endif %}
 </div>
-
