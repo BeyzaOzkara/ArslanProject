@@ -106,5 +106,9 @@ urlpatterns = [
     path('uretim_get_locations', views.uretim_get_locations, name='uretimgetlocations'),
     path('presuretimtakip/<int:id>/', views.pres_uretim_takip, name='pres_uretim_takip'),
     path('presuretimtakip/rapor', views.pres_uretim_takip_rapor),
-
+    path('hammadde_billet/', views.HammaddeBilletView.as_view(), name='hammadde_billet'),
+    path('get_parti_no/', views.get_parti_no, name='get_parti_no'),
+    path('get_billet_info/', views.get_billet_info, name='get_billet_info'),
+    path('get_available_billets/', views.get_available_billets, name='get_available_billets'),
+    path('save_hammadde/', views.save_hammadde),
 ]

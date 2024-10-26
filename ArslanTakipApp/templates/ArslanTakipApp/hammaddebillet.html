@@ -1,0 +1,141 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Arslan Alüminyum
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <style>
+    .input-group {
+      align-items: center;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container col-12">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Hammadde Billet Gelenler</h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>                  
+          <tr>
+            <th style="width: 10px"></th>
+            <th>Tarih</th>
+            <th>Parti No</th>
+            <th>Boy</th>
+            <th>Kg</th>
+            <th>Adet</th>
+            <th>Billet Cinsi</th>
+            <th>Açıklama</th>
+          </tr>
+        </thead>
+        <tbody id="billet-table">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+
+  </div>
+  <div id="hammaddetable"></div>
+  <div class="modal fade" id="stokAdetModal" tabindex="-1" aria-labelledby="stokAdetModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Adet Giriniz</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+              <div class="form-group col-lg-6">
+                <label for="stokAdet">Adet: </label>
+                <input type="number" id="stokAdet" name="stokAdet" class="form-control mb-2">
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnStokKaydet" class="btn btn-primary" onclick=billetKaydet()>Kaydet</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function showModal() {
+    $('#stokAdetModal').modal('show');
+  };
+
+  function billetKaydet() {
+    let adet = $('#stokAdet').val();
+
+
+    $.ajax({
+      url:'/save_',
+      method:'POST',
+      success: function(data) {
+        
+      }
+    })
+  };
+
+  $(document).ready(function() {
+    $.ajax({
+      url:'/get_available_billets/',
+      method: 'GET',
+      success: function(data) {
+        const billettable = $('#billet-table');
+        billettable.empty();
+
+        data.forEach(function(item) {
+          let tablerow = `
+            <td><button type='button' class='btn btn-sm btn-primary' onclick=showModal()>+</button></td>
+            <td>${item.Create_Time}</td>
+            <td>${item.GirenPartiNo}</td>
+            <td>${item.GirenBoy}</td>
+            <td>${item.GirenKg}</td>
+            <td>${item.GirenAdet}</td>
+            <td>${item.StokCinsi}</td>
+            <td>${item.Aciklama}</td>
+          `;
+          const row = $('<tr></tr>').html(tablerow);
+          billettable.append(row);
+        });
+      }
+    });
+
+
+  })
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}

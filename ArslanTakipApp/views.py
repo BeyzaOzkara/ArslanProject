@@ -26,8 +26,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
+from django.utils import timezone
 import urllib3
-from .models import LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip
+from .models import BilletDepoTransfer, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -2132,6 +2133,54 @@ def baskigecmisi_list(request):
     lastData['data'] = baskiList
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
+
+class HammaddeBilletView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/hammaddebillet.html'
+
+def get_parti_no(request):
+    one_week = timezone.now() - timezone.timedelta(days=7)
+    billet_kimlikler = BilletDepoTransfer.objects.using('dies').filter(Create_Time__gte=one_week, GirenDepoKodu='4.FAB.PRES.').values_list('Kimlik', flat=True)
+    hammadde_kimlikler = HammaddeBilletStok.objects.filter(kayit_tarihi__gte=one_week).values_list('gelen_kimlik', flat=True)
+
+    available_kimlikler = set(billet_kimlikler) - set(hammadde_kimlikler)
+    # parti_nos = BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values_list('GirenPartiNo', flat=True)
+    parti_nos = BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values('Kimlik', 'GirenPartiNo')
+    return JsonResponse(list(parti_nos), safe=False)
+
+def get_billet_info(request):
+    kimlik = request.GET.get('kimlik')
+    if not kimlik:
+        return JsonResponse({"error": "Kimlik is required"}, status=400)
+
+    stok_info = BilletDepoTransfer.objects.using('dies').filter(Kimlik=kimlik).values(
+        'Kimlik', 'Create_Time', 'GirenPartiNo', 'GirenBoy', 'GirenAdet', 'GirenKg', 'GirenDepoKodu', 'StokCinsi', 'Aciklama'
+    )[0]
+
+    if stok_info:
+        return JsonResponse(stok_info, safe=False)
+    else:
+        return JsonResponse({"error": "Billet information not found"}, status=404)
+
+def get_available_billets(request):
+    one_week = timezone.now() - timezone.timedelta(days=7)
+    billet_kimlikler = BilletDepoTransfer.objects.using('dies').filter(Create_Time__gte=one_week, GirenDepoKodu='4.FAB.PRES.').values_list('Kimlik', flat=True)
+    hammadde_kimlikler = HammaddeBilletStok.objects.filter(kayit_tarihi__gte=one_week).values_list('gelen_kimlik', flat=True)
+
+    available_kimlikler = set(billet_kimlikler) - set(hammadde_kimlikler)
+    stok_info = list(BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values(
+        'Kimlik', 'Create_Time', 'GirenPartiNo', 'GirenBoy', 'GirenAdet', 'GirenKg', 'GirenDepoKodu', 'StokCinsi', 'Aciklama'
+    ))
+
+    for s in stok_info:
+        s['Create_Time']=format_date(s['Create_Time'])
+
+    if stok_info:
+        return JsonResponse(stok_info, safe=False)
+    else:
+        return JsonResponse({"error": "Billet information not found"}, status=404)
+
+def save_hammadde(request):
+    return
 
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'

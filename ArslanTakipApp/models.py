@@ -205,6 +205,54 @@ class PresUretimTakip(models.Model): # pres operatörü, şarj no vs eklenecek
         verbose_name = "PresUretimTakip"
         verbose_name_plural = "PresUretimTakipler"
 
+class BilletDepoTransfer(models.Model):
+    Create_Time = models.DateTimeField(null=True, blank=True)
+    Kimlik = models.IntegerField(null=True, blank=True)
+    GirenPartiNo = models.CharField(null=True, blank=True)
+    GirenBoy = models.FloatField(null=True, blank=True)
+    GirenAdet = models.FloatField(null=True, blank=True)
+    GirenKg = models.FloatField(null=True, blank=True)
+    GirenDepoKodu = models.CharField(null=True, blank=True)
+    StokCinsi = models.CharField(null=True, blank=True)
+    Aciklama = models.CharField(null=True, blank=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'BilletDepoTransfer'
+
+class HammaddePartiListesi(models.Model):
+    Billet = models.CharField(null=True, blank=True)
+    DepoKodu = models.CharField(null=True, blank=True)
+    StokKodu = models.CharField(null=True, blank=True)
+    StokCinsi = models.CharField(null=True, blank=True)
+    PartiNo = models.CharField(null=True, blank=True)
+    TransferCikanKg = models.FloatField(null=True, blank=True)
+    UretimKg = models.FloatField(null=True, blank=True)
+    KalanKg = models.FloatField(null=True, blank=True)
+    Cap = models.FloatField(null=True, blank=True)
+    Aciklama = models.CharField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View044_HammaddePartiListesi'
+
+class HammaddeBilletStok(models.Model):
+    parti_no = models.CharField(null=True, blank=True)
+    kayit_tarihi = models.DateTimeField(auto_now=True)
+    konum = models.ForeignKey(Location, on_delete=models.DO_NOTHING, null=True)
+    boy = models.FloatField(null=True, blank=True)
+    adet = models.IntegerField(null=True, blank=True)
+    kg = models.FloatField(null=True, blank=True)
+    stok_cinsi = models.CharField(null=True, blank=True)
+    transfer_giren_kg = models.FloatField(null=True, blank=True)
+    aciklama = models.CharField(null=True, blank=True)
+    gelen_kimlik = models.IntegerField(null=True)
+
+class HammaddeBillet(models.Model):
+    billet_no = models.BigIntegerField(primary_key=True, auto_created=True, serialize=True)
+    stok = models.ForeignKey(HammaddeBilletStok, on_delete=models.SET_NULL, null=True)
+    guncel_boy = models.FloatField(null=True, blank=True)
+    sira = models.IntegerField(null=True, blank=True)
 
 class EkSiparis(models.Model):
     EkNo = models.IntegerField(null=True)
