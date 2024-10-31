@@ -22,7 +22,7 @@
 
 {% block content %}
 <div class="container col-12">
-  <div class="card">
+  <div class="card" id="transfer-card">
     <div class="card-header">
       <h3 class="card-title">Hammadde Billet Gelenler</h3>
     </div>
@@ -40,7 +40,7 @@
             <th>Açıklama</th>
           </tr>
         </thead>
-        <tbody id="billet-table">
+        <tbody id="transfer-table">
           <tr>
             <td></td>
             <td></td>
@@ -54,8 +54,63 @@
       </table>
     </div>
   </div>
-  <div class="row">
-
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Stok</h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Parti No</th>
+            <th>Boy</th>
+            <th>Kg</th>
+            <th>Adet</th>
+            <th>Billet Cinsi</th>
+            <th>Açıklama</th>
+            <th>Durum</th>
+          </tr>
+        </thead>
+        <tbody id="stok-table">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Fırın</h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Parti No</th>
+            <th>Boy</th>
+            <th>Billet Cinsi</th>
+            <th>Billet No</th>
+          </tr>
+        </thead>
+        <tbody id="firin-table">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div id="hammaddetable"></div>
   <div class="modal fade" id="stokAdetModal" tabindex="-1" aria-labelledby="stokAdetModalLabel" style="display: none;" aria-hidden="true">
@@ -76,7 +131,7 @@
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="btnStokKaydet" class="btn btn-primary" onclick=billetKaydet()>Kaydet</button>
+          <button type="button" id="btnStokKaydet" class="btn btn-primary" onclick=firinaAt()>Fırına At</button>
         </div>
 
       </div>
@@ -88,34 +143,47 @@
 
 {% block extra_js %}
 <script>
-  function showModal() {
+  let selectedId;
+  function showModal(id) {
+    selectedId = id;
     $('#stokAdetModal').modal('show');
   };
 
-  function billetKaydet() {
+  function firinaAt() {
     let adet = $('#stokAdet').val();
 
-
+    const firinData = new FormData();
+    firinData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    firinData.append("adet", adet);
+    firinData.append("id", selectedId);
     $.ajax({
-      url:'/save_',
+      url:'/billet_firina_at/',
       method:'POST',
+      data: firinData,
+      contentType: false,
+      processData: false,
       success: function(data) {
+        $('#stokAdetModal').modal('hide');
         
+        //refresh stok and fırın data
+        fill_stok_table();
+        fill_firin_table();
       }
     })
   };
 
-  $(document).ready(function() {
+  function fill_transfer_table() {
     $.ajax({
-      url:'/get_available_billets/',
+      url:'/get_transfer_billets/',
       method: 'GET',
       success: function(data) {
-        const billettable = $('#billet-table');
+        console.log(data)
+        const billettable = $('#transfer-table');
         billettable.empty();
 
         data.forEach(function(item) {
           let tablerow = `
-            <td><button type='button' class='btn btn-sm btn-primary' onclick=showModal()>+</button></td>
+            <td><button type='button' class='btn btn-sm btn-primary add-button' data-kimlik='${item.Kimlik}'>+</button></td>
             <td>${item.Create_Time}</td>
             <td>${item.GirenPartiNo}</td>
             <td>${item.GirenBoy}</td>
@@ -127,11 +195,125 @@
           const row = $('<tr></tr>').html(tablerow);
           billettable.append(row);
         });
+
+        $('.add-button').on('click', function() {
+          const kimlik = $(this).data('kimlik');
+          const row = $(this).closest('tr');
+          console.log(kimlik);
+
+          row.animate({
+            backgroundColor: "#f2f2f2"
+          }, 500).animate({
+            backgroundColor: ""
+          }, 500);
+          
+          
+          const hammaddeData = new FormData();
+          hammaddeData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+          hammaddeData.append("Kimlik", kimlik);
+          $.ajax({
+            url: '/save_hammadde_billets/',
+            method: 'POST',
+            contentType: false,
+            processData: false,
+            data: hammaddeData,
+            success: function(response) {
+              console.log('Data saved successfully:', response);
+              row.animate({opacity: 0}, 500, function() {
+                $(this).remove();
+                if ($('#transfer-table tr').length === 0) {
+                  location.reload();
+                };
+                fill_stok_table();
+              });
+
+            },
+            error: function(xhr, status, error) {
+              console.error('Error saving data:', error);
+            }
+          });
+        });
+      },
+      error: function() {
+        const transfercard = $('#transfer-card');
+        transfercard.remove();
       }
+
     });
 
+    
 
-  })
+  };
+
+  function fill_stok_table() {
+    $.ajax({
+      url:'/get_stok_billets/',
+      method: 'GET',
+      success: function(data) {
+        const stoktable = $('#stok-table');
+        stoktable.empty();
+        console.log(data);
+        
+        //item.firin_aktif fırında olan billet sayısı, item.firin_pasif fırına atılmış ve tüketilmiş billet sayısı, item.adet ile fırında olmayan billet sayısı
+        data.forEach(function(item) {
+          let total = item.firin_aktif + item.firin_pasif + item.adet;
+          let aktif = (item.firin_aktif / total) * 100 || 0;
+          let pasif = (item.firin_pasif / total) * 100 || 0;
+          let stok = (item.adet / total) * 100 || 0;
+
+          let progressHtml = `
+            <div class="progress" style="height: 20px;">
+              <div class="progress-bar bg-primary" role="progressbar" style="width: ${stok}%" aria-valuenow="${stok}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" title="Stokta: ${item.adet}">${item.adet}</div>
+              <div class="progress-bar bg-success" role="progressbar" style="width: ${aktif}%" aria-valuenow="${aktif}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" title="Fırında: ${item.firin_aktif}">${item.firin_aktif}</div>
+              <div class="progress-bar bg-secondary" role="progressbar" style="width: ${pasif}%" aria-valuenow="${pasif}" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" title="Tüketilen: ${item.firin_pasif}">${item.firin_pasif}</div>
+            </div>
+          `;
+          let stablerow = `
+            <td><button type='button' class='btn btn-sm btn-primary' onclick=showModal(${item.id})>Fırına At</button></td>
+            <td>${item.parti_no}</td>
+            <td>${item.boy}</td>
+            <td>${item.kg}</td>
+            <td>${item.adet}</td>
+            <td>${item.stok_cinsi}</td>
+            <td>${item.aciklama}</td>
+            <td>${progressHtml}</td>
+          `;
+          const row = $('<tr></tr>').html(stablerow);
+          stoktable.append(row);
+        });
+      },
+
+      });
+  };
+
+  function fill_firin_table() {
+      $.ajax({
+      url:'/get_firin_billets/',
+      method: 'GET',
+      success: function(data) {
+        const firintable = $('#firin-table');
+        firintable.empty();
+
+        data.forEach(function(item) {
+          let tablerow = `
+            <td>${item.parti_no}</td>
+            <td>${item.guncel_boy}</td>
+            <td>${item.billet_cinsi}</td>
+            <td>${item.billet_no}</td>
+          `;
+          const row = $('<tr></tr>').html(tablerow);
+          firintable.append(row);
+        });
+      },
+
+      });
+  }
+
+  $(document).ready(function() {
+    fill_transfer_table();
+    fill_stok_table();
+    fill_firin_table();
+  });
 </script>
 {% endblock %}
 

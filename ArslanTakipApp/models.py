@@ -244,15 +244,16 @@ class HammaddeBilletStok(models.Model):
     adet = models.IntegerField(null=True, blank=True)
     kg = models.FloatField(null=True, blank=True)
     stok_cinsi = models.CharField(null=True, blank=True)
-    transfer_giren_kg = models.FloatField(null=True, blank=True)
     aciklama = models.CharField(null=True, blank=True)
     gelen_kimlik = models.IntegerField(null=True)
 
-class HammaddeBillet(models.Model):
-    billet_no = models.BigIntegerField(primary_key=True, auto_created=True, serialize=True)
-    stok = models.ForeignKey(HammaddeBilletStok, on_delete=models.SET_NULL, null=True)
+class HammaddeBilletCubuk(models.Model): #fırın için
+    billet_no = models.CharField(null=True, blank=True)
+    parti_no =models.CharField(null=True, blank=True)
+    stok = models.ForeignKey(HammaddeBilletStok, on_delete=models.DO_NOTHING, null=True)
     guncel_boy = models.FloatField(null=True, blank=True)
     sira = models.IntegerField(null=True, blank=True)
+    tarih = models.DateTimeField(null=True, blank=True)
 
 class EkSiparis(models.Model):
     EkNo = models.IntegerField(null=True)

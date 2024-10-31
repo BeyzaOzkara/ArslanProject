@@ -28,7 +28,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
 from django.utils import timezone
 import urllib3
-from .models import BilletDepoTransfer, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip
+from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip
 from django.template import loader
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -2137,50 +2137,112 @@ def baskigecmisi_list(request):
 class HammaddeBilletView(generic.TemplateView):
     template_name = 'ArslanTakipApp/hammaddebillet.html'
 
-def get_parti_no(request):
+def get_transfer_billets(request):
     one_week = timezone.now() - timezone.timedelta(days=7)
     billet_kimlikler = BilletDepoTransfer.objects.using('dies').filter(Create_Time__gte=one_week, GirenDepoKodu='4.FAB.PRES.').values_list('Kimlik', flat=True)
     hammadde_kimlikler = HammaddeBilletStok.objects.filter(kayit_tarihi__gte=one_week).values_list('gelen_kimlik', flat=True)
 
     available_kimlikler = set(billet_kimlikler) - set(hammadde_kimlikler)
-    # parti_nos = BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values_list('GirenPartiNo', flat=True)
-    parti_nos = BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values('Kimlik', 'GirenPartiNo')
-    return JsonResponse(list(parti_nos), safe=False)
-
-def get_billet_info(request):
-    kimlik = request.GET.get('kimlik')
-    if not kimlik:
-        return JsonResponse({"error": "Kimlik is required"}, status=400)
-
-    stok_info = BilletDepoTransfer.objects.using('dies').filter(Kimlik=kimlik).values(
-        'Kimlik', 'Create_Time', 'GirenPartiNo', 'GirenBoy', 'GirenAdet', 'GirenKg', 'GirenDepoKodu', 'StokCinsi', 'Aciklama'
-    )[0]
-
-    if stok_info:
-        return JsonResponse(stok_info, safe=False)
-    else:
-        return JsonResponse({"error": "Billet information not found"}, status=404)
-
-def get_available_billets(request):
-    one_week = timezone.now() - timezone.timedelta(days=7)
-    billet_kimlikler = BilletDepoTransfer.objects.using('dies').filter(Create_Time__gte=one_week, GirenDepoKodu='4.FAB.PRES.').values_list('Kimlik', flat=True)
-    hammadde_kimlikler = HammaddeBilletStok.objects.filter(kayit_tarihi__gte=one_week).values_list('gelen_kimlik', flat=True)
-
-    available_kimlikler = set(billet_kimlikler) - set(hammadde_kimlikler)
-    stok_info = list(BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values(
+    transfer_info = list(BilletDepoTransfer.objects.using('dies').filter(Kimlik__in=available_kimlikler).values(
         'Kimlik', 'Create_Time', 'GirenPartiNo', 'GirenBoy', 'GirenAdet', 'GirenKg', 'GirenDepoKodu', 'StokCinsi', 'Aciklama'
     ))
 
-    for s in stok_info:
+    for s in transfer_info:
         s['Create_Time']=format_date(s['Create_Time'])
+    
+    if transfer_info:
+        return JsonResponse(transfer_info, safe=False)
+    else:
+        return JsonResponse({"error": "Billet information not found"}, status=404)
+    
+def get_stok_billets(request):
+    stok_info = list(HammaddeBilletStok.objects.values().exclude(adet = 0))
+    for item in stok_info:
+        item['firin_aktif'] = HammaddeBilletCubuk.objects.filter(stok_id=item['id']).exclude(sira = 0).count()
+        item['firin_pasif'] = HammaddeBilletCubuk.objects.filter(stok_id=item['id'], sira=0).count()
 
     if stok_info:
         return JsonResponse(stok_info, safe=False)
     else:
-        return JsonResponse({"error": "Billet information not found"}, status=404)
+        return JsonResponse({"error": "Stok information not found"}, status=404)
 
-def save_hammadde(request):
-    return
+def get_firin_billets(request):
+    firin_info = list(HammaddeBilletCubuk.objects.values().exclude(sira = 0))
+    for f in firin_info:
+        stok_info = HammaddeBilletStok.objects.get(id=f["stok_id"])
+        f['parti_no'] = stok_info.parti_no
+        f['billet_cinsi'] = stok_info.stok_cinsi
+    if firin_info:
+        return JsonResponse(firin_info, safe=False)
+    else:
+        return JsonResponse({"error": "Fırın information not found"}, status=404)
+    
+
+def save_hammadde_billets(request):
+    if request.method == 'POST':
+        kimlik = int(request.POST.get('Kimlik'))
+        print(kimlik)
+
+        try:
+            transfer = BilletDepoTransfer.objects.using('dies').filter(Kimlik=kimlik).values('GirenPartiNo', 'GirenBoy', 'GirenAdet', 'GirenKg', 'StokCinsi', 'Aciklama', 'Kimlik')[0]
+            print(transfer)
+            HammaddeBilletStok.objects.create(
+                parti_no=transfer['GirenPartiNo'],
+                boy=transfer['GirenBoy'],
+                adet=transfer['GirenAdet'],
+                kg=transfer['GirenKg'],
+                stok_cinsi=transfer['StokCinsi'],
+                aciklama=transfer['Aciklama'],
+                gelen_kimlik=kimlik,
+                konum_id=1102
+            )
+
+            return JsonResponse({'success': True, 'message': 'Hammadde eklendi.'})
+        except HammaddeBilletStok.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'id not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+        
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
+
+def billet_firina_at(request):
+    if request.method == 'POST':
+        stok_id = request.POST.get('id')
+        adet = int(request.POST.get('adet'))
+
+        try:
+            stok_info = HammaddeBilletStok.objects.get(id=stok_id)
+            last_billet = HammaddeBilletCubuk.objects.filter(stok=stok_info).order_by('-sira').first()
+            next_sira = (last_billet.sira + 1) if last_billet else 1
+            
+            last_billet_parti_no = HammaddeBilletCubuk.objects.filter(parti_no=stok_info.parti_no).order_by('-sira').first()
+            if last_billet:
+                last_billet_no = last_billet_parti_no.billet_no
+                last_number = int(last_billet_no.split('-')[-1])
+                next_number = last_number + 1
+            else:
+                next_number = 1
+
+            for i in range(adet):
+                HammaddeBilletCubuk.objects.create(
+                    billet_no=f"{stok_info.parti_no}-{next_number + i}",
+                    stok=stok_info,
+                    parti_no=stok_info.parti_no,
+                    guncel_boy=stok_info.boy,
+                    sira=next_sira + i,
+                    tarih=datetime.datetime.now()
+                )
+
+            stok_info.adet -= adet  # adet değiştiğinde kgde değişmeli (adet*boy*0.1367 mi?)
+            stok_info.save()
+            return JsonResponse({'success': True, 'message': 'Fırına atıldı.'})
+        except HammaddeBilletStok.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'id not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
+
 
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
