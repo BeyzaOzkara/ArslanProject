@@ -1,0 +1,46 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+  Pres Sipariş Listesi
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+
+{% endblock %}
+
+{% block content %}
+<div>
+    {% for profil_no, orders in grouped_orders.items %}
+    <h3>Profil No: {{ profil_no }}</h3>
+    <ul>
+        {% for order in orders %}
+            <li>
+                Kimlik: {{ order.Kimlik }}, Kart No: {{ order.KartNo }}, Kalan Kg: {{ order.Kg }}
+            </li>
+        {% endfor %}
+    </ul>
+    {% empty %}
+        <p>Sipariş bulunamadı.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}
+

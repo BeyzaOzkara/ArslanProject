@@ -72,7 +72,7 @@ class Kalip(models.Model):
     def __str__(self):
         return self.KalipNo
 
-class DiesLocation(models.Model):
+class DiesLocation(models.Model): #Kalıpların son konumları
     kalipNo = models.CharField(primary_key=True, verbose_name="Kalıp Numarası")
     kalipVaris = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
     hareketTarihi = models.DateTimeField(auto_now=True, null=True)
@@ -80,6 +80,16 @@ class DiesLocation(models.Model):
     class Meta:
         managed = False
         db_table = 'View1_KalipLastLocation'
+
+class LocationDies(models.Model): #konumların içindeki kalıplar
+    location_id = models.IntegerField(null=True)
+    locationName = models.CharField(null=True)
+    kalip_list = models.TextField(null=True)
+
+    class Meta:
+        managed=False
+        db_table = 'View_DiesInLocations'
+
 
 #bir yerden diğer yere aktarılması, tarih saat, kim
 class Hareket(models.Model):

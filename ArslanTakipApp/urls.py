@@ -112,4 +112,5 @@ urlpatterns = [
     path('get_firin_billets/', views.get_firin_billets, name='get_firin_billets'),
     path('save_hammadde_billets/', views.save_hammadde_billets),
     path('billet_firina_at/', views.billet_firina_at),
+    path('pres_siparis_list/', views.PresSiparisListView.as_view(), name='pres_siparis_list'),
 ]

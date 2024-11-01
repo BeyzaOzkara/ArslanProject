@@ -1384,6 +1384,33 @@ def eksiparis_yuzey(request):
     data = json.dumps(raporList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+
+class PresSiparisListView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/presSiparisList.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pres_grubu = '4500-1'
+        location_ids = gozler.get(pres_grubu, [])
+
+        die_numbers = list(DiesLocation.objects.filter(kalipVaris__in=location_ids).values_list('kalipNo', flat=True))
+        
+        all_orders = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']) \
+            .only('Kimlik', 'Kg', 'PlanlananMm', 'Siparismm', 'FirmaAdi', 'KondusyonTuru', 'SonTermin')
+        orders = all_orders.filter(ProfilNo__in=die_numbers)
+
+        grouped_orders = {}
+        for order in orders:
+            profil_no = order.ProfilNo
+            if profil_no not in grouped_orders:
+                grouped_orders[profil_no] = []
+            grouped_orders[profil_no].append(order)
+
+        print(grouped_orders)
+
+        context['grouped_orders'] = grouped_orders
+        return context
+
 class PresUretimTakipView(generic.TemplateView):
     template_name = 'ArslanTakipApp/presUretimTakipList.html'
 
@@ -1582,28 +1609,8 @@ def pres_uretim_takip(request, id):
                                 node['replies'].append(com_dict)
                                 break
         return tree
-    # def build_comment_tree(comments):
-    #     comment_dict = {comment.id: comment for comment in comments}
-    #     tree = []
-        
-    #     for comment in comments:
-    #         comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
-    #         if comment.ReplyTo is None:  # This is a top-level comment
-    #             tree.append({'comment': comment, 'replies': []})
-    #         else:  # This is a reply
-    #             parent = comment_dict.get(comment.ReplyTo.id)
-    #             if parent:
-    #                 for node in tree:
-    #                     if node['comment'] == parent:
-    #                         com_dict = {'comment': comment}
-    #                         node['replies'].append(com_dict)
-    #                         break
-    #     return tree
     
     comment_tree = build_comment_tree(comments)
-    print(f"count: {comments.count()}")
-    print(comment_tree)
-    
     context = {
         'kalip_no': kalip.KalipNo,
         'teknik1': teknik1,
@@ -2134,6 +2141,7 @@ def baskigecmisi_list(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+
 class HammaddeBilletView(generic.TemplateView):
     template_name = 'ArslanTakipApp/hammaddebillet.html'
 
@@ -2167,7 +2175,7 @@ def get_stok_billets(request):
         return JsonResponse({"error": "Stok information not found"}, status=404)
 
 def get_firin_billets(request):
-    firin_info = list(HammaddeBilletCubuk.objects.values().exclude(sira = 0))
+    firin_info = list(HammaddeBilletCubuk.objects.values().exclude(sira = 0).order_by('sira'))
     for f in firin_info:
         stok_info = HammaddeBilletStok.objects.get(id=f["stok_id"])
         f['parti_no'] = stok_info.parti_no
@@ -2177,7 +2185,6 @@ def get_firin_billets(request):
     else:
         return JsonResponse({"error": "Fırın information not found"}, status=404)
     
-
 def save_hammadde_billets(request):
     if request.method == 'POST':
         kimlik = int(request.POST.get('Kimlik'))
@@ -2188,7 +2195,7 @@ def save_hammadde_billets(request):
             print(transfer)
             HammaddeBilletStok.objects.create(
                 parti_no=transfer['GirenPartiNo'],
-                boy=transfer['GirenBoy'],
+                boy=transfer['GirenBoy']*10,
                 adet=transfer['GirenAdet'],
                 kg=transfer['GirenKg'],
                 stok_cinsi=transfer['StokCinsi'],
@@ -2233,7 +2240,8 @@ def billet_firina_at(request):
                     tarih=datetime.datetime.now()
                 )
 
-            stok_info.adet -= adet  # adet değiştiğinde kgde değişmeli (adet*boy*0.1367 mi?)
+            stok_info.adet -= adet  # adet değiştiğinde kgde değişmeli (adet*boy*1.367 mi?)
+            stok_info.kg = stok_info.adet * stok_info.boy * 1.367
             stok_info.save()
             return JsonResponse({'success': True, 'message': 'Fırına atıldı.'})
         except HammaddeBilletStok.DoesNotExist:
