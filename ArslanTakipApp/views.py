@@ -2216,7 +2216,7 @@ def billet_firina_at(request):
             next_sira = (last_billet.sira + 1) if last_billet else 1
             
             last_billet_parti_no = HammaddeBilletCubuk.objects.filter(parti_no=stok_info.parti_no).order_by('-sira').first()
-            if last_billet:
+            if last_billet_parti_no:
                 last_billet_no = last_billet_parti_no.billet_no
                 last_number = int(last_billet_no.split('-')[-1])
                 next_number = last_number + 1
