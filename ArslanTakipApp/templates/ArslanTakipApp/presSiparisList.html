@@ -17,24 +17,133 @@
 {% endblock %}
 
 {% block content %}
-<div>
-    {% for profil_no, orders in grouped_orders.items %}
-    <h3>Profil No: {{ profil_no }}</h3>
-    <ul>
-        {% for order in orders %}
-            <li>
-                Kimlik: {{ order.Kimlik }}, Kart No: {{ order.KartNo }}, Kalan Kg: {{ order.Kg }}
-            </li>
-        {% endfor %}
-    </ul>
-    {% empty %}
-        <p>Sipariş bulunamadı.</p>
-    {% endfor %}
+<div class="container col-12">
+  <div class="card">
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Profil No</th> 
+                <th>Kart No</th> 
+                <th>Kalan Kg</th>
+                <th>Termin</th> 
+                <th>Billet Türü</th>
+                <th>Kondüsyon</th>
+                <th>Yüzey</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="stok-table">
+            {% for profil_no, orders in grouped_orders.items %}
+                {% for order in orders %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td rowspan="{{ orders|length }}" style="font-size: large; font-weight: bold;">{{ profil_no }}</td>
+                            <td>{{ order.KartNo }}</td>
+                            <td>{{ order.Kg }}</td>
+                            <td>{{ order.Termin }}</td>
+                            <td>{{ order.BilletTuru }}</td>
+                            <td>{{ order.KondusyonTuru }}</td>
+                            <td>{{ order.YuzeyOzelligi }}</td>
+                            <td><button class="btn btn-primary" onclick="showDieNumbers('{{ profil_no }}', '{{ order.Kimlik }}')">Üretime Başla</button></td>
+                        {% else %}
+                            <td>{{ order.KartNo }}</td>
+                            <td>{{ order.Kg }}</td>
+                            <td>{{ order.Termin }}</td>
+                            <td>{{ order.BilletTuru }}</td>
+                            <td>{{ order.KondusyonTuru }}</td>
+                            <td>{{ order.YuzeyOzelligi }}</td>
+                            <td><button class="btn btn-primary" onclick="showDieNumbers('{{ profil_no  }}', '{{ order.Kimlik }}')">Üretime Başla</button></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+</div>
+<div class="modal fade" id="dieNumbersModal" tabindex="-1" role="dialog" aria-labelledby="dieNumbersModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dieNumbersModalLabel">Kalıp Seç</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="card-holder">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="modalBtnUretimeBasla" class="btn btn-primary" data-kimlik="" data-dismiss="modal" style="font-size: 1.5rem; font-weight:bold ;">Üretime Başla</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+
+  function showDieNumbers(profilno, kimlik) {
+    $.ajax({
+        url: '/get_die_numbers_for_production/',
+        type: 'GET',
+        data: { 'profil_no': profilno },
+        success: function(data) {
+            const cardholder = $('#card-holder');
+            cardholder.empty();
+            data.dieNumbers.forEach(function(number) {
+              let kalipNo = $('<div class="card bg-info text-white text-center">').html(`
+                <label for="check${number}" style="display: inline-flex; align-items: center; font-size: 2rem;">
+                  <div class="card-body">
+                    <input class="check-input mr-2" type="radio" name="dieNumber" id="check${number}" value="${number}" aria-label="..." style="transform: scale(2);">  ${number}</div>
+                </label>`);
+              cardholder.append(kalipNo);
+            });
+            $('#modalBtnUretimeBasla').attr('data-kimlik', kimlik).prop('disabled', true);
+            $('input[name="dieNumber"]').change(function() {
+                $('#modalBtnUretimeBasla').prop('disabled', false);
+            });
+            $('#dieNumbersModal').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching die numbers:', error);
+            alert('Kalıp numaralarını getirirken bir hata ile karşılaşıldı.');
+        }
+    });
+  };
+
+  $('#modalBtnUretimeBasla').click(function() {
+    const selectedDieNumber = $('input[name="dieNumber"]:checked').val();
+    const kimlik = $(this).attr('data-kimlik');
+
+    if (selectedDieNumber) {
+        $.ajax({
+            url: '/pres_siparis_list/',
+            type: 'POST',
+            data: {
+                'kimlik': kimlik,
+                'die_number': selectedDieNumber,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                $('#dieNumbersModal').modal('hide');
+                alert(response.message);
+                window.location.href = "/pres_siparis_takip/"+response.id;
+                // sayfa yönlendirme ile siparis kart bilgi sayfasına yönlendir
+            },
+            error: function(xhr, status, error) {
+                console.error('Error starting production:', error);
+                alert('Üretime başlatırken bir hata ile karşılaşıldı.');
+            }
+        });
+    } else {
+        alert('Lütfen bir kalıp numarası seçin.');
+    }
+  });
 
 </script>
 {% endblock %}

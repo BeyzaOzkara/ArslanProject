@@ -201,15 +201,11 @@ class SiparisList(models.Model):
         managed = False
         db_table = 'View051_ProsesDepoListesi'
 
-class PresUretimTakip(models.Model): # pres operatörü, şarj no vs eklenecek
+class PresUretimTakip(models.Model):
     siparis_kimlik = models.IntegerField(null=True, blank=True)
     kalip_no = models.CharField(null=True, blank=True)
     pres_kodu = models.CharField(null=True, blank=True)
     baslangic_datetime = models.DateTimeField(null=True, blank=True)
-    bitis_datetime = models.DateTimeField(null=True, blank=True)
-    finish_reason = models.CharField(null=True, blank=True)
-    destination = models.ForeignKey(Location, on_delete=models.DO_NOTHING, null=True, blank=True)
-    billet_boy_adet = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = "PresUretimTakip"

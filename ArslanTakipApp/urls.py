@@ -104,8 +104,6 @@ urlpatterns = [
     path('presuretimbasla', views.presuretimbasla, name='presuretimbasla'),
     path('presuretimbitir', views.presuretimbitir, name='presuretimbitir'),
     path('uretim_get_locations', views.uretim_get_locations, name='uretimgetlocations'),
-    path('presuretimtakip/<int:id>/', views.pres_uretim_takip, name='pres_uretim_takip'),
-    path('presuretimtakip/rapor', views.pres_uretim_takip_rapor),
     path('hammadde_billet/', views.HammaddeBilletView.as_view(), name='hammadde_billet'),
     path('get_transfer_billets/', views.get_transfer_billets, name='get_transfer_billets'),
     path('get_stok_billets/', views.get_stok_billets, name='get_stok_billets'),
@@ -113,4 +111,7 @@ urlpatterns = [
     path('save_hammadde_billets/', views.save_hammadde_billets),
     path('billet_firina_at/', views.billet_firina_at),
     path('pres_siparis_list/', views.PresSiparisListView.as_view(), name='pres_siparis_list'),
+    path('get_die_numbers_for_production/', views.get_die_numbers_for_production),
+    path('pres_siparis_takip/<int:id>/', views.pres_siparis_takip, name='pres_siparis_takip'),
+    path('pres_siparis_takip/rapor', views.pres_siparis_takip_rapor),
 ]

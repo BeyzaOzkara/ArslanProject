@@ -1388,28 +1388,156 @@ def eksiparis_yuzey(request):
 class PresSiparisListView(generic.TemplateView):
     template_name = 'ArslanTakipApp/presSiparisList.html'
     
+    # eğer preste kalıp var ise uyarı versin ve yeni üretime başlanamasın
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pres_grubu = '4500-1'
         location_ids = gozler.get(pres_grubu, [])
 
         die_numbers = list(DiesLocation.objects.filter(kalipVaris__in=location_ids).values_list('kalipNo', flat=True))
+        profil_list = set(KalipMs.objects.using('dies')
+                      .filter(KalipNo__in=list(die_numbers))
+                      .exclude(Silindi=1)
+                      .values_list('ProfilNo', flat=True))
+        orders = (
+            SiparisList.objects.using('dies')
+            .filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE'], ProfilNo__in=profil_list)
+            .only('ProfilNo', 'Kimlik', 'Kg', 'KartNo', 'SonTermin', 'BilletTuru', 'KondusyonTuru', 'YuzeyOzelligi') 
+        )
         
-        all_orders = SiparisList.objects.using('dies').filter(Adet__gt=0, KartAktif=1, BulunduguYer__in=['DEPO', 'TESTERE']) \
-            .only('Kimlik', 'Kg', 'PlanlananMm', 'Siparismm', 'FirmaAdi', 'KondusyonTuru', 'SonTermin')
-        orders = all_orders.filter(ProfilNo__in=die_numbers)
-
         grouped_orders = {}
         for order in orders:
             profil_no = order.ProfilNo
             if profil_no not in grouped_orders:
                 grouped_orders[profil_no] = []
-            grouped_orders[profil_no].append(order)
-
-        print(grouped_orders)
+            grouped_orders[profil_no].append({
+                'Kimlik': order.Kimlik,
+                'KartNo': order.KartNo,
+                'Kg': order.Kg,
+                'Termin': format_date(order.SonTermin),
+                'BilletTuru': order.BilletTuru,
+                'KondusyonTuru': order.KondusyonTuru,
+                'YuzeyOzelligi': order.YuzeyOzelligi,
+            })
 
         context['grouped_orders'] = grouped_orders
         return context
+    
+    def post(self, request, *args, **kwargs):
+        kimlik = request.POST.get('kimlik')
+        die_number = request.POST.get('die_number')
+
+        try:
+            production_id = self.start_production(kimlik, die_number) # oluşturduğumuz presuretimtakip entrysinin idsini döndür
+            
+            return JsonResponse({'status': 'success', 'message': 'Üretim başarıyla başlatıldı.', 'id': production_id})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        
+    def start_production(self, kimlik, die_number):
+        print(f"kimlik: {kimlik}, kalıp no: {die_number}")
+        # pres_kodu = '4500-1' olan pres_takipi bul ve değiştir, yoksa yarat
+        pres_kodu = '4500-1' # parametre olarak gönder
+        try: 
+            pres_takip = PresUretimTakip.objects.get(pres_kodu=pres_kodu)
+            pres_takip.siparis_kimlik = kimlik
+            pres_takip.kalip_no = die_number
+            pres_takip.baslangic_datetime = datetime.datetime.now()
+            pres_takip.save()
+
+        except PresUretimTakip.DoesNotExist:
+            pres_takip = PresUretimTakip.objects.create(
+                siparis_kimlik=kimlik,
+                kalip_no=die_number,
+                pres_kodu=pres_kodu,
+                baslangic_datetime=datetime.datetime.now()
+            )
+        return pres_takip.id
+
+def get_die_numbers_for_production(request):
+    profil_no = request.GET.get('profil_no')
+    pres_grubu = '4500-1' 
+    location_ids = gozler.get(pres_grubu, [])
+
+    kalip_nos = set(KalipMs.objects.using('dies').filter(ProfilNo=profil_no).exclude(Silindi=1).values_list('KalipNo', flat=True))
+
+    die_numbers = list(DiesLocation.objects.filter(kalipVaris__in=location_ids, kalipNo__in=kalip_nos).values_list('kalipNo', flat=True))
+    return JsonResponse({'dieNumbers': die_numbers})
+
+def pres_siparis_takip(request, id):
+    presuretim = get_object_or_404(PresUretimTakip, id=id)
+    kalip = KalipMs.objects.using('dies').filter(KalipNo=presuretim.kalip_no)[0]
+    resim_dizini = kalip.ResimDizini.replace(" ", "")
+    resim_yol = "http://arslan/static" + resim_dizini[13:]
+    teknik1 = resim_yol + "Teknik1.jpg"
+    teknik2 = resim_yol + "Teknik2.jpg"
+
+    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
+
+    def build_comment_tree(comments):
+        comment_dict = {comment.id: comment for comment in comments}
+        tree = []
+
+        for comment in comments:
+            comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
+            if comment.Silindi == True:
+                if comments.filter(ReplyTo_id=comment.id):
+                    comment.Aciklama = "Yorum silindi."
+                    tree.append({'comment': comment, 'replies': []})
+            else:
+                if comment.ReplyTo is None:  # Top-level comment
+                    tree.append({'comment': comment, 'replies': []})
+                else:  # This is a reply
+                    parent = comment_dict.get(comment.ReplyTo.id)
+                    if parent:
+                        for node in tree:
+                            if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
+                                com_dict = {'comment': comment}
+                                node['replies'].append(com_dict)
+                                break
+        return tree
+    
+    comment_tree = build_comment_tree(comments)
+    context = {
+        'kalip_no': kalip.KalipNo,
+        'teknik1': teknik1,
+        'teknik2': teknik2,
+        'comment_tree': comment_tree,
+    }
+    return render(request, 'ArslanTakipApp/presUretimTakip.html', context)
+
+def pres_siparis_takip_rapor(request):
+    params = json.loads(unquote(request.GET.get('params')))
+    size = params["size"]
+    page = params["page"]
+    offset, limit = calculate_pagination(page, size)
+    filter_list = params["filter"]
+    q = {} 
+    kalip_count = 0
+    lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+
+    if len(filter_list)>0:
+        for i in filter_list:
+            if i["type"] == "like":
+                q[i['field']+"__startswith"] = i['value']
+            elif i["type"] == "=":
+                q[i['field']] = i['value']
+    
+        query = PresUretimRaporu.objects.using('dies').filter(**q) \
+        .values('PresKodu', 'Tarih', 'BaslamaSaati', 'BitisSaati', 'HataAciklama', 'Durum').order_by('-Tarih')
+
+        g = list(query[offset:limit])
+        for c in g:
+            if c['Tarih'] != None:
+                c['Tarih'] = format_date(c['Tarih']) + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
+                c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
+                c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
+        kalip_count = query.count()
+        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+        lastData['data'] = g
+
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
 
 class PresUretimTakipView(generic.TemplateView):
     template_name = 'ArslanTakipApp/presUretimTakipList.html'
@@ -1543,81 +1671,6 @@ def presuretimbitir(request):
             print(f"Error: {e}")
             return JsonResponse({'message': 'Bir hata oluştu. Lütfen tekrar deneyin.'})
     return JsonResponse({'message': 'Geçersiz istek metodu.'})
-
-def pres_uretim_takip_rapor(request):
-    params = json.loads(unquote(request.GET.get('params')))
-    size = params["size"]
-    page = params["page"]
-    offset, limit = calculate_pagination(page, size)
-    filter_list = params["filter"]
-    q = {} 
-    kalip_count = 0
-    lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
-
-    if len(filter_list)>0:
-        for i in filter_list:
-            if i["type"] == "like":
-                q[i['field']+"__startswith"] = i['value']
-            elif i["type"] == "=":
-                q[i['field']] = i['value']
-    
-        query = PresUretimRaporu.objects.using('dies').filter(**q) \
-        .values('PresKodu', 'Tarih', 'BaslamaSaati', 'BitisSaati', 'HataAciklama', 'Durum').order_by('-Tarih')
-
-        g = list(query[offset:limit])
-        for c in g:
-            if c['Tarih'] != None:
-                c['Tarih'] = format_date(c['Tarih']) + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
-                c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
-                c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
-        kalip_count = query.count()
-        lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
-        lastData['data'] = g
-
-    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return HttpResponse(data)
-
-def pres_uretim_takip(request, id):
-    presuretim = get_object_or_404(PresUretimTakip, id=id)
-    kalip = KalipMs.objects.using('dies').filter(KalipNo=presuretim.kalip_no)[0]
-    resim_dizini = kalip.ResimDizini.replace(" ", "")
-    resim_yol = "http://arslan/static" + resim_dizini[13:]
-    teknik1 = resim_yol + "Teknik1.jpg"
-    teknik2 = resim_yol + "Teknik2.jpg"
-
-    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
-
-    def build_comment_tree(comments):
-        comment_dict = {comment.id: comment for comment in comments}
-        tree = []
-
-        for comment in comments:
-            comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
-            if comment.Silindi == True:
-                if comments.filter(ReplyTo_id=comment.id):
-                    comment.Aciklama = "Yorum silindi."
-                    tree.append({'comment': comment, 'replies': []})
-            else:
-                if comment.ReplyTo is None:  # Top-level comment
-                    tree.append({'comment': comment, 'replies': []})
-                else:  # This is a reply
-                    parent = comment_dict.get(comment.ReplyTo.id)
-                    if parent:
-                        for node in tree:
-                            if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
-                                com_dict = {'comment': comment}
-                                node['replies'].append(com_dict)
-                                break
-        return tree
-    
-    comment_tree = build_comment_tree(comments)
-    context = {
-        'kalip_no': kalip.KalipNo,
-        'teknik1': teknik1,
-        'teknik2': teknik2,
-        'comment_tree': comment_tree,
-    }
-    return render(request, 'ArslanTakipApp/presUretimTakip.html', context)
 
 class eksiparisDenemeView(generic.TemplateView):
     template_name = 'ArslanTakipApp/eksiparisdeneme.html'
