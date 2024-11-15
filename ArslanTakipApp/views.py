@@ -157,6 +157,10 @@ def location(request):
                 
             if gozCapacity == None:
                 hareketSave(dieList, lRec, dieTo, request)
+                send_email_notification(request, dieList, dieTo)
+                # eğer belli bölümler gönderiyorsa mail de gönderilmeli
+                # şu bölüm şu kalıpları gönderdi şeklinde mail göndermeli
+                # eğer kullanıcının grup ismi içinde 'Konum' geçen bir grubu varsa mail gönderen grup adı olsun
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
                 if firinKalipSayisi < gozCapacity:
@@ -168,6 +172,16 @@ def location(request):
         
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
+
+def send_email_notification(request, dieList, dieTo):
+    user_groups = request.user.groups.all()
+    group_names = [group.name for group in user_groups]
+
+    sender_group_name = next((group.name for group in user_groups if 'Konum' in group.name), None)
+    sender_location = sender_group_name.split("- ")[1]
+
+    # if dieTo in ()
+    
 
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
@@ -1452,7 +1466,7 @@ class PresSiparisListView(generic.TemplateView):
                 pres_kodu=pres_kodu,
                 baslangic_datetime=datetime.datetime.now()
             )
-        return pres_takip.id
+        return pres_takip.id 
 
 def get_die_numbers_for_production(request):
     profil_no = request.GET.get('profil_no')
@@ -1466,14 +1480,17 @@ def get_die_numbers_for_production(request):
 
 def pres_siparis_takip(request, id):
     presuretim = get_object_or_404(PresUretimTakip, id=id)
+    siparis = SiparisList.objects.using('dies').filter(Kimlik=presuretim.siparis_kimlik)[0]
+    print(siparis)
     kalip = KalipMs.objects.using('dies').filter(KalipNo=presuretim.kalip_no)[0]
     resim_dizini = kalip.ResimDizini.replace(" ", "")
     resim_yol = "http://arslan/static" + resim_dizini[13:]
     teknik1 = resim_yol + "Teknik1.jpg"
     teknik2 = resim_yol + "Teknik2.jpg"
 
-    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
+    siparis.SonTermin = format_date(siparis.SonTermin)
 
+    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
     def build_comment_tree(comments):
         comment_dict = {comment.id: comment for comment in comments}
         tree = []
@@ -1502,6 +1519,7 @@ def pres_siparis_takip(request, id):
         'kalip_no': kalip.KalipNo,
         'teknik1': teknik1,
         'teknik2': teknik2,
+        'siparis': siparis,
         'comment_tree': comment_tree,
     }
     return render(request, 'ArslanTakipApp/presUretimTakip.html', context)
@@ -1853,60 +1871,6 @@ def eksiparis_list(request):
     page = params["page"]
     filter_list = params["filter"]
     offset, limit = calculate_pagination(page, size)
-    # q = {}
-
-    # user_id = request.user.id
-    # user_pres_dict = {1: '4500-1', 2: '4500-1'}
-    # user_pres = user_pres_dict[user_id]
-
-    # eksiparis_query = EkSiparis.objects.all()
-    # siparis_all_query = SiparisList.objects.using('dies').all()
-    # pres_eksiparis = eksiparis_query.filter(PresGrubu=user_pres)
-    # eksiparisler = []
-    # order_field = "Sira"
-    # exclude_field = "MsSilindi"
-
-    # if pres_eksiparis.exists():
-    #     eksiparisler = pres_eksiparis.exclude(MsSilindi = True).exclude(Silindi = True)
-    # else:
-    #     siparis_query = siparis_all_query.filter(PresKodu=user_pres)
-    #     eksiparisler = siparis_query
-    #     order_field = "SonTermin"
-
-    # if len(filter_list)>0:
-    #     for i in filter_list:
-    #         q = filter_method(i, q)
-    
-    # ekSiparis = eksiparisler.filter(**q).order_by(order_field)
-    # ek_siparis_list = list(ekSiparis[offset:limit].values())
-
-    # for e in ek_siparis_list:
-    #     siparis1 = siparis_all_query.get(Kimlik=e['Kimlik'])
-    #     e['Termin'] = format_date(e['Termin'])
-    #     e['KartNo'] = f"{e['KartNo']}-{e['EkNo']}"
-    #     e['KimTarafindan'] = get_user_full_name(int(e['KimTarafindan_id']))
-    #     e.update({
-    #         'FirmaAdi': siparis1.FirmaAdi,
-    #         'GirenKg': siparis1.GirenKg,
-    #         'Kg': siparis1.Kg,
-    #         'GirenAdet': siparis1.GirenAdet,
-    #         'Adet': siparis1.Adet,
-    #         'PlanlananMm': siparis1.PlanlananMm,
-    #         'Mm': siparis1.Siparismm,
-    #         'KondusyonTuru': siparis1.KondusyonTuru,
-    #         'SiparisTamam': siparis1.SiparisTamam,
-    #         'SonTermin': format_date(siparis1.SonTermin),
-    #         'AktifKalip': siparis1.AktifKalip,
-    #         'KalipSokmeDurum': kalipPresCheck(e['id']),
-    #         'UretimDurum' : checkKalip(e['id']), 
-    #     })
-    # ek_count = ekSiparis.count()
-    # lastData= {'last_page': math.ceil(ek_count/size), 'data': []}
-    # lastData['data'] = ek_siparis_list
-    # data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    # return HttpResponse(data)
-
-    # presKodu bazlı getirilecek pres operatörlerine sadece o pres için olan siparişleri görme yetkisi verilecek.
     
     q={}
     w={}

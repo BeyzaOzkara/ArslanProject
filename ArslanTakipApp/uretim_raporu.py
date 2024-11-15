@@ -24,36 +24,37 @@ def check_new_rapor():
 
         for n in new_raports:
             if n['KalipNo'] != '':
-                if n['PresKodu'] in birinci_fab:
-                    varis = 547
-                elif n['PresKodu'] in ikinci_fab:
+                if n['PresKodu'] in ikinci_fab:
                     varis = 766
-                else:
-                    continue
-                try:
-                    kalip = KalipMs.objects.using('dies').filter(KalipNo=n['KalipNo']).first()
-                    last_location = DiesLocation.objects.filter(kalipNo = n['KalipNo']).first()
-                    if not last_location:
-                        last_location = DiesLocation.objects.filter(kalipNo = n['KalipNo']+"               ").first()
-                    pres_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first()
-                    if last_location and (last_location.kalipVaris != pres_location):
+                    try:
+                        kalip = KalipMs.objects.using('dies').filter(KalipNo=n['KalipNo']).first()
+                        last_location = DiesLocation.objects.filter(kalipNo = n['KalipNo']).first()
+                        if not last_location:
+                            last_location = DiesLocation.objects.filter(kalipNo = n['KalipNo']+"               ").first()
+                        pres_location = Location.objects.filter(presKodu__contains = n['PresKodu']).first()
+                        if last_location and (last_location.kalipVaris != pres_location):
+                            Hareket.objects.create(
+                                kalipNo=kalip.KalipNo,
+                                kalipKonum=last_location.kalipVaris,
+                                kalipVaris=pres_location,
+                                kimTarafindan_id=57,
+                                aciklama = 'pres uretim raporu hazırlık'
+                            )
                         Hareket.objects.create(
                             kalipNo=kalip.KalipNo,
-                            kalipKonum=last_location.kalipVaris,
-                            kalipVaris=pres_location,
+                            kalipKonum=pres_location,
+                            kalipVaris_id=varis,
                             kimTarafindan_id=57,
-                            aciklama = 'pres uretim raporu hazırlık'
+                            aciklama = n['Siralama']
                         )
-                    Hareket.objects.create(
-                        kalipNo=kalip.KalipNo,
-                        kalipKonum=pres_location,
-                        kalipVaris_id=varis,
-                        kimTarafindan_id=57,
-                        aciklama = n['Siralama']
-                    )
-                except Exception as e:
-                    print(f"Error processing {n['Siralama']}: {e}")
-                    logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
+                    except Exception as e:
+                        print(f"Error processing {n['Siralama']}: {e}")
+                        logger.error(f"An error occurred while processing the {n['Siralama']}: {e}")
+
+                else:
+                    continue
+
+                
             else:
                 continue
     else:

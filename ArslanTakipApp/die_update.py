@@ -11,7 +11,8 @@ def check_new_dies():
                 Hareket.objects.create(
                     kalipVaris_id=48, # Yeri Bilinmeyenler
                     kalipNo=k['KalipNo'],
-                    kimTarafindan_id=57
+                    kimTarafindan_id=57, # Yapay Zeka user
+                    aciklama="Yeni Kalıp"
                 )         
 
 def check_die_deletes():
@@ -28,7 +29,8 @@ def check_die_deletes():
                         kalipKonum_id=last_loc,
                         kalipVaris_id=1134, #HURDA
                         kalipNo=k['KalipNo'],
-                        kimTarafindan_id=57
+                        kimTarafindan_id=57,
+                        aciklama="Kalıp Hurda"
                     )
             except DiesLocation.DoesNotExist:
                 print(f"Warning: No location found for KalipNo: {kalip_no}")

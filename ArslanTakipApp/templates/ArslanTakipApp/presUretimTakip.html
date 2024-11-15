@@ -53,7 +53,7 @@
     <div class="col-md-4 mb-4">
       <button type="button" class="btn btn-block btn-info btn-lg">SİPARİŞ TAMAM</button>
     </div>
-    <div class="col-md-4 mb-4"> <!-- eğer tek kalıp ve tek kart ise bu görünmesin -->
+    <div class="col-md-4 mb-4"> <!-- eğer tek kalıp ve tek kart  -->
       <button type="button" class="btn btn-block btn-success btn-lg">KALIBI SÖK</button>
     </div>
       <div class="col-lg-6 col-md-12 mb-4">
@@ -62,6 +62,110 @@
                   <h5>Teknik Resim</h5> 
               </div>
               <div class="card-body">
+                <div class="row col-lg-12">
+                    <div class="row col-lg-4">
+                        <div class="container-fluid col-lg-12">
+                            <div class="card col-lg-12">
+                                <div class="card-body">  <!-- Fotoğraflar  -->
+                                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active">
+                                                <a href="{{ teknik1 }}" data-toggle="lightbox" id="TeknikA">
+                                                    <img id="TeknikResim" class="d-block w-100" alt="First slide" src="{{ teknik1 }}" > </a>
+                                            </div>
+                                            <div class="carousel-item">
+                                                <a href="{{ teknik2 }}" data-toggle="lightbox" id="TeknikB">
+                                                    <img id="TeknikResim2" class="d-block w-100" alt="Second slide" src="{{ teknik2 }}" > </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card col-lg-12">
+                                <div class="card-body">
+                                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                        <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-left"></i> </span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                                        <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-right"></i> </span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                    <ol class="carousel-indicators">
+                                        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="" style="background-color: rgb(226, 141, 43);"></li>
+                                        <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""  style="background-color: rgb(226, 141, 43);"></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-lg-8">
+                        <div class="container-fluid">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="info-box col-lg-6 col-sm-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">KALIP NO:</span>
+                                        <span class="info-box-number" id="infoKalipNo">{{ kalip_no }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-box col-lg-6 col-sm-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">KART NO:</span>
+                                        <span class="info-box-number" id="infoKartNo">{{ siparis.KartNo }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">KONDÜSYON:</span>
+                                        <span class="info-box-number" id="infoKondusyon">{{ siparis.KondusyonTuru }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">BİLLET:</span>
+                                        <span class="info-box-number" id="infoBillet">{{ siparis.BilletTuru }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">SON TERMİN:</span>
+                                        <span class="info-box-number" id="infoSonUretimGramaj">{{ siparis.SonTermin }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">PROFİL GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoGramaj">{{ siparis.Profil_Gramaj }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row col-lg-12">
+                    <div class="container-fluid">
+                    <div class="row ">
+                        <div class="info-box col-lg-12">
+                            <div class="info-box-content">
+                                <span class="info-box-text">MÜŞTERİ (FİRMA) ADI:</span>
+                                <span class="info-box-number" id="infoGramaj">{{ siparis.FirmaAdi }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+              <!-- <div class="card-body">
                   <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
@@ -86,7 +190,7 @@
                     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="" style="background-color: rgb(226, 141, 43);"></li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""  style="background-color: rgb(226, 141, 43);"></li>
                 </ol>
-              </div>
+              </div> -->
           </div>
       </div>
       <div class="col-lg-6 col-md-12 mb-4">
@@ -109,7 +213,7 @@
               </div>
           </div>
       </div>
-      <div class="col-lg-6 col-md-12 mb-4">
+      <div class="col-lg-6 col-md-12 mb-4"> 
           <div class="card">
               <div class="card-header">
                   <h5>Kalıp Yorumları</h5>
