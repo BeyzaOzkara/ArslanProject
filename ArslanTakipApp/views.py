@@ -159,7 +159,8 @@ def location(request):
                 
             if gozCapacity == None:
                 hareketSave(dieList, lRec, dieTo, request)
-                send_email_notification(request, dieList, dieTo)
+                if int(dieTo) in (48, 1, 545, 1079, 542, 543, 544, 550, 551, 1135, 1136, 547, 555, 556, 568, 569): # 1. fabrikada ise
+                    send_email_notification(request, dieList)
                 # eğer belli bölümler gönderiyorsa mail de gönderilmeli
                 # şu bölüm şu kalıpları gönderdi şeklinde mail göndermeli
                 # eğer kullanıcının grup ismi içinde 'Konum' geçen bir grubu varsa mail gönderen grup adı olsun
@@ -175,36 +176,27 @@ def location(request):
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
-def send_email_notification(request, dieList, dieTo):
+def send_email_notification(request, dieList):
     user_groups = request.user.groups.all()
-    group_names = [group.name for group in user_groups]
-
     sender_group_name = next((group.name for group in user_groups if 'Konum' in group.name), None)
     sender_location = sender_group_name.split("- ")[1]
+    user_info = get_user_full_name(request.user.id)
 
-    if int(dieTo) in (48, 1, 545, 1079, 542, 543, 544, 550, 551, 1135, 1136, 547, 555, 556, 568, 569): # 1. fabrikada ise
-        # Construct email content
-        print("burda")
-        subject = f"Notification from {sender_location}"
-        html_message = render_to_string('mail/die_move.html', {
-            'dieList': dieList,
-            'sender_location': sender_location,
-        })
-        plain_message = strip_tags(html_message)
-        recipient_list = ['ai@arslanaluminyum.com']  # Replace with recipient email(s)
-        try:
-            # Send email
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email='yazilim@aluminyum.com', 
-                recipient_list=recipient_list,
-                html_message=html_message,
-                fail_silently=False
-            )
-            print("Email sent successfully.")
-        except Exception as e:
-            print(f"Error sending email: {e}")
+    subject = f"{sender_location}'dan Kalıp Transferi"
+    html_message = render_to_string('mail/die_move.html', {
+        'dieList': dieList,
+        'sender_location': sender_location,
+        'user_info': user_info
+    })
+    to_address = 'yazilim@arslanaluminyum.com'
+    body = html_message
+
+    try:
+        # Send email
+        send_email(to_address, subject, body)
+        print("Email sent successfully.")
+    except Exception as e:
+        print(f"Error sending email: {e}")
     
 
 def location_list(a):
