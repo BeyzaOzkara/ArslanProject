@@ -1,0 +1,12 @@
+<html>
+<body>
+    <h1>Notification</h1>
+    <p>Location: {{ sender_location }}</p>
+    <p>Die List:</p>
+    <ul>
+        {% for die in dieList %}
+            <li>{{ die }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

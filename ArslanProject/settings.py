@@ -186,6 +186,7 @@ EMAIL_PORT = 587
 EMAIL_TIMEOUT = None
 DEFAULT_FROM_EMAIL = 'yazilim@arslanaluminyum.com'
 
+
 # Celery configurations
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

@@ -30,6 +30,8 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip
 from django.template import loader
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
@@ -48,7 +50,7 @@ from .forms import PasswordChangingForm
 from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
-from mailer import send_mail
+from django.core.mail import send_mail
 from django.db.models.functions import ExtractHour, ExtractMinute
 from .email_utils import check_new_emails, send_email
 from django.core.cache import cache
@@ -180,7 +182,29 @@ def send_email_notification(request, dieList, dieTo):
     sender_group_name = next((group.name for group in user_groups if 'Konum' in group.name), None)
     sender_location = sender_group_name.split("- ")[1]
 
-    # if dieTo in ()
+    if int(dieTo) in (48, 1, 545, 1079, 542, 543, 544, 550, 551, 1135, 1136, 547, 555, 556, 568, 569): # 1. fabrikada ise
+        # Construct email content
+        print("burda")
+        subject = f"Notification from {sender_location}"
+        html_message = render_to_string('mail/die_move.html', {
+            'dieList': dieList,
+            'sender_location': sender_location,
+        })
+        plain_message = strip_tags(html_message)
+        recipient_list = ['ai@arslanaluminyum.com']  # Replace with recipient email(s)
+        try:
+            # Send email
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email='yazilim@aluminyum.com', 
+                recipient_list=recipient_list,
+                html_message=html_message,
+                fail_silently=False
+            )
+            print("Email sent successfully.")
+        except Exception as e:
+            print(f"Error sending email: {e}")
     
 
 def location_list(a):
