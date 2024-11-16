@@ -114,5 +114,5 @@ urlpatterns = [
     path('get_die_numbers_for_production/', views.get_die_numbers_for_production),
     path('pres_siparis_takip/<int:id>/', views.pres_siparis_takip, name='pres_siparis_takip'),
     path('pres_siparis_takip/rapor', views.pres_siparis_takip_rapor),
-    path('4500/pres', views.pres_4500),
+    # path('4500/pres', views.pres_4500),
 ]
