@@ -629,28 +629,8 @@ key = b'arslandenemebyz1'
 
 def qrKalite(request):
     if request.method == "GET":
-        send_email("yazilim@arslanaluminyum.com", "deneme", "deneme body")
-    
-        """ path = request.get_full_path()
-        print(path)
-        print(path.rsplit('/', 1)[-1]) """
-        """ sepetArray = []
-        # Şifre oluşturma
-        for i in range(100,251): #250 if i<10: 
-            sepet = "S" + str(i)
-            encSepet = encrypt_aes_ecb(key, sepet)
-            hexSepet = binascii.hexlify(encSepet)
-            print(hexSepet)
-            #encode mu kullanmıştım??
-            decodedString = hexSepet.decode('utf-8') #??sanırım buydu
-            print(decodedString)
-            s = sepet + ", " + str(decodedString)
-            sepetArray.append(s)
-        print(sepetArray)
-        f = open("QRsepet2.csv", "a")
-        for j in sepetArray:
-            f.write(j+"\n")
-        f.close() """
+        # send_email("yazilim@arslanaluminyum.com", "deneme", "deneme body")
+
         #1 ve 9 arasındaysa başına 2 sıfır 10 ve 99 arasındaysa 1 sıfır
         # Şifre çözme
     #     unhexli = binascii.unhexlify('819a7b20eed64469c8adaa3ccf01ad06')
@@ -3653,3 +3633,6 @@ class UretimPlanlamaView(generic.TemplateView):
 
         return plan
             
+class Press4500View(generic.TemplateView):
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
