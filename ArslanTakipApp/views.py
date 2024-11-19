@@ -275,12 +275,15 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
         kal = KalipMs.objects.using('dies').all()
         a = list(query.values()[(page-1)*size:page*size])
         for b in a:
-            s = kal.get(KalipNo=b['kalipNo'])
-            if s.Silindi == 1 or s.AktifPasif == 'Pasif':
+            if len(kal.filter(KalipNo=b['kalipNo'])) > 0:
+                s = kal.get(KalipNo=b['kalipNo'])
+                if s.Silindi == 1 or s.AktifPasif == 'Pasif':
+                    a.remove(b)
+                c = kal.get(KalipNo=b['kalipNo']).Hatali
+                if c==1:
+                    b['Hatali'] = 1
+            else:
                 a.remove(b)
-            c = kal.get(KalipNo=b['kalipNo']).Hatali
-            if c==1:
-                b['Hatali'] = 1
 
         kalip_count = query.count()
         lastData= {'last_page': math.ceil(kalip_count/size), 'data': [], 'sayi': sayi}
