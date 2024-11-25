@@ -46,14 +46,15 @@ from asgiref.sync import async_to_sync
 # from Crypto.Cipher import AES
 # from Crypto.Util.Padding import pad, unpad
 import locale
-from .forms import PasswordChangingForm
+from .forms import PasswordChangingForm, PasswordResettingForm
 from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
-from django.core.mail import send_mail
 from django.db.models.functions import ExtractHour, ExtractMinute
 from .email_utils import check_new_emails, send_email
 from django.core.cache import cache
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 # Create your views here.
 
 
@@ -70,11 +71,12 @@ class RegisterView(generic.CreateView):
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = 'registration/password_reset.html'
+    form_class = PasswordResettingForm
     email_template_name = 'registration/password_reset_email.html'
     subject_template_name = 'registration/password_reset_subject.txt'
     success_message ="Girilen E-posta adresi ile bir hesap mevcutsa, " \
-                    "şifrenizi ayarlamak için size talimatlar gönderdik. Kısa bir süre içinde almış olmanız gerekiyor." \
-                    "Eğer bir e-posta almadıysanız, lütfen kayıt olduğunuz adresi doğru girdiğinizden emin olun ve spam klasörünüzü kontrol edin."
+                "şifrenizi ayarlamak için size talimatlar gönderdik. Kısa bir süre içinde almış olmanız gerekiyor." \
+                "Eğer bir e-posta almadıysanız, lütfen kayıt olduğunuz adresi doğru girdiğinizden emin olun ve spam klasörünüzü kontrol edin."
     success_url = reverse_lazy('ArslanTakipApp:index')
 
 def login_success(request):
