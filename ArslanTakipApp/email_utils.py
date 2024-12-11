@@ -11,7 +11,7 @@ from django.db.models.functions import Replace
 
 logger = logging.getLogger(__name__)
 
-def send_email(to_address, subject, body):
+def send_email(to_addresses, subject, body):
     email = 'ai@arslanaluminyum.com'
     password = 'Arslan123.'
     credentials = Credentials(email, password)
@@ -38,7 +38,7 @@ def send_email(to_address, subject, body):
         folder=account.sent,
         subject=subject,
         body=HTMLBody(body),
-        to_recipients=[to_address]
+        to_recipients=to_addresses
     )
 
     # E-postayı gönderme

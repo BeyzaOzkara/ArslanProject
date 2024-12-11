@@ -116,6 +116,14 @@ DATABASES = {
         'PORT': '1433',
         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
         },
+    },
+    'dms': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'DMS',
+        'USER': 'arslan',
+        'PASSWORD': 'gqTYe5HdX0VQ',
+        'HOST': '192.168.150.230', 
+        'PORT': '5432',
     }
 }
 

@@ -1,0 +1,109 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum Lokasyon{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<style>
+     /* Container for cards */
+     .cards-container {
+        display: flex;
+        flex-direction: column; /* Stack cards vertically */
+        gap: 20px; /* Space between the cards */
+        margin-top: 20px;
+    }
+
+    /* Individual card styling */
+    .card {
+        height: 200px; /* Fixed height for each card */
+        padding: 15px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow-y: auto; /* Enables scrolling if content overflows */
+        display: flex;
+        flex-direction: column; /* Content inside the card will stack vertically */  
+    }
+
+    /* Header for each card */
+    .card-header {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    /* Content inside the card */
+    .card-content {
+        flex-grow: 1; /* Take remaining space inside the card */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Press 4500 Control Panel</h2>
+    <h2></h2>
+    <!-- Cards Container -->
+    <div class="cards-container">
+        <div class="card">
+            <div class="card-header">
+                <h3>Logs</h3>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Press Status</div>
+            <div class="card-body card-content">
+                <p class="press-status">Current Temperature: <span id="temp">Loading...</span>°C</p>
+                <p class="press-status">Current Pressure: <span id="pressure">Loading...</span> bar</p>
+                <p class="press-status">Current Speed: <span id="speed">Loading...</span> rpm</p>
+                
+                <p>More data to test the scroll... (add more content if needed)</p>
+                <p>More data to test the scroll... (add more content if needed)</p>
+                <p>More data to test the scroll... (add more content if needed)</p>
+                <p>More data to test the scroll... (add more content if needed)</p>
+            </div>
+            
+        </div>
+
+        <div class="card">
+            <div class="card-header">Machine Settings</div>
+            <div class="card-body card-content">
+                <p>Adjust machine parameters...</p>
+                <p>More settings and controls here...</p>
+                <p>Settings can include temperature limits, pressure settings, etc.</p>
+                <p>Additional setting option...</p>
+                <p>Another setting...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Maintenance Logs</div>
+            <div class="card-body card-content">
+                <ul>
+                    <li>Log 1: Maintenance at 10:00 AM</li>
+                    <li>Log 2: Temperature issue detected at 11:00 AM</li>
+                    <li>Log 3: Press calibration at 12:00 PM</li>
+                    <li>Log 4: Another maintenance task...</li>
+                </ul>
+                <p>More logs can be displayed as needed...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}

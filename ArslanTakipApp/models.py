@@ -519,6 +519,29 @@ class Personel(models.Model): # bölümü eklemeli miyim
         verbose_name='Personel'
         verbose_name_plural='Personeller'
 
+class IO_List(models.Model):
+    line = models.CharField(max_length=250, null=True, blank=True)
+    unit = models.CharField(max_length=250, null=True, blank=True)
+    ip = models.CharField(max_length=250, null=True, blank=True)
+    label = models.CharField(max_length=250, null=True, blank=True)
+    address = models.CharField(max_length=250, null=True, blank=True)
+    protocol = models.CharField(max_length=250, null=True, blank=True)
+    writable = models.BooleanField(null=True, blank=True)
+    frequency = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'IO_List'
+
+class Recipe(models.Model):
+    datetime = models.DateTimeField(auto_now=True)
+    profile_number = models.CharField(max_length=250, null=True, blank=True)
+    parameters = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Recipe'
+
 # class WorkCenter(models.Model):
 #     name = models.CharField(max_length=250, null=True, blank=True)
 #     capacity = models.FloatField(null=True, blank=True)

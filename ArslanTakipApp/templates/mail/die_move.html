@@ -1,13 +1,20 @@
 <html>
+<head>
+    <title>Kalıp Transferi</title>
+</head>
 <body>
-    <h1>KALIP TRANSFERİ</h1>
-    <p>Gönderen Konum: {{ sender_location }}</p>
-    <p>Gönderen Kişi: {{ user_info }}</p>
-    <p>Kalıp Listesi:</p>
+    <p>Merhaba,</p>
+    <p>{{ user_info }} tarafından yeni bir kalıp transferi yapılmıştır.</p>
+
+    <p>Aşağıda transfer edilen kalıpların listesi bulunmaktadır:</p>
     <ul>
         {% for die in dieList %}
             <li>{{ die }}</li>
         {% endfor %}
     </ul>
+
+    <p>Pres: {{ dieTo_press }}</p>
+
+    <p>İyi çalışmalar dilerim.</p>
 </body>
 </html>

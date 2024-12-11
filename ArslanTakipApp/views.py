@@ -116,16 +116,17 @@ def format_date(date):
 def hareketSave(dieList, lRec, dieTo, request):
     for i in dieList:
         k = DiesLocation.objects.get(kalipNo = i)
-        if k.kalipVaris.id != lRec.id:
-            hareket = Hareket()
-            hareket.kalipKonum_id = k.kalipVaris.id
-            hareket.kalipVaris_id = dieTo
-            hareket.kalipNo = i
-            hareket.kimTarafindan_id = request.user.id
-            hareket.save()
-            print("Hareket saved")
-        else:
-            print("Hareket not saved")
+        if k.kalipVaris.id != 1134: #HURDA
+            if k.kalipVaris.id != lRec.id:
+                hareket = Hareket()
+                hareket.kalipKonum_id = k.kalipVaris.id
+                hareket.kalipVaris_id = dieTo
+                hareket.kalipNo = i
+                hareket.kimTarafindan_id = request.user.id
+                hareket.save()
+                print("Hareket saved")
+            else:
+                print("Hareket not saved")
 
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
@@ -161,8 +162,8 @@ def location(request):
                 
             if gozCapacity == None:
                 hareketSave(dieList, lRec, dieTo, request)
-                if int(dieTo) in (48, 1, 545, 1079, 542, 543, 544, 550, 551, 1135, 1136, 547, 555, 556, 568, 569): # 1. fabrikada ise
-                    send_email_notification(request, dieList)
+                if int(dieTo) in (542, 543, 544, 548, 549, 550, 551, 552, 553, 554, 555, 556, 562, 563, 564, 565, 566, 567, 568, 569, 572, 573, 1087, 1088, 1092, 1093):
+                    check_last_location_press(request, dieList, dieTo)
                 # eğer belli bölümler gönderiyorsa mail de gönderilmeli
                 # şu bölüm şu kalıpları gönderdi şeklinde mail göndermeli
                 # eğer kullanıcının grup ismi içinde 'Konum' geçen bir grubu varsa mail gönderen grup adı olsun
@@ -178,24 +179,44 @@ def location(request):
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
-def send_email_notification(request, dieList):
-    user_groups = request.user.groups.all()
-    sender_group_name = next((group.name for group in user_groups if 'Konum' in group.name), None)
-    sender_location = sender_group_name.split("- ")[1]
-    user_info = get_user_full_name(request.user.id)
+def check_last_location_press(request, dieList, dieTo):
+    dieTo_press = Location.objects.get(id=dieTo).presKodu
+    dies = DiesLocation.objects.filter(kalipNo__in=dieList).select_related('kalipVaris')
+    dies_to_notify = []
 
-    subject = f"{sender_location}'dan Kalıp Transferi"
+    for die in dies:
+        die_press = die.kalipVaris.presKodu
+        
+        if die_press != dieTo_press:
+            dies_to_notify.append(die.kalipNo) 
+    
+    if dies_to_notify:
+        send_email_notification(request, dies_to_notify, dieTo_press)
+    else:
+        print("don't send mail")
+
+def send_email_notification(request, dieList, dieTo_press):
+    user_info = get_user_full_name(request.user.id)
+    to_addresses = ['pres1@arslanaluminyum.com']
+
+    if dieTo_press == '1100-1':
+        to_addresses.append('eski1100pres@arslanaluminyum.com')
+    elif dieTo_press == '1200-1':
+        to_addresses.append('1200pres@arslanaluminyum.com')
+    elif dieTo_press == '1600-1':
+        to_addresses.append('1600PRES@arslanaluminyum.com')
+
+    subject = f"Kalıp Transferi"
     html_message = render_to_string('mail/die_move.html', {
         'dieList': dieList,
-        'sender_location': sender_location,
+        'dieTo_press': dieTo_press,
         'user_info': user_info
-    })
-    to_address = 'yazilim@arslanaluminyum.com'
+    }) 
     body = html_message
 
     try:
         # Send email
-        send_email(to_address, subject, body)
+        send_email(to_addresses, subject, body)
         print("Email sent successfully.")
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -2269,7 +2290,6 @@ def billet_firina_at(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
 
-
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
 
@@ -3639,5 +3659,7 @@ class UretimPlanlamaView(generic.TemplateView):
         return plan
             
 class Press4500View(generic.TemplateView):
+    template_name = 'ArslanTakipApp/pres4500.html'
+    
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs)

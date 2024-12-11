@@ -37,8 +37,8 @@ class PasswordResettingForm(PasswordResetForm):
 
         # Call the custom send_email function
         try:
-            send_email(to_email, subject, body)
+            send_email([to_email], subject, body)
             if html_body:
-                send_email(to_email, subject, html_body)  # Optionally send HTML version too
+                send_email([to_email], subject, html_body)  # Optionally send HTML version too
         except Exception as e:
             print(f"Failed to send email to {to_email}: {e}")
