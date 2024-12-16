@@ -162,11 +162,9 @@ def location(request):
                 
             if gozCapacity == None:
                 hareketSave(dieList, lRec, dieTo, request)
+                # 1.fabrikaya kalıp gönderiliyorsa
                 if int(dieTo) in (542, 543, 544, 548, 549, 550, 551, 552, 553, 554, 555, 556, 562, 563, 564, 565, 566, 567, 568, 569, 572, 573, 1087, 1088, 1092, 1093):
                     check_last_location_press(request, dieList, dieTo)
-                # eğer belli bölümler gönderiyorsa mail de gönderilmeli
-                # şu bölüm şu kalıpları gönderdi şeklinde mail göndermeli
-                # eğer kullanıcının grup ismi içinde 'Konum' geçen bir grubu varsa mail gönderen grup adı olsun
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
                 if firinKalipSayisi < gozCapacity:
@@ -221,7 +219,6 @@ def send_email_notification(request, dieList, dieTo_press):
     except Exception as e:
         print(f"Error sending email: {e}")
     
-
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
     gonderLoc_list = list(gonderLoc.values().order_by('id'))
@@ -639,6 +636,21 @@ def kalip_comments_delete(request, cId):
         response.status_code = 500 #server error
     return response
 
+def kalip_get_info(request, kalip_no):
+    try:
+        kalip = KalipMs.objects.using('dies').get(KalipNo=kalip_no)
+
+        return render(request, '')
+    except KalipMs.DoesNotExist:
+        return JsonResponse({"error": "Kalip not found"}, status=404)
+    
+def kalip_get_tab(request, kalip_no):
+    try:
+        kalip = KalipMs.objects.using('dies').get(KalipNo=kalip_no)
+
+        return render(request, '')
+    except KalipMs.DoesNotExist:
+        return JsonResponse({"error": "Kalip not found"}, status=404)
 key = b'arslandenemebyz1'
 
 # def encrypt_aes_ecb(key, plaintext):
