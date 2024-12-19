@@ -31,7 +31,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY')) #'django-insecure-5a3gd-zj_#1h$bstcn)(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.150.43', 'arslan']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.150.43', 'arslan', '192.168.8.21']
 
 
 # Application definition

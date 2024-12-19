@@ -115,6 +115,6 @@ urlpatterns = [
     path('pres_siparis_takip/<int:id>/', views.pres_siparis_takip, name='pres_siparis_takip'),
     path('pres_siparis_takip/rapor', views.pres_siparis_takip_rapor),
     path('4500/press', views.Press4500View.as_view(), name='pres_4500'),
-    path('getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
-    path('getTabData/<str:tab_id>/', views.kalip_get_tab, name='get_tab_data'),
+    path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
+    path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
 ]

@@ -7,22 +7,704 @@
 
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
-    
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
+
+
+<style>
+    .tabulator-menu{
+        width: 200px;
+        height: 150px;
+        overflow-y: auto;
+    }
+    .tabulator { 
+        background-color: #ccc;
+        font-weight: bold;
+        /* width: 535px; */
+    }
+</style>
+  
 {% endblock %}
 
 {% block content %}
-
 <div class="container-fluid col-lg-11">
-    <iframe src="http://192.168.150.230:3000/d-solo/fe1c6ph9rkdfke/ueretim-verileri?orgId=1&refresh=1s&from=1731744000000&to=1731772024195&theme=light&panelId=20" width="450" height="200" frameborder="0"></iframe>
+    <h1 class="col-lg-11">Arslan Alüminyum Kalıp Listesi</h1>
+    <div class="row">
+        <div class="container-fluid col-lg-12">
+            <div class="row col-lg-12">
+                <div class="col-lg-6">
+                    <span id="deneme"></span>
+                </div>
+                <div class="col-lg-6">
+                    <a class="btn btn-app bg-success" style="float: right;" id="download-xlsx" >
+                        <i class="fas fa-file-excel"></i>
+                        excell
+                    </a>
+                </div>
+            </div>
+            <div class="card" id="kalipListe-table"></div>
+        </div>
+        <div class="container-fluid col-lg-12">
+            <div class="card card-primary card-tabs" id="kalipInfoCard" style="display: none;">
+                <div class="card-header p-0 pt-1">
+                  <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+                    <li class="pt-2 px-3"><h3 class="card-title" id="kalipNoInfoCard">Kalıp No</h3></li>
+                    <li class="nav-item">
+                      <a class="nav-link active" id="custom-tabs-two-bilgi-tab" data-toggle="pill" href="#custom-tabs-two-bilgi" role="tab" aria-controls="custom-tabs-two-bilgi" aria-selected="true">Kalıp Kartı</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="custom-tabs-two-uretimraporu-tab" data-toggle="pill" href="#custom-tabs-two-uretimraporu" role="tab" aria-controls="custom-tabs-two-uretimraporu" aria-selected="false">Üretim Raporu</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="custom-tabs-two-hareketler-tab" data-toggle="pill" href="#custom-tabs-two-hareketler" role="tab" aria-controls="custom-tabs-two-hareketler" aria-selected="false">Hareketler</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="custom-tabs-two-yorumlar-tab" data-toggle="pill" href="#custom-tabs-two-yorumlar" role="tab" aria-controls="custom-tabs-two-yorumlar" aria-selected="false">Yorumlar</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="custom-tabs-two-grafikler-tab" data-toggle="pill" href="#custom-tabs-two-grafikler" role="tab" aria-controls="custom-tabs-two-grafikler" aria-selected="false">Grafikler</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="card-body">
+                  <div class="tab-content" id="custom-tabs-two-tabContent">
+                    <div class="tab-pane fade show active" id="custom-tabs-two-bilgi" role="tabpanel" aria-labelledby="custom-tabs-two-bilgi-tab">
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-uretimraporu" role="tabpanel" aria-labelledby="custom-tabs-two-uretimraporu-tab">
+                       Mauris tincidunt mi at erat gravida, eget tristique urna bibendum. Mauris pharetra purus ut ligula tempor, et vulputate metus facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas sollicitudin, nisi a luctus interdum, nisl ligula placerat mi, quis posuere purus ligula eu lectus. Donec nunc tellus, elementum sit amet ultricies at, posuere nec nunc. Nunc euismod pellentesque diam. 
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-hareketler" role="tabpanel" aria-labelledby="custom-tabs-two-hareketler-tab">
+                       Morbi turpis dolor, vulputate vitae felis non, tincidunt congue mauris. Phasellus volutpat augue id mi placerat mollis. Vivamus faucibus eu massa eget condimentum. Fusce nec hendrerit sem, ac tristique nulla. Integer vestibulum orci odio. Cras nec augue ipsum. Suspendisse ut velit condimentum, mattis urna a, malesuada nunc. Curabitur eleifend facilisis velit finibus tristique. Nam vulputate, eros non luctus efficitur, ipsum odio volutpat massa, sit amet sollicitudin est libero sed ipsum. Nulla lacinia, ex vitae gravida fermentum, lectus ipsum gravida arcu, id fermentum metus arcu vel metus. Curabitur eget sem eu risus tincidunt eleifend ac ornare magna. 
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-yorumlar" role="tabpanel" aria-labelledby="custom-tabs-two-yorumlar-tab">
+                       Pellentesque vestibulum commodo nibh nec blandit. Maecenas neque magna, iaculis tempus turpis ac, ornare sodales tellus. Mauris eget blandit dolor. Quisque tincidunt venenatis vulputate. Morbi euismod molestie tristique. Vestibulum consectetur dolor a vestibulum pharetra. Donec interdum placerat urna nec pharetra. Etiam eget dapibus orci, eget aliquet urna. Nunc at consequat diam. Nunc et felis ut nisl commodo dignissim. In hac habitasse platea dictumst. Praesent imperdiet accumsan ex sit amet facilisis. 
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-grafikler" role="tabpanel" aria-labelledby="custom-tabs-two-grafikler-tab">
+                       Pellentesque vestibulum commodo nibh nec blandit. Maecenas neque magna, iaculis tempus turpis ac, ornare sodales tellus. Mauris eget blandit dolor. Quisque tincidunt venenatis vulputate. Morbi euismod molestie tristique. Vestibulum consectetur dolor a vestibulum pharetra. Donec interdum placerat urna nec pharetra. Etiam eget dapibus orci, eget aliquet urna. Nunc at consequat diam. Nunc et felis ut nisl commodo dignissim. In hac habitasse platea dictumst. Praesent imperdiet accumsan ex sit amet facilisis. 
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card -->
+              </div>
+        </div>
+        <div class="container-fluid col-lg-7">
+                <div class="card container-fluid " id="kalip_karti" style="display: none;">
+                <!-- Kalıp Kartı -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="row col-lg-4">
+                            <div class="container-fluid col-lg-12">
+                                <div class="card col-lg-12">
+                                    <div class="card-body" id="photos">  <!-- Fotoğraflar  -->
+                                        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                                            <div class="carousel-inner">
+                                                <div class="carousel-item active">
+                                                    <a href="{% static '/ArslanTakipApp/arslanLogo.png' %}" data-toggle="lightbox" id="TeknikA">
+                                                        <img id="TeknikResim" class="d-block w-100" alt="First slide" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" > </a>
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <a href="{% static '/ArslanTakipApp/arslanLogo.png' %}" data-toggle="lightbox" id="TeknikB">
+                                                        <img id="TeknikResim2" class="d-block w-100" alt="Second slide" src="{% static '/ArslanTakipApp/arslanLogo.png' %}" > </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card col-lg-12">
+                                    <div class="card-body">
+                                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                            <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-left"></i> </span>
+                                            <span class="sr-only">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                                            <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-right"></i> </span>
+                                            <span class="sr-only">Next</span>
+                                        </a>
+                                        <ol class="carousel-indicators">
+                                            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="" style="background-color: rgb(226, 141, 43);"></li>
+                                            <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""  style="background-color: rgb(226, 141, 43);"></li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row col-lg-8">
+                            <div class="container-fluid">
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                    <span class="info-box-text">KALIP NO:</span>
+                                    <span class="info-box-number" id="infoKalipNo">Kalıp No</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                    <span class="info-box-text">MÜŞTERİ (FİRMA) ADI:</span>
+                                    <span class="info-box-number" id="infoFirmaAdi">Firma Adı</span>
+                                    </div>
+                                </div>
+                                <div class="container-fluid">
+                                <div class="row">
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">RESİM GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoGramaj">Resim Gramaj</span>
+                                        </div>
+                                    </div>
+                                    <div class="info-box col-lg-6">
+                                        <div class="info-box-content">
+                                        <span class="info-box-text">SON ÜRETİM GRAMAJ:</span>
+                                        <span class="info-box-number" id="infoSonUretimGramaj">Son Üretim Gramaj</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-lg-12">
+                        <div class="container-fluid">
+                        <div class="row ">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">ÜRETİCİ FİRMA:</span>
+                                <span class="info-box-number" id="infoUreticiFirma">Üretici Firma</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">CİNSİ:</span>
+                                <span class="info-box-number" id="infoCins">Cinsi</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">FİGÜR:</span>
+                                <span class="info-box-number" id="infoFigür">Figür</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                    <div class="row">
+                                        <span class="info-box-text col-lg-5" style="line-height: 30px; vertical-align: middle;">Ø ÇAPI:</span>
+                                        <span class="info-box-text col-lg-2">x</span>
+                                        <span class="info-box-text col-lg-5" style="line-height: 30px; vertical-align: middle;">PAKET BOYU:</span>
+                                    </div>
+                                    <div class="row">
+                                        <span class="info-box-number col-lg-5" id="infoCap">Ø ÇAPI</span>
+                                        <span class="info-box-text col-lg-2">x</span>
+                                        <span class="info-box-number col-lg-5" id="infoPaket">PAKET BOYU</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">SON ÜRETİM TARİHİ:</span>
+                                <span class="info-box-number" id="infoSonUretimTarihi">Son Üretim Tarihi</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">SON TEN. TARİHİ:</span>
+                                <span class="info-box-number" id="infoSonTenTarihi">Son Ten Tarihi</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">ÜRETİM TOPLAM KG:</span>
+                                <span class="info-box-number" id="infoUretimTopKG">Üretim Toplam Kg</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">TEN KALAN OMUR KG:</span>
+                                <span class="info-box-number" id="infoSonTen"></span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">Sıradaki Tenifer:</span>
+                                <span class="info-box-number" id="infoTeniferNo">Sıradaki Tenifer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">DURUMU:</span>
+                                <span class="info-box-number" id="infoDurumu">Durumu</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">KALIP AÇIKLAMA:</span>
+                                <span class="info-box-number" id="infoKalipAciklama">Kalıp Açıklama</span>
+                                </div>
+                            </div>
+                            <div class="info-box col-lg-4">
+                                <div class="info-box-content">
+                                <span class="info-box-text">KALİTE AÇIKLAMA:</span>
+                                <span class="info-box-number" id="infoKaliteAciklama">Kalite Açıklama</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <!--row end-->
+                </div>
+            </div>
+                <!--kalipKart end-->
+        </div>
+        <!--Pres Üretim Raporu start -->
+        <div class="container-fluid col-lg-5">
+            <div class="card" id="presURaporListe-table" style="display: none;"></div>
+            <div class="card" id="kalipHareketListe-table" style="display: none;"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container-fluid col-lg-12">
+            <div class="card" id="dieComment" style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title">Paylaşılanlar</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+                        <i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12" id="commentCol"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="diePostComment" style="display: none;">
+                <div class="card-header">
+                  <h3 class="card-title">Paylaşım Yap</h3>
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
+                      <i class="fas fa-minus"></i></button>
+                  </div>
+                </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
+                <div class="card-body" id="yorumCard">
+                  <div class="row">
+                    <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1" id="yorumTextCol">
+                      <textarea class="textarea" name="ilkYorumText" data-kalip="" id="yorumText" placeholder=" . . . "
+                                      style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol" style="height: 265px;">
+                      <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="Dosyalar" id="fileInput" lang="tr" multiple>
+                            <label class="custom-file-label" for="fileInput" style="overflow: hidden;">Fotoğraf Yükle</label>
+                        </div>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="dosyaTemizle" onclick="DosyaTemizle()">Temizle</span>
+                        </div>
+                      </div>
+                      <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-primary" id="yorumPaylas">Paylaş</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
- 
+<script type="text/javascript">
+// document loaded
+// urli kontrol et
+// kaliptan sonra hiç bir şey yoksa normal sayfa gözüksün
+// kaliptan sonra bir kalipno var ise alttaki kalipInfoCard o kalipNo için gözüksün
+document.addEventListener("DOMContentLoaded", function(){
+    const currentHash = window.location.hash;
+    console.log("currentHash: " + currentHash);
+    const kalipPattern = /^#.+$/; // Matches "#<any characters>"
+    // # karakterini çıkart
+
+    if (kalipPattern.test(currentHash)) {
+        let dieNumber = currentHash.slice(1);
+        handleDieChange(dieNumber);
+    }
+});
+
+let loadedData = {
+    currentDie: null,
+    data: {}  // Store data for each die by tab
+};
+    
+let userID = "{{user.id}}";
+var selectedFiles = [];
+
+//define column header menu as column visibility toggle
+var headerMenu = function(){
+    var menu = [];
+    var columns = this.getColumns();
+
+    for(let column of columns){
+        if (column.getDefinition().title != ""){
+        //create checkbox element using font awesome icons
+            let icon = document.createElement("i");
+            icon.classList.add("fas");
+            
+            icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
+            
+            //build label
+            let label = document.createElement("span");
+            let title = document.createElement("span");
+
+            title.textContent = " " + column.getDefinition().title;
+            label.appendChild(icon);
+            label.appendChild(title);
+
+            //create menu item
+            menu.push({
+                label:label,
+                action:function(e){
+                    //prevent menu closing
+                    e.stopPropagation();
+                    //toggle current column visibility
+                    column.toggle();
+
+                    //change menu item icon
+                    if(column.isVisible()){
+                        icon.classList.remove("fa-square");
+                        icon.classList.add("fa-check-square");
+                    }else{
+                        icon.classList.remove("fa-check-square");
+                        icon.classList.add("fa-square");
+                    }
+                }
+            });
+    }};
+
+   return menu;
+};
+
+var listIcon = function(cell, formatterParams, onRendered){ 
+    return "<a><i class='fa fa-list-ul'></i></a> ";
+};
+var msgIcon = function(cell, formatterParams, onRendered) {
+    return `<a href='#dieComment'><i class='fa fa-comments'></i></a>`;
+}
+var aktifIcon = function(cell, formatterParams, onRendered){
+    return "<i class='fa fa-list-ul'></i> ";
+};
+var printIcon = function(cell, formatterParams, onRendered) {
+    return "<i class='fa fa-print'></i> ";
+}
+
+var hatAccessor = function(value, data, type, params, column){
+    if (value == params.Hatasiz){
+        value = 'Hatasız';
+    }
+    else if (value == params.Hatali){
+        value = 'Hatalı';
+    };
+    return value;
+};
+var aktAccessor = function(value, data, type, params, column) {
+    if (value == params.Akt){
+        value = 'Aktif';
+    }
+    else if (value == params.Pas){
+        value = 'Pasif';
+    };
+    return value;
+};
+
+var kSayisi = 0;
+var toplamKalip = function(values, data, calcParams) {
+    $.ajax({
+      url: `/kalip/tum`,
+      method: 'GET', 
+      dataType: 'json',
+      success: function (sayi) {
+        kSayisi = parseInt(sayi);
+      },
+      error: function (error) {
+          console.error('Error loading kalip sayisi:', error);
+      }
+    });
+    return kSayisi;
+}
+
+$('#custom-tabs-two-uretimraporu-tab').on('click', function() {
+    if (!loadedData.data.uretimraporu) {
+        console.log("deneme2");
+        $.ajax({
+            url: `/kalip/getTabData/${loadedData.currentKalip}/uretimraporu`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                loadedData.data.uretimraporu = data;
+                console.log(loadedData);
+                // Insert the content into the tab
+                document.getElementById("custom-tabs-two-uretimraporu").innerHTML = data.bilgi;
+            },
+            error: function () {
+                console.error('Error loading Kalıp Kartı data.');
+            }
+        });
+    } else {
+        // Data already loaded, show it
+        document.getElementById("custom-tabs-two-bilgi").innerHTML = loadedData.data.bilgi;
+    }
+});
+
+function handleDieChange(kalipNo) {
+    loadedData.data = {};
+    loadedData.currentKalip = kalipNo;
+
+    showKalipInfoCard(kalipNo);
+    document.getElementById("kalipNoInfoCard").innerHTML = kalipNo;
+    resetTabs();
+}
+
+function resetTabs() {
+    // Clear tab content for all tabs
+    const tabContent = document.querySelectorAll(".tab-pane");
+    tabContent.forEach(tab => {
+        tab.innerHTML = ""; // Clear existing content
+        tab.dataset.loaded = "false"; // Reset the loaded flag for lazy loading
+    });
+}
+
+function showKalipInfoCard(kalipNo) {
+    const kalipInfoCard = document.getElementById("kalipInfoCard");
+    if (kalipInfoCard) {
+        // ajax ile kalip bilgilerini getir 
+        $.ajax({
+            url: `/kalip/getinfo/${kalipNo}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // die info tabini doldur.
+                const rdizin = data.ResimDizini.replace(/\s+/g, '') + "Teknik1.jpg";
+                const rdizin2 = data.ResimDizini.replace(/\s+/g, '') + "Teknik2.jpg";
+                const teknikUrl1 = "http://arslan/static" + rdizin.slice(13);
+                const teknikUrl2 = "http://arslan/static" + rdizin2.slice(13);
+
+                let bilgiTabContent = `
+                    <p><strong>Firma Adı:</strong> ${data.FirmaAdi}</p>
+                    <p><strong>Cinsi:</strong> ${data.Cinsi}</p>
+                    <p><strong>Çapı:</strong> ${data.Capi}</p>
+                    <p><strong>Üretim Tarihi:</strong> ${data.UretimTarihi}</p>
+                    <p><strong>Bolster:</strong> ${data.Bolster}</p>
+                    <div class="image-gallery">
+                        <p><strong>Resimler:</strong></p>
+                        <img src="${teknikUrl1}" alt="Die Technical Image 1" class="img-fluid" />
+                        <img src="${teknikUrl2}" alt="Die Technical Image 2" class="img-fluid" />
+                    </div>
+                `;
+                const bilgiTab = document.getElementById("custom-tabs-two-bilgi");
+                if (bilgiTab) {
+                    bilgiTab.innerHTML = bilgiTabContent;
+                }
+            },
+            error: function (error) {
+                console.error('Error loading comments data:', error);
+            }
+        });
+
+        kalipInfoCard.style.display = "block";
+    }
+}
+
+// Lazy load content for the other tabs
+function loadTabContent(tabId) {
+    const tabContent = document.getElementById(tabId);
+    console.log(tabContent)
+    
+    // Check if the tab has already been loaded
+    if (tabContent && tabContent.dataset.loaded !== "true") {
+        tabContent.dataset.loaded = "true"; // Mark as loaded to avoid multiple requests
+
+        if (tabId == 'custom-tabs-two-uretimraporu-tab') {
+            console.log("uretimraporu")
+        }
+        else if (tabId == 'custom-tabs-two-hareketler') {
+            console.log("hareketler")
+        }
+        else if (tabId == 'custom-tabs-two-yorumlar') {
+            console.log("yorumlar")
+        }
+        else if (tabId == 'custom-tabs-two-grafikler') {
+            console.log("grafikler")
+        }
+    }
+}
+
+function handleCommentPost() {
+    let kNo = $('#yorumText').data("kalip");
+    yorumPaylas(kNo);
+}
+
+function printQR(kalipNo) {
+    console.log("kalip: " + kalipNo);
+}
+
+var tableKalip = new Tabulator("#kalipListe-table", {
+    height:"700px",
+    layout:"fitDataFill",
+    placeholder:"Kalıp Liste",
+    ajaxURL:"/kalip/liste",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    popupContainer:true,
+    rowFormatter: row => {
+        let data = row.getData();
+        if (data.Hatali === 0) {
+            row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
+        }
+        if (data.AktifPasif === false) {
+            row.getElement().style.color = "#a3050a"
+        }
+    },
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+        {
+            title:"Gösterilen Sütunlar",
+            headerMenu:headerMenu, //add a menu to this column header
+            columns:[
+            {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                kalData = cell.getData();
+                kalipNo = kalData.KalipNo;
+                window.location.hash = kalipNo;
+                handleDieChange(kalipNo);
+            },
+            },
+            {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                let kId = cell.getData().KalipNo;
+                clickComment(kId);
+                $('#yorumText').data('kalip', kId);
+                // document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
+                document.getElementById("yorumPaylas").removeEventListener("click", handleCommentPost);
+                document.getElementById("yorumPaylas").addEventListener("click", handleCommentPost);
+                
+                document.getElementById("dieComment").style.display = 'block';
+                document.getElementById("diePostComment").style.display = 'block';
+            }},
+            {formatter:printIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                let kalipNo = cell.getData().KalipNo;
+                printQR(kalipNo);
+            }},
+            {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
+            accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
+            {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
+            accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
+            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc: toplamKalip},//"count"},
+            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
+            {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
+            {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
+            {title:"CİNSİ", field:"Cinsi", headerFilter:"input", visible:false},
+            {title:"GRAMAJ", field:"Miktar", headerFilter:"input", visible:false},
+            {title:"CAPİ", field:"Capi", headerFilter:"input", visible:false},
+            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
+            {title:"URETİM TARİHİ", field:"UretimTarihi", headerFilter:"input", visible:false},
+            {title:"FİGÜR", field:"GozAdedi", headerFilter:"input", visible:false},
+            {title:"BOLSTER", field:"Bolster", headerFilter:"input", visible:false},
+            {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
+            {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
+            {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
+            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruMt", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
+            {title:"SON TENİFER", field:"SonTeniferKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"SON TENİFER SEBEBİ", field:"SonTeniferSebebi", headerFilter:"input", visible:false},
+            {title:"SIRADAKİ TENİFER NO", field:"TeniferNo", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
+            {title:"ÜRETİM TEN SONRASI", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"ÜRETİM TOPLAM", field:"UretimToplamKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"PROFİL GRAMAJ", field:"ProfilGramaj", headerFilter:"input", visible:false},
+            {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
+            {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
+            {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
+            {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
+            {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
+            {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+            {title:"KONUM", field:"kalipLocation", formatter:"html"},
+            {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
+            ],
+            
+        },
+    ],
+}); 
+
+var presURaporu = new Tabulator("#presURaporListe-table", {
+    height:"500px",
+    layout:"fitDataFill",
+    placeholder:"Pres Üretim Raporu",
+    ajaxURL:"/kalip/rapor",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+        {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+        {title:"TARİH", field:"Tarih",formatter:"html", headerFilter:"input"},
+        {title:"DURUM", field:"Durum", headerFilter:"input"},
+        {title:"AÇIKLAMA", field:"HataAciklama", headerFilter:"input"},
+    ]
+});
+
+var kalipHareketleri = new Tabulator("#kalipHareketListe-table", {
+    height:"250px",
+    layout:"fitColumns",
+    placeholder:"Kalıp Harketleri",
+    ajaxURL:"/location/hareket",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+    {title:"NEREDEN", field:"kalipKonum", formatter:"html", headerSort:false},
+    {title:"NEREYE", field:"kalipVaris", formatter:"html", headerSort:false},
+    {title:"GÖNDEREN", field:"kimTarafindan", headerSort:false},
+    {title:"HAREKET TARİHİ", field:"hareketTarihi"},
+    ],
+});
+
+
+</script>
 
 {% endblock %}
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'ArslanTakipApp/xlsx.full.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
+
+<script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/lang/summernote-tr-TR.js' %}"></script>
 <!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
 {% endblock %}

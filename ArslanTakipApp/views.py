@@ -639,20 +639,59 @@ def kalip_comments_delete(request, cId):
 def kalip_get_info(request, kalip_no):
     try:
         kalip = KalipMs.objects.using('dies').get(KalipNo=kalip_no)
+        kalip_data = {
+            'KalipNo': kalip.KalipNo,
+            'FirmaAdi': kalip.FirmaAdi,
+            'Cinsi': kalip.Cinsi,
+            'Miktar': kalip.Miktar,
+            'Capi': kalip.Capi,
+            'UretimTarihi': format_date(kalip.UretimTarihi) if kalip.UretimTarihi else None,  # Convert DateTime to string
+            'GozAdedi': kalip.GozAdedi,
+            'Silindi': kalip.Silindi,
+            'SilinmeSebebi': kalip.SilinmeSebebi,
+            'Bolster': kalip.Bolster,
+            'KalipCevresi': kalip.KalipCevresi,
+            'KaliteOkey': kalip.KaliteOkey,
+            'UreticiFirma': kalip.UreticiFirma,
+            'TeniferOmruMt': kalip.TeniferOmruMt,
+            'TeniferOmruKg': kalip.TeniferOmruKg,
+            'TeniferKalanOmurKg': kalip.TeniferKalanOmurKg,
+            'TeniferNo': kalip.TeniferNo,
+            'SonTeniferTarih': format_date(kalip.SonTeniferTarih) if kalip.SonTeniferTarih else None,
+            'SonTeniferKg': kalip.SonTeniferKg,
+            'SonUretimTarih': format_date(kalip.SonUretimTarih) if kalip.SonUretimTarih else None,
+            'SonUretimGr': kalip.SonUretimGr,
+            'UretimTenSonrasiKg': kalip.UretimTenSonrasiKg,
+            'UretimToplamKg': kalip.UretimToplamKg,
+            'ProfilGramaj': kalip.ProfilGramaj,
+            'KalipAciklama': kalip.KalipAciklama,
+            'SikayetVar': kalip.SikayetVar,
+            'KaliteAciklama': kalip.KaliteAciklama,
+            'AktifPasif': kalip.AktifPasif,
+            'Hatali': kalip.Hatali,
+            'ResimDizini': kalip.ResimDizini,
+            'PaketBoyu': kalip.PaketBoyu,
+        }
 
-        return render(request, '')
+        return JsonResponse(kalip_data)
     except KalipMs.DoesNotExist:
         return JsonResponse({"error": "Kalip not found"}, status=404)
     
-def kalip_get_tab(request, kalip_no):
+def kalip_get_tab(request, kalip_no, tab):
     try:
-        kalip = KalipMs.objects.using('dies').get(KalipNo=kalip_no)
-
-        return render(request, '')
+        if tab == 'uretimraporu':
+            # send kalip_no to kalip_rapor
+            print("rapor")
+        elif tab == 'hareketler':
+            print("hareket")
+        elif tab == 'yorumlar':
+            print("yorum")
+        elif tab == 'grafikler':
+            print("grafik")
     except KalipMs.DoesNotExist:
         return JsonResponse({"error": "Kalip not found"}, status=404)
+    
 key = b'arslandenemebyz1'
-
 # def encrypt_aes_ecb(key, plaintext):
 #     cipher = AES.new(key, AES.MODE_ECB)
 #     padded_plaintext = pad(plaintext.encode('utf8'), AES.block_size)
@@ -3671,7 +3710,7 @@ class UretimPlanlamaView(generic.TemplateView):
         return plan
             
 class Press4500View(generic.TemplateView):
-    template_name = 'ArslanTakipApp/pres4500.html'
+    template_name = '4500/pres4500.html'
     
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs)
