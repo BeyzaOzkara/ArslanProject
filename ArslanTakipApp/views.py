@@ -161,10 +161,10 @@ def location(request):
                 dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
                 
             if gozCapacity == None:
-                hareketSave(dieList, lRec, dieTo, request)
-                # 1.fabrikaya kalıp gönderiliyorsa
                 if int(dieTo) in (542, 543, 544, 548, 549, 550, 551, 552, 553, 554, 555, 556, 562, 563, 564, 565, 566, 567, 568, 569, 572, 573, 1087, 1088, 1092, 1093):
                     check_last_location_press(request, dieList, dieTo)
+                hareketSave(dieList, lRec, dieTo, request)
+                # 1.fabrikaya kalıp gönderiliyorsa
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
                 if firinKalipSayisi < gozCapacity:
@@ -690,7 +690,45 @@ def kalip_get_tab(request, kalip_no, tab):
             print("grafik")
     except KalipMs.DoesNotExist:
         return JsonResponse({"error": "Kalip not found"}, status=404)
+
+def kalip_rapor2(request):
+    kalip_no = request.GET.get('KalipNo')
+    print(kalip_no)
+    params = json.loads(unquote(request.GET.get('params')))
+    size = params["size"]
+    page = params["page"]
+    offset, limit = calculate_pagination(page, size)
+    filter_list = params["filter"]
+    q = {} 
+    kalip_count = 0
+    lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+
+    if len(filter_list)>0:
+        for i in filter_list:
+            if i["type"] == "like":
+                q[i['field']+"__startswith"] = i['value']
+            elif i["type"] == "=":
+                q[i['field']] = i['value']
     
+    query = PresUretimRaporu.objects.using('dies').filter(KalipNo = kalip_no, **q) \
+    .values('PresKodu', 'Tarih', 'BaslamaSaati', 'BitisSaati', 'HataAciklama', 'Durum').order_by('-Tarih')
+
+    g = list(query[offset:limit])
+    for c in g:
+        if c['Tarih'] != None:
+            c['Tarih'] = format_date(c['Tarih']) + " <BR>└ " + c['BaslamaSaati'].strftime("%H:%M") + " - " + c['BitisSaati'].strftime("%H:%M")
+            c['BaslamaSaati'] =c['BaslamaSaati'].strftime("%H:%M")
+            c['BitisSaati'] =c['BitisSaati'].strftime("%H:%M")
+    kalip_count = query.count()
+    lastData= {'last_page': math.ceil(kalip_count/size), 'data': []}
+    lastData['data'] = g
+
+    data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
+def kalip_qr(request, kalip_no):
+    print(kalip_no)
+
 key = b'arslandenemebyz1'
 # def encrypt_aes_ecb(key, plaintext):
 #     cipher = AES.new(key, AES.MODE_ECB)
@@ -703,11 +741,6 @@ key = b'arslandenemebyz1'
 #     decrypted_data = cipher.decrypt(ciphertext)
 #     unpadded_data = unpad(decrypted_data, AES.block_size)
 #     return unpadded_data.decode('utf-8')
-
-def qrKalite(request):
-    if request.method == "GET":
-        # send_email("yazilim@arslanaluminyum.com", "deneme", "deneme body")
-
         #1 ve 9 arasındaysa başına 2 sıfır 10 ve 99 arasındaysa 1 sıfır
         # Şifre çözme
     #     unhexli = binascii.unhexlify('819a7b20eed64469c8adaa3ccf01ad06')
@@ -724,6 +757,10 @@ def qrKalite(request):
     #     }
 
     # return render(request, 'ArslanTakipApp/qrKalite.html', context)
+    
+def qrKalite(request):
+    if request.method == "GET":
+
         context = {
             "no": "denemee"
         }

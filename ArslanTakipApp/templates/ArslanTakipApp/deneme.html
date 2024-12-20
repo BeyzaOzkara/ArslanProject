@@ -437,32 +437,46 @@ var toplamKalip = function(values, data, calcParams) {
     return kSayisi;
 }
 
+function initializeProductionReports() {
+    var pressProductionReports = new Tabulator("#custom-tabs-two-uretimraporu", {
+        height: "500px",
+        layout: "fitDataFill",
+        placeholder: "Pres Üretim Raporu",
+        progressiveLoad: "scroll",
+        paginationMode: "remote",
+        filterMode: "remote",
+        paginationSize: 30,
+        ajaxURL: "/kalip/rapor2",  // The URL to fetch data from
+        ajaxURLGenerator: function(url, config, params) {
+            const kalipNo = loadedData.currentDie;
+            return `${url}?KalipNo=${kalipNo}&params=${encodeURI(JSON.stringify(params))}`;
+        },
+        columns: [
+            { title: "PRES KODU", field: "PresKodu", headerFilter: "input" },
+            { title: "TARİH", field: "Tarih", formatter: "html", headerFilter: "input" },
+            { title: "DURUM", field: "Durum", headerFilter: "input" },
+            { title: "AÇIKLAMA", field: "HataAciklama", headerFilter: "input" }
+        ]
+    });
+    loadedData.data.uretimraporu = pressProductionReports;
+}
+
 $('#custom-tabs-two-uretimraporu-tab').on('click', function() {
     if (!loadedData.data.uretimraporu) {
-        console.log("deneme2");
-        $.ajax({
-            url: `/kalip/getTabData/${loadedData.currentKalip}/uretimraporu`,
-            method: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                loadedData.data.uretimraporu = data;
-                console.log(loadedData);
-                // Insert the content into the tab
-                document.getElementById("custom-tabs-two-uretimraporu").innerHTML = data.bilgi;
-            },
-            error: function () {
-                console.error('Error loading Kalıp Kartı data.');
-            }
-        });
+        console.log("uretimraporu tab clicked");
+        let kalipNo = loadedData.currentDie;
+        initializeProductionReports(kalipNo);
+        
     } else {
         // Data already loaded, show it
-        document.getElementById("custom-tabs-two-bilgi").innerHTML = loadedData.data.bilgi;
+        console.log("Press Production Reports Tabulator already initialized.");
+        // document.getElementById("custom-tabs-two-bilgi").innerHTML = loadedData.data.uretimraporu;
     }
 });
 
 function handleDieChange(kalipNo) {
     loadedData.data = {};
-    loadedData.currentKalip = kalipNo;
+    loadedData.currentDie = kalipNo;
 
     showKalipInfoCard(kalipNo);
     document.getElementById("kalipNoInfoCard").innerHTML = kalipNo;
@@ -550,6 +564,13 @@ function handleCommentPost() {
 
 function printQR(kalipNo) {
     console.log("kalip: " + kalipNo);
+
+}
+
+function generateQRCode(url) {
+    let qrCodeContainer = document.getElementById('qr-code-container');
+    qrCodeContainer.innerHTML = ''; 
+    new QRCode(qrCodeContainer, url);
 }
 
 var tableKalip = new Tabulator("#kalipListe-table", {
@@ -599,7 +620,15 @@ var tableKalip = new Tabulator("#kalipListe-table", {
             }},
             {formatter:printIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 let kalipNo = cell.getData().KalipNo;
-                printQR(kalipNo);
+                // printQR(kalipNo);
+                let resimDizini = cell.getData().ResimDizini.replace(/\s+/g, '') + "Teknik1.jpg";
+                let imageUrl = `http://arslan/static/${resimDizini}`;
+                console.log(imageUrl);
+                document.getElementById('technical-image').src = imageUrl;
+                
+                // Generate the QR code for the KalipNo
+                let qrUrl = `http://arslan/qr/${kalipNo}`;
+                generateQRCode(qrUrl);
             }},
             {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
             accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
@@ -650,26 +679,6 @@ var tableKalip = new Tabulator("#kalipListe-table", {
         },
     ],
 }); 
-
-var presURaporu = new Tabulator("#presURaporListe-table", {
-    height:"500px",
-    layout:"fitDataFill",
-    placeholder:"Pres Üretim Raporu",
-    ajaxURL:"/kalip/rapor",
-    progressiveLoad:"scroll",
-    paginationMode:"remote",
-    filterMode:"remote",
-    paginationSize:30,
-    ajaxURLGenerator:function(url, config, params){
-        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
-    },
-    columns:[
-        {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
-        {title:"TARİH", field:"Tarih",formatter:"html", headerFilter:"input"},
-        {title:"DURUM", field:"Durum", headerFilter:"input"},
-        {title:"AÇIKLAMA", field:"HataAciklama", headerFilter:"input"},
-    ]
-});
 
 var kalipHareketleri = new Tabulator("#kalipHareketListe-table", {
     height:"250px",

@@ -117,4 +117,6 @@ urlpatterns = [
     path('4500/press', views.Press4500View.as_view(), name='pres_4500'),
     path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
     path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
+    path('kalip/rapor2', views.kalip_rapor2),
+    path('kalip/qr', views.kalip_qr),
 ]
