@@ -164,8 +164,8 @@ def location(request):
                 
             if gozCapacity == None:
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
-                if int(dieTo) in checkList:
-                    check_last_location_press(request, dieList, dieTo)  
+                if int(dieTo) in checkList and request.user.id != 1:
+                    check_last_location_press(request, dieList, dieTo) 
                 hareketSave(dieList, lRec, dieTo, request)
                 # 1.fabrikaya kalıp gönderiliyorsa
             else:
