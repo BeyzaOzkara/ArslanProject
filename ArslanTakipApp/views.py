@@ -160,7 +160,7 @@ def location(request):
 
             notPhysical = ["542", "543", "544", "545", "570", "571", "572", "573", "574", "575", "1079"]
             if dieTo in notPhysical:
-                dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
+                dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "MEYDAN").id
                 
             if gozCapacity == None:
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
