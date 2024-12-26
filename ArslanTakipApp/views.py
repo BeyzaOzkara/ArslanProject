@@ -214,7 +214,7 @@ def send_email_notification(request, dieList, dieTo_press):
             to_addresses.append('1600PRES@arslanaluminyum.com')
         elif dieTo_press == '2750-1':
             to_addresses.append('PRES2750@arslanaluminyum.com')
-        elif dieTo_press == '1100-2, 1100-3':
+        elif dieTo_press == 'Yeni 1100':
             to_addresses.append('pres1100@arslanaluminyum.com')
         elif dieTo_press == '1600-2':
             to_addresses.append('yeni1600pres@arslanaluminyum.com')
@@ -222,6 +222,14 @@ def send_email_notification(request, dieList, dieTo_press):
             to_addresses.append('4000pres@arslanaluminyum.com')
         elif dieTo_press == '4500-1':
             to_addresses.append('4.fabrikabakim@arslanaluminyum.com')
+        elif dieTo_press == '1. Fabrika Kalıp Hazırlama':
+            to_addresses.append('kaliphazirlama1ofis@arslanaluminyum.com')
+        elif dieTo_press == '1. Fabrika Kalıp Arşivi':
+            to_addresses.append('kaliphazirlama1ofis@arslanaluminyum.com')
+        elif dieTo_press == '2. Fabrika Kalıp Hazırlama':
+            to_addresses.append('kaliphazirlama@arslanaluminyum.com')
+        elif dieTo_press == '2. Fabrika Kalıp Arşivi':
+            to_addresses.append('kaliparsivi@arslanaluminyum.com')
 
         subject = f"Kalıp Transferi"
         html_message = render_to_string('mail/die_move.html', {
