@@ -197,41 +197,40 @@ def check_last_location_press(request, dieList, dieTo):
         print("don't send mail")
 
 def send_email_notification(request, dieList, dieTo_press):
-    user_info = get_user_full_name(request.user.id)
-    
-    cc_addresses = ['pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'kaliphazirlama@arslanaluminyum.com' 
-        'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com' 
-        'burakduman@arslanaluminyum.com','nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
-        'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
-        'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com']
-    
-    to_addresses = [request.email]
-    if dieTo_press == '1100-1':
-        to_addresses.append('eski1100pres@arslanaluminyum.com')
-    elif dieTo_press == '1200-1':
-        to_addresses.append('1200pres@arslanaluminyum.com')
-    elif dieTo_press == '1600-1':
-        to_addresses.append('1600PRES@arslanaluminyum.com')
-    elif dieTo_press == '2750-1':
-        to_addresses.append('PRES2750@arslanaluminyum.com')
-    elif dieTo_press == '1100-2, 1100-3':
-        to_addresses.append('pres1100@arslanaluminyum.com')
-    elif dieTo_press == '1600-2':
-        to_addresses.append('yeni1600pres@arslanaluminyum.com')
-    elif dieTo_press == '4000-1':
-        to_addresses.append('4000pres@arslanaluminyum.com')
-    elif dieTo_press == '4500-1':
-        to_addresses.append('4.fabrikabakim@arslanaluminyum.com')
-
-    subject = f"Kalıp Transferi"
-    html_message = render_to_string('mail/die_move.html', {
-        'dieList': dieList,
-        'dieTo_press': dieTo_press,
-        'user_info': user_info
-    }) 
-    body = html_message
-
     try:
+        user_info = get_user_full_name(request.user.id)
+        cc_addresses = ['pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'kaliphazirlama@arslanaluminyum.com' ,
+            'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com',
+            'burakduman@arslanaluminyum.com','nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
+            'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
+            'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com']
+        
+        to_addresses = [request.user.email]
+        if dieTo_press == '1100-1':
+            to_addresses.append('eski1100pres@arslanaluminyum.com')
+        elif dieTo_press == '1200-1':
+            to_addresses.append('1200pres@arslanaluminyum.com')
+        elif dieTo_press == '1600-1':
+            to_addresses.append('1600PRES@arslanaluminyum.com')
+        elif dieTo_press == '2750-1':
+            to_addresses.append('PRES2750@arslanaluminyum.com')
+        elif dieTo_press == '1100-2, 1100-3':
+            to_addresses.append('pres1100@arslanaluminyum.com')
+        elif dieTo_press == '1600-2':
+            to_addresses.append('yeni1600pres@arslanaluminyum.com')
+        elif dieTo_press == '4000-1':
+            to_addresses.append('4000pres@arslanaluminyum.com')
+        elif dieTo_press == '4500-1':
+            to_addresses.append('4.fabrikabakim@arslanaluminyum.com')
+
+        subject = f"Kalıp Transferi"
+        html_message = render_to_string('mail/die_move.html', {
+            'dieList': dieList,
+            'dieTo_press': dieTo_press,
+            'user_info': user_info
+        })
+        body = html_message
+
         # Send email
         send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject= subject, body= body)
         print("Email sent successfully.")
