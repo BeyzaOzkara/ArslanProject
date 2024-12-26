@@ -28,7 +28,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
 from django.utils import timezone
 import urllib3
-from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip
+from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, \
+    PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
+    QRCode
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -161,8 +163,9 @@ def location(request):
                 dieTo = Location.objects.get(locationRelationID = dieTo, locationName__contains = "ONAY").id
                 
             if gozCapacity == None:
-                if int(dieTo) in (542, 543, 544, 548, 549, 550, 551, 552, 553, 554, 555, 556, 562, 563, 564, 565, 566, 567, 568, 569, 572, 573, 1087, 1088, 1092, 1093):
-                    check_last_location_press(request, dieList, dieTo)
+                checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
+                if int(dieTo) in checkList:
+                    check_last_location_press(request, dieList, dieTo)  
                 hareketSave(dieList, lRec, dieTo, request)
                 # 1.fabrikaya kalıp gönderiliyorsa
             else:
@@ -195,14 +198,30 @@ def check_last_location_press(request, dieList, dieTo):
 
 def send_email_notification(request, dieList, dieTo_press):
     user_info = get_user_full_name(request.user.id)
-    to_addresses = ['pres1@arslanaluminyum.com']
-
+    
+    cc_addresses = ['pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'kaliphazirlama@arslanaluminyum.com' 
+        'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com' 
+        'burakduman@arslanaluminyum.com','nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
+        'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
+        'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com']
+    
+    to_addresses = [request.email]
     if dieTo_press == '1100-1':
         to_addresses.append('eski1100pres@arslanaluminyum.com')
     elif dieTo_press == '1200-1':
         to_addresses.append('1200pres@arslanaluminyum.com')
     elif dieTo_press == '1600-1':
         to_addresses.append('1600PRES@arslanaluminyum.com')
+    elif dieTo_press == '2750-1':
+        to_addresses.append('PRES2750@arslanaluminyum.com')
+    elif dieTo_press == '1100-2, 1100-3':
+        to_addresses.append('pres1100@arslanaluminyum.com')
+    elif dieTo_press == '1600-2':
+        to_addresses.append('yeni1600pres@arslanaluminyum.com')
+    elif dieTo_press == '4000-1':
+        to_addresses.append('4000pres@arslanaluminyum.com')
+    elif dieTo_press == '4500-1':
+        to_addresses.append('4.fabrikabakim@arslanaluminyum.com')
 
     subject = f"Kalıp Transferi"
     html_message = render_to_string('mail/die_move.html', {
@@ -214,7 +233,7 @@ def send_email_notification(request, dieList, dieTo_press):
 
     try:
         # Send email
-        send_email(to_addresses, subject, body)
+        send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject= subject, body= body)
         print("Email sent successfully.")
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -726,8 +745,79 @@ def kalip_rapor2(request):
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
-def kalip_qr(request, kalip_no):
+def kalip_hareket(request):
+    kalip_no = request.GET.get('KalipNo')
     print(kalip_no)
+    params = json.loads(unquote(request.GET.get('params', '{}')))
+    size = params.get("size", 30)
+    page = params.get("page", 1)
+    filter_list = params.get("filter", [])
+
+    q = {}
+    hareket_count = 0
+    lastData= {'last_page': math.ceil(hareket_count/size), 'data': []}
+    harAr = []
+
+    if filter_list: # filter list boş gönderiyorum burayı düzelt
+        for i in filter_list:
+            if i['type'] == 'like':
+                konumId = i['value']
+                locations = list(get_objects_for_user(request.user, "ArslanTakipApp.gonder_view_location", klass=Location).values().order_by('id'))
+                child_location_ids = filter_locations(locations, konumId, depth=4) # Adjust depth if needed
+                q["kalipKonum_id__in"] = child_location_ids
+
+    hareket_query = Hareket.objects.filter(kalipNo=kalip_no, **q).select_related('kalipKonum', 'kalipVaris', 'kimTarafindan').order_by("-hareketTarihi")
+    hareket_count = hareket_query.count()
+    hareket_query = hareket_query[(page-1)*size:page*size]
+    for h in hareket_query:
+        kalipKonumName = ""
+        kalipVarisName = ""
+        
+        if h.kalipKonum:
+            kalipKonumName = f"{h.kalipKonum.locationRelationID.locationName} <BR>└ {h.kalipKonum.locationName}" if h.kalipKonum.locationRelationID else h.kalipKonum.locationName
+
+        if h.kalipVaris:
+            kalipVarisName = f"{h.kalipVaris.locationRelationID.locationName} <BR>└ {h.kalipVaris.locationName}" if h.kalipVaris.locationRelationID else h.kalipVaris.locationName
+
+        har = {
+            'id': h.id,
+            'kalipNo': h.kalipNo,
+            'kalipKonum': kalipKonumName,
+            'kalipVaris': kalipVarisName,
+            'kimTarafindan': get_user_full_name(h.kimTarafindan_id),
+            'hareketTarihi': format_date_time_s(h.hareketTarihi),
+        }
+        harAr.append(har)
+    
+    paginated_data = harAr
+    lastData = {
+        'last_page': math.ceil(hareket_count/size),
+        'data': paginated_data
+    }
+
+    return JsonResponse(lastData)
+
+def kalip_yorum(request):
+    kalip_no = request.GET.get('KalipNo')
+    print(kalip_no)
+    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
+    comment_tree = build_comment_tree(comments)
+
+    return 
+
+def qrcodeRedirect(request, id):
+    if request.method == "GET":
+        # qr kodundan gelen id'yi getir (qr/id)
+        qr_code = QRCode.objects.get(id=id)
+        print(f"name: {qr_code.name}")
+        print(f"detail: {qr_code.detail}")
+        if qr_code.detail == 'kalıp':
+            # kalıp sayfasına yönlendir, kalıp/#qr_code.name
+            url = f'/kalip/#{qr_code.name}'
+        else:
+            print("kalıp olmayan durumları sonra yaz")
+
+    return redirect(url)
 
 key = b'arslandenemebyz1'
 # def encrypt_aes_ecb(key, plaintext):
@@ -757,6 +847,7 @@ key = b'arslandenemebyz1'
     #     }
 
     # return render(request, 'ArslanTakipApp/qrKalite.html', context)
+
     
 def qrKalite(request):
     if request.method == "GET":
@@ -1588,6 +1679,29 @@ def get_die_numbers_for_production(request):
     die_numbers = list(DiesLocation.objects.filter(kalipVaris__in=location_ids, kalipNo__in=kalip_nos).values_list('kalipNo', flat=True))
     return JsonResponse({'dieNumbers': die_numbers})
 
+def build_comment_tree(comments):
+    comment_dict = {comment.id: comment for comment in comments}
+    tree = []
+
+    for comment in comments:
+        comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
+        if comment.Silindi == True:
+            if comments.filter(ReplyTo_id=comment.id):
+                comment.Aciklama = "Yorum silindi."
+                tree.append({'comment': comment, 'replies': []})
+        else:
+            if comment.ReplyTo is None:  # Top-level comment
+                tree.append({'comment': comment, 'replies': []})
+            else:  # This is a reply
+                parent = comment_dict.get(comment.ReplyTo.id)
+                if parent:
+                    for node in tree:
+                        if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
+                            com_dict = {'comment': comment}
+                            node['replies'].append(com_dict)
+                            break
+    return tree
+
 def pres_siparis_takip(request, id):
     presuretim = get_object_or_404(PresUretimTakip, id=id)
     siparis = SiparisList.objects.using('dies').filter(Kimlik=presuretim.siparis_kimlik)[0]
@@ -1601,28 +1715,28 @@ def pres_siparis_takip(request, id):
     siparis.SonTermin = format_date(siparis.SonTermin)
 
     comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
-    def build_comment_tree(comments):
-        comment_dict = {comment.id: comment for comment in comments}
-        tree = []
+    # def build_comment_tree(comments):
+    #     comment_dict = {comment.id: comment for comment in comments}
+    #     tree = []
 
-        for comment in comments:
-            comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
-            if comment.Silindi == True:
-                if comments.filter(ReplyTo_id=comment.id):
-                    comment.Aciklama = "Yorum silindi."
-                    tree.append({'comment': comment, 'replies': []})
-            else:
-                if comment.ReplyTo is None:  # Top-level comment
-                    tree.append({'comment': comment, 'replies': []})
-                else:  # This is a reply
-                    parent = comment_dict.get(comment.ReplyTo.id)
-                    if parent:
-                        for node in tree:
-                            if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
-                                com_dict = {'comment': comment}
-                                node['replies'].append(com_dict)
-                                break
-        return tree
+    #     for comment in comments:
+    #         comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
+    #         if comment.Silindi == True:
+    #             if comments.filter(ReplyTo_id=comment.id):
+    #                 comment.Aciklama = "Yorum silindi."
+    #                 tree.append({'comment': comment, 'replies': []})
+    #         else:
+    #             if comment.ReplyTo is None:  # Top-level comment
+    #                 tree.append({'comment': comment, 'replies': []})
+    #             else:  # This is a reply
+    #                 parent = comment_dict.get(comment.ReplyTo.id)
+    #                 if parent:
+    #                     for node in tree:
+    #                         if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
+    #                             com_dict = {'comment': comment}
+    #                             node['replies'].append(com_dict)
+    #                             break
+    #     return tree
     
     comment_tree = build_comment_tree(comments)
     context = {

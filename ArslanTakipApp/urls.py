@@ -46,8 +46,8 @@ urlpatterns = [
     path('kalip/postcomment', views.kalip_comments_post, name='kalipCommentPost'),
     path('kalip/editcomment', views.kalip_comments_edit, name='kalipCommentEdit'),
     path('kalip/deletecomment/<str:cId>', views.kalip_comments_delete, name='kalipCommentDelete'),
-    path('qr/', views.qrKalite, name='qr'),
-    path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
+    path('qr/<int:id>', views.qrcodeRedirect, name='qr'),
+    # path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
     path('siparis2/', views.siparis2_list),
     path('siparis3/', login_required(views.Siparis2View.as_view())),
     path('siparis3/list', views.siparis3_list),
@@ -118,5 +118,6 @@ urlpatterns = [
     path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
     path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
     path('kalip/rapor2', views.kalip_rapor2),
-    path('kalip/qr', views.kalip_qr),
+    path('kalip/hareket', views.kalip_hareket),
+    path('kalip/yorum', views.kalip_yorum),
 ]

@@ -149,6 +149,11 @@ class KalipMs(models.Model):
         managed = False
         db_table = 'View020_KalipListe'
 
+class QRCode(models.Model):
+    qr = models.CharField(null=True, blank=True)
+    name = models.CharField(null=True, blank=True)
+    detail = models.CharField(null=True, blank=True)
+
 class PresUretimRaporu(models.Model):
     KalipNo = models.CharField(primary_key=True)
     KartNo = models.IntegerField(null=True)

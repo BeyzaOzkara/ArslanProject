@@ -11,7 +11,7 @@ from django.db.models.functions import Replace
 
 logger = logging.getLogger(__name__)
 
-def send_email(to_addresses, subject, body):
+def send_email(to_addresses, cc_recipients, subject, body):
     email = 'ai@arslanaluminyum.com'
     password = 'Arslan123.'
     credentials = Credentials(email, password)
@@ -38,7 +38,8 @@ def send_email(to_addresses, subject, body):
         folder=account.sent,
         subject=subject,
         body=HTMLBody(body),
-        to_recipients=to_addresses
+        to_recipients=to_addresses,
+        cc_recipients=cc_recipients
     )
 
     # E-postayı gönderme
@@ -142,7 +143,7 @@ def check_new_emails():
                 wrong_numbers, saved_numbers = save_move(movements)
                 print(f'wrong_numbers: {wrong_numbers}, saved_numbers: {saved_numbers}')
                 # maili atan kişiye başarılı ve başarısız olan kalıp numaralarını mail at.
-                send_results(email.sender.email_address, wrong_numbers, saved_numbers)
+                send_results([email.sender.email_address], wrong_numbers, saved_numbers)
         
         # Save the ID of the last processed email
         try:
@@ -333,4 +334,4 @@ def send_results(to_email, wrong_numbers, saved_numbers):
     </body>
     </html>"""
 
-    send_email(to_email, subject, html)
+    send_email(to_addresses=to_email, subject= subject, body= html)

@@ -52,19 +52,19 @@
                   <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
                     <li class="pt-2 px-3"><h3 class="card-title" id="kalipNoInfoCard">Kalıp No</h3></li>
                     <li class="nav-item">
-                      <a class="nav-link active" id="custom-tabs-two-bilgi-tab" data-toggle="pill" href="#custom-tabs-two-bilgi" role="tab" aria-controls="custom-tabs-two-bilgi" aria-selected="true">Kalıp Kartı</a>
+                      <a class="nav-link tab-item active" id="custom-tabs-two-bilgi-tab" data-tab="custom-tabs-two-bilgi" data-toggle="pill" href="#custom-tabs-two-bilgi" role="tab" aria-controls="custom-tabs-two-bilgi" aria-selected="true">Kalıp Kartı</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" id="custom-tabs-two-uretimraporu-tab" data-toggle="pill" href="#custom-tabs-two-uretimraporu" role="tab" aria-controls="custom-tabs-two-uretimraporu" aria-selected="false">Üretim Raporu</a>
+                      <a class="nav-link tab-item" id="custom-tabs-two-uretimraporu-tab" data-tab="custom-tabs-two-uretimraporu" data-toggle="pill" href="#custom-tabs-two-uretimraporu" role="tab" aria-controls="custom-tabs-two-uretimraporu" aria-selected="false">Üretim Raporu</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" id="custom-tabs-two-hareketler-tab" data-toggle="pill" href="#custom-tabs-two-hareketler" role="tab" aria-controls="custom-tabs-two-hareketler" aria-selected="false">Hareketler</a>
+                      <a class="nav-link tab-item" id="custom-tabs-two-hareketler-tab" data-tab="custom-tabs-two-hareketler" data-toggle="pill" href="#custom-tabs-two-hareketler" role="tab" aria-controls="custom-tabs-two-hareketler" aria-selected="false">Hareketler</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" id="custom-tabs-two-yorumlar-tab" data-toggle="pill" href="#custom-tabs-two-yorumlar" role="tab" aria-controls="custom-tabs-two-yorumlar" aria-selected="false">Yorumlar</a>
+                      <a class="nav-link tab-item" id="custom-tabs-two-yorumlar-tab" data-tab="custom-tabs-two-yorumlar" data-toggle="pill" href="#custom-tabs-two-yorumlar" role="tab" aria-controls="custom-tabs-two-yorumlar" aria-selected="false">Yorumlar</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" id="custom-tabs-two-grafikler-tab" data-toggle="pill" href="#custom-tabs-two-grafikler" role="tab" aria-controls="custom-tabs-two-grafikler" aria-selected="false">Grafikler</a>
+                      <a class="nav-link tab-item" id="custom-tabs-two-grafikler-tab" data-tab="custom-tabs-two-grafikler" data-toggle="pill" href="#custom-tabs-two-grafikler" role="tab" aria-controls="custom-tabs-two-grafikler" aria-selected="false">Grafikler</a>
                     </li>
                   </ul>
                 </div>
@@ -79,7 +79,8 @@
                        Morbi turpis dolor, vulputate vitae felis non, tincidunt congue mauris. Phasellus volutpat augue id mi placerat mollis. Vivamus faucibus eu massa eget condimentum. Fusce nec hendrerit sem, ac tristique nulla. Integer vestibulum orci odio. Cras nec augue ipsum. Suspendisse ut velit condimentum, mattis urna a, malesuada nunc. Curabitur eleifend facilisis velit finibus tristique. Nam vulputate, eros non luctus efficitur, ipsum odio volutpat massa, sit amet sollicitudin est libero sed ipsum. Nulla lacinia, ex vitae gravida fermentum, lectus ipsum gravida arcu, id fermentum metus arcu vel metus. Curabitur eget sem eu risus tincidunt eleifend ac ornare magna. 
                     </div>
                     <div class="tab-pane fade" id="custom-tabs-two-yorumlar" role="tabpanel" aria-labelledby="custom-tabs-two-yorumlar-tab">
-                       Pellentesque vestibulum commodo nibh nec blandit. Maecenas neque magna, iaculis tempus turpis ac, ornare sodales tellus. Mauris eget blandit dolor. Quisque tincidunt venenatis vulputate. Morbi euismod molestie tristique. Vestibulum consectetur dolor a vestibulum pharetra. Donec interdum placerat urna nec pharetra. Etiam eget dapibus orci, eget aliquet urna. Nunc at consequat diam. Nunc et felis ut nisl commodo dignissim. In hac habitasse platea dictumst. Praesent imperdiet accumsan ex sit amet facilisis. 
+                        <div class="col-lg-12" id="commentCol">
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="custom-tabs-two-grafikler" role="tabpanel" aria-labelledby="custom-tabs-two-grafikler-tab">
                        Pellentesque vestibulum commodo nibh nec blandit. Maecenas neque magna, iaculis tempus turpis ac, ornare sodales tellus. Mauris eget blandit dolor. Quisque tincidunt venenatis vulputate. Morbi euismod molestie tristique. Vestibulum consectetur dolor a vestibulum pharetra. Donec interdum placerat urna nec pharetra. Etiam eget dapibus orci, eget aliquet urna. Nunc at consequat diam. Nunc et felis ut nisl commodo dignissim. In hac habitasse platea dictumst. Praesent imperdiet accumsan ex sit amet facilisis. 
@@ -259,11 +260,6 @@
                 </div>
             </div>
                 <!--kalipKart end-->
-        </div>
-        <!--Pres Üretim Raporu start -->
-        <div class="container-fluid col-lg-5">
-            <div class="card" id="presURaporListe-table" style="display: none;"></div>
-            <div class="card" id="kalipHareketListe-table" style="display: none;"></div>
         </div>
     </div>
     <div class="row">
@@ -461,18 +457,73 @@ function initializeProductionReports() {
     loadedData.data.uretimraporu = pressProductionReports;
 }
 
-$('#custom-tabs-two-uretimraporu-tab').on('click', function() {
-    if (!loadedData.data.uretimraporu) {
-        console.log("uretimraporu tab clicked");
-        let kalipNo = loadedData.currentDie;
-        initializeProductionReports(kalipNo);
-        
-    } else {
-        // Data already loaded, show it
-        console.log("Press Production Reports Tabulator already initialized.");
-        // document.getElementById("custom-tabs-two-bilgi").innerHTML = loadedData.data.uretimraporu;
-    }
-});
+function initializeDieMovements(){
+    var dieMovements = new Tabulator("#custom-tabs-two-hareketler", {
+        height: "500px",
+        layout: "fitDataFill",
+        placeholder: "Kalıp Hareketleri",
+        progressiveLoad: "scroll",
+        paginationMode: "remote",
+        filterMode: "remote",
+        paginationSize: 30,
+        ajaxURL: "/kalip/hareket",  // The URL to fetch data from
+        ajaxURLGenerator: function(url, config, params) {
+            const kalipNo = loadedData.currentDie;
+            return `${url}?KalipNo=${kalipNo}&params=${encodeURI(JSON.stringify(params))}`;
+        },
+        columns: [
+            {title:"KALIP NO", field:"kalipNo", headerSort:false},
+            {title:"NEREDEN", field:"kalipKonum", formatter:"html", headerSort:false},
+            {title:"NEREYE", field:"kalipVaris", formatter:"html", headerSort:false},
+            {title:"GÖNDEREN", field:"kimTarafindan", headerSort:false},
+            {title:"HAREKET TARİHİ", field:"hareketTarihi"},
+        ]
+    });
+    loadedData.data.hareketler = dieMovements;
+}
+
+function initializeComments() {
+    console.log("Yorumlar...");
+    
+    // Make AJAX request to fetch the comment data in JSON format
+    $.ajax({
+        url: `/kalip/yorumlar`,  // The URL to fetch the comment data
+        method: 'GET',
+        success: function(data) {
+            console.log('Comments data loaded:', data);
+
+            // Clear the existing comment container
+            const commentsContainer = document.getElementById('commentCol');
+            commentsContainer.innerHTML = '';  // Clear existing content
+
+            // If there are comments, render them
+            if (data && data.comment_tree) {
+                // This is where we use the Django template to render the comments
+                const commentsHTML = renderCommentsTemplate(data.comment_tree);
+
+                // Insert the rendered comments HTML into the comment container
+                commentsContainer.innerHTML = commentsHTML;
+            } else {
+                commentsContainer.innerHTML = '<p>No comments available.</p>';
+            }
+        },
+        error: function(error) {
+            console.error('Error loading comments:', error);
+        }
+    });
+}
+
+// Function to render the comment tree using the Django template tag
+function renderCommentsTemplate(commentTree) {
+    let commentsHTML = '';
+    
+    commentTree.forEach(node => {
+        // Render the comment using Django's {% render_comment %} template tag
+        commentsHTML += `{% for node in comment_tree %}{% render_comment node %}{% endfor %}`;
+    });
+
+    return commentsHTML;
+}
 
 function handleDieChange(kalipNo) {
     loadedData.data = {};
@@ -533,29 +584,34 @@ function showKalipInfoCard(kalipNo) {
     }
 }
 
+const tabInitializers = {
+    'custom-tabs-two-uretimraporu': initializeProductionReports,
+    'custom-tabs-two-hareketler': initializeDieMovements,
+    'custom-tabs-two-yorumlar': () => initializeComments,
+    'custom-tabs-two-grafikler': () => console.log("grafikler")
+};
+
 // Lazy load content for the other tabs
 function loadTabContent(tabId) {
     const tabContent = document.getElementById(tabId);
-    console.log(tabContent)
-    
-    // Check if the tab has already been loaded
+
     if (tabContent && tabContent.dataset.loaded !== "true") {
         tabContent.dataset.loaded = "true"; // Mark as loaded to avoid multiple requests
 
-        if (tabId == 'custom-tabs-two-uretimraporu-tab') {
-            console.log("uretimraporu")
-        }
-        else if (tabId == 'custom-tabs-two-hareketler') {
-            console.log("hareketler")
-        }
-        else if (tabId == 'custom-tabs-two-yorumlar') {
-            console.log("yorumlar")
-        }
-        else if (tabId == 'custom-tabs-two-grafikler') {
-            console.log("grafikler")
+        // Call the corresponding initializer function for the tab
+        const initializer = tabInitializers[tabId];
+        if (initializer) {
+            initializer();
         }
     }
 }
+
+// Attach click handlers to all tabs with the .tab-item class
+$('.tab-item').on('click', function() {
+    const tabId = $(this).attr('id'); //.replace('-tab', '');
+    const contentTabId = $(this).data('tab');
+    loadTabContent(contentTabId);
+});
 
 function handleCommentPost() {
     let kNo = $('#yorumText').data("kalip");
@@ -564,7 +620,19 @@ function handleCommentPost() {
 
 function printQR(kalipNo) {
     console.log("kalip: " + kalipNo);
-
+    $.ajax({
+      url: `/kalip/qr`,
+      method: 'GET', 
+      dataType: 'json',
+      success: function (data) {
+        console.log(data);
+        // kalip no gönde ve qr için id al. 
+        // arslna/qr/id şeklinde bir url kullanarak qr oluştur.
+      },
+      error: function (error) {
+          console.error('Error getting :', error);
+      }
+    });
 }
 
 function generateQRCode(url) {
@@ -572,134 +640,6 @@ function generateQRCode(url) {
     qrCodeContainer.innerHTML = ''; 
     new QRCode(qrCodeContainer, url);
 }
-
-var tableKalip = new Tabulator("#kalipListe-table", {
-    height:"700px",
-    layout:"fitDataFill",
-    placeholder:"Kalıp Liste",
-    ajaxURL:"/kalip/liste",
-    progressiveLoad:"scroll",
-    paginationMode:"remote",
-    filterMode:"remote",
-    paginationSize:30,
-    popupContainer:true,
-    rowFormatter: row => {
-        let data = row.getData();
-        if (data.Hatali === 0) {
-            row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
-        }
-        if (data.AktifPasif === false) {
-            row.getElement().style.color = "#a3050a"
-        }
-    },
-    ajaxURLGenerator:function(url, config, params){
-        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
-    },
-    columns:[
-        {
-            title:"Gösterilen Sütunlar",
-            headerMenu:headerMenu, //add a menu to this column header
-            columns:[
-            {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                kalData = cell.getData();
-                kalipNo = kalData.KalipNo;
-                window.location.hash = kalipNo;
-                handleDieChange(kalipNo);
-            },
-            },
-            {formatter:msgIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                let kId = cell.getData().KalipNo;
-                clickComment(kId);
-                $('#yorumText').data('kalip', kId);
-                // document.getElementsByName("ilkYorumText")[0].setAttribute("id", `yorumText${kId}`);
-                document.getElementById("yorumPaylas").removeEventListener("click", handleCommentPost);
-                document.getElementById("yorumPaylas").addEventListener("click", handleCommentPost);
-                
-                document.getElementById("dieComment").style.display = 'block';
-                document.getElementById("diePostComment").style.display = 'block';
-            }},
-            {formatter:printIcon, title:"", width:45, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                let kalipNo = cell.getData().KalipNo;
-                // printQR(kalipNo);
-                let resimDizini = cell.getData().ResimDizini.replace(/\s+/g, '') + "Teknik1.jpg";
-                let imageUrl = `http://arslan/static/${resimDizini}`;
-                console.log(imageUrl);
-                document.getElementById('technical-image').src = imageUrl;
-                
-                // Generate the QR code for the KalipNo
-                let qrUrl = `http://arslan/qr/${kalipNo}`;
-                generateQRCode(qrUrl);
-            }},
-            {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
-            accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
-            {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
-            accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
-            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc: toplamKalip},//"count"},
-            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
-            {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
-            {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
-            {title:"CİNSİ", field:"Cinsi", headerFilter:"input", visible:false},
-            {title:"GRAMAJ", field:"Miktar", headerFilter:"input", visible:false},
-            {title:"CAPİ", field:"Capi", headerFilter:"input", visible:false},
-            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
-            {title:"URETİM TARİHİ", field:"UretimTarihi", headerFilter:"input", visible:false},
-            {title:"FİGÜR", field:"GozAdedi", headerFilter:"input", visible:false},
-            {title:"BOLSTER", field:"Bolster", headerFilter:"input", visible:false},
-            {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
-            {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
-            {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
-            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
-             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-            {title:"TENİFER ÖMRÜ", field:"TeniferOmruMt", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,},
-             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,}},
-            {title:"TENİFER ÖMRÜ", field:"TeniferOmruKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
-             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-            {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
-            {title:"SON TENİFER", field:"SonTeniferKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
-             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-            {title:"SON TENİFER SEBEBİ", field:"SonTeniferSebebi", headerFilter:"input", visible:false},
-            {title:"SIRADAKİ TENİFER NO", field:"TeniferNo", headerFilter:"input", visible:false},
-            {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
-            {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
-            {title:"ÜRETİM TEN SONRASI", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
-             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-            {title:"ÜRETİM TOPLAM", field:"UretimToplamKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
-             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
-            {title:"PROFİL GRAMAJ", field:"ProfilGramaj", headerFilter:"input", visible:false},
-            {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
-            {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
-            {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
-            {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
-            {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
-            {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
-            {title:"KONUM", field:"kalipLocation", formatter:"html"},
-            {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
-            ],
-            
-        },
-    ],
-}); 
-
-var kalipHareketleri = new Tabulator("#kalipHareketListe-table", {
-    height:"250px",
-    layout:"fitColumns",
-    placeholder:"Kalıp Harketleri",
-    ajaxURL:"/location/hareket",
-    progressiveLoad:"scroll",
-    paginationMode:"remote",
-    filterMode:"remote",
-    paginationSize:30,
-    ajaxURLGenerator:function(url, config, params){
-        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
-    },
-    columns:[
-    {title:"NEREDEN", field:"kalipKonum", formatter:"html", headerSort:false},
-    {title:"NEREYE", field:"kalipVaris", formatter:"html", headerSort:false},
-    {title:"GÖNDEREN", field:"kimTarafindan", headerSort:false},
-    {title:"HAREKET TARİHİ", field:"hareketTarihi"},
-    ],
-});
-
 
 </script>
 
