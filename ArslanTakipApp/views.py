@@ -57,6 +57,7 @@ from .email_utils import check_new_emails, send_email
 from django.core.cache import cache
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.forms.models import model_to_dict
 # Create your views here.
 
 
@@ -201,7 +202,7 @@ def send_email_notification(request, dieList, dieTo_press):
         user_info = get_user_full_name(request.user.id)
         cc_addresses = ['pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'kaliphazirlama@arslanaluminyum.com' ,
             'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com',
-            'burakduman@arslanaluminyum.com','nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
+            'nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
             'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
             'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com']
         
@@ -582,7 +583,6 @@ def comment_kalip(request, kNo):
         i['UretimTarihi'] = format_date_time(i['UretimTarihi'])
         i['SonUretimTarih'] = format_date_time(i['SonUretimTarih'])
         i['SonTeniferTarih'] = format_date_time(i['SonTeniferTarih'])
-        
     return render(request, 'ArslanTakipApp/kalipYorum.html', {'kalip_json':kalipList})
 
 def kalip_tum(request):
@@ -597,7 +597,6 @@ def kalip_getcomments(request, kId):
         yudaComments = getParentComments("KalipMs", kId).order_by("Tarih")
         yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
         comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-
         data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
@@ -805,12 +804,39 @@ def kalip_hareket(request):
     return JsonResponse(lastData)
 
 def kalip_yorum(request):
-    kalip_no = request.GET.get('KalipNo')
-    print(kalip_no)
-    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip.KalipNo).order_by("Tarih")
+    kalip_no = request.GET.get('kalipNo')
+    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip_no).order_by("Tarih")
     comment_tree = build_comment_tree(comments)
+    data = json.dumps(comment_tree, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
 
-    return 
+def build_comment_tree(comments):
+    comment_dict = {comment.id: comment for comment in comments}
+    tree = []
+
+    for comment in comments:
+        comment_data = model_to_dict(comment)  # Convert to dictionary
+
+        # Add the user full name (assuming `get_user_full_name` is a valid function)
+        comment_data['KullaniciAdi'] = get_user_full_name(comment.Kullanici.id)
+        
+        # Handling if comment is deleted
+        if comment.Silindi:
+            comment_data['Aciklama'] = "Yorum silindi."
+            tree.append({'comment': comment_data, 'replies': []})
+        else:
+            if comment.ReplyTo is None:  # Top-level comment
+                tree.append({'comment': comment_data, 'replies': []})
+            else:  # This is a reply
+                parent = comment_dict.get(comment.ReplyTo.id)
+                if parent:
+                    for node in tree:
+                        if node['comment']['id'] == parent.id:
+                            com_dict = {'comment': comment_data}
+                            node['replies'].append(com_dict)
+                            break
+
+    return tree
 
 def qrcodeRedirect(request, id):
     if request.method == "GET":
@@ -1685,29 +1711,6 @@ def get_die_numbers_for_production(request):
 
     die_numbers = list(DiesLocation.objects.filter(kalipVaris__in=location_ids, kalipNo__in=kalip_nos).values_list('kalipNo', flat=True))
     return JsonResponse({'dieNumbers': die_numbers})
-
-def build_comment_tree(comments):
-    comment_dict = {comment.id: comment for comment in comments}
-    tree = []
-
-    for comment in comments:
-        comment.KullaniciAdi = get_user_full_name(comment.Kullanici.id)
-        if comment.Silindi == True:
-            if comments.filter(ReplyTo_id=comment.id):
-                comment.Aciklama = "Yorum silindi."
-                tree.append({'comment': comment, 'replies': []})
-        else:
-            if comment.ReplyTo is None:  # Top-level comment
-                tree.append({'comment': comment, 'replies': []})
-            else:  # This is a reply
-                parent = comment_dict.get(comment.ReplyTo.id)
-                if parent:
-                    for node in tree:
-                        if node['comment'] == parent or (parent.Silindi and node['comment'].id == parent.id):
-                            com_dict = {'comment': comment}
-                            node['replies'].append(com_dict)
-                            break
-    return tree
 
 def pres_siparis_takip(request, id):
     presuretim = get_object_or_404(PresUretimTakip, id=id)

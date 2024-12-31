@@ -2,6 +2,7 @@
 {% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
 
 {% load static %}
+{% load comment_tags %}
 
 {% block title %}Arslan Alüminyum{% endblock %}
 
@@ -79,11 +80,25 @@
                        Morbi turpis dolor, vulputate vitae felis non, tincidunt congue mauris. Phasellus volutpat augue id mi placerat mollis. Vivamus faucibus eu massa eget condimentum. Fusce nec hendrerit sem, ac tristique nulla. Integer vestibulum orci odio. Cras nec augue ipsum. Suspendisse ut velit condimentum, mattis urna a, malesuada nunc. Curabitur eleifend facilisis velit finibus tristique. Nam vulputate, eros non luctus efficitur, ipsum odio volutpat massa, sit amet sollicitudin est libero sed ipsum. Nulla lacinia, ex vitae gravida fermentum, lectus ipsum gravida arcu, id fermentum metus arcu vel metus. Curabitur eget sem eu risus tincidunt eleifend ac ornare magna. 
                     </div>
                     <div class="tab-pane fade" id="custom-tabs-two-yorumlar" role="tabpanel" aria-labelledby="custom-tabs-two-yorumlar-tab">
+                        deneme
                         <div class="col-lg-12" id="commentCol">
                         </div>
                     </div>
                     <div class="tab-pane fade" id="custom-tabs-two-grafikler" role="tabpanel" aria-labelledby="custom-tabs-two-grafikler-tab">
-                       Pellentesque vestibulum commodo nibh nec blandit. Maecenas neque magna, iaculis tempus turpis ac, ornare sodales tellus. Mauris eget blandit dolor. Quisque tincidunt venenatis vulputate. Morbi euismod molestie tristique. Vestibulum consectetur dolor a vestibulum pharetra. Donec interdum placerat urna nec pharetra. Etiam eget dapibus orci, eget aliquet urna. Nunc at consequat diam. Nunc et felis ut nisl commodo dignissim. In hac habitasse platea dictumst. Praesent imperdiet accumsan ex sit amet facilisis. 
+                        <div class="post commentId" id="commentDiv">
+                            <div class="user-block">
+                                <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                                <span class="username" style="color: blue;">comment.KullaniciAdi</span>
+                                <span class="description">comment.Tarih</span>
+                            </div>
+                            <p id="commentId">açıklama</p>
+                            <!-- dosyalar için previewlar -->
+                            <!-- dosylar için linkler-->
+                            <!-- read button, reply, edit, delete --> 
+                             <div class="replies-container">
+                                
+                             </div>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -316,6 +331,9 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+
+
+
 // document loaded
 // urli kontrol et
 // kaliptan sonra hiç bir şey yoksa normal sayfa gözüksün
@@ -484,19 +502,17 @@ function initializeDieMovements(){
 
 function initializeComments() {
     console.log("Yorumlar...");
-    
-    // Make AJAX request to fetch the comment data in JSON format
+    // yorumları ajax ile getir ve javascript kodu ile htmlin içini doldur ve 
+    let kalip_no = loadedData.currentDie;
     $.ajax({
-        url: `/kalip/yorumlar`,  // The URL to fetch the comment data
+        url: `/kalip/yorum`,
         method: 'GET',
+        data: {'kalipNo': kalip_no},
         success: function(data) {
             console.log('Comments data loaded:', data);
-
-            // Clear the existing comment container
-            const commentsContainer = document.getElementById('commentCol');
+            console.log(data)
+            const commentsContainer = document.getElementById('custom-tabs-two-yorumlar');
             commentsContainer.innerHTML = '';  // Clear existing content
-
-            // If there are comments, render them
             if (data && data.comment_tree) {
                 // This is where we use the Django template to render the comments
                 const commentsHTML = renderCommentsTemplate(data.comment_tree);
@@ -504,7 +520,7 @@ function initializeComments() {
                 // Insert the rendered comments HTML into the comment container
                 commentsContainer.innerHTML = commentsHTML;
             } else {
-                commentsContainer.innerHTML = '<p>No comments available.</p>';
+                commentsContainer.innerHTML = '<p>Yorum Yok.</p>';
             }
         },
         error: function(error) {
@@ -513,16 +529,8 @@ function initializeComments() {
     });
 }
 
-// Function to render the comment tree using the Django template tag
 function renderCommentsTemplate(commentTree) {
-    let commentsHTML = '';
-    
-    commentTree.forEach(node => {
-        // Render the comment using Django's {% render_comment %} template tag
-        commentsHTML += `{% for node in comment_tree %}{% render_comment node %}{% endfor %}`;
-    });
 
-    return commentsHTML;
 }
 
 function handleDieChange(kalipNo) {
@@ -587,7 +595,7 @@ function showKalipInfoCard(kalipNo) {
 const tabInitializers = {
     'custom-tabs-two-uretimraporu': initializeProductionReports,
     'custom-tabs-two-hareketler': initializeDieMovements,
-    'custom-tabs-two-yorumlar': () => initializeComments,
+    'custom-tabs-two-yorumlar': initializeComments,
     'custom-tabs-two-grafikler': () => console.log("grafikler")
 };
 
@@ -613,33 +621,89 @@ $('.tab-item').on('click', function() {
     loadTabContent(contentTabId);
 });
 
-function handleCommentPost() {
-    let kNo = $('#yorumText').data("kalip");
-    yorumPaylas(kNo);
-}
+var tableKalip = new Tabulator("#kalipListe-table", {
+    height:"700px",
+    layout:"fitDataFill",
+    placeholder:"Kalıp Liste",
+    ajaxURL:"/kalip/liste",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    popupContainer:true,
+    rowFormatter: row => {
+        let data = row.getData();
+        if (data.Hatali === 0) {
+            row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
+        }
+        if (data.AktifPasif === false) {
+            row.getElement().style.color = "#a3050a"
+        }
+    },
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+        {
+            title:"Gösterilen Sütunlar",
+            headerMenu:headerMenu, //add a menu to this column header
+            columns:[
+            {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                kalData = cell.getData();
+                kalipNo = kalData.KalipNo;
+                window.location.hash = kalipNo;
+                handleDieChange(kalipNo);
+            },
+            },
+            {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
+            accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
+            {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
+            accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
+            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc: toplamKalip},//"count"},
+            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
+            {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
+            {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
+            {title:"CİNSİ", field:"Cinsi", headerFilter:"input", visible:false},
+            {title:"GRAMAJ", field:"Miktar", headerFilter:"input", visible:false},
+            {title:"CAPİ", field:"Capi", headerFilter:"input", visible:false},
+            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
+            {title:"URETİM TARİHİ", field:"UretimTarihi", headerFilter:"input", visible:false},
+            {title:"FİGÜR", field:"GozAdedi", headerFilter:"input", visible:false},
+            {title:"BOLSTER", field:"Bolster", headerFilter:"input", visible:false},
+            {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
+            {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
+            {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
+            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruMt", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
+            {title:"SON TENİFER", field:"SonTeniferKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"SON TENİFER SEBEBİ", field:"SonTeniferSebebi", headerFilter:"input", visible:false},
+            {title:"SIRADAKİ TENİFER NO", field:"TeniferNo", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
+            {title:"ÜRETİM TEN SONRASI", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"ÜRETİM TOPLAM", field:"UretimToplamKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"PROFİL GRAMAJ", field:"ProfilGramaj", headerFilter:"input", visible:false},
+            {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
+            {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
+            {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
+            {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
+            {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
+            {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+            {title:"KONUM", field:"kalipLocation", formatter:"html"},
+            {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
+            ],
 
-function printQR(kalipNo) {
-    console.log("kalip: " + kalipNo);
-    $.ajax({
-      url: `/kalip/qr`,
-      method: 'GET', 
-      dataType: 'json',
-      success: function (data) {
-        console.log(data);
-        // kalip no gönde ve qr için id al. 
-        // arslna/qr/id şeklinde bir url kullanarak qr oluştur.
-      },
-      error: function (error) {
-          console.error('Error getting :', error);
-      }
-    });
-}
-
-function generateQRCode(url) {
-    let qrCodeContainer = document.getElementById('qr-code-container');
-    qrCodeContainer.innerHTML = ''; 
-    new QRCode(qrCodeContainer, url);
-}
+        },
+    ],
+}); 
 
 </script>
 

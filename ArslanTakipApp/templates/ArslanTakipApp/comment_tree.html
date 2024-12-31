@@ -1,0 +1,7 @@
+{% load comment_tags %}
+
+<div id="comments">
+    {% for node in comment_tree %}
+        {% render_comment node %}
+    {% endfor %}
+</div>
