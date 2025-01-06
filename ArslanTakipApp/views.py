@@ -805,10 +805,17 @@ def kalip_hareket(request):
 
 def kalip_yorum(request):
     kalip_no = request.GET.get('kalipNo')
-    comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip_no).order_by("Tarih")
-    comment_tree = build_comment_tree(comments)
-    data = json.dumps(comment_tree, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return HttpResponse(data)
+    if request.method == "GET":
+        comments = getParentComments("KalipMs", kalip_no).order_by("Tarih")
+        comment_list = [process_comment(request.user, comment) for comment in comments]
+        print(f"comment_list: {comment_list}")
+        data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+        return HttpResponse(data)
+    # comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip_no).order_by("Tarih")
+    # comment_tree = build_comment_tree(comments)
+    # print(f"comment_tree: {comment_tree}")
+    # data = json.dumps(comment_tree, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    # return HttpResponse(data)
 
 def build_comment_tree(comments):
     comment_dict = {comment.id: comment for comment in comments}
@@ -819,7 +826,11 @@ def build_comment_tree(comments):
 
         # Add the user full name (assuming `get_user_full_name` is a valid function)
         comment_data['KullaniciAdi'] = get_user_full_name(comment.Kullanici.id)
+        comment_data['All_Viewed'] = False
         
+        comment_data['Tarih'] = format_date_time(comment_data['Tarih'])
+        comment_data['Is_Viewed'] = False
+        comment_data['cfiles'] = list(getFiles("Comment", comment_data['id']))
         # Handling if comment is deleted
         if comment.Silindi:
             comment_data['Aciklama'] = "Yorum silindi."

@@ -509,13 +509,13 @@ function initializeComments() {
         method: 'GET',
         data: {'kalipNo': kalip_no},
         success: function(data) {
-            console.log('Comments data loaded:', data);
-            console.log(data)
+            // console.log('Comments data loaded:', data);
             const commentsContainer = document.getElementById('custom-tabs-two-yorumlar');
             commentsContainer.innerHTML = '';  // Clear existing content
-            if (data && data.comment_tree) {
-                // This is where we use the Django template to render the comments
-                const commentsHTML = renderCommentsTemplate(data.comment_tree);
+            let comment_data = JSON.parse(data);
+            // console.log(comment_data);
+            if (comment_data) {
+                const commentsHTML = renderCommentsTemplate(comment_data);
 
                 // Insert the rendered comments HTML into the comment container
                 commentsContainer.innerHTML = commentsHTML;
@@ -530,8 +530,118 @@ function initializeComments() {
 }
 
 function renderCommentsTemplate(commentTree) {
-
+    let commentsHTML = '';
+    // console.log("comment_tree: ", commentTree);
+    // console.log(Array.isArray(commentTree))
+    commentTree.forEach(comment => {
+        commentsHTML += createCommentBlock(comment).prop('outerHTML');
+        
+    });
+    return commentsHTML;
 }
+
+function renderReplies(replies) {
+    let repliesHTML = '<div class="replies-container">'; // Optional: wrap replies in a container
+    replies.forEach(reply => {
+        repliesHTML += createCommentBlock(reply).prop('outerHTML');
+
+        // If the reply has further replies, render them recursively
+        if (reply.replies && Array.isArray(reply.replies) && reply.replies.length > 0) {
+            repliesHTML += renderReplies(reply.replies);
+        }
+    });
+    repliesHTML += '</div>'; // Closing the replies container
+    return repliesHTML;
+}
+
+function createUserBlock(comment) {
+    return `<div class="user-block">
+                <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
+                <span class="description">${comment.Tarih}</span>
+            </div>`;
+};
+
+function createCommentContent(comment) {
+    return `<p id="${comment.id}>${comment.Aciklama}</p>`;
+}
+
+function createImagePreview(cf) { // comment.files foreach cf
+    var format_array = ["img", "jpg", "PNG", "png"];
+    var video_format_array = ["mp4"];
+    var file_format = /[^.]*$/.exec(cf.File)[0];
+    var fileHtml ="";
+    if (format_array.indexOf(file_format) > -1) {
+        fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
+    }
+    if (video_format_array.indexOf(file_format) > -1) {
+        fileHtml = `<div class="gallery__item"><video width="320" height="240" controls>
+            <source src="/media/${cf.File}" type="video/${file_format}"></video></div>`;
+    }
+    return fileHtml;
+}
+ 
+function commentImagePreviews(cfiles) {
+    var imagePreviews = ``;
+    cfiles.forEach(cf => { imagePreviews += createImagePreview(cf); });
+    var galleryDiv = `<div class="gallery">${imagePreviews}</div>`;
+    return galleryDiv;
+}
+
+function createFileLink(cf) {
+    return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
+                <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
+            </a></p>`;
+}
+
+function createViewedIcon(comment) {
+    const iconColor = comment.All_Viewed ? "#4FB6EC" : "black";
+    return $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Görüntüleyenler"  onclick="iconClick(${comment.id})"><i class="fa fa-check iconelement" style="color:${iconColor}" name="iconElement" aria-hidden="true"></i></a></span>`);
+}
+
+function createReadButton(id) {
+    return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
+}
+
+function createReplyButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:green" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+}
+
+function createEditButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+}
+
+function createDeleteButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
+}
+
+function createCommentBlock(comment) {
+    const commentElement = $('<div>', { class: `post ${comment.id}` });
+    commentElement.append(createUserBlock(comment), createCommentContent(comment));
+
+    if (comment.cfiles.length > 0) {
+        commentElement.append(commentImagePreviews(comment.cfiles));
+    }
+    comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
+    
+    const isViewed = comment.Is_Viewed;
+    commentElement.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
+    
+    commentElement.append(createReplyButton(comment.id));
+    if (comment.Kullanici_id === userID) {
+        commentElement.append(createEditButton(comment.id), createDeleteButton(comment.id));
+    }
+    if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
+        commentElement.append(renderReplies(comment.replies));
+    }
+
+    // if (comment.replies.length > 0) {
+    //     commentElement.append(createRepliesContainer(comment.replies));
+    // }
+
+    return commentElement;
+}
+
 
 function handleDieChange(kalipNo) {
     loadedData.data = {};
