@@ -533,7 +533,6 @@ function renderCommentsTemplate(commentTree) {
     let commentsHTML = '';
     commentTree.forEach(comment => {
         commentsHTML += createCommentBlock(comment).prop('outerHTML');
-        
     });
     return commentsHTML;
 }
