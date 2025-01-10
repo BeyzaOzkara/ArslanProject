@@ -188,9 +188,8 @@ def check_last_location_press(request, dieList, dieTo):
 
     for die in dies:
         die_press = die.kalipVaris.presKodu
-        
-        if die_press != dieTo_press:
-            dies_to_notify.append(die.kalipNo) 
+        if die_press != dieTo_press and die_press != None and dieTo_press!= None:
+            dies_to_notify.append(die.kalipNo)
     
     if dies_to_notify:
         send_email_notification(request, dies_to_notify, dieTo_press)
@@ -811,11 +810,6 @@ def kalip_yorum(request):
         print(f"comment_list: {comment_list}")
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
-    # comments = Comment.objects.filter(FormModel='KalipMs', FormModelId=kalip_no).order_by("Tarih")
-    # comment_tree = build_comment_tree(comments)
-    # print(f"comment_tree: {comment_tree}")
-    # data = json.dumps(comment_tree, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    # return HttpResponse(data)
 
 def build_comment_tree(comments):
     comment_dict = {comment.id: comment for comment in comments}

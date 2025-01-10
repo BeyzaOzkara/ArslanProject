@@ -633,26 +633,21 @@ function initializeDieMovements(){
 }
 
 function initializeComments() {
-    console.log("Yorumlar...");
-    // yorumları ajax ile getir ve javascript kodu ile htmlin içini doldur ve 
     let kalip_no = loadedData.currentDie;
     $.ajax({
-        url: `/kalip/yorum`,
+        url: `yorum`,
         method: 'GET',
         data: {'kalipNo': kalip_no},
         success: function(data) {
-            console.log('Comments data loaded:', data);
-            console.log(data)
             const commentsContainer = document.getElementById('custom-tabs-two-yorumlar');
             commentsContainer.innerHTML = '';  // Clear existing content
-            if (data && data.comment_tree) {
-                // This is where we use the Django template to render the comments
-                const commentsHTML = renderCommentsTemplate(data.comment_tree);
-
+            let comment_data = JSON.parse(data);
+            if (comment_data) {
+                const commentsHTML = renderCommentsTemplate(comment_data);
                 // Insert the rendered comments HTML into the comment container
                 commentsContainer.innerHTML = commentsHTML;
             } else {
-                commentsContainer.innerHTML = '<p>No comments available.</p>';
+                commentsContainer.innerHTML = '<p>Yorum Yok.</p>';
             }
         },
         error: function(error) {
@@ -662,7 +657,11 @@ function initializeComments() {
 }
 
 function renderCommentsTemplate(commentTree) {
-
+    let commentsHTML = '';
+    commentTree.forEach(comment => {
+        commentsHTML += createCommentBlock(comment).prop('outerHTML');
+    });
+    return commentsHTML;
 }
 
 
@@ -710,9 +709,9 @@ function showKalipInfoCard(kalipNo) {
                     </tr>
                     <tr>
                         <th>Resim Gramaj</th>
-                        <td id="resim-gramaj">${data.ResimGramaj}</td>
-                        <th>Son Üretim Gramaj</th>
-                        <td id="son-uretim-gramaj">${data.SonUretimGramaj}</td>
+                        <td id="resim-gramaj">${data.ProfilGramaj}</td>
+                        <th>Son Üretim Gr</th>
+                        <td id="son-uretim-gramaj">${data.SonUretimGr}</td>
                     </tr>
                     <tr>
                         <th>Cinsi</th>
@@ -1181,6 +1180,7 @@ function clickComment(kalipNo) {
         method: 'GET',
         dataType: 'json',
         success: function (commentData) {
+            console.log(commentData)
             getComments(JSON.parse(commentData));
         },
         error: function (error) {
@@ -1425,6 +1425,7 @@ $(function () {
         ['height', ['height']],
         ['table'],
         ['custom', ['specialchars']],
+        ['insert', ['link', 'picture', 'file']],
       ]
     });
     
@@ -1445,5 +1446,6 @@ $(function () {
 <script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
 <script src="{% static 'admin-lte/plugins/summernote/lang/summernote-tr-TR.js' %}"></script>
+<script src="{% static 'node_modules/summernote-file/summernote-file.js' %}"></script>
 <!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
 {% endblock %}
