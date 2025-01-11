@@ -333,25 +333,27 @@ function createPostComment() {
 }
 
 function sendComment(element) {
-    let action = element.data.action;
+    var action = $(element).attr('data-action');
+    console.log(action)
     if (action == "Paylas") {
         postComment();
     }
     else if (action == "Gönder") {
-        let cId = element.data.comment;
+        let cId = $(element).attr('data-comment');
+        console.log(cId)
         postComment(cId);
     }
     else if (action == "Düzenle") {
-        let cId = element.data.comment;
+        let cId = $(element).attr('data-comment');
         editComment(cId);
     }
 }
 
 function postComment(commentId="") {
     var yorumData = new FormData();
-    var textareaValue = $(`#commentTextarea${cId}`).summernote('code');
+    var textareaValue = $(`#commentTextarea${commentId}`).summernote('code');
     var kNo = loadedData.currentDie;
-
+    console.log(kNo);
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", kNo);
     yorumData.append("yorum", textareaValue);
@@ -539,7 +541,7 @@ function replyEditBtnClick(commentId, action) {
 
     // Create a new textarea for reply or edit
     const textarea = $(`<textarea id="commentTextarea${commentId}" class="textarea btnText ${action}"></textarea>`);
-    const sendButton =  $(`<button id="send${commentId}" class="btn btn-primary mb-2" data-cooment=${commentId} data-action=${action}>${action}</button>`);
+    const sendButton =  $(`<button id="send${commentId}" onclick="sendComment(this)" class="btn btn-primary mb-2" data-comment=${commentId} data-action=${action}>${action}</button>`);
     textareaContainer.append(textarea, sendButton);
 
     // Initialize Summernote

@@ -807,7 +807,7 @@ def kalip_yorum(request):
     if request.method == "GET":
         comments = getParentComments("KalipMs", kalip_no).order_by("Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
-        print(f"comment_list: {comment_list}")
+        # print(f"comment_list: {comment_list}")
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 

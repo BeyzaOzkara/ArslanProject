@@ -147,7 +147,7 @@ class KalipMs(models.Model):
         managed = False
         db_table = 'View020_KalipListe'
 
-class Yukleme(models.Model):
+class Sepet(models.Model):
     sepet_no = models.CharField(null=True, blank=True)
     baslangic_saati = models.DateTimeField(null=True, blank=True)
     bitis_saati = models.DateTimeField(null=True, blank=True)
