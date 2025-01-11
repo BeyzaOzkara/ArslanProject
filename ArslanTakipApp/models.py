@@ -23,7 +23,6 @@ class Location(models.Model):
                        ("goz_view_location", "Goz Gorme Yetkisi Var"),
                         ("kalipEkran_view_location", "Kalip Ekrani Gorme Yetkisi Var")]
 
-
 #veritabanı isimlerini ingilizce yap
 #blank true eklenecekleri belirle
 class Kalip(models.Model):
@@ -90,7 +89,6 @@ class LocationDies(models.Model): #konumların içindeki kalıplar
         managed=False
         db_table = 'View_DiesInLocations'
 
-
 #bir yerden diğer yere aktarılması, tarih saat, kim
 class Hareket(models.Model):
     kalipNo = models.CharField(null=False, verbose_name="Kalıp Numarası")
@@ -148,6 +146,13 @@ class KalipMs(models.Model):
     class Meta:
         managed = False
         db_table = 'View020_KalipListe'
+
+class Yukleme(models.Model):
+    sepet_no = models.CharField(null=True, blank=True)
+    baslangic_saati = models.DateTimeField(null=True, blank=True)
+    bitis_saati = models.DateTimeField(null=True, blank=True)
+    pres_kodu = models.CharField(null=True, blank=True)
+    yuklenen = models.JSONField(null=True, blank=True)
 
 class QRCode(models.Model):
     qr = models.CharField(null=True, blank=True)

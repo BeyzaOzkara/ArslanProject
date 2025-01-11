@@ -196,11 +196,11 @@ var aktAccessor = function(value, data, type, params, column) {
 var kSayisi = 0;
 var toplamKalip = function(values, data, calcParams) {
     $.ajax({
-      url: `/kalip/tum`,
+      url: `tum`,
       method: 'GET', 
       dataType: 'json',
       success: function (sayi) {
-        kSayisi = parseInt(sayi);
+        kSayisi = parseInt(sayi); 
       },
       error: function (error) {
           console.error('Error loading kalip sayisi:', error);
@@ -218,7 +218,7 @@ function initializeProductionReports() {
         paginationMode: "remote",
         filterMode: "remote",
         paginationSize: 30,
-        ajaxURL: "/kalip/rapor2",  // The URL to fetch data from
+        ajaxURL: "rapor2",  // The URL to fetch data from
         ajaxURLGenerator: function(url, config, params) {
             const kalipNo = loadedData.currentDie;
             return `${url}?KalipNo=${kalipNo}&params=${encodeURI(JSON.stringify(params))}`;
@@ -242,7 +242,7 @@ function initializeDieMovements(){
         paginationMode: "remote",
         filterMode: "remote",
         paginationSize: 30,
-        ajaxURL: "/kalip/hareket",  // The URL to fetch data from
+        ajaxURL: "hareket",  // The URL to fetch data from
         ajaxURLGenerator: function(url, config, params) {
             const kalipNo = loadedData.currentDie;
             return `${url}?KalipNo=${kalipNo}&params=${encodeURI(JSON.stringify(params))}`;
@@ -261,7 +261,7 @@ function initializeDieMovements(){
 function initializeComments() {
     let kalip_no = loadedData.currentDie;
     $.ajax({
-        url: `/kalip/yorum`,
+        url: `yorum`,
         method: 'GET',
         data: {'kalipNo': kalip_no},
         success: function(data) {
@@ -625,22 +625,67 @@ function showKalipInfoCard(kalipNo) {
     if (kalipInfoCard) {
         // ajax ile kalip bilgilerini getir 
         $.ajax({
-            url: `/kalip/getinfo/${kalipNo}`,
+            url: `getinfo/${kalipNo}`,
             method: 'GET',
             dataType: 'json',
             success: function (data) {
-                // die info tabini doldur.
                 const rdizin = data.ResimDizini.replace(/\s+/g, '') + "Teknik1.jpg";
                 const rdizin2 = data.ResimDizini.replace(/\s+/g, '') + "Teknik2.jpg";
                 const teknikUrl1 = "http://arslan/static" + rdizin.slice(13);
                 const teknikUrl2 = "http://arslan/static" + rdizin2.slice(13);
 
+                let durum = data.Silindi == 1 ? "Silindi, Sebebi: " + data.SilinmeSebebi : (data.AktifPasif ? (data.Hatali ? "Aktif" : "Hatalı ve Aktif") : (data.Hatali ? "Pasif" : "Hatalı ve Pasif"));
                 let bilgiTabContent = `
-                    <p><strong>Firma Adı:</strong> ${data.FirmaAdi}</p>
-                    <p><strong>Cinsi:</strong> ${data.Cinsi}</p>
-                    <p><strong>Çapı:</strong> ${data.Capi}</p>
-                    <p><strong>Üretim Tarihi:</strong> ${data.UretimTarihi}</p>
-                    <p><strong>Bolster:</strong> ${data.Bolster}</p>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Müşteri (Firma) Adı</th>
+                        <td id="firma-adi">${data.FirmaAdi}</td>
+                        <th>Üretici Firma</th>
+                        <td id="uretici-firma">${data.UreticiFirma}</td>
+                    </tr>
+                    <tr>
+                        <th>Resim Gramaj</th>
+                        <td id="resim-gramaj">${data.ProfilGramaj}</td>
+                        <th>Son Üretim Gr</th>
+                        <td id="son-uretim-gramaj">${data.SonUretimGr}</td>
+                    </tr>
+                    <tr>
+                        <th>Cinsi</th>
+                        <td id="cinsi">${data.Cinsi}</td>
+                        <th>Figür</th>
+                        <td id="figur">${data.GozAdedi}</td>
+                    </tr>
+                    <tr>
+                        <th>Ø ÇAPI</th>
+                        <td id="cinsi">${data.Capi}</td>
+                        <th>Paket Boyu</th>
+                        <td id="figur">${data.PaketBoyu}</td>
+                    </tr>
+                    <tr>
+                        <th>Son Üretim Tarihi</th>
+                        <td id="cinsi">${data.SonUretimTarih}</td>
+                        <th>Son Tenifer Tarihi</th>
+                        <td id="figur">${data.SonTeniferTarih}</td>
+                    </tr>
+                    <tr>
+                        <th>Üretim Toplam (Kg)</th>
+                        <td id="cinsi">${data.UretimToplamKg} kg</td>
+                        <th>TEN KALAN OMUR (KG)</th>
+                        <td id="figur">${data.TeniferKalanOmurKg} kg</td>
+                    </tr>
+                    <tr>
+                        <th>Sıradaki Tenifer</th>
+                        <td id="cinsi">${data.TeniferNo}</td>
+                        <th>Durumu</th>
+                        <td id="figur">${durum}</td>
+                    </tr>
+                    <tr>
+                        <th>Kalıp Açıklama</th>
+                        <td id="cinsi">${data.KalipAciklama}</td>
+                        <th>Kalite Açıklama</th>
+                        <td id="figur">${data.KaliteAciklama}</td>
+                    </tr>
+                </table>
                     <div class="image-gallery">
                         <p><strong>Resimler:</strong></p>
                         <img src="${teknikUrl1}" alt="Die Technical Image 1" class="img-fluid" />
