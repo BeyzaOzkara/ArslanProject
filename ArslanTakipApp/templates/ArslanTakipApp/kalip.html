@@ -356,7 +356,7 @@ function postComment(commentId="") {
     console.log(kNo);
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", kNo);
-    yorumData.append("yorum", textareaValue);
+    yorumData.append("yorum", textareaValue); // file nameler textareada olmasın
     selectedFiles.forEach(function(file) {
         yorumData.append('yfiles', file);
     });
@@ -577,6 +577,23 @@ function replyEditBtnClick(commentId, action) {
     }
 
 }
+
+function deleteComment(cId) {
+    let con = confirm("Silmek istediğinize emin misiniz?");
+    if (con == true) {
+      $.ajax({
+        url: 'deletecomment/'+cId,
+        type: 'GET',
+        success: function (response) {
+            $(`.${cId}`).remove();
+            alert(response.message);
+        },
+        error: function (error) {
+          alert('Yorum silinemedi. '+error);
+        }
+      });
+    }
+};
 
 function handleFileSelection(files, type) {
     for (let i = 0; i < files.length; i++) {
