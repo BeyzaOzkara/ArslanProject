@@ -25,6 +25,14 @@
         font-weight: bold;
         /* width: 535px; */
     }
+    .gallery {
+        display: flex;
+        flex-wrap: wrap; /* Wrap images if there's not enough space */
+        gap: 10px; /* Add spacing between images */
+    }
+    .gallery__item {
+        max-width: 100%; /* Set maximum width for individual gallery items */
+    }
 </style>
   
 {% endblock %}
