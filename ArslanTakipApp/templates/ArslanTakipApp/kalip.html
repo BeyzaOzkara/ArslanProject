@@ -398,6 +398,8 @@ function editComment(commentId="") {
             p.innerHTML = textareaValue;
             
             $(`.textarea`).summernote('code', '');
+            selectedFiles = [];
+            initializeComments(JSON.parse(response.data));
         },
         error: function(response) {
             alert('Yorum düzenlenemedi.');
@@ -474,15 +476,15 @@ function createReadButton(id) {
 }
 
 function createReplyButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:green" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:green; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
 function createEditButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:blue" data-toggle="collapse" href="#replyComment${id}" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function createDeleteButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:red" onclick="deleteComment(${id})">sil</a></span>`;
+    return `<span><a role="button" class="ml-2" style="color:red; cursor:pointer;" onclick="deleteComment(${id})">sil</a></span>`;
 }
 
 function createButtons(comment) {

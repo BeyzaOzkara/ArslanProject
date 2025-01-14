@@ -643,7 +643,11 @@ def kalip_comments_edit(request):
             c.Aciklama = req["commentText"]
             c.save()
             #dosyalar için olan bölüm de eklenecek
-            response = JsonResponse({'message': 'Kayıt başarılı'})
+            yudaComments = getParentComments("KalipMs", c.FormModelId).order_by("Tarih")
+            yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
+            comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+
+            response = JsonResponse({'message': 'Düzenleme başarılı', 'data':comments})
         except Exception as e:
             response = JsonResponse({'error': str(e)})
             response.status_code = 500 #server error
