@@ -119,7 +119,7 @@ DATABASES = {
     },
     'dms': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'DMS',
+        'NAME': 'fabrika4',
         'USER': 'arslan',
         'PASSWORD': 'gqTYe5HdX0VQ',
         'HOST': '192.168.150.230', 

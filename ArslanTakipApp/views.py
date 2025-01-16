@@ -28,8 +28,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
 from django.utils import timezone
 import urllib3
-from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, \
-    PresUretimRaporu, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
+from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PlcData, \
+    PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
     QRCode
 from django.template import loader
 from django.template.loader import render_to_string
@@ -3883,4 +3883,106 @@ class Press4500View(generic.TemplateView):
     template_name = '4500/pres4500.html'
     
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**kwargs) 
+    
+def get_ongoing_sepet():
+    ongoing_sepet = Sepet.objects.filter(bitis_saati__isnull=True)
+    
+    if ongoing_sepet:
+        return ongoing_sepet.latest('id')
+    return None
+         
+class Stacker4500View(generic.TemplateView):
+    template_name = '4500/stacker4500.html'
+    
+    def get_context_data(self, **kwargs):
+        sepet = get_ongoing_sepet()
+        
+        context = super().get_context_data(**kwargs)
+
+        if sepet:
+            context['ongoing_sepet_id'] = sepet.id
+            context['ongoing_sepet_no'] = sepet.sepet_no
+            context['yuklenen_data'] = json.dumps(sepet.yuklenen or [])
+        else:
+            context['yuklenen_data'] = []
+            context['ongoing_sepet_no'] = ''
+            context['ongoing_sepet_id'] = ''
+
+        print(context['yuklenen_data'])
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        sepet_id = request.POST.get('sepet_id')
+        sepet_no = request.POST.get('sepet_no')
+        sepet_bitti = request.POST.get('sepet_bitti')
+
+        if sepet_bitti:
+            sepet = Sepet.objects.get(id=sepet_id)
+            sepet.bitis_saati = timezone.now()
+            sepet.save()
+            return JsonResponse({'success': True}, status=200)
+        
+        if sepet_id and sepet_no: # id varsa sepet no değiştiriliyor
+            old_sepet = Sepet.objects.get(id=sepet_id)
+            old_sepet.sepet_no = sepet_no
+            old_sepet.save()
+            return JsonResponse({'sepet_id': sepet_id})
+        elif sepet_no: # yoksa yeni sepet yaratılıyor
+            new_sepet = Sepet.objects.create(
+                sepet_no=sepet_no,
+                baslangic_saati=timezone.now(),
+                pres_kodu = '4500-1'
+            )
+            return JsonResponse({'sepet_id': new_sepet.id})
+        else:
+            return JsonResponse({'error': 'Sepet No is required'}, status=400)
+
+def get_kart_no_list(request):
+    if request.method == "GET":
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=48)
+        # Son 48 saatteki singular_paramsı alıyoruz
+        plc_data = PlcData.objects.using('dms').filter(start__gte=start_time).values_list('singular_params', flat=True)
+        profil_listesi = set()
+
+        for singular_params in plc_data:
+            if singular_params:
+                die_number = singular_params.get("DieNumber", "")
+                if die_number:
+                    # "-" karakterinden sonrasını silip boşlukları temizliyoruz
+                    cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
+                    profil_listesi.add(cleaned_die_number)
+
+        # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
+        siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True).distinct()
+
+        list_siparisler = list(siparisler)
+        return JsonResponse(list_siparisler, safe=False)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def update_sepet_yuklenen(request):
+    if request.method == "POST":
+        sepet_id = request.POST.get('sepet_id')
+        kart_no = request.POST.get('kart_no')
+        adet = request.POST.get('adet')
+
+        try:
+            sepet = Sepet.objects.get(id=sepet_id)
+            
+            # Yuklenende böyle bir kartno var mı bak varsa adetleri topla
+            yuklenen = sepet.yuklenen or []  # Default to an empty list if yuklenen is None
+            yuklenen.append({'KartNo': kart_no, 'Adet': adet})
+            
+            # Update the yuklenen field
+            sepet.yuklenen = yuklenen
+            sepet.save()
+
+            # Return the updated yuklenen data as a response
+            return JsonResponse({'success': True, 'yuklenen': yuklenen})
+
+        except Sepet.DoesNotExist:
+            return JsonResponse({'error': 'Sepet not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

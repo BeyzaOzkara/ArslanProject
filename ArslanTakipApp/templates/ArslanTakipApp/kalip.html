@@ -25,13 +25,19 @@
         font-weight: bold;
         /* width: 535px; */
     }
+    .imgComment {
+        max-width: 100%; /* Restrict width to fit the parent container */
+        height: auto; /* Maintain aspect ratio */
+        display: block;
+        margin: auto; /* Center the image */
+    }
     .gallery {
         display: flex;
         flex-wrap: wrap; /* Wrap images if there's not enough space */
         gap: 10px; /* Add spacing between images */
     }
     .gallery__item {
-        max-width: 900px; /* Set maximum width for individual gallery items */
+        max-width: 1000px; /* Set maximum width for individual gallery items */
     }
 </style>
   
@@ -326,7 +332,6 @@ function initializeComments() {
     });
 }
 
-
 function createPostComment() {
     const newCommentHTML = `
         <div id="newCommentContainer" style="margin-top: 20px; margin-bottom:20px">
@@ -452,7 +457,7 @@ function createImagePreview(cf) { // comment.files foreach cf
     var file_format = /[^.]*$/.exec(cf.File)[0];
     var fileHtml ="";
     if (format_array.indexOf(file_format) > -1) {
-        fileHtml = `<div class="gallery__item"><img class="imgComment" style="max-width: 100%; height: auto; display: block; margin: auto;" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
+        fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
     }
     if (video_format_array.indexOf(file_format) > -1) {
         fileHtml = `<div class="gallery__item"><video width="320" height="240" controls>

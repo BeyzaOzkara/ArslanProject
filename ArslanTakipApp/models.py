@@ -211,6 +211,17 @@ class SiparisList(models.Model):
         managed = False
         db_table = 'View051_ProsesDepoListesi'
 
+class PlcData(models.Model):
+    plc = models.CharField(blank=True, null=True)
+    start = models.DateTimeField(null=True, blank=True)
+    stop = models.DateTimeField(null=True, blank=True)
+    event = models.CharField(blank=True, null=True)
+    singular_params = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'plcdata'
+
 class PresUretimTakip(models.Model):
     siparis_kimlik = models.IntegerField(null=True, blank=True)
     kalip_no = models.CharField(null=True, blank=True)

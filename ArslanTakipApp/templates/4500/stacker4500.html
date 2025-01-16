@@ -1,0 +1,294 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum 4500 Stacker{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
+<style>
+    .container-fluid {
+        margin-top: 20px;
+    }
+
+    .sepetno-container, .sepet-container {
+        margin-bottom: 20px;
+        display: flex; /* Use flexbox */
+        align-items: center; /* Align items vertically center */
+    }
+
+    .kart-ekle-container {
+        display: flex; /* Align elements horizontally */
+        align-items: center; /* Align items vertically center */
+        gap: 10px; /* Optional: Adjust spacing between elements */
+        width: 100%; /* Make the container full width */
+    }
+
+    .kart-ekle-container label {
+        margin-right: 10px; /* Adjust spacing between the label and input/select */
+    }
+
+    .kart-ekle-container input, .kart-ekle-container select {
+        flex: 1; /* Allow inputs to stretch evenly */
+    }
+    .kart-ekle-container button {
+        flex: 0; /* Keep the button at its natural size */
+    }
+
+    .btn-ok {
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Stacker - 4500</h2>
+    <hr>
+    <div class="sepetno-container">
+        <label for="sepetNo">Sepet No:</label>
+        <input type="text" id="sepetNo" class="form-control" placeholder="Sepet Numarası Giriniz" />
+        <button id="okButton" class="btn btn-primary btn-ok disabled" disabled>✔</button>
+    </div>
+    <div class="sepet-container" style="display: none;">
+        <div class="kart-ekle-container">
+            <label for="kartNoSelect">Sipariş Kart No:</label>
+            <select name="KartNoSelect" class="form-control" id="kartNoSelect">
+                <option value="" id="kartNoSelected" selected disabled>Kart No* </option>
+                
+            </select>
+            <label for="adet">Adet:</label>
+            <input type="number" id="adet" class="form-control" placeholder="Adet">
+            <button id="ekleButton" class="btn btn-primary" disabled>Yükle</button>
+        </div>
+        <div class="sepet-tabulator mt-3"></div>
+        <div class="sepet-doldu-container mt-2">
+            <button id="dolduButton" class="btn btn-primary form-control">SEPET DOLDU</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var sepet_id = "";
+    var table = null;  // Tabulator instance
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var sepetNoInput = document.getElementById("sepetNo");
+        var okButton = document.getElementById("okButton");
+        var sepetContainer = document.querySelector(".sepet-container");
+
+        var kartNoSelect = document.getElementById("kartNoSelect");
+        var adetInput = document.getElementById("adet");
+        var ekleButton = document.getElementById("ekleButton");
+        var dolduButton = document.getElementById("dolduButton");
+
+        var yuklenenData = '{{ yuklenen_data|safe }}';
+        var sepet_no_data = '{{ ongoing_sepet_no|safe }}';
+        sepet_id = '{{ ongoing_sepet_id|safe }}';
+
+        initializeTabulator(yuklenenData);
+
+        if (sepet_id) {
+            sepetNoInput.value = sepet_no_data;
+            sepetNoInput.disabled = true;
+            okButton.textContent = "Düzenle";
+            getKartNoList();
+            sepetContainer.style.display = "block";
+        }
+
+        function toggleButtonState() {
+            if (sepetNoInput.value.trim() !== "") {
+                okButton.disabled = false;
+                okButton.classList.remove("disabled");
+            } else {
+                okButton.disabled = true;
+                okButton.classList.add("disabled");
+            }
+        }
+
+        function getKartNoList() {
+            $.ajax({
+                url: "/4500/stacker/get_kart_nos/",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(sepet_id)
+                    populateKartNoSelect(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching KartNo list:", error);
+                }
+            });
+        }
+
+        function populateKartNoSelect(data) {
+            // Clear existing options
+            kartNoSelect.innerHTML = `<option value="" id="kartNoSelected" selected disabled>Kart No Seçiniz</option>`;
+            data.forEach(kartNo => {
+                const option = document.createElement("option");
+                option.value = kartNo;
+                option.textContent = kartNo;
+                kartNoSelect.appendChild(option);
+            });
+        }
+
+        // Handle the Okay button click event
+        okButton.addEventListener("click", function () {
+            var sepetNo = sepetNoInput.value.trim();
+            if (okButton.textContent === "✔") {
+                // Change button text to "Düzenle" and disable input
+                $.ajax({
+                    url: "",  // URL to the create_sepet view
+                    type: "POST",
+                    data: {
+                        'sepet_no': sepetNo,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+                    },
+                    success: function (response) {
+                        if (response.sepet_id) {
+                            // Store the new sepet_id
+                            sepet_id = response.sepet_id;
+                            console.log("New Sepet created with ID:", sepet_id);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error creating Sepet:", error);
+                    }
+                });
+                okButton.textContent = "Düzenle";
+                sepetNoInput.disabled = true;
+                getKartNoList();
+                sepetContainer.style.display = "block";
+            } else if (okButton.textContent === "Düzenle") {
+                // Enable input and change button text back to "Değişikliği Onayla"
+                sepetNoInput.disabled = false;
+                okButton.textContent = "Değişikliği Onayla";
+            } else if (okButton.textContent === "Değişikliği Onayla") {
+                // Disable input and reset button to initial state
+                $.ajax({
+                    url: "",  // URL to the create_sepet view
+                    type: "POST",
+                    data: {
+                        'sepet_id': sepet_id,
+                        'sepet_no': sepetNo,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+                    },
+                    success: function (response) {
+                        if (response.sepet_id) {
+                            // Store the new sepet_id
+                            sepet_id = response.sepet_id;
+                            console.log("Sepet No changed with ID:", sepet_id);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error creating Sepet:", error);
+                    }
+                });
+                sepetNoInput.disabled = true;
+                okButton.textContent = "Düzenle";
+            }
+        });
+
+        // Initialize button state on page load
+        toggleButtonState();
+        // Enable/Disable the Okay button based on input field content
+        sepetNoInput.addEventListener("input", toggleButtonState);
+
+        function toggleEkleButtonState() {
+            if (kartNoSelect.value && adetInput.value && parseInt(adetInput.value) > 0) {
+                ekleButton.disabled = false;
+            } else {
+                ekleButton.disabled = true;
+            }
+        }
+
+        // Add event listeners for both fields
+        kartNoSelect.addEventListener("change", toggleEkleButtonState);
+        adetInput.addEventListener("input", toggleEkleButtonState);
+
+        document.getElementById("ekleButton").addEventListener("click", function () {
+            var selectedKartNo = document.getElementById("kartNoSelect").value;
+            var adet = document.getElementById("adet").value;
+
+            $.ajax({
+                url: '/4500/stacker/update_sepet_yuklenen/',
+                type: 'POST',
+                data: {
+                    sepet_id: sepet_id,
+                    kart_no: selectedKartNo,
+                    adet: adet,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        updateTabulator(response.yuklenen);
+                        kartNoSelect.value = "";
+                        adetInput.value = "";
+
+                        ekleButton.disabled = true;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error updating data:", error);
+                }
+            });
+        });
+
+        dolduButton.addEventListener("click", function () {
+            if (sepet_id) {
+                $.ajax({
+                    url: "",  // URL to the create_sepet view
+                    type: "POST",
+                    data: {
+                        sepet_id: sepet_id,
+                        sepet_bitti: true,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // You can update the UI to show that the "bitis_saati" has been set
+                            alert("Sepet Dolduruldu ve Bitis Saati Belirlendi.");
+                            window.location.reload();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error setting bitis_saati::", error);
+                    }
+                });
+            } else {
+                console.error("Sepet ID is missing.");
+            }
+        });
+
+        function initializeTabulator(data) {
+            table = new Tabulator(".sepet-tabulator", {
+                height: "500px",
+                layout:"fitColumns",
+                placeholder: "Sepettekiler",
+                data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
+                columns: [
+                    { title: "KartNo", field: "KartNo" },
+                    { title: "Adet", field: "Adet" },
+                ]
+            });
+        }
+
+        function updateTabulator(newYuklenenData) {
+            table.replaceData(newYuklenenData);
+        }
+
+    });
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+
+{% endblock %}
