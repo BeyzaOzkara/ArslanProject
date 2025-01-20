@@ -3909,7 +3909,6 @@ class Stacker4500View(generic.TemplateView):
             context['ongoing_sepet_no'] = ''
             context['ongoing_sepet_id'] = ''
 
-        print(context['yuklenen_data'])
         return context
     
     def post(self, request, *args, **kwargs):
