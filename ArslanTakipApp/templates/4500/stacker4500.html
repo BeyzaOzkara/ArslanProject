@@ -1,5 +1,5 @@
 {% extends 'adminlte/base.html' %}
-{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+{% block body_class %}{% block bodyclass %} sidebar-collapse {% endblock %}{% endblock %}
 
 {% load static %}
 
@@ -11,7 +11,8 @@
 
 <style>
     .container-fluid {
-        margin-top: 20px;
+        max-width: 80%;
+        margin-left: 0;
     }
 
     .sepetno-container, .sepet-container {
