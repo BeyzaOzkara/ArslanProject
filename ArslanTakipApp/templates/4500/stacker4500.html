@@ -64,6 +64,26 @@
             <input type="number" id="adet" class="form-control" placeholder="Adet">
             <button id="ekleButton" class="btn btn-primary" disabled>Yükle</button>
         </div>
+        <div id="siparisInfo">
+            <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
+                <thead>
+                    <tr>
+                        <th>Sipariş Kg</th>
+                        <th>Sipariş Adet</th>
+                        <th>Kalan Kg</th>
+                        <th>Kalan Adet</th>
+                        <th>Kondusyon Turu</th>
+                        <th>Billet Turu</th>
+                        <th>Yuzey Ozelligi</th>
+                        <th>Profil Gramaj</th>
+                        <th>Firma Adi</th>
+                    </tr>
+                </thead>
+                <tbody id="siparisTableBody">
+                    <!-- Dynamic rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
         <div class="sepet-tabulator mt-3"></div>
         <div class="sepet-doldu-container mt-2">
             <button id="dolduButton" class="btn btn-primary form-control">SEPET DOLDU</button>
@@ -207,8 +227,53 @@
             }
         }
 
-        // Add event listeners for both fields
-        kartNoSelect.addEventListener("change", toggleEkleButtonState);
+        kartNoSelect.addEventListener("change",function () {
+            toggleEkleButtonState;
+            var selectedKartNo = this.value;
+            if (selectedKartNo) {
+                $.ajax({
+                    url: '/4500/stacker/get_siparis_info/',
+                    type: 'GET',
+                    data: {
+                        kart_no: selectedKartNo
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            var orders = response.orders;
+                            var table = document.getElementById('siparisTable');
+                            table.style.display = "table";
+                            var tableBody = document.getElementById('siparisTableBody');
+                            tableBody.innerHTML = "";
+
+                            orders.forEach(function (order) {
+                                var row = document.createElement('tr');
+
+                                row.innerHTML = `
+                                    <td>${order.GirenKg}</td>
+                                    <td>${order.GirenAdet}</td>
+                                    <td>${order.Kg}</td>
+                                    <td>${order.Adet}</td>
+                                    <td>${order.KondusyonTuru}</td>
+                                    <td>${order.BilletTuru}</td>
+                                    <td>${order.YuzeyOzelligi}</td>
+                                    <td>${order.Profil_Gramaj}</td>
+                                    <td>${order.FirmaAdi}</td>
+                                `;
+
+                                tableBody.appendChild(row);
+                            });
+
+                        } else {
+                            console.error("Error fetching Siparis info:", response.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching Siparis info:", error);
+                    }
+                });
+            }
+        
+        }) ;
         adetInput.addEventListener("input", toggleEkleButtonState);
 
         document.getElementById("ekleButton").addEventListener("click", function () {
@@ -266,6 +331,9 @@
         });
 
         function initializeTabulator(data) {
+            var deleteIcon = function(cell, formatterParams, onRendered){ 
+                return "<i class='fa fa-trash'></i>";
+            };
             table = new Tabulator(".sepet-tabulator", {
                 height: "500px",
                 layout:"fitColumns",
@@ -274,7 +342,36 @@
                 columns: [
                     { title: "KartNo", field: "KartNo" },
                     { title: "Adet", field: "Adet" },
+                    {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                        var kartNo = cell.getRow().getData().KartNo;
+                        if (confirm("Silmek istediğinizden emin misiniz?")) {
+                            deleteItem(kartNo, cell);
+                        }
+                    }},
                 ]
+            });
+        }
+
+        function deleteItem(kartNo, cell) {
+            $.ajax({
+                url: '/4500/stacker/delete_sepet_yuklenen/',
+                type: 'POST',
+                data: {
+                    sepet_id: sepet_id,
+                    kart_no: kartNo,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Remove the row from the table after deletion
+                        table.deleteRow(cell.getRow());
+                    } else {
+                        alert("Error deleting Kart No.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error deleting item:", error);
+                }
             });
         }
 

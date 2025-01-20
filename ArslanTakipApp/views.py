@@ -3962,19 +3962,52 @@ def get_kart_no_list(request):
         return JsonResponse(list_siparisler, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
+def get_siparis_info(request):
+    if request.method == "GET":
+        kart_no = request.GET.get('kart_no')
+    try:
+        orders = SiparisList.objects.using('dies').filter(Q(KartNo=kart_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        order_data = [
+            {
+                "GirenKg": order.GirenKg,
+                "GirenAdet": order.GirenAdet,
+                "Kg": order.Kg,
+                "Adet": order.Adet,
+                "FirmaAdi": order.FirmaAdi,
+                "KondusyonTuru": order.KondusyonTuru,
+                "BilletTuru": order.BilletTuru,
+                "Profil_Gramaj": order.Profil_Gramaj,
+                "YuzeyOzelligi": order.YuzeyOzelligi,
+            }
+            for order in orders
+        ]
+        return JsonResponse({'success': True, 'orders': order_data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
 def update_sepet_yuklenen(request):
     if request.method == "POST":
         sepet_id = request.POST.get('sepet_id')
         kart_no = request.POST.get('kart_no')
-        adet = request.POST.get('adet')
+        adet = int(request.POST.get('adet'))
 
         try:
             sepet = Sepet.objects.get(id=sepet_id)
             
             # Yuklenende böyle bir kartno var mı bak varsa adetleri topla
-            yuklenen = sepet.yuklenen or []  # Default to an empty list if yuklenen is None
-            yuklenen.append({'KartNo': kart_no, 'Adet': adet})
+            yuklenen = sepet.yuklenen or []
+            found = False
+            for item in yuklenen:
+                if item['KartNo'] == kart_no:
+                    # Kart No varsa adetleri topla
+                    item['Adet'] = int(item['Adet']) + adet
+                    found = True
+                    break
             
+            # Kart no yoksa yeni entry
+            if not found:
+                yuklenen.append({'KartNo': kart_no, 'Adet': adet})
+
             # Update the yuklenen field
             sepet.yuklenen = yuklenen
             sepet.save()
@@ -3982,6 +4015,25 @@ def update_sepet_yuklenen(request):
             # Return the updated yuklenen data as a response
             return JsonResponse({'success': True, 'yuklenen': yuklenen})
 
+        except Sepet.DoesNotExist:
+            return JsonResponse({'error': 'Sepet not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def delete_sepet_yuklenen(request):
+    if request.method == "POST":
+        sepet_id = request.POST.get('sepet_id')
+        kart_no = request.POST.get('kart_no')
+
+        try:
+            sepet = Sepet.objects.get(id=sepet_id)
+            yuklenen = sepet.yuklenen or []
+            updated_yuklenen = [item for item in yuklenen if item['KartNo'] != kart_no]
+            
+            sepet.yuklenen = updated_yuklenen
+            sepet.save()
+
+            return JsonResponse({'success': True})
         except Sepet.DoesNotExist:
             return JsonResponse({'error': 'Sepet not found'}, status=404)
 
