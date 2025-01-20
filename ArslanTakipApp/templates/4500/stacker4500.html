@@ -50,7 +50,13 @@
     <hr>
     <div class="sepetno-container">
         <label for="sepetNo">Sepet No:</label>
-        <input type="text" id="sepetNo" class="form-control" placeholder="Sepet Numarası Giriniz" />
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">S</span>
+            </div>
+            <input type="text" id="sepetNo" class="form-control" placeholder="Sepet Numarası Giriniz" aria-describedby="basic-addon1" />
+        </div>
+        <!-- <input type="text" id="sepetNo" class="form-control" placeholder="Sepet Numarası Giriniz" /> -->
         <button id="okButton" class="btn btn-primary btn-ok disabled" disabled>✔</button>
     </div>
     <div class="sepet-container" style="display: none;">
@@ -111,6 +117,13 @@
         var sepet_no_data = '{{ ongoing_sepet_no|safe }}';
         sepet_id = '{{ ongoing_sepet_id|safe }}';
 
+        function toggleDolduButtonState() {
+            if (table.getData().length === 0) {
+                dolduButton.disabled = true;
+            } else {
+                dolduButton.disabled = false;
+            }
+        }
         initializeTabulator(yuklenenData);
 
         if (sepet_id) {
@@ -157,7 +170,6 @@
             });
         }
 
-        // Handle the Okay button click event
         okButton.addEventListener("click", function () {
             var sepetNo = sepetNoInput.value.trim();
             if (okButton.textContent === "✔") {
@@ -166,7 +178,7 @@
                     url: "",  // URL to the create_sepet view
                     type: "POST",
                     data: {
-                        'sepet_no': sepetNo,
+                        'sepet_no': "S" + sepetNo,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
                     },
                     success: function (response) {
@@ -363,8 +375,8 @@
                 },
                 success: function (response) {
                     if (response.success) {
-                        // Remove the row from the table after deletion
                         table.deleteRow(cell.getRow());
+                        toggleDolduButtonState();
                     } else {
                         alert("Error deleting Kart No.");
                     }
@@ -377,6 +389,7 @@
 
         function updateTabulator(newYuklenenData) {
             table.replaceData(newYuklenenData);
+            toggleDolduButtonState();
         }
 
     });

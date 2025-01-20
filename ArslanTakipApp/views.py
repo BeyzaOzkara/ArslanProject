@@ -3902,7 +3902,7 @@ class Stacker4500View(generic.TemplateView):
 
         if sepet:
             context['ongoing_sepet_id'] = sepet.id
-            context['ongoing_sepet_no'] = sepet.sepet_no
+            context['ongoing_sepet_no'] = sepet.sepet_no[1:] if sepet.sepet_no.startswith("S") else sepet.sepet_no
             context['yuklenen_data'] = json.dumps(sepet.yuklenen or [])
         else:
             context['yuklenen_data'] = []
