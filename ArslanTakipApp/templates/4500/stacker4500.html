@@ -87,8 +87,7 @@
             <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
                 <thead>
                     <tr>
-                        <th>Sipariş Kg</th>
-                        <th>Sipariş Adet</th>
+                        <th>Profil No</th>
                         <th>Kalan Kg</th>
                         <th>Kalan Adet</th>
                         <th>Kondusyon Turu</th>
@@ -272,17 +271,17 @@
 
                             orders.forEach(function (order) {
                                 var row = document.createElement('tr');
+                                var FirmaAdi = order.FirmaAdi.split(' ')[0];
 
                                 row.innerHTML = `
-                                    <td>${order.GirenKg}</td>
-                                    <td>${order.GirenAdet}</td>
+                                    <td>${order.ProfilNo}</td>
                                     <td>${order.Kg}</td>
                                     <td>${order.Adet}</td>
                                     <td>${order.KondusyonTuru}</td>
                                     <td>${order.BilletTuru}</td>
                                     <td>${order.YuzeyOzelligi}</td>
                                     <td>${order.Profil_Gramaj}</td>
-                                    <td>${order.FirmaAdi}</td>
+                                    <td>${FirmaAdi}</td>
                                 `;
 
                                 tableBody.appendChild(row);

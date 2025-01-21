@@ -3968,8 +3968,7 @@ def get_siparis_info(request):
         orders = SiparisList.objects.using('dies').filter(Q(KartNo=kart_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         order_data = [
             {
-                "GirenKg": order.GirenKg,
-                "GirenAdet": order.GirenAdet,
+                "ProfilNo": order.ProfilNo,
                 "Kg": order.Kg,
                 "Adet": order.Adet,
                 "FirmaAdi": order.FirmaAdi,
