@@ -10,8 +10,17 @@
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
 <style>
+    .wrapper {
+        margin-left: 0; /* Remove left margin */
+        width: 100%; /* Make it full width */
+    }
+
+    /* If the navbar is removed, adjust top padding */
+    .wrapper .content-wrapper {
+        padding-top: 0;
+    }
     .container-fluid {
-        max-width: 80%;
+        max-width: 65%;
         margin-left: 0;
     }
 
