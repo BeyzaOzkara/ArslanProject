@@ -13,7 +13,7 @@
     .wrapper {
         margin-left: 0; /* Remove left margin */
         width: 100%; /* Make it full width */
-        height: 65%;
+        height: 80%;
     }
 
     /* If the navbar is removed, adjust top padding */
@@ -59,8 +59,6 @@
 {% block nav_sidebar %}{% comment %} Remove Sidebar {% endcomment %}{% endblock %}
 {% block content %}
 <div class="container-fluid">
-    <h2>Stacker - 4500</h2>
-    <hr>
     <div class="sepetno-container">
         <label for="sepetNo">Sepet No:</label>
         <div class="input-group">
@@ -359,7 +357,7 @@
                 return "<i class='fa fa-trash'></i>";
             };
             table = new Tabulator(".sepet-tabulator", {
-                height: "200px",
+                height: "250px",
                 layout:"fitColumns",
                 placeholder: "Sepettekiler",
                 data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
