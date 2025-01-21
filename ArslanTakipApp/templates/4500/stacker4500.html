@@ -13,7 +13,7 @@
     .wrapper {
         margin-left: 0; /* Remove left margin */
         width: 100%; /* Make it full width */
-        height: 80%;
+        height: 60%;
     }
 
     /* If the navbar is removed, adjust top padding */
@@ -360,7 +360,7 @@
                 return "<i class='fa fa-trash'></i>";
             };
             table = new Tabulator(".sepet-tabulator", {
-                height: "500px",
+                height: "250px",
                 layout:"fitColumns",
                 placeholder: "Sepettekiler",
                 data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
