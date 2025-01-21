@@ -217,7 +217,7 @@
                     type: "POST",
                     data: {
                         'sepet_id': sepet_id,
-                        'sepet_no': sepetNo,
+                        'sepet_no': "S" + sepetNo,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
                     },
                     success: function (response) {
