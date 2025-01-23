@@ -125,4 +125,7 @@ urlpatterns = [
     path('kalip/rapor2', views.kalip_rapor2),
     path('kalip/hareket', views.kalip_hareket),
     path('kalip/yorum', views.kalip_yorum),
+    path('4500/hesaplama', views.Hesaplama4500View.as_view(), name='hesaplama_4500'),
+    path('4500/hesaplama/get_ext_info/', views.get_ext_info, name='get_ext_info'),
+    path('4500/hesaplama/get_sepet_info/', views.get_sepet_info, name='get_sepet_info'),
 ]

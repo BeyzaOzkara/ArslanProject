@@ -39,7 +39,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
-from django.db.models import Q, Sum, Max, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
+from django.db.models import Q, Sum, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
 from django.db.models.functions import Cast, Replace
 from django.db import transaction 
 from channels.layers import get_channel_layer
@@ -4001,10 +4001,10 @@ def update_sepet_yuklenen(request):
                     item['Adet'] = int(item['Adet']) + adet
                     found = True
                     break
-            
+            siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
             # Kart no yoksa yeni entry
             if not found:
-                yuklenen.append({'KartNo': kart_no, 'Adet': adet})
+                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo})
 
             # Update the yuklenen field
             sepet.yuklenen = yuklenen
@@ -4036,3 +4036,77 @@ def delete_sepet_yuklenen(request):
             return JsonResponse({'error': 'Sepet not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def get_profil_nos(pres):
+    end_time = timezone.now()
+    start_time = end_time - datetime.timedelta(hours=48)
+
+    ext_list = list(PlcData.objects.using('dms').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
+
+    profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
+    siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+    profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
+    return profiller
+
+class Hesaplama4500View(generic.TemplateView):
+    template_name = '4500/hesaplama.html'
+
+    def get_context_data(self, **kwargs):
+        # Son 48 saatteki profil numaraları
+        profil_nos = get_profil_nos('4500')
+        
+        context = super().get_context_data(**kwargs)
+        context['profils'] = profil_nos
+
+        return context
+
+def get_ext_info(request):
+    if request.method == "GET":
+        profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=48)
+
+        try:
+            queryset = (
+                PlcData.objects.using('dms').filter(
+                    start__gte=start_time, 
+                    stop__lte=end_time,
+                    singular_params__DieNumber__startswith = profil_no
+                )
+                .annotate(
+                    kart_no=Cast(F("singular_params__kartNo"), FloatField()),
+                    kalip_no=F("singular_params__DieNumber"),
+                    billet_count=Count(F("singular_params__DieNumber")),
+                    brüt_imalat=ExpressionWrapper(
+                        Sum(Cast(F("singular_params__Billet Length Pusher"), FloatField())) * 0.1367,
+                        output_field=FloatField()
+                    )
+                )
+                .values(
+                    "kart_no",
+                    "kalip_no",
+                )
+                .annotate(
+                    imalat_baslangici=Min("start"),
+                    imalat_sonu=Max("stop"),
+                    billet_count=F("billet_count"),
+                    brüt_imalat=F("brüt_imalat")
+                )
+                .order_by("-imalat_sonu")
+            )
+            ext_data = list(queryset)
+            return JsonResponse({'success': True, 'ext_data': ext_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def get_sepet_info(request):
+    if request.method == "GET":
+        profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+        end_time = timezone.now()
+        end_48_time = end_time - datetime.timedelta(hours=48)
+
+        start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, singular_params__DieNumber__startswith = profil_no).values('start', 'stop').order_by('start')[0]['start']
+        print(start)
+        sepet_data = Sepet.objects.filter(baslangic_saati__gte=start)
+        print(sepet_data.values('id'))
+
