@@ -23,6 +23,13 @@
             {% endfor %}
         </select>
     </div>
+    <div class="extDiv col-6" style="display: none;">
+        <p>dddd</p>
+        <div id="extTable"></div>
+    </div>
+    <div class="sepetDiv col-6" style="display: none;">
+        <div id="sepetTable"></div>
+    </div>
 </div>
 {% endblock %}
 
@@ -30,6 +37,9 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     var profilSelect = document.getElementById('profilSelect');
+    var extDiv = document.getElementById('extTable');
+    var sepetDiv = document.getElementById('sepetTable');
+    
     profilSelect.addEventListener("change",function () {
         var selectedProfilNo = this.value;
         $.ajax({
@@ -60,7 +70,35 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     
-    })
+    });
+
+    function initializeExtTabulator(data) {
+        table = new Tabulator("#extTable", {
+            height: "250px",
+            layout:"fitColumns",
+            placeholder: "Ext Geçmişi",
+            data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
+            columns: [
+                { title: "KartNo", field: "kart_no" },
+                { title: "Kalıp No", field: "kalip_no" },
+            ]
+        });
+    };
+
+    function initializeSepetTabulator(data) {
+        table = new Tabulator("#sepetTable", {
+            height: "250px",
+            layout:"fitColumns",
+            placeholder: "Sepetler",
+            data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
+            columns: [
+                { title: "Sepet No", field: "SepetNo" },
+                { title: "Profil No", field: "ProfilNo" },
+                { title: "Adet", field: "Adet" },
+            ]
+        });
+    }
+
 
 });
 </script>

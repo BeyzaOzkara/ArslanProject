@@ -4004,7 +4004,7 @@ def update_sepet_yuklenen(request):
             siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
             # Kart no yoksa yeni entry
             if not found:
-                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo})
+                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru})
 
             # Update the yuklenen field
             sepet.yuklenen = yuklenen
@@ -4101,12 +4101,25 @@ def get_ext_info(request):
 
 def get_sepet_info(request):
     if request.method == "GET":
-        profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
-        end_time = timezone.now()
-        end_48_time = end_time - datetime.timedelta(hours=48)
+        try:
+            profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+            end_time = timezone.now()
+            end_48_time = end_time - datetime.timedelta(hours=48)
 
-        start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, singular_params__DieNumber__startswith = profil_no).values('start', 'stop').order_by('start')[0]['start']
-        print(start)
-        sepet_data = Sepet.objects.filter(baslangic_saati__gte=start)
-        print(sepet_data.values('id'))
+            start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, singular_params__DieNumber__startswith = profil_no).values('start', 'stop').order_by('start')[0]['start']
+            sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no}]).values() # profil no ile filtrele
+            sepet_data = []
 
+            for s in sepet:
+                for item in s['yuklenen']:
+                    if item.get("ProfilNo") == profil_no:
+                        elem = {
+                            "SepetNo": s["sepet_no"],
+                            "Adet": item["Adet"],
+                            "KartNo": item["KartNo"],
+                            "Boy": item["Boy"]
+                        }
+                        sepet_data.append(elem)
+            return JsonResponse({'success': True, 'sepet_data': sepet_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
