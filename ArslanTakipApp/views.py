@@ -107,6 +107,9 @@ def get_user_full_name(user_id):
     user = User.objects.get(id=user_id)
     return f"{user.first_name} {user.last_name}"
 
+def format_date_time_without_year(date):
+    return date.strftime("%d-%m %H:%M")
+
 def format_date_time_s(date):
     return date.strftime("%d-%m-%Y %H:%M:%S")
 
@@ -4094,6 +4097,11 @@ def get_ext_info(request):
                 )
                 .order_by("-imalat_sonu")
             )
+            
+            for e in queryset:
+                e['imalat_baslangici_2'] = format_date_time_without_year(e['imalat_baslangici'])
+                e['imalat_sonu_2'] = format_date_time_without_year(e['imalat_sonu'])
+
             ext_data = list(queryset)
             return JsonResponse({'success': True, 'ext_data': ext_data})
         except Exception as e:
@@ -4121,5 +4129,21 @@ def get_sepet_info(request):
                         }
                         sepet_data.append(elem)
             return JsonResponse({'success': True, 'sepet_data': sepet_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def get_kart_info(request):
+    if request.method == "GET":
+        try:
+            profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+            siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+            siparisler = siparis_query.filter(ProfilNo=profil_no).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj')
+
+            for s in siparisler:
+                s["FirmaAdi"] = s['FirmaAdi'].split(' ')[0]
+                s['SonTermin'] = format_date(s['SonTermin'])
+            list_siparisler = list(siparisler)
+            
+            return JsonResponse({'success': True, 'siparis_data': list_siparisler}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})

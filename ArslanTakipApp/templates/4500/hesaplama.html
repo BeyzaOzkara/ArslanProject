@@ -7,6 +7,8 @@
 
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+
 <style>
 
 </style>
@@ -23,13 +25,25 @@
             {% endfor %}
         </select>
     </div>
-    <div class="extDiv col-6" style="display: none;">
-        <p>dddd</p>
-        <div id="extTable"></div>
+    <hr>
+    <div class="hideDiv" style="display: none;">
+        <div class="row">
+            <div class="extDiv col-6">
+                <div id="extTable"></div>
+            </div>
+            <div class="sepetDiv col-6">
+                <div id="sepetTable"></div>
+            </div>       
+        </div>
+        <div class="siparisDiv mt-2">
+            <div id="siparisTable"></div>
+        </div>
+        <div class="buttonDiv">
+            <hr>
+            <button id="hesaplaButton" class="btn btn-primary form-control">Hesapla</button>
+        </div>        
     </div>
-    <div class="sepetDiv col-6" style="display: none;">
-        <div id="sepetTable"></div>
-    </div>
+
 </div>
 {% endblock %}
 
@@ -37,8 +51,69 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     var profilSelect = document.getElementById('profilSelect');
-    var extDiv = document.getElementById('extTable');
-    var sepetDiv = document.getElementById('sepetTable');
+    var hideDiv = document.querySelector('.hideDiv');
+    var hesaplaButton = document.getElementById('hesaplaButton');
+    var data = [];
+
+    extTable = new Tabulator("#extTable", {
+        height: "250px",
+        layout:"fitColumns",
+        placeholder: "Ext Geçmişi",
+        data: data || '[]',
+        columns: [
+            {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                cell.getRow().toggleSelect();
+            }},
+            { title: "Kart", field: "kart_no" },
+            { title: "Kalıp No", field: "kalip_no" },
+            { title: "Başlangıç", field: "imalat_baslangici_2" },
+            { title: "Bitiş", field: "imalat_sonu_2" },
+            { title: "Brüt", field: "brüt_imalat", formatter:"money", formatterParams:{
+                decimal:",",
+                thousand:".",
+                symbol:"kg",
+                symbolAfter:"kg",
+                precision:true,
+            } },
+            { title: "Billet Sayısı", field: "billet_count" },
+        ]
+    });
+
+    sepetTable = new Tabulator("#sepetTable", {
+        height: "250px",
+        layout:"fitColumns",
+        placeholder: "Sepetler",
+        data: data || '[]',
+        columns: [
+            {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                cell.getRow().toggleSelect();
+            }},
+            { title: "Sepet No", field: "SepetNo" },
+            { title: "Kart No", field: "KartNo" },
+            { title: "Adet", field: "Adet" },
+            { title: "Boy", field: "Boy" },
+        ]
+    });
+
+    siparisTable = new Tabulator("#siparisTable", {
+        height: "250px",
+        layout:"fitColumns",
+        placeholder: "Siparisler",
+        data: data || '[]',
+        columns: [
+            {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                cell.getRow().toggleSelect();
+            }},
+            { title: "Kart No", field: "KartNo" },
+            { title: "Kg", field: "Kg" },
+            { title: "Adet", field: "Adet" },
+            { title: "Boy", field: "PlanlananMm" },
+            { title: "Kondüsyon", field: "KondusyonTuru" },
+            { title: "Yüzey", field: "YuzeyOzelligi" },
+            { title: "Termin", field: "SonTermin" },
+            { title: "Firma", field: "FirmaAdi" },
+        ]
+    });
     
     profilSelect.addEventListener("change",function () {
         var selectedProfilNo = this.value;
@@ -50,6 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             success: function (response) {
                 console.log(response.ext_data);
+                extTable.replaceData(response.ext_data);
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching Ext info:", error);
@@ -63,42 +139,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 profil_no: selectedProfilNo
             },
             success: function (response) {
-                console.log(response.sepet_data)
+                console.log(response.sepet_data);
+                sepetTable.replaceData(response.sepet_data);
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching Ext info:", error);
             }
         });
-    
+
+        $.ajax({
+            url: '/4500/hesaplama/get_kart_info/',
+            type: 'GET',
+            data: {
+                profil_no: selectedProfilNo
+            },
+            success: function (response) {
+                console.log(response.siparis_data);
+                siparisTable.replaceData(response.siparis_data);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching Ext info:", error);
+            }
+        });
+
+        hideDiv.style.display = 'block';
     });
 
-    function initializeExtTabulator(data) {
-        table = new Tabulator("#extTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Ext Geçmişi",
-            data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
-            columns: [
-                { title: "KartNo", field: "kart_no" },
-                { title: "Kalıp No", field: "kalip_no" },
-            ]
-        });
-    };
-
-    function initializeSepetTabulator(data) {
-        table = new Tabulator("#sepetTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Sepetler",
-            data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
-            columns: [
-                { title: "Sepet No", field: "SepetNo" },
-                { title: "Profil No", field: "ProfilNo" },
-                { title: "Adet", field: "Adet" },
-            ]
-        });
-    }
-
+    hesaplaButton.addEventListener("click", function () { 
+        // 3 tabulatorden de seçim yapılmış mı kontrol et.
+        // yapılmayan varsa alert ile uyar işlem yapma.
+        
+    });
 
 });
 </script>
@@ -107,5 +178,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
 
 {% endblock %}
