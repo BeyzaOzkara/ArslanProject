@@ -57,6 +57,7 @@
         <hr>
     </div>
     <button id="sepeteDagitButton" class="btn btn-primary form-control">SEPETE DAĞIT</button>
+    <button id="onaylaButton" class="btn btn-primary form-control" style="display: none;">ONAYLA</button>
 </div>
 {% endblock %}
 
@@ -70,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var sepetDagitDiv = document.querySelector('.sepetDagitDiv');
     var hesaplaButton = document.getElementById('hesaplaButton');
     var sepetButton = document.getElementById('sepeteDagitButton');
+    var onaylaButton = document.getElementById('onaylaButton');
     var gramajInp = document.getElementById('gramaj');
     var data = [];
     var profil = "";
@@ -428,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                     sonuc[j].hesapAdet -= yazilacak;
                     sepet[i].Adet -= yazilacak;
-                    var row = {"id": sepet[i].id, "KartNo": sonuc[j].KartNo, "Adet": yazilacak};
+                    var row = {"id": sepet[i].id, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy};
                     dagilan.push(row);
                 }
             }
@@ -437,7 +439,33 @@ document.addEventListener("DOMContentLoaded", function () {
         
         sepetDagitTable.replaceData(dagilan);
         sepetDagitDiv.style.display = 'block';
+        sepetButton.style.display = 'none';
+        onaylaButton.style.display = 'block';
     })
+
+    onaylaButton.addEventListener("click", function() {
+        var gonderSepet = sepetDagitTable.getData();
+        console.log(gonderSepet);
+        $.ajax({
+            url: "/4500/hesaplama/sepete_dagit/",  // URL to the create_sepet view
+            type: "POST",
+            data: {
+                sepetler: gonderSepet,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+            },
+            success: function (response) {
+                if (response.success) {
+                    // You can update the UI to show that the "bitis_saati" has been set
+                    alert("Sepetlere Dağıtıldı.");
+                    window.location.reload();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error setting sepets::", error);
+            }
+        });
+    });
+
 });
 </script>
 

@@ -53431,3 +53431,42 @@ Traceback (most recent call last):
     raise self.model.DoesNotExist(
 ArslanTakipApp.models.Location.DoesNotExist: Location matching query does not exist.
 [35;1mHTTP GET /location/kalip?params=%7B%22filter%22:%5B%7B%22field%22:%22kalipVaris_id%22,%22type%22:%22=%22,%22value%22:%221133%22%7D%5D,%22page%22:1,%22size%22:30%7D 500 [0.08, 127.0.0.1:59594][0m
+Internal Server Error: /4500/hesaplama/sepete_dagit/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 265, in _get_response_async
+    self.check_response(response, callback)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view ArslanTakipApp.views.sepete_dagit didn't return an HttpResponse object. It returned None instead.
+[35;1mHTTP POST /4500/hesaplama/sepete_dagit/ 500 [0.06, 127.0.0.1:60337][0m
+Internal Server Error: /4500/hesaplama/sepete_dagit/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 265, in _get_response_async
+    self.check_response(response, callback)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view ArslanTakipApp.views.sepete_dagit didn't return an HttpResponse object. It returned None instead.
+[35;1mHTTP POST /4500/hesaplama/sepete_dagit/ 500 [0.06, 127.0.0.1:60392][0m
+Internal Server Error: /4500/hesaplama/sepete_dagit/
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 265, in _get_response_async
+    self.check_response(response, callback)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view ArslanTakipApp.views.sepete_dagit didn't return an HttpResponse object. It returned None instead.
+[35;1mHTTP POST /4500/hesaplama/sepete_dagit/ 500 [0.03, 127.0.0.1:60473][0m

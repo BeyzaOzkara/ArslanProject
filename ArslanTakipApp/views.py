@@ -4152,4 +4152,8 @@ def get_kart_info(request):
         
 def sepete_dagit(request):
     if request.method == 'POST':
+        for key, value in request.POST.items():
+            print(f"key: {key}, value: {value}")
+        gelen_sepetler = request.POST.get('sepetler')
+        print(gelen_sepetler)
         return
