@@ -129,4 +129,5 @@ urlpatterns = [
     path('4500/hesaplama/get_ext_info/', views.get_ext_info, name='get_ext_info'),
     path('4500/hesaplama/get_sepet_info/', views.get_sepet_info, name='get_sepet_info'),
     path('4500/hesaplama/get_kart_info/', views.get_kart_info, name='get_kart_info'),
+    path('4500/hesaplama/sepete_dagit/', views.sepete_dagit, name='sepete_dagit'),
 ]

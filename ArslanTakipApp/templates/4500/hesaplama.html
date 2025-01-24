@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid secimDiv">
     <div class="profilDiv">
         <label for="profilSelect">Profil Numarası Seçiniz: </label>
         <select name="profil" id="profilSelect" class="form-control">
@@ -25,7 +25,7 @@
             {% endfor %}
         </select>
         <label for="gramaj">Profil Gramajı Giriniz:</label>
-        <input type="text" class="form-control" name="gramaj" id="gramaj">
+        <input type="number" class="form-control" name="gramaj" id="gramaj">
     </div>
     <hr>
     <div class="hideDiv" style="display: none;">
@@ -47,6 +47,14 @@
     </div>
 
 </div>
+<div class="container-fluid kartSonucDiv" style="display: none;">
+    <div id="kartSonucTable"></div>
+    <hr>
+    <div class="row mt-2 kartSButtonDiv">
+        <button id="editButton" class="btn btn-primary form-control col-6">Düzenle</button>
+        <button id="sepeteDagitButton" class="btn btn-primary form-control col-6">Sepete Dağıt</button>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -54,9 +62,13 @@
 document.addEventListener("DOMContentLoaded", function () {
     var profilSelect = document.getElementById('profilSelect');
     var hideDiv = document.querySelector('.hideDiv');
+    var secimDiv = document.querySelector('.secimDiv');
+    var kartSonucDiv = document.querySelector('.kartSonucDiv');
     var hesaplaButton = document.getElementById('hesaplaButton');
+    var sepetButton = document.getElementById('sepeteDagitButton');
     var gramajInp = document.getElementById('gramaj');
     var data = [];
+    var profil = "";
 
     extTable = new Tabulator("#extTable", {
         height: "250px",
@@ -118,13 +130,65 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
     });
     
+    // gramaj ve profil no gibi sabit olanlar tek bir satırda gösterilsin.
+    // genel fire ve genel imalat hızı da bu satırda.
+    kartSonucTable = new Tabulator("#kartSonucTable", {
+        height: "250px",
+        layout:"fitColumns",
+        placeholder: "Kart Dağılımı",
+        data: data || '[]',
+        columns: [
+            {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                cell.getRow().toggleSelect();
+            }},
+            { title: "Kart No", field: "KartNo" },
+            { title: "Sipariş Boyu", field: "SipBoy" },
+            { title: "Sipariş Adeti", field: "SipAdet" },
+            { title: "Baslangıç Saati", field: "Baslangic", formatter:function(cell, formatterParams, onRendered){
+                var value = cell.getValue();
+                value = moment(value).format("DD/MM HH:mm");
+                return value;
+            }},
+            { title: "Bitiş Saati", field: "Bitis", formatter:function(cell, formatterParams, onRendered){
+                var value = cell.getValue();
+                value = moment(value).format("DD/MM HH:mm");
+                return value;
+            }},
+            { title: "Adet", field: "hesapAdet" },
+            { title: "Billet Boyu", field: "billetBoy", formatter:"money", formatterParams:{
+                decimal:",",
+                thousand:".",
+                symbol:" cm",
+                symbolAfter:" cm",
+                precision:false,
+            } },
+            { title: "Billet Adeti", field: "billetAdet" },
+            { title: "Fire", field: "Fire" , formatter:"money", formatterParams:{
+                decimal:",",
+                thousand:".",
+                symbol:"% ",
+                precision:true,
+            } },
+            { title: "İmalat Hızı", field: "ImalatHizi" , formatter:"money", formatterParams:{
+                decimal:",",
+                thousand:".",
+                symbol:" kg/sa",
+                symbolAfter:" kg/sa",
+                precision:false,
+            } },
+            { title: "Firma", field: "FirmaAdi" },
+            { title: "Termin", field: "SonTermin" },
+        ]
+    });
+    
     profilSelect.addEventListener("change",function () {
-        var selectedProfilNo = this.value;
+        gramajInp.value = "";
+        profil = this.value;
         $.ajax({
             url: '/4500/hesaplama/get_ext_info/',
             type: 'GET',
             data: {
-                profil_no: selectedProfilNo
+                profil_no: profil
             },
             success: function (response) {
                 console.log(response.ext_data);
@@ -139,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/4500/hesaplama/get_sepet_info/',
             type: 'GET',
             data: {
-                profil_no: selectedProfilNo
+                profil_no: profil
             },
             success: function (response) {
                 console.log(response.sepet_data);
@@ -154,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/4500/hesaplama/get_kart_info/',
             type: 'GET',
             data: {
-                profil_no: selectedProfilNo
+                profil_no: profil
             },
             success: function (response) {
                 console.log(response.siparis_data);
@@ -218,13 +282,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         console.log("Brüt Ext: ", brutExt);
         console.log("Toplam Billet Adet: ", toplamBilletAdet);
-        // console.log("Min Start: ", minStartTime);
-        // console.log("Max End: ", maxEndTime);
         var sure = (maxEndTime - minStartTime) / 60000;
         console.log("Süre: ", sure);
 
         var verim = netSepet / brutExt;
         console.log("Verim: ", verim);
+        var genelFire = 1- verim;
+        console.log("Genel Fire: ", genelFire);
+
+        var genelImalatHizi = totalNetBoy * gramaj*60 / sure;
+        console.log("Genel İmalat Hızı: ", genelImalatHizi);
 
         var netUretimHizi = sure / totalNetBoy;
         console.log("Net Üretim Hızı: ", netUretimHizi);
@@ -265,15 +332,21 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("toplamKartAdet: ", toplamKartAdet);
             console.log("fazlaUretim: ", fazlaUretim);
 
+            var harcananAdet = 0;
             siparisler.forEach(function(siparisData) {
                 if (fazlaUretim > 1) { 
-                    var uretilenAdet = Math.round(siparisData.Adet * fazlaUretim);
+                    var hesaplananAdet = Math.round(siparisData.Adet * fazlaUretim);
                 }
                 else {
-                    var uretilenAdet = Math.round(siparisData.Adet * 1.05);
+                    var hesaplananAdet = Math.round(siparisData.Adet * 1.05);
                 }
-                console.log("UretilenAdet: ", uretilenAdet);
-                var uretilenBoy = uretilenAdet * siparisData.PlanlananMm / 1000; // metre
+                if (hesaplananAdet>toplamSepetAdet) {
+                    hesaplananAdet = toplamSepetAdet;
+                }
+                toplamSepetAdet -= hesaplananAdet;
+                var kalanAdet = toplamSepetAdet - hesaplananAdet;
+                console.log("HesaplananAdet: ", hesaplananAdet);
+                var uretilenBoy = hesaplananAdet * siparisData.PlanlananMm / 1000; // metre
                 console.log("uretilenBoy", uretilenBoy);
                 var hesaplananSure = uretilenBoy * netUretimHizi; // metre * dk/metre = dk
                 console.log("hesaplananSure", hesaplananSure)
@@ -286,15 +359,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log(baslangicSaat);
                 var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
                 console.log(bitisSaati);
-                var row = {"KartNo": siparisData.KartNo, "Baslangic": baslangicSaat, "Bitis": bitisSaati, "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, 
-                            "billetBoy": hesaplananBilletBoyu, "uretAdet": uretilenAdet, "uretBoy": uretilenBoy};
+                var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
+                var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
+                var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm, 
+                 "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy,
+                 "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
+                 "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin};
                 sonuc.push(row);
                 baslangicSaat = bitisSaati;
             });
 
         }
 
-        console.log("sonuç: ", sonuc)
+        console.log("sonuç: ", sonuc);
+        
+        kartSonucTable.replaceData(sonuc);
+        secimDiv.style.display = 'none';
+        kartSonucDiv.style.display = 'block';
         // + net = seçili her sepet için adet*boy*gramaj hesaplanır ve toplanır
         // + brüt = seçili üretimlerin toplam brütü
         // + verim = net / brüt
@@ -318,6 +399,9 @@ document.addEventListener("DOMContentLoaded", function () {
     
     });
 
+    sepetButton.addEventListener("click", function() {
+        
+    })
 });
 </script>
 

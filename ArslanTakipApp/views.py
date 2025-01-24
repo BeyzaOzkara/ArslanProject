@@ -4007,7 +4007,7 @@ def update_sepet_yuklenen(request):
             siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
             # Kart no yoksa yeni entry
             if not found:
-                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru})
+                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False})
 
             # Update the yuklenen field
             sepet.yuklenen = yuklenen
@@ -4062,6 +4062,7 @@ class Hesaplama4500View(generic.TemplateView):
         context['profils'] = profil_nos
 
         return context
+        
 
 def get_ext_info(request):
     if request.method == "GET":
@@ -4147,3 +4148,7 @@ def get_kart_info(request):
             return JsonResponse({'success': True, 'siparis_data': list_siparisler}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+        
+def sepete_dagit(request):
+    if request.method == 'POST':
+        return
