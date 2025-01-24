@@ -4116,13 +4116,14 @@ def get_sepet_info(request):
             end_48_time = end_time - datetime.timedelta(hours=48)
 
             start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, singular_params__DieNumber__startswith = profil_no).values('start', 'stop').order_by('start')[0]['start']
-            sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no}]).values() # profil no ile filtrele
+            sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no}]).values().order_by('baslangic_saati') # profil no ile filtrele
             sepet_data = []
 
             for s in sepet:
                 for item in s['yuklenen']:
                     if item.get("ProfilNo") == profil_no:
                         elem = {
+                            "id": s['id'],
                             "SepetNo": s["sepet_no"],
                             "Adet": item["Adet"],
                             "KartNo": item["KartNo"],
