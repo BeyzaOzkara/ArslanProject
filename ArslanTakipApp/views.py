@@ -4137,7 +4137,7 @@ def get_kart_info(request):
         try:
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
             siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-            siparisler = siparis_query.filter(ProfilNo=profil_no).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj')
+            siparisler = siparis_query.filter(ProfilNo=profil_no).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
 
             for s in siparisler:
                 s["FirmaAdi"] = s['FirmaAdi'].split(' ')[0]
