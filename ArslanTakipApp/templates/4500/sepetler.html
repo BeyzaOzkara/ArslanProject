@@ -9,18 +9,47 @@
 {% include 'adminlte/lib/_styles.html' %}
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 <style>
-    
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-
+<div id="sepetlerTable"></div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var editIcon = function(cell, formatterParams, onRendered){ 
+            return "<i class='fa fa-edit'></i>";
+        };
+        var sepetTable = new Tabulator("#sepetlerTable", {
+            height: "500px",
+            layout:"fitColumns",
+            placeholder: "Sepetler",
+            ajaxURL:"/4500/sepetler/get_sepetler",
+            columns: [
+                {formatter:editIcon, width:80, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                    var data = cell.getData();
+                }},
+                { title: "Sepet No", field: "sepet_no" },
+                { title: "Başlangıç", field: "baslangic_saati", formatter:function(cell, formatterParams, onRendered){
+                var value = cell.getValue();
+                value = moment(value).format("DD/MM HH:mm");
+                return value;
+            } },
+                { title: "Bitiş", field: "bitis_saati", formatter:function(cell, formatterParams, onRendered){
+                var value = cell.getValue();
+                value = moment(value).format("DD/MM HH:mm");
+                return value;
+            } },
+            ]
+        });
+
+     })
+
 
 </script>
 {% endblock %}
