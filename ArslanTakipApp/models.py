@@ -154,6 +154,9 @@ class Sepet(models.Model):
     pres_kodu = models.CharField(null=True, blank=True)
     yuklenen = models.JSONField(null=True, blank=True)
 
+    class Meta:
+        permissions = [("view_4500_uretim", "Uretim Gorme Yetkisi Var")]
+
 class QRCode(models.Model):
     qr = models.CharField(null=True, blank=True)
     name = models.CharField(null=True, blank=True)

@@ -32,6 +32,15 @@
             <a href="/kalipfirini" class="nav-link">Kalıp Fırını</a>
         </li>
         {% endif %}
+        
+        {% if perms.ArslanTakipApp.view_4500_uretim or user.is_superuser%}
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/4500/hesaplama" class="nav-link">Üretim Bölüştürme</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/4500/sepetler" class="nav-link">Sepet Listesi</a>
+        </li>
+        {% endif %}
     </ul>
 
     {% block nav_custom_menu %}

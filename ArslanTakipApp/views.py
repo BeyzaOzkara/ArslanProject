@@ -4187,3 +4187,7 @@ def sepete_dagit(request):
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+        
+class Sepetler4500View(generic.TemplateView):
+    template_name = '4500/sepetler.html'
+

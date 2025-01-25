@@ -1,0 +1,33 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+
+{% block title %}Testere - Sepet Listesi{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+<style>
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+
+{% endblock %}
