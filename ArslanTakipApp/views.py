@@ -4152,6 +4152,38 @@ def get_kart_info(request):
         
 def sepete_dagit(request):
     if request.method == 'POST':
-        gelen_sepetler = request.POST.get('sepetler')
-        print(gelen_sepetler)
-        return
+        try:
+            profil_no = request.POST.get('profil')
+            gelen_sepetler = json.loads(request.POST.get('sepetler'))
+            sepetler_grouped = {}
+
+            kart_nos = [sepet["KartNo"] for sepet in gelen_sepetler]
+            siparis_list = {siparis.KartNo: siparis for siparis in SiparisList.objects.using('dies').filter(KartNo__in=kart_nos)}
+
+            for sepet in gelen_sepetler:
+                sepet_id = sepet["id"]
+                kart_no = sepet["KartNo"]
+
+                if sepet_id not in sepetler_grouped:
+                    sepetler_grouped[sepet_id] = []
+                siparis = siparis_list.get(kart_no) # SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
+                if siparis:
+                    sepetler_grouped[sepet_id].append({"KartNo": kart_no, "Adet":sepet["Adet"], "Boy": sepet["Boy"], "ProfilNo":profil_no, "Yuzey": siparis.YuzeyOzelligi, 
+                                                   "Kondusyon": siparis.KondusyonTuru, "Atandi": True})
+
+            grouped_sepetler = [{"id": sepet_id, "items": items} for sepet_id, items in sepetler_grouped.items()]
+
+            with transaction.atomic():
+                for sepetler in grouped_sepetler:
+                    sepet = Sepet.objects.get(id=sepetler['id']) 
+                    yuklenen_veri = sepet.yuklenen
+                    # ProfilNo ile eşleşen eski verileri sil
+                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] != profil_no]
+                    for item in sepetler['items']:
+                        yuklenen_veri.append(item)
+                    sepet.yuklenen = yuklenen_veri
+                    sepet.save()
+
+            return JsonResponse({'success': True}, safe=False)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

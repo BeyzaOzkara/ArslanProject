@@ -470,6 +470,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var dagilan = [];
 
         for (var i = 0; i < sepet.length; i++) {
+            console.log(sepet[i])
             for (var j = 0; j < sonuc.length; j++) {
                 if (sepet[i].Boy == sonuc[j].SipBoy && sonuc[j].hesapAdet >0) {
                     var sepetAdet = sepet[i].Adet;
@@ -486,8 +487,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 }
             }
+            if (sepet[i].Adet > 0) {
+                dagilan.push(sepet[i]);
+            }
         }
-        
+        // console.log("dagilan: ", dagilan);
         sepetDagitTable.replaceData(dagilan);
         sepetDagitDiv.style.display = 'block';
         sepetButton.style.display = 'none';
@@ -502,6 +506,7 @@ document.addEventListener("DOMContentLoaded", function () {
             type: "POST",
             data: {
                 sepetler: gonderSepet,
+                profil: profil,
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function (response) {
