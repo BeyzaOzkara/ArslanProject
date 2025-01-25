@@ -108,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var hesaplaButton = document.getElementById('hesaplaButton');
     var sepetButton = document.getElementById('sepeteDagitButton');
     var onaylaButton = document.getElementById('onaylaButton');
+    var duzenleButton = document.getElementById('editButton');
     var gramajInp = document.getElementById('gramaj');
     var genelFireInp = document.getElementById('genelFire');
     var genleImalatHiziInp = document.getElementById('genelImalatHizi');
@@ -522,6 +523,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    duzenleButton.addEventListener("click", function() {
+        kartSonucDiv.style.display = 'none';
+        secimDiv.style.display = 'block';
+        
+        kartSonucTable.replaceData(data);
+        sepetDagitTable.replaceData(data);
+        genelFireInp.value = "";
+        genelImalatHiziInp.value = "";
+
+    })
 });
 </script>
 
