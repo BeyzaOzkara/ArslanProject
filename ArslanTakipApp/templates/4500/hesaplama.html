@@ -109,6 +109,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var sepetButton = document.getElementById('sepeteDagitButton');
     var onaylaButton = document.getElementById('onaylaButton');
     var gramajInp = document.getElementById('gramaj');
+    var genelFireInp = document.getElementById('genelFire');
+    var genleImalatHiziInp = document.getElementById('genelImalatHizi');
     var data = [];
     var profil = "";
 
@@ -181,14 +183,14 @@ document.addEventListener("DOMContentLoaded", function () {
         data: data || '[]',
         columns: [
             { title: "Kart No", field: "KartNo" },
-            { title: "Sipariş Boyu", field: "SipBoy" },
-            { title: "Sipariş Adeti", field: "SipAdet" },
-            { title: "Baslangıç Saati", field: "Baslangic", formatter:function(cell, formatterParams, onRendered){
+            { title: "Sip. Boyu", field: "SipBoy" },
+            { title: "Sip. Adeti", field: "SipAdet" },
+            { title: "Baslangıç", field: "Baslangic", formatter:function(cell, formatterParams, onRendered){
                 var value = cell.getValue();
                 value = moment(value).format("DD/MM HH:mm");
                 return value;
             }},
-            { title: "Bitiş Saati", field: "Bitis", formatter:function(cell, formatterParams, onRendered){
+            { title: "Bitiş", field: "Bitis", formatter:function(cell, formatterParams, onRendered){
                 var value = cell.getValue();
                 value = moment(value).format("DD/MM HH:mm");
                 return value;
@@ -207,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 thousand:".",
                 symbol:"% ",
                 precision:true,
-            } },
+            }},
             { title: "İmalat Hızı", field: "ImalatHizi" , formatter:"money", formatterParams:{
                 decimal:",",
                 thousand:".",
@@ -215,6 +217,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 symbolAfter:" kg/sa",
                 precision:false,
             } },
+            { title: "İ. Fazlası", field: "ImalatFazlasi", formatter:"money", formatterParams:{
+                decimal:",",
+                thousand:".",
+                symbol:"% ",
+                precision:true,
+            }  },
             { title: "Firma", field: "FirmaAdi" },
             { title: "Termin", field: "SonTermin" },
         ]
@@ -339,11 +347,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var verim = netSepet / brutExt;
         console.log("Verim: ", verim);
-        var genelFire = 1- verim;
+        var genelFire = ((1- verim) * 100).toFixed(1);
         console.log("Genel Fire: ", genelFire);
+        genelFireInp.value = "% " + genelFire;
 
-        var genelImalatHizi = totalNetBoy * gramaj*60 / sure;
+        var genelImalatHizi = Math.round(totalNetBoy * gramaj*60 / sure);
         console.log("Genel İmalat Hızı: ", genelImalatHizi);
+        genleImalatHiziInp.value =genelImalatHizi;
 
         var netUretimHizi = sure / totalNetBoy;
         console.log("Net Üretim Hızı: ", netUretimHizi);
@@ -378,7 +388,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 toplamKartAdet += siparisler[i].Adet;
             }
             var fazlaUretim = toplamSepetAdet / toplamKartAdet;
-            // var fazlaUretim = netSepet / toplamBilletAdet;
             console.log("toplamSepetAdet: ", toplamSepetAdet);
             console.log("toplamSepetBoy: ", toplamSepetBoy);
             console.log("toplamKartAdet: ", toplamKartAdet);
@@ -386,40 +395,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
             var harcananAdet = 0;
             siparisler.forEach(function(siparisData) {
-                if (fazlaUretim > 1) { 
-                    var hesaplananAdet = Math.round(siparisData.Adet * fazlaUretim);
+                if (toplamSepetAdet > 0) {
+                    if (fazlaUretim > 1) { 
+                        var hesaplananAdet = Math.round(siparisData.Adet * fazlaUretim);
+                    }
+                    else {
+                        var hesaplananAdet = Math.round(siparisData.Adet * 1.05);
+                    }
+                    if (hesaplananAdet>toplamSepetAdet) {
+                        hesaplananAdet = toplamSepetAdet;
+                    }
+                    toplamSepetAdet -= hesaplananAdet;
+                    var kalanAdet = toplamSepetAdet - hesaplananAdet;
+                    console.log("HesaplananAdet: ", hesaplananAdet);
+                    var uretilenBoy = hesaplananAdet * siparisData.PlanlananMm / 1000; // metre
+                    console.log("uretilenBoy", uretilenBoy);
+                    var hesaplananSure = uretilenBoy * netUretimHizi; // metre * dk/metre = dk
+                    console.log("hesaplananSure", hesaplananSure)
+                    var hesaplananBrut = (uretilenBoy * gramaj) / (verim * 1.367);
+                    console.log("Hesaplanan Brüt: ", hesaplananBrut);
+                    var hesaplananBilletAdeti = Math.round(hesaplananBrut / ortBilletBoyu);
+                    console.log("Hesaplanan Billet Adeti: ", hesaplananBilletAdeti);
+                    var hesaplananBilletBoyu = hesaplananBrut / hesaplananBilletAdeti;
+                    console.log("Hesaplanan Billet Boyu: ", hesaplananBilletBoyu);
+                    console.log(baslangicSaat);
+                    var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
+                    console.log(bitisSaati);
+                    var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
+                    var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
+                    var imalatFazlasi = ((hesaplananAdet / siparisData.Adet) - 1)*100;
+                    var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm, 
+                    "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy,
+                    "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
+                    "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi};
+                    sonuc.push(row);
+                    baslangicSaat = bitisSaati;
+                    
                 }
-                else {
-                    var hesaplananAdet = Math.round(siparisData.Adet * 1.05);
-                }
-                if (hesaplananAdet>toplamSepetAdet) {
-                    hesaplananAdet = toplamSepetAdet;
-                }
-                toplamSepetAdet -= hesaplananAdet;
-                var kalanAdet = toplamSepetAdet - hesaplananAdet;
-                console.log("HesaplananAdet: ", hesaplananAdet);
-                var uretilenBoy = hesaplananAdet * siparisData.PlanlananMm / 1000; // metre
-                console.log("uretilenBoy", uretilenBoy);
-                var hesaplananSure = uretilenBoy * netUretimHizi; // metre * dk/metre = dk
-                console.log("hesaplananSure", hesaplananSure)
-                var hesaplananBrut = (uretilenBoy * gramaj) / (verim * 1.367);
-                console.log("Hesaplanan Brüt: ", hesaplananBrut);
-                var hesaplananBilletAdeti = Math.round(hesaplananBrut / ortBilletBoyu);
-                console.log("Hesaplanan Billet Adeti: ", hesaplananBilletAdeti);
-                var hesaplananBilletBoyu = hesaplananBrut / hesaplananBilletAdeti;
-                console.log("Hesaplanan Billet Boyu: ", hesaplananBilletBoyu);
-                console.log(baslangicSaat);
-                var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
-                console.log(bitisSaati);
-                var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
-                var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
-                var imalatFazlasi = ((hesaplananAdet / siparisData.Adet) - 1)*100;
-                var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm, 
-                 "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy,
-                 "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
-                 "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi};
-                sonuc.push(row);
-                baslangicSaat = bitisSaati;
             });
 
         }
@@ -466,10 +478,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (sonucAdet >= sepetAdet) {
                         yazilacak = sepetAdet;
                     }
-                    sonuc[j].hesapAdet -= yazilacak;
-                    sepet[i].Adet -= yazilacak;
-                    var row = {"id": sepet[i].id, "SepetNo":sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy};
-                    dagilan.push(row);
+                    if (yazilacak>0) {
+                        sonuc[j].hesapAdet -= yazilacak;
+                        sepet[i].Adet -= yazilacak;
+                        var row = {"id": sepet[i].id, "SepetNo":sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy};
+                        dagilan.push(row);
+                    }
                 }
             }
         }
