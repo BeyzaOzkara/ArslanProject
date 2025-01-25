@@ -10,7 +10,35 @@
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
 <style>
+.profilDiv {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.profilDiv label {
+    margin-right: 5px;
+}
+
+.profilDiv select,
+.profilDiv input {
+    width: auto;
+}
+
+.kartlarSonucInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.kartlarSonucInfo label {
+    margin-right: 5px;
+}
+
+.kartlarSonucInfo input {
+    width: auto;
+}
 </style>
 {% endblock %}
 
@@ -24,7 +52,7 @@
             <option value={{p}}>{{p}}</option>
             {% endfor %}
         </select>
-        <label for="gramaj">Profil Gramajı Giriniz:</label>
+        <label for="gramaj" class="ml-2">Profil Gramajı Giriniz:</label>
         <input type="number" class="form-control" name="gramaj" id="gramaj">
     </div>
     <hr>
@@ -48,7 +76,15 @@
 
 </div>
 <div class="container-fluid kartSonucDiv" style="display: none;">
-    <div id="kartSonucTable"></div>
+    <div class="kartlarSonuc">
+        <div class="kartlarSonucInfo">
+            <label for="genelFire">Genel Fire: </label>
+            <input type="text" class="form-control ml-1 mr-2" name="genelFire" id="genelFire" disabled>
+            <label for="genelImalatHizi">Genel İmalat Hızı: </label>
+            <input type="text" class="form-control ml-1" name="genelImalatHizi" id="genelImalatHizi" disabled>
+        </div>
+        <div id="kartSonucTable"></div>
+    </div>
     <hr>
     <button id="editButton" class="btn btn-primary form-control">DÜZENLE</button>
     <hr>
@@ -190,6 +226,7 @@ document.addEventListener("DOMContentLoaded", function () {
         placeholder: "Kart Dağılımı",
         data: data || '[]',
         columns: [
+            { title: "Sepet No", field: "SepetNo" },
             { title: "Kart No", field: "KartNo" },
             { title: "Adet", field: "Adet" },
             { title: "Boy", field: "Boy" },
@@ -376,10 +413,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log(bitisSaati);
                 var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
                 var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
+                var imalatFazlasi = ((hesaplananAdet / siparisData.Adet) - 1)*100;
                 var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm, 
                  "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy,
                  "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
-                 "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin};
+                 "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi};
                 sonuc.push(row);
                 baslangicSaat = bitisSaati;
             });
@@ -430,12 +468,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                     sonuc[j].hesapAdet -= yazilacak;
                     sepet[i].Adet -= yazilacak;
-                    var row = {"id": sepet[i].id, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy};
+                    var row = {"id": sepet[i].id, "SepetNo":sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy};
                     dagilan.push(row);
                 }
             }
         }
-        console.log(dagilan);
         
         sepetDagitTable.replaceData(dagilan);
         sepetDagitDiv.style.display = 'block';
@@ -444,18 +481,17 @@ document.addEventListener("DOMContentLoaded", function () {
     })
 
     onaylaButton.addEventListener("click", function() {
-        var gonderSepet = sepetDagitTable.getData();
+        var gonderSepet = JSON.stringify(sepetDagitTable.getData());
         console.log(gonderSepet);
         $.ajax({
-            url: "/4500/hesaplama/sepete_dagit/",  // URL to the create_sepet view
+            url: "/4500/hesaplama/sepete_dagit/", 
             type: "POST",
             data: {
                 sepetler: gonderSepet,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function (response) {
                 if (response.success) {
-                    // You can update the UI to show that the "bitis_saati" has been set
                     alert("Sepetlere Dağıtıldı.");
                     window.location.reload();
                 }
