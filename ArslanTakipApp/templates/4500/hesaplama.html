@@ -159,7 +159,9 @@ document.addEventListener("DOMContentLoaded", function () {
         layout:"fitColumns",
         placeholder: "Siparisler",
         data: data || '[]',
+        movableRows:true,
         columns: [
+            {rowHandle:true, formatter:"handle", title:"", headerSort:false, frozen:true, width:40, minWidth:40},
             {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
                 cell.getRow().toggleSelect();
             }},
@@ -491,7 +493,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 dagilan.push(sepet[i]);
             }
         }
-        // console.log("dagilan: ", dagilan);
         sepetDagitTable.replaceData(dagilan);
         sepetDagitDiv.style.display = 'block';
         sepetButton.style.display = 'none';
