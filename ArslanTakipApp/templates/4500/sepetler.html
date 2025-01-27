@@ -9,23 +9,164 @@
 {% include 'adminlte/lib/_styles.html' %}
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 <style>
+    .sepetno-container {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .kart-ekle-container {
+        display: flex; /* Align elements horizontally */
+        align-items: center; /* Align items vertically center */
+        gap: 10px; /* Optional: Adjust spacing between elements */
+        width: 100%; /* Make the container full width */
+    }
 
+    .kart-ekle-container label {
+        margin-right: 10px; /* Adjust spacing between the label and input/select */
+    }
+
+    .kart-ekle-container input, .kart-ekle-container select {
+        flex: 1; /* Allow inputs to stretch evenly */
+    }
+    .kart-ekle-container button {
+        flex: 0; /* Keep the button at its natural size */
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
+    <h3>SEPETLER</h3>
+    <hr>
 <div id="sepetlerTable"></div>
 </div>
+<div class="modal fade" id="sepetModal" tabindex="-1" aria-labelledby="sepetModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Sepet Düzenle</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="sepetno-container">
+                    <label for="sepetNo">Sepet No:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">S</span>
+                        </div>
+                        <input type="text" id="sepetNo" class="form-control" placeholder="Sepet Numarası Giriniz" aria-describedby="basic-addon1" />
+                    </div>
+                </div>
+                <div class="sepet-container">
+                    <div class="kart-ekle-container mb-3">
+                        <label for="kartNo">Sipariş Kart No:</label>
+                        <input type="text" class="form-control" id="kartNo" placeholder="Sipariş Kart No" onfocusout="checkKartNo()">
+                        <label for="adet">Adet:</label>
+                        <input type="text" id="adet" class="form-control" placeholder="Adet">
+                        <button id="ekleButton" class="btn btn-primary">Yükle</button>
+                    </div>
+                    <div id="siparisInfo">
+                        <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Profil No</th>
+                                    <th>Kalan Kg</th>
+                                    <th>Kalan Adet</th>
+                                    <th>Boy</th>
+                                    <th>Kondusyon Turu</th>
+                                    <th>Yuzey Ozelligi</th>
+                                    <th>Profil Gramaj</th>
+                                    <th>Firma Adi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siparisTableBody">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3" id="sepet-tabulator"></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnSepetKaydet" class="btn btn-primary">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
+<script>        
+    function checkKartNo() {
+        var kartNo = document.getElementById('kartNo').value;
+        if (kartNo) {
+            $.ajax({
+                url: '/4500/sepetler/get_siparis_kart_info/',
+                type: 'GET',
+                data: {
+                    kart_no: kartNo
+                },
+                success: function (response) {
+                    if (response.success) {
+                        var orders = response.orders;
+                        var table = document.getElementById('siparisTable');
+                        table.style.display = "table";
+                        var tableBody = document.getElementById('siparisTableBody');
+                        tableBody.innerHTML = "";
+                        console.log(orders)
+                        orders.forEach(function (order) {
+                            var row = document.createElement('tr');
+                            var FirmaAdi = order.FirmaAdi.split(' ')[0];
+
+                            row.innerHTML = `
+                                <td>${order.ProfilNo}</td>
+                                <td>${order.Kg}</td>
+                                <td>${order.Adet}</td>
+                                <td>${order.Boy}</td>
+                                <td>${order.KondusyonTuru}</td>
+                                <td>${order.YuzeyOzelligi}</td>
+                                <td>${order.Profil_Gramaj}</td>
+                                <td>${FirmaAdi}</td>
+                            `;
+
+                            tableBody.appendChild(row);
+                        });
+
+                    } else {
+                        console.error("Error fetching Siparis info:", response.error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Siparis info:", error);
+                }
+            });
+        }
+    }
+    var sepetTable = null;
+    var sepet_id = 0;
     document.addEventListener("DOMContentLoaded", function () {
+        var sepetNoInput = document.getElementById('sepetNo');
+        var kartNo = document.getElementById('kartNo');
+        var adet = document.getElementById('adet');
+        var duzenleButton = document.getElementById('duzenleButton');
+        var ekleButton = document.getElementById('ekleButton');
+        var kaydetButton = document.getElementById('btnSepetKaydet');
+
+        function fillModal(data) {
+            sepetNoInput.value = data.sepet_no.slice(1);
+            sepet_id = data.id;
+            initializeTabulator(data.yuklenen);
+        }
         var editIcon = function(cell, formatterParams, onRendered){ 
             return "<i class='fa fa-edit'></i>";
         };
-        var sepetTable = new Tabulator("#sepetlerTable", {
+        var sepetlerTable = new Tabulator("#sepetlerTable", {
             height: "500px",
             layout:"fitColumns",
             placeholder: "Sepetler",
@@ -33,21 +174,81 @@
             columns: [
                 {formatter:editIcon, width:80, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
                     var data = cell.getData();
+                    console.log(data.yuklenen)
+                    fillModal(data);
+                    $('#sepetModal').modal('show');
                 }},
                 { title: "Sepet No", field: "sepet_no" },
                 { title: "Başlangıç", field: "baslangic_saati", formatter:function(cell, formatterParams, onRendered){
-                var value = cell.getValue();
-                value = moment(value).format("DD/MM HH:mm");
-                return value;
-            } },
+                    var value = cell.getValue();
+                    value = moment(value).format("DD/MM HH:mm");
+                    return value;
+                }},
                 { title: "Bitiş", field: "bitis_saati", formatter:function(cell, formatterParams, onRendered){
-                var value = cell.getValue();
-                value = moment(value).format("DD/MM HH:mm");
-                return value;
-            } },
+                    var value = cell.getValue();
+                    value = moment(value).format("DD/MM HH:mm");
+                    return value;
+                }},
             ]
         });
 
+        function initializeTabulator(data) { 
+            var deleteIcon = function(cell, formatterParams, onRendered){ 
+                return "<i class='fa fa-trash'></i>";
+            };
+            sepetTable = new Tabulator("#sepet-tabulator", {
+                height: "300px",
+                layout:"fitColumns",
+                placeholder: "Sepet",
+                data: data || '[]',
+                columns: [
+                    { title: "KartNo", field: "KartNo" },
+                    { title: "Adet", field: "Adet" },
+                    {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                        var kartNo = cell.getRow().getData().KartNo;
+                        if (confirm("Silmek istediğinizden emin misiniz?")) {
+                            sepetTable.deleteRow(cell.getRow());
+                        }
+                    }},
+                ]
+            });
+        }
+
+        ekleButton.addEventListener('click', function() {
+            // Kart No ve Adet var mı kontrol et
+            if (kartNo.value == "" || adet.value == "") {
+                alert("Lütfen boş alan bırakmayınız.");
+                return;
+            }
+            sepetTable.addData([{"KartNo": kartNo.value, "Adet": adet.value}], true);
+        });
+    
+        kaydetButton.addEventListener('click', function(){
+            var data = sepetTable.getData();
+            if (data.length > 0) {
+                $.ajax({
+                    url: '/4500/sepetler/update_sepet/',
+                    type: 'POST',
+                    data: {
+                        sepet_id: sepet_id,
+                        yuklenen: data,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        alert("Güncelleme başarıyla kaydedildi.");
+                        $('#sepetModal').modal('hide');
+                        sepet_id = 0;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error deleting item:", error);
+                    }
+                });
+            }
+            else {
+                alert("Lütfen boş bırakmayınız!");
+                return;
+            }
+        })
      })
 
 

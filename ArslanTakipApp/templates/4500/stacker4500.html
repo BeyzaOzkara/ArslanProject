@@ -329,16 +329,15 @@
         dolduButton.addEventListener("click", function () {
             if (sepet_id) {
                 $.ajax({
-                    url: "",  // URL to the create_sepet view
+                    url: "",
                     type: "POST",
                     data: {
                         sepet_id: sepet_id,
                         sepet_bitti: true,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
                     success: function (response) {
                         if (response.success) {
-                            // You can update the UI to show that the "bitis_saati" has been set
                             alert("Sepet Dolduruldu ve Bitis Saati Belirlendi.");
                             window.location.reload();
                         }

@@ -4198,4 +4198,48 @@ def get_sepetler(pres):
 class Sepetler4500View(generic.TemplateView):
     template_name = '4500/sepetler.html'
 
+def get_siparis_kart_info(request):
+    if request.method == "GET":
+        kart_no = request.GET.get('kart_no')
+    try:
+        orders = SiparisList.objects.using('dies').filter(KartNo=kart_no, Kg__gt=0, Adet__gt=0)
+        order_data = [
+            {
+                "ProfilNo": order.ProfilNo,
+                "Kg": order.Kg,
+                "Adet": order.Adet,
+                "FirmaAdi": order.FirmaAdi,
+                "Boy": order.PlanlananMm,
+                "KondusyonTuru": order.KondusyonTuru,
+                "Profil_Gramaj": order.Profil_Gramaj,
+                "YuzeyOzelligi": order.YuzeyOzelligi,
+            }
+            for order in orders
+        ]
+        return JsonResponse({'success': True, 'orders': order_data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
     
+def update_sepet(request):
+    if request.method == "POST":
+        sepet_id = request.POST.get('sepet_id')
+        yuklenen_data = request.POST.get('yuklenen')
+        new_data = []
+        try:
+            sepet = Sepet.objects.get(id=sepet_id)
+            
+            for y in yuklenen_data:
+                siparis = SiparisList.objects.using('dies').filter(KartNo=y['KartNo'])[0]
+                row = {"KartNo": y['KartNo'], "Adet": y['Adet'], 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False}
+                new_data.append(row)
+            
+            sepet.yuklenen = new_data
+            sepet.save()
+
+            # Return the updated yuklenen data as a response
+            return JsonResponse({'success': True})
+
+        except Sepet.DoesNotExist:
+            return JsonResponse({'error': 'Sepet not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
