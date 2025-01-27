@@ -4051,8 +4051,9 @@ def get_profil_nos(pres):
     profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
     return profiller
 
-class Hesaplama4500View(generic.TemplateView):
+class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
     template_name = '4500/hesaplama.html'
+    permission_required ="ArslanTakipApp.view_4500_uretim"
 
     def get_context_data(self, **kwargs):
         # Son 48 saatteki profil numaraları
