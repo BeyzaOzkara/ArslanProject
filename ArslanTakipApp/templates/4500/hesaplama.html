@@ -338,7 +338,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         
-        var baslangicSaat = new Date(ext[0].imalat_baslangici);
         var netSepet = 0;
         var totalNetBoy = 0;
         for (var i = 0; i < sepet.length; i++) {
@@ -367,6 +366,8 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Toplam Billet Adet: ", toplamBilletAdet);
         var sure = (maxEndTime - minStartTime) / 60000;
         console.log("Süre: ", sure);
+
+        var baslangicSaat = minStartTime;
 
         var verim = netSepet / brutExt;
         console.log("Verim: ", verim);
@@ -524,12 +525,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     onaylaButton.addEventListener("click", function() {
         var gonderSepet = JSON.stringify(sepetDagitTable.getData());
-        console.log(gonderSepet);
+        var gonderKart = JSON.stringify(kartSonucTable.getData());
+        console.log("gonder kart:", gonderKart);
         $.ajax({
             url: "/4500/hesaplama/sepete_dagit/", 
             type: "POST",
             data: {
                 sepetler: gonderSepet,
+                kartlar: gonderKart,
                 profil: profil,
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
