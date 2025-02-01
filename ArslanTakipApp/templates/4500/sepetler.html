@@ -224,7 +224,7 @@
         });
     
         kaydetButton.addEventListener('click', function(){
-            var data = sepetTable.getData();
+            var data = JSON.stringify(sepetTable.getData());
             if (data.length > 0) {
                 $.ajax({
                     url: '/4500/sepetler/update_sepet/',
@@ -238,6 +238,7 @@
                         alert("Güncelleme başarıyla kaydedildi.");
                         $('#sepetModal').modal('hide');
                         sepet_id = 0;
+                        window.location.reload();
                     },
                     error: function (xhr, status, error) {
                         console.error("Error deleting item:", error);

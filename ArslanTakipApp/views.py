@@ -4155,6 +4155,7 @@ def sepete_dagit(request):
     if request.method == 'POST':
         try:
             profil_no = request.POST.get('profil')
+            kart_dagilimi = json.loads(request.POST.get('kartlar')) # kartları neyle birlikte kaydetmeliyim
             gelen_sepetler = json.loads(request.POST.get('sepetler'))
             sepetler_grouped = {}
 
@@ -4163,7 +4164,7 @@ def sepete_dagit(request):
 
             for sepet in gelen_sepetler:
                 sepet_id = sepet["id"]
-                kart_no = sepet["KartNo"]
+                kart_no = sepet["KartNo"]    
 
                 if sepet_id not in sepetler_grouped:
                     sepetler_grouped[sepet_id] = []
@@ -4203,7 +4204,7 @@ def get_siparis_kart_info(request):
     if request.method == "GET":
         kart_no = request.GET.get('kart_no')
     try:
-        orders = SiparisList.objects.using('dies').filter(KartNo=kart_no, Kg__gt=0, Adet__gt=0)
+        orders = SiparisList.objects.using('dies').filter(KartNo=kart_no)
         order_data = [
             {
                 "ProfilNo": order.ProfilNo,
@@ -4224,12 +4225,13 @@ def get_siparis_kart_info(request):
 def update_sepet(request):
     if request.method == "POST":
         sepet_id = request.POST.get('sepet_id')
-        yuklenen_data = request.POST.get('yuklenen')
+        yuklenen_data = json.loads(request.POST.get('yuklenen'))
         new_data = []
         try:
             sepet = Sepet.objects.get(id=sepet_id)
             
             for y in yuklenen_data:
+                print(y)
                 siparis = SiparisList.objects.using('dies').filter(KartNo=y['KartNo'])[0]
                 row = {"KartNo": y['KartNo'], "Adet": y['Adet'], 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False}
                 new_data.append(row)
@@ -4244,3 +4246,4 @@ def update_sepet(request):
             return JsonResponse({'error': 'Sepet not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+

@@ -466,6 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // kartSonucTable.replaceData(sonuc);
         secimDiv.style.display = 'none';
         kartSonucDiv.style.display = 'block';
+        sendKartDagilimi(JSON.stringify(sonuc));
         // + net = seçili her sepet için adet*boy*gramaj hesaplanır ve toplanır
         // + brüt = seçili üretimlerin toplam brütü
         // + verim = net / brüt
@@ -488,6 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
         //     geri kalan hesaplanan değerler aynı
     
     });
+
 
     sepetButton.addEventListener("click", function() {
         var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
