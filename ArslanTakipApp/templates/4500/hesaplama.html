@@ -403,13 +403,13 @@ document.addEventListener("DOMContentLoaded", function () {
             var toplamSepetBoy = 0;
             for (var i = 0; i < sepet.length; i++) {
                 if (sepet[i].Boy === parseFloat(boy)) {
-                    toplamSepetAdet += sepet[i].Adet;
-                    toplamSepetBoy += sepet[i].Boy;
+                    toplamSepetAdet += parseFloat(sepet[i].Adet);
+                    toplamSepetBoy += parseFloat(sepet[i].Boy);
                 }
             }
             var toplamKartAdet = 0;
             for (var i = 0; i < siparisler.length; i++) {
-                toplamKartAdet += siparisler[i].Adet;
+                toplamKartAdet += parseInt(siparisler[i].Adet);
             }
             var fazlaUretim = toplamSepetAdet / toplamKartAdet;
             console.log("toplamSepetAdet: ", toplamSepetAdet);
@@ -421,10 +421,10 @@ document.addEventListener("DOMContentLoaded", function () {
             siparisler.forEach(function(siparisData) {
                 if (toplamSepetAdet > 0) {
                     if (fazlaUretim > 1) { 
-                        var hesaplananAdet = Math.round(siparisData.Adet * fazlaUretim);
+                        var hesaplananAdet = Math.round(parseFloat(siparisData.Adet) * fazlaUretim);
                     }
                     else {
-                        var hesaplananAdet = Math.round(siparisData.Adet * 1.05);
+                        var hesaplananAdet = Math.round(parseFloat(siparisData.Adet) * 1.05);
                     }
                     if (hesaplananAdet>toplamSepetAdet) {
                         hesaplananAdet = toplamSepetAdet;
@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     toplamSepetAdet -= hesaplananAdet;
                     var kalanAdet = toplamSepetAdet - hesaplananAdet;
                     console.log("HesaplananAdet: ", hesaplananAdet);
-                    var uretilenBoy = hesaplananAdet * siparisData.PlanlananMm / 1000; // metre
+                    var uretilenBoy = hesaplananAdet * parseInt(siparisData.PlanlananMm) / 1000; // metre
                     console.log("uretilenBoy", uretilenBoy);
                     var hesaplananSure = uretilenBoy * netUretimHizi; // metre * dk/metre = dk
                     console.log("hesaplananSure", hesaplananSure)
@@ -447,7 +447,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.log(bitisSaati);
                     var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
                     var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
-                    var imalatFazlasi = ((hesaplananAdet / siparisData.Adet) - 1)*100;
+                    var imalatFazlasi = ((hesaplananAdet / parseInt(siparisData.Adet)) - 1)*100;
                     var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm, 
                     "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy,
                     "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
