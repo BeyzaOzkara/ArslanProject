@@ -4049,6 +4049,7 @@ def get_profil_nos(pres):
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
     profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
+    profiller = ['16155']
     return profiller
 
 class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
@@ -4068,9 +4069,48 @@ class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
 def get_ext_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
-        end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        # end_time = timezone.now()
+        # start_time = end_time - datetime.timedelta(hours=48)
 
+        # try:
+        #     queryset = (
+        #         PlcData.objects.using('dms').filter(
+        #             start__gte=start_time, 
+        #             stop__lte=end_time,
+        #             singular_params__DieNumber__startswith = profil_no
+        #         )
+        #         .annotate(
+        #             kart_no=Cast(F("singular_params__kartNo"), FloatField()),
+        #             kalip_no=F("singular_params__DieNumber"),
+        #             billet_count=Count(F("singular_params__DieNumber")),
+        #             brüt_imalat=ExpressionWrapper(
+        #                 Sum(Cast(F("singular_params__Billet Length Pusher"), FloatField())) * 0.1367,
+        #                 output_field=FloatField()
+        #             )
+        #         )
+        #         .values(
+        #             "kart_no",
+        #             "kalip_no",
+        #         )
+        #         .annotate(
+        #             imalat_baslangici=Min("start"),
+        #             imalat_sonu=Max("stop"),
+        #             billet_count=F("billet_count"),
+        #             brüt_imalat=F("brüt_imalat")
+        #         )
+        #         .order_by("-imalat_sonu")
+        #     )
+            
+        #     for e in queryset:
+        #         e['imalat_baslangici_2'] = format_date_time_without_year(e['imalat_baslangici'])
+        #         e['imalat_sonu_2'] = format_date_time_without_year(e['imalat_sonu'])
+
+        #     ext_data = list(queryset)
+
+        #     print(ext_data)
+
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=72)
         try:
             queryset = (
                 PlcData.objects.using('dms').filter(
@@ -4105,6 +4145,7 @@ def get_ext_info(request):
                 e['imalat_sonu_2'] = format_date_time_without_year(e['imalat_sonu'])
 
             ext_data = list(queryset)
+
             return JsonResponse({'success': True, 'ext_data': ext_data})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -4114,10 +4155,12 @@ def get_sepet_info(request):
         try:
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
             end_time = timezone.now()
-            end_48_time = end_time - datetime.timedelta(hours=48)
+            end_48_time = end_time - datetime.timedelta(hours=72)
 
             start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, singular_params__DieNumber__startswith = profil_no).values('start', 'stop').order_by('start')[0]['start']
-            sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no, 'Atandi':False}]).values().order_by('baslangic_saati') # profil no ile filtrele
+            # sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no, 'Atandi':False}]).values().order_by('baslangic_saati') # profil no ile filtrele
+            sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no, 'Atandi':True}]).values().order_by('baslangic_saati') # profil no ile filtrele
+
             sepet_data = []
 
             for s in sepet:
@@ -4139,14 +4182,22 @@ def get_kart_info(request):
     if request.method == "GET":
         try:
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
-            siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-            siparisler = siparis_query.filter(ProfilNo=profil_no).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
-
+            # siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+            # siparisler = siparis_query.filter(ProfilNo=profil_no).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
+            siparisler = SiparisList.objects.using('dies').filter(KartNo__in = ['312578', '312579', '312580', '312581', '312582', '312583', '312584']).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
             for s in siparisler:
                 s["FirmaAdi"] = s['FirmaAdi'].split(' ')[0]
                 s['SonTermin'] = format_date(s['SonTermin'])
             list_siparisler = list(siparisler)
-            
+            print(list_siparisler)
+            list_siparisler = [
+                {'Kimlik': 124194747, 'KartNo': 312578, 'Kg': 0.0, 'Adet': 161.0, 'PlanlananMm': 4050.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147},
+                {'Kimlik': 124194774, 'KartNo': 312579, 'Kg': 0.0, 'Adet': 63.0, 'PlanlananMm': 4550.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147},
+                {'Kimlik': 124194782, 'KartNo': 312580, 'Kg': 0.0, 'Adet': 62.0, 'PlanlananMm': 5050.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147},
+                {'Kimlik': 124194807, 'KartNo': 312581, 'Kg': 0.0, 'Adet': 159.0, 'PlanlananMm': 5550.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147},
+                {'Kimlik': 124194836, 'KartNo': 312582, 'Kg': 0.0, 'Adet': 159.0, 'PlanlananMm': 6050.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147},
+                {'Kimlik': 124194847, 'KartNo': 312583, 'Kg': 0.0, 'Adet': 59.0, 'PlanlananMm': 6550.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147},
+                {'Kimlik': 124194865, 'KartNo': 312584, 'Kg': 0.0, 'Adet': 51.0, 'PlanlananMm': 7050.0, 'SonTermin': '19-02-2025', 'FirmaAdi': 'Hundt', 'KondusyonTuru': '6060-T66 TERMİKLİ F22', 'YuzeyOzelligi': 'BEYAZ BOYALI', 'Profil_Gramaj': 5.147}]
             return JsonResponse({'success': True, 'siparis_data': list_siparisler}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
