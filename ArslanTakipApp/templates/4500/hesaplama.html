@@ -276,6 +276,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     precision:false,
                 } },
                 { title: "Billet Adeti", field: "billetAdet" },
+                { title: "Pres Üretilen", field: "presUret" , formatter:"money", formatterParams:{
+                    decimal:",",
+                    thousand:".",
+                    precision:true,
+                }},
                 { title: "Fire", field: "Fire" , formatter:"money", formatterParams:{
                     decimal:",",
                     thousand:".",
@@ -448,8 +453,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
                     var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
                     var imalatFazlasi = ((hesaplananAdet / parseInt(siparisData.Adet)) - 1)*100;
+                    var presUretilen = (hesaplananBilletAdeti * hesaplananBilletBoyu * 1.367);
                     var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm, 
-                    "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy,
+                    "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy, "presUret": presUretilen, 
                     "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
                     "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi};
                     sonuc.push(row);
