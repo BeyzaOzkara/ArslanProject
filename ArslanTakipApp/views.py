@@ -4049,7 +4049,6 @@ def get_profil_nos(pres):
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
     profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
-    profiller = ['16155']
     return profiller
 
 class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
