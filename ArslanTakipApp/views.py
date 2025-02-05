@@ -4227,13 +4227,13 @@ def get_siparis_kart_info(request):
 def update_sepet(request):
     if request.method == "POST":
         sepet_id = request.POST.get('sepet_id')
+        sepet_no = request.POST.get('sepet_no')
         yuklenen_data = json.loads(request.POST.get('yuklenen'))
         new_data = []
         try:
             sepet = Sepet.objects.get(id=sepet_id)
-            
+            sepet.sepet_no = sepet_no
             for y in yuklenen_data:
-                print(y)
                 siparis = SiparisList.objects.using('dies').filter(KartNo=y['KartNo'])[0]
                 row = {"KartNo": y['KartNo'], "Adet": y['Adet'], 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False}
                 new_data.append(row)

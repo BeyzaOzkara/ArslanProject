@@ -231,6 +231,7 @@
                     type: 'POST',
                     data: {
                         sepet_id: sepet_id,
+                        sepet_no: "S" + sepetNoInput.value,
                         yuklenen: data,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
