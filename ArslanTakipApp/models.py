@@ -157,6 +157,14 @@ class Sepet(models.Model):
     class Meta:
         permissions = [("view_4500_uretim", "Uretim Gorme Yetkisi Var")]
 
+class KartDagilim(models.Model):
+    profil_no = models.CharField(null=True, blank=True)
+    profil_gr = models.FloatField(null=True, blank=True)
+    secilen_ext = models.JSONField(null=True, blank=True)
+    secilen_sepet = models.JSONField(null=True, blank=True)
+    secilen_siparis = models.JSONField(null=True, blank=True)
+    dagitilan_kartlar = models.JSONField(null=True, blank=True)
+
 class QRCode(models.Model):
     qr = models.CharField(null=True, blank=True)
     name = models.CharField(null=True, blank=True)

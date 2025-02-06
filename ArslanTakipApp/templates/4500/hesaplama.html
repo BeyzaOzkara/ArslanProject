@@ -465,8 +465,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
         }
-
-        console.log("sonuç: ", sonuc);
         
         initializeKartSonuc(sonuc);
         // kartSonucTable.replaceData(sonuc);
@@ -532,15 +530,23 @@ document.addEventListener("DOMContentLoaded", function () {
     })
 
     onaylaButton.addEventListener("click", function() {
+        var secilenSepetler = JSON.stringify(sepetTable.getSelectedData());
+        var secilenExt = JSON.stringify(extTable.getSelectedData());
+        var secilenSiparisler = JSON.stringify(siparisTable.getSelectedData());
         var gonderSepet = JSON.stringify(sepetDagitTable.getData());
         var gonderKart = JSON.stringify(kartSonucTable.getData());
+        var profil_gr = gramajInp.value;
         console.log("gonder kart:", gonderKart);
         $.ajax({
             url: "/4500/hesaplama/sepete_dagit/", 
             type: "POST",
             data: {
-                sepetler: gonderSepet,
-                kartlar: gonderKart,
+                secilen_ext: secilenExt,
+                secilen_sepet: secilenSepetler,
+                secilen_siparis: secilenSiparisler,
+                sonuc_sepetler: gonderSepet,
+                sonuc_kartlar: gonderKart,
+                profil_gr: profil_gr,
                 profil: profil,
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             },

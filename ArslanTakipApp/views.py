@@ -30,7 +30,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode
+    QRCode, KartDagilim
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -812,9 +812,8 @@ def kalip_hareket(request):
 def kalip_yorum(request):
     kalip_no = request.GET.get('kalipNo')
     if request.method == "GET":
-        comments = getParentComments("KalipMs", kalip_no).order_by("Tarih")
+        comments = getParentComments("KalipMs", kalip_no).order_by("-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
-        # print(f"comment_list: {comment_list}")
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
 
@@ -4157,8 +4156,12 @@ def sepete_dagit(request):
     if request.method == 'POST':
         try:
             profil_no = request.POST.get('profil')
-            kart_dagilimi = json.loads(request.POST.get('kartlar')) # kartları neyle birlikte kaydetmeliyim
-            gelen_sepetler = json.loads(request.POST.get('sepetler'))
+            profil_gr = request.POST.get('profil_gr')
+            secilen_ext = json.loads(request.POST.get('secilen_ext'))
+            secilen_sepet = json.loads(request.POST.get('secilen_sepet'))
+            secilen_siparis = json.loads(request.POST.get('secilen_siparis'))
+            kart_dagilimi = json.loads(request.POST.get('sonuc_kartlar')) # kartları neyle birlikte kaydetmeliyim
+            gelen_sepetler = json.loads(request.POST.get('sonuc_sepetler'))
             sepetler_grouped = {}
 
             kart_nos = [sepet["KartNo"] for sepet in gelen_sepetler]
@@ -4187,6 +4190,14 @@ def sepete_dagit(request):
                         yuklenen_veri.append(item)
                     sepet.yuklenen = yuklenen_veri
                     sepet.save()
+                KartDagilim.objects.create(
+                    profil_no = profil_no,
+                    profil_gr = profil_gr,
+                    secilen_ext = secilen_ext,
+                    secilen_sepet = secilen_sepet,
+                    secilen_siparis = secilen_siparis,
+                    dagitilan_kartlar = kart_dagilimi
+                )
 
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
