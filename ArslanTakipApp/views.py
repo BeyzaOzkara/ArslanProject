@@ -4072,8 +4072,11 @@ class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
 
         return context
         
-
+# profil no seçti, eğer birden fazla kalıp varsa kalıpta seçmesi lazım 
+# 
 def get_ext_info(request):
+    # her satır için ortalama billet boyu:
+    # brüt / (billet sayısı * 1,367)
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
@@ -4122,6 +4125,12 @@ def get_ext_info(request):
             for e in queryset:
                 e['imalat_baslangici_2'] = format_date_time_without_year(e['imalat_baslangici'])
                 e['imalat_sonu_2'] = format_date_time_without_year(e['imalat_sonu'])
+                if e['billet_count'] > 0:  # Prevent division by zero
+                    average_billet_length = e['brüt_imalat'] / (e['billet_count'] * 1.367)
+                else:
+                    average_billet_length = 0  # Handle the case when billet_count is zero or invalid
+
+                e['ortalama_billet_boyu'] = round(average_billet_length, 2)
 
             ext_data = list(queryset)
 
