@@ -164,6 +164,7 @@ class KartDagilim(models.Model):
     secilen_sepet = models.JSONField(null=True, blank=True)
     secilen_siparis = models.JSONField(null=True, blank=True)
     dagitilan_kartlar = models.JSONField(null=True, blank=True)
+    tarih = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 class QRCode(models.Model):
     qr = models.CharField(null=True, blank=True)
