@@ -4096,7 +4096,7 @@ def get_ext_info(request):
                     billet_count=F("billet_count"),
                     brüt_imalat=F("brüt_imalat")
                 )
-                .order_by("-imalat_sonu")
+                .order_by("imalat_baslangici")
             )
             
             for e in queryset:
