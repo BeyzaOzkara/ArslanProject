@@ -166,6 +166,11 @@ class KartDagilim(models.Model):
     dagitilan_kartlar = models.JSONField(null=True, blank=True)
     tarih = models.DateTimeField(auto_now=True, blank=True, null=True)
 
+class KalipMuadil(models.Model):
+    profiller = ArrayField(models.CharField(max_length=50),  # Each die ID will be a string (e.g., 'A', 'B', 'C')
+        size=None, blank=True,
+    )
+
 class QRCode(models.Model):
     qr = models.CharField(null=True, blank=True)
     name = models.CharField(null=True, blank=True)

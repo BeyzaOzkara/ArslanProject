@@ -30,7 +30,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim
+    QRCode, KartDagilim, KalipMuadil
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -3953,7 +3953,16 @@ def get_kart_no_list(request):
                 if die_number:
                     # "-" karakterinden sonrasını silip boşlukları temizliyoruz
                     cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-                    profil_listesi.add(cleaned_die_number)
+
+                    try:
+                        alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
+                        if alt_group:
+                            alternative_dies = alt_group.profiller
+                            for alternative_die in alternative_dies:
+                                profil_listesi.add(alternative_die)
+                    except KalipMuadil.DoesNotExist:
+                        profil_listesi.add(cleaned_die_number)
+                        pass
 
         # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
@@ -4071,12 +4080,23 @@ def get_ext_info(request):
         start_time = end_time - datetime.timedelta(hours=48)
 
         try:
+            alt_group = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
+            if alt_group:
+                alternative_dies = alt_group.profiller
+            else:
+                alternative_dies = [profil_no]
+
+            q = {}
+            for die in alternative_dies:
+                q["singular_params__DieNumber__startswith"] = die
+
             queryset = (
                 PlcData.objects.using('dms').filter(
                     start__gte=start_time, 
                     stop__lte=end_time,
-                    singular_params__DieNumber__startswith = profil_no
+                    # singular_params__DieNumber__startswith = profil_no
                 )
+                .filter(**q)
                 .annotate(
                     kart_no=Cast(F("singular_params__kartNo"), FloatField()),
                     kalip_no=F("singular_params__DieNumber"),
@@ -4115,8 +4135,18 @@ def get_sepet_info(request):
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
             end_time = timezone.now()
             end_48_time = end_time - datetime.timedelta(hours=48)
+            
+            alt_group = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
+            if alt_group:
+                alternative_dies = alt_group.profiller
+            else:
+                alternative_dies = [profil_no]
 
-            start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, singular_params__DieNumber__startswith = profil_no).values('start', 'stop').order_by('start')[0]['start']
+            q = {}
+            for die in alternative_dies:
+                q["singular_params__DieNumber__startswith"] = die
+
+            start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, **q).values('start', 'stop').order_by('start')[0]['start']
             sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no, 'Atandi':False}]).values().order_by('baslangic_saati') # profil no ile filtrele
 
             sepet_data = []
