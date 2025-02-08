@@ -3963,15 +3963,13 @@ def get_kart_no_list(request):
                     # "-" karakterinden sonrasını silip boşlukları temizliyoruz
                     cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
 
-                    try:
-                        alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
-                        if alt_group:
-                            alternative_dies = alt_group.profiller
-                            for alternative_die in alternative_dies:
-                                profil_listesi.add(alternative_die)
-                    except KalipMuadil.DoesNotExist:
+                    alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
+                    if alt_group:
+                        alternative_dies = alt_group.profiller
+                        for alternative_die in alternative_dies:
+                            profil_listesi.add(alternative_die)
+                    else:
                         profil_listesi.add(cleaned_die_number)
-                        pass
 
         # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
