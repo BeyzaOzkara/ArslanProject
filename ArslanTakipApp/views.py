@@ -4160,22 +4160,25 @@ def get_sepet_info(request):
         end_48_time = end_time - datetime.timedelta(hours=48)
         
         alternative_dies = get_alternative_profiles(profil_no)
-        
+        print(alternative_dies)
         q = Q()
         w = Q()
         for die in alternative_dies:
             q |= Q(singular_params__DieNumber__startswith=die)
             w |= Q(yuklenen__contains=[{'ProfilNo': die, 'Atandi': False}]) 
-            
+        
+        print(q)
         start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
+        print(start)
+        print(w)
         sepet = Sepet.objects.filter(baslangic_saati__gte=start).filter(w).values().order_by('baslangic_saati') # profil no ile filtrele
-        print(sepet)
+        print(w)
         try:
             sepet_data = []
 
             for s in sepet:
                 for item in s['yuklenen']:
-                    if item.get("ProfilNo") == profil_no:
+                    if item.get("ProfilNo") in alternative_dies:
                         elem = {
                             "id": s['id'],
                             "SepetNo": s["sepet_no"],
