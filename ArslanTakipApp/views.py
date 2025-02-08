@@ -4064,7 +4064,6 @@ def get_profil_nos(pres):
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
     gonderilecek_profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
-
     fark_listesi = list(set(profil_list) - set(gonderilecek_profiller))
     if fark_listesi:
         for profil in fark_listesi:
@@ -4072,11 +4071,10 @@ def get_profil_nos(pres):
             if muadiller:
                 # Her muadil profilin siparişi olup olmadığını kontrol ediyoruz
                 for muadil in muadiller.profiller:
-                    siparisler = siparis_query.filter(ProfilNo__in=muadil)
+                    siparisler = siparis_query.filter(ProfilNo=muadil)
                     if siparisler.exists():
                         gonderilecek_profiller.append(profil)
                         break
-
     return gonderilecek_profiller
 
 class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
