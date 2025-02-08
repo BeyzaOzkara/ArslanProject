@@ -3880,7 +3880,16 @@ class UretimPlanlamaView(generic.TemplateView):
             o['SonTermin'] = s.SonTermin.strftime("%d-%m-%Y")
 
         return plan
-            
+
+def get_alternative_profiles(profil_no):
+    alt_group = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
+    if alt_group:
+        alternative_dies = alt_group.profiller
+    else:
+        alternative_dies = [profil_no]
+    
+    return alternative_dies
+             
 class Press4500View(generic.TemplateView):
     template_name = '4500/pres4500.html'
     
@@ -4053,11 +4062,24 @@ def get_profil_nos(pres):
     start_time = end_time - datetime.timedelta(hours=48)
 
     ext_list = list(PlcData.objects.using('dms').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
-
+ 
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-    profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
-    return profiller
+    gonderilecek_profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
+
+    fark_listesi = list(set(profil_list) - set(gonderilecek_profiller))
+    if fark_listesi:
+        for profil in fark_listesi:
+            muadiller = KalipMuadil.objects.filter(profiller__contains=[profil]).first()
+            if muadiller:
+                # Her muadil profilin siparişi olup olmadığını kontrol ediyoruz
+                for muadil in muadiller.profiller:
+                    siparisler = siparis_query.filter(ProfilNo__in=muadil)
+                    if siparisler.exists():
+                        gonderilecek_profiller.append(profil)
+                        break
+
+    return gonderilecek_profiller
 
 class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
     template_name = '4500/hesaplama.html'
@@ -4083,15 +4105,12 @@ def get_ext_info(request):
         start_time = end_time - datetime.timedelta(hours=48)
 
         try:
-            alt_group = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
-            if alt_group:
-                alternative_dies = alt_group.profiller
-            else:
-                alternative_dies = [profil_no]
+            alternative_dies = get_alternative_profiles(profil_no)
 
-            q = {}
+            q = Q()
             for die in alternative_dies:
-                q["singular_params__DieNumber__startswith"] = die
+                q |= Q(singular_params__DieNumber__startswith=die)
+                # q["singular_params__DieNumber__startswith"] = die
 
             queryset = (
                 PlcData.objects.using('dms').filter(
@@ -4099,7 +4118,7 @@ def get_ext_info(request):
                     stop__lte=end_time,
                     # singular_params__DieNumber__startswith = profil_no
                 )
-                .filter(**q)
+                .filter(q)
                 .annotate(
                     kart_no=Cast(F("singular_params__kartNo"), FloatField()),
                     kalip_no=F("singular_params__DieNumber"),
@@ -4140,24 +4159,22 @@ def get_ext_info(request):
 
 def get_sepet_info(request):
     if request.method == "GET":
-        try:
-            profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
-            end_time = timezone.now()
-            end_48_time = end_time - datetime.timedelta(hours=48)
+        profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+        end_time = timezone.now()
+        end_48_time = end_time - datetime.timedelta(hours=48)
+        
+        alternative_dies = get_alternative_profiles(profil_no)
+        
+        q = Q()
+        w = Q()
+        for die in alternative_dies:
+            q |= Q(singular_params__DieNumber__startswith=die)
+            w |= Q(yuklenen__contains=[{'ProfilNo': die, 'Atandi': False}]) 
             
-            alt_group = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
-            if alt_group:
-                alternative_dies = alt_group.profiller
-            else:
-                alternative_dies = [profil_no]
-
-            q = {}
-            for die in alternative_dies:
-                q["singular_params__DieNumber__startswith"] = die
-
-            start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time, **q).values('start', 'stop').order_by('start')[0]['start']
-            sepet = Sepet.objects.filter(baslangic_saati__gte=start, yuklenen__contains=[{'ProfilNo': profil_no, 'Atandi':False}]).values().order_by('baslangic_saati') # profil no ile filtrele
-
+        start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
+        sepet = Sepet.objects.filter(baslangic_saati__gte=start).filter(w).values().order_by('baslangic_saati') # profil no ile filtrele
+        print(sepet)
+        try:
             sepet_data = []
 
             for s in sepet:
@@ -4179,8 +4196,10 @@ def get_kart_info(request):
     if request.method == "GET":
         try:
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+            alternative_dies = get_alternative_profiles(profil_no)
+
             siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-            siparisler = siparis_query.filter(ProfilNo=profil_no).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin', '-PlanlananMm')
+            siparisler = siparis_query.filter(ProfilNo__in=alternative_dies).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin', '-PlanlananMm')
             # siparisler = SiparisList.objects.using('dies').filter(KartNo__in = ['312578', '312579', '312580', '312581', '312582', '312583', '312584']).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
             for s in siparisler:
                 s["FirmaAdi"] = s['FirmaAdi'].split(' ')[0]
