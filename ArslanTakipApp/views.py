@@ -2703,7 +2703,6 @@ def yudas_list(request):
     for i in params:
         value = params[i]
         # print("Key and Value pair are ({}) = ({})".format(i, value))
-
     size = params.get("size", 7)  # Default size to 7
     page = params.get("page", 1)  # Default page to 1
     offset, limit = calculate_pagination(page, size)
@@ -3202,6 +3201,22 @@ def determine_onay_durumu(durumlar):
         return 'Onaylandı'
     
     return 'Bilinmeyen Durum'
+
+def checkYudaOnayDurum(request):
+    yudas = YudaForm.objects.values().order_by('id')
+    for y in yudas:
+        yuda = YudaForm.objects.get(id=y['id'])
+        yuda_onay_durumu = YudaOnayDurum.objects.filter(yuda_id=y['id']).values('yuda_id', 'kaliphane_onay_durumu', 'satis_onay_durumu', 'mekanik_islem_onay_durumu')[0]
+        
+        kh_durum = yuda_onay_durumu['kaliphane_onay_durumu'] # değer 1 ise null, 2 ise True, 3 ise False
+        satis_durum = yuda_onay_durumu['satis_onay_durumu'] # değer 1 ise null, 2 ise True, 3 ise False
+        mekanik_durum = yuda_onay_durumu['mekanik_islem_onay_durumu'] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
+        durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
+        
+        onay_durumu = determine_onay_durumu(durumlar)
+        print(f"yudaNo: {y['YudaNo']} onay_durumu: {onay_durumu}")
+        yuda.OnayDurumu = onay_durumu
+        # yuda.save()
 
 def yudaDetailAnket(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
@@ -4160,19 +4175,14 @@ def get_sepet_info(request):
         end_48_time = end_time - datetime.timedelta(hours=48)
         
         alternative_dies = get_alternative_profiles(profil_no)
-        print(alternative_dies)
         q = Q()
         w = Q()
         for die in alternative_dies:
             q |= Q(singular_params__DieNumber__startswith=die)
             w |= Q(yuklenen__contains=[{'ProfilNo': die, 'Atandi': False}]) 
         
-        print(q)
         start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
-        print(start)
-        print(w)
         sepet = Sepet.objects.filter(baslangic_saati__gte=start).filter(w).values().order_by('baslangic_saati') # profil no ile filtrele
-        print(w)
         try:
             sepet_data = []
 
@@ -4220,6 +4230,7 @@ def sepete_dagit(request):
             kart_dagilimi = json.loads(request.POST.get('sonuc_kartlar')) # kartları neyle birlikte kaydetmeliyim
             gelen_sepetler = json.loads(request.POST.get('sonuc_sepetler'))
             sepetler_grouped = {}
+            alternative_dies = get_alternative_profiles(profil_no)
 
             kart_nos = [sepet["KartNo"] for sepet in gelen_sepetler]
             siparis_list = {siparis.KartNo: siparis for siparis in SiparisList.objects.using('dies').filter(KartNo__in=kart_nos)}
@@ -4242,7 +4253,7 @@ def sepete_dagit(request):
                     sepet = Sepet.objects.get(id=sepetler['id']) 
                     yuklenen_veri = sepet.yuklenen
                     # ProfilNo ile eşleşen eski verileri sil
-                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] != profil_no]
+                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
                     for item in sepetler['items']:
                         yuklenen_veri.append(item)
                     sepet.yuklenen = yuklenen_veri

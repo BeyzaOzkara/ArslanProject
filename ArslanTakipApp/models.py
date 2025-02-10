@@ -418,7 +418,7 @@ class YudaOnayDurum(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'View1_YudaDurum4'
+        db_table = 'view1_yudadurum4'
 
 class Yuda(models.Model):
     """ IstekYapanBolum = models.CharField(null=True, blank=True)
