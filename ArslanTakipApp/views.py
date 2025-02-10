@@ -4328,3 +4328,6 @@ def update_sepet(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+class Camera4500View(generic.TemplateView):
+    template_name = '4500/camera.html'
+
