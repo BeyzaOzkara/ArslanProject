@@ -230,34 +230,20 @@ function initializeGraphics() {
     var grapDiv = document.getElementById('custom-tabs-two-grafikler');
     grapDiv.innerHTML = '';
     var graphics = `
-        <div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=1" width=100% height="300" frameborder="0"></iframe></div>
-        <div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=2" width=100% height="400" frameborder="0"></iframe></div>`;
+        <div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=1" width=100% height="300" frameborder="0"></iframe></div>`;
     grapDiv.innerHTML += graphics;
     loadedData.data.graphics = graphics;
 }
 
 function initializeProductionReports() {
-    var pressProductionReports = new Tabulator("#custom-tabs-two-uretimraporu", {
-        height: "500px",
-        layout: "fitDataFill",
-        placeholder: "Pres Üretim Raporu",
-        progressiveLoad: "scroll",
-        paginationMode: "remote",
-        filterMode: "remote",
-        paginationSize: 30,
-        ajaxURL: "rapor2",  // The URL to fetch data from
-        ajaxURLGenerator: function(url, config, params) {
-            const kalipNo = loadedData.currentDie;
-            return `${url}?KalipNo=${kalipNo}&params=${encodeURI(JSON.stringify(params))}`;
-        },
-        columns: [
-            { title: "PRES KODU", field: "PresKodu", headerFilter: "input" },
-            { title: "TARİH", field: "Tarih", formatter: "html", headerFilter: "input" },
-            { title: "DURUM", field: "Durum", headerFilter: "input" },
-            { title: "AÇIKLAMA", field: "HataAciklama", headerFilter: "input" }
-        ]
-    });
-    loadedData.data.uretimraporu = pressProductionReports;
+    let kalipNo = loadedData.currentDie;
+    var toTime = Date.now();
+    var fromTime = toTime - (48 * 60 * 60 * 1000);;
+    var reportDiv = document.getElementById('custom-tabs-two-uretimraporu');
+    reportDiv.innerHTML = '';
+    var grafana = `<div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=2" width=100% height="400" frameborder="0"></iframe></div>`;
+    reportDiv.innerHTML += grafana;
+    loadedData.data.uretimraporu = grafana;
 }
 
 function initializeDieMovements(){

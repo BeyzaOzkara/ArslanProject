@@ -412,6 +412,8 @@ class YudaOnay(models.Model):
 
 class YudaOnayDurum(models.Model):
     yuda_id = models.IntegerField(null=True, blank=True)
+    yuda_tarih = models.DateTimeField(null=True, blank=True)
+    firma_adi = models.CharField(null=True, blank=True)
     kaliphane_onay_durumu = models.IntegerField(null=True, blank=True)
     satis_onay_durumu = models.IntegerField(null=True, blank=True)
     mekanik_islem_onay_durumu = models.IntegerField(null=True, blank=True)
