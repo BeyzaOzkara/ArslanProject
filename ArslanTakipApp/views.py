@@ -1,6 +1,7 @@
 from collections import OrderedDict, defaultdict
 import csv
 import logging
+import os
 import re
 import ssl
 import base64, binascii, zlib
@@ -903,16 +904,7 @@ def qrKalite(request):
     return render(request, 'ArslanTakipApp/qrKalite.html', context)
 
 def qrKalite_deneme(request):
-    user = request.user
-    message = "Yuda Kaydet"
-    y = YudaForm.objects.get(id=107)
-
-    allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
-
     try: 
-        # for u in allowed_users:
-        for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
-            print(u)
         response = JsonResponse({'message': "gitti"})
     except Exception as e:
         response = JsonResponse({'error': str(e)})
@@ -4327,7 +4319,3 @@ def update_sepet(request):
             return JsonResponse({'error': 'Sepet not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-class Camera4500View(generic.TemplateView):
-    template_name = '4500/camera.html'
-

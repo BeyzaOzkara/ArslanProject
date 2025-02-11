@@ -223,6 +223,19 @@ var toplamKalip = function(values, data, calcParams) {
     return kSayisi;
 }
 
+function initializeGraphics() {
+    let kalipNo = loadedData.currentDie;
+    var toTime = Date.now();
+    var fromTime = toTime - (48 * 60 * 60 * 1000);;
+    var grapDiv = document.getElementById('custom-tabs-two-grafikler');
+    grapDiv.innerHTML = '';
+    var graphics = `
+        <div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=1" width=100% height="300" frameborder="0"></iframe></div>
+        <div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=2" width=100% height="400" frameborder="0"></iframe></div>`;
+    grapDiv.innerHTML += graphics;
+    loadedData.data.graphics = graphics;
+}
+
 function initializeProductionReports() {
     var pressProductionReports = new Tabulator("#custom-tabs-two-uretimraporu", {
         height: "500px",
@@ -773,7 +786,7 @@ const tabInitializers = {
     'custom-tabs-two-uretimraporu': initializeProductionReports,
     'custom-tabs-two-hareketler': initializeDieMovements,
     'custom-tabs-two-yorumlar': initializeComments,
-    'custom-tabs-two-grafikler': () => console.log("grafikler")
+    'custom-tabs-two-grafikler': initializeGraphics
 };
 
 // Lazy load content for the other tabs
