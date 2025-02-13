@@ -18,7 +18,7 @@ def get_yudas():
     start_of_year = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
     two_days_ago = now - datetime.timedelta(hours=48)
     results = YudaOnayDurum.objects.filter((Q(yuda_tarih__lte=two_days_ago) & Q(yuda_tarih__gte=start_of_year)) & (Q(kaliphane_onay_durumu=1) | Q(satis_onay_durumu=1) | Q(mekanik_islem_onay_durumu=1))) \
-        .values('yuda_id', 'yuda_tarih', 'firma_adi', 'kaliphane_onay_durumu', 'satis_onay_durumu', 'mekanik_islem_onay_durumu').order_by('yuda_tarih')
+        .exclude(Silindi=True).values('yuda_id', 'yuda_tarih', 'firma_adi', 'kaliphane_onay_durumu', 'satis_onay_durumu', 'mekanik_islem_onay_durumu').order_by('yuda_tarih')
 
     yuda_ids = [onay['yuda_id'] for onay in results]
     yuda_forms = YudaForm.objects.filter(id__in=yuda_ids)

@@ -391,19 +391,29 @@ document.addEventListener("DOMContentLoaded", function () {
         var ortBilletBoyu = brutExt / toplamBilletAdet / 1.367;
         console.log("Ortalama Billet Boyu: ", ortBilletBoyu);
 
-        var siparisByBoy = {};
-
+        // var siparisByBoy = {};
+        var siparisByBoy = new Map();
         // Boylara göre grupla
         for (var i = 0; i < siparis.length; i++) {
             var boy = siparis[i].PlanlananMm;
-            if (!siparisByBoy[boy]) {
-                siparisByBoy[boy] = [];
+            console.log("siparisBoy: ", boy);
+            if (!siparisByBoy.has(boy)) {
+                siparisByBoy.set(boy, []);
             }
-            siparisByBoy[boy].push(siparis[i]);
+            
+            // Push the current order (siparis[i]) to the respective group, preserving FIFO order
+            siparisByBoy.get(boy).push(siparis[i]);
+            // if (!siparisByBoy[boy]) {
+            //     siparisByBoy[boy] = [];
+            // }
+            // siparisByBoy[boy].push(siparis[i]);
         }
+        console.log("siparisByBoy (FIFO Order):", Array.from(siparisByBoy.entries()));
 
-        for(var boy in siparisByBoy) {
-            var siparisler = siparisByBoy[boy];
+        // for(var boy in siparisByBoy) {
+        for (let [boy, siparisler] of siparisByBoy) {
+            console.log("siparisByBoy: ", boy);
+            // var siparisler = siparisByBoy[boy];
 
             var toplamSepetAdet = 0;
             var toplamSepetBoy = 0;
