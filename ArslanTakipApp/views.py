@@ -54,11 +54,12 @@ from .dxfsvg import dxf_file_area_calculation
 from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
 from django.db.models.functions import ExtractHour, ExtractMinute
-from .email_utils import check_new_emails, send_email
+from .email_utils import send_email
 from django.core.cache import cache
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
+from .reports import send_report_email
 # Create your views here.
 
 
@@ -140,22 +141,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
-
-    now = datetime.datetime.now()
-    start_of_year = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-    two_days_ago = now - datetime.timedelta(hours=48)
-    results = YudaOnayDurum.objects.filter((Q(yuda_tarih__lte=two_days_ago) & Q(yuda_tarih__gte=start_of_year)) & (Q(kaliphane_onay_durumu=1) | Q(satis_onay_durumu=1) | Q(mekanik_islem_onay_durumu=1))) \
-    .values('yuda_id', 'yuda_tarih', 'firma_adi', 'kaliphane_onay_durumu', 'satis_onay_durumu', 'mekanik_islem_onay_durumu').order_by('yuda_tarih')
-
-    yuda_ids = [onay['yuda_id'] for onay in results]
-    yuda_forms = YudaForm.objects.filter(id__in=yuda_ids)
-
-    for onay in results:
-        yuda_form = yuda_forms.get(id=onay['yuda_id'])
-        onay['yuda_no'] = yuda_form.YudaNo
-        onay['yuda_acan_kisi'] = get_user_full_name(yuda_form.YudaAcanKisi.id)
-        print(f"Yuda ID: {onay['yuda_id']}, Yuda Tarih: {onay['yuda_tarih']}, Firma Adi: {onay['firma_adi']}, Yuda No: {onay['yuda_no']}, Yuda Acan Kisi: {onay['yuda_acan_kisi']}")
-
+    # send_report_email()
 
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
@@ -225,31 +211,24 @@ def send_email_notification(request, dieList, dieTo_press):
             'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
             'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com']
         
+        email_mapping = {
+            '1100-1': 'eski1100pres@arslanaluminyum.com',
+            '1200-1': '1200pres@arslanaluminyum.com',
+            '1600-1': '1600PRES@arslanaluminyum.com',
+            '2750-1': 'PRES2750@arslanaluminyum.com',
+            'Yeni 1100': 'pres1100@arslanaluminyum.com',
+            '1600-2': 'yeni1600pres@arslanaluminyum.com',
+            '4000-1': '4000pres@arslanaluminyum.com',
+            '4500-1': '4.fabrikabakim@arslanaluminyum.com',
+            '1. Fabrika Kalıp Hazırlama': 'kaliphazirlama1ofis@arslanaluminyum.com',
+            '1. Fabrika Kalıp Arşivi': 'kaliphazirlama1ofis@arslanaluminyum.com',
+            '2. Fabrika Kalıp Hazırlama': 'kaliphazirlama@arslanaluminyum.com',
+            '2. Fabrika Kalıp Arşivi': 'kaliparsivi@arslanaluminyum.com'
+        }
+        
         to_addresses = [request.user.email]
-        if dieTo_press == '1100-1':
-            to_addresses.append('eski1100pres@arslanaluminyum.com')
-        elif dieTo_press == '1200-1':
-            to_addresses.append('1200pres@arslanaluminyum.com')
-        elif dieTo_press == '1600-1':
-            to_addresses.append('1600PRES@arslanaluminyum.com')
-        elif dieTo_press == '2750-1':
-            to_addresses.append('PRES2750@arslanaluminyum.com')
-        elif dieTo_press == 'Yeni 1100':
-            to_addresses.append('pres1100@arslanaluminyum.com')
-        elif dieTo_press == '1600-2':
-            to_addresses.append('yeni1600pres@arslanaluminyum.com')
-        elif dieTo_press == '4000-1':
-            to_addresses.append('4000pres@arslanaluminyum.com')
-        elif dieTo_press == '4500-1':
-            to_addresses.append('4.fabrikabakim@arslanaluminyum.com')
-        elif dieTo_press == '1. Fabrika Kalıp Hazırlama':
-            to_addresses.append('kaliphazirlama1ofis@arslanaluminyum.com')
-        elif dieTo_press == '1. Fabrika Kalıp Arşivi':
-            to_addresses.append('kaliphazirlama1ofis@arslanaluminyum.com')
-        elif dieTo_press == '2. Fabrika Kalıp Hazırlama':
-            to_addresses.append('kaliphazirlama@arslanaluminyum.com')
-        elif dieTo_press == '2. Fabrika Kalıp Arşivi':
-            to_addresses.append('kaliparsivi@arslanaluminyum.com')
+        if dieTo_press in email_mapping:
+            to_addresses.append(email_mapping[dieTo_press])
 
         subject = f"Kalıp Transferi"
         html_message = render_to_string('mail/die_move.html', {

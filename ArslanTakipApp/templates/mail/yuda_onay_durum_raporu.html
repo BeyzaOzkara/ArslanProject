@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuda Onay Durum Raporu</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid rgb(161, 161, 161);
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Yuda Onay Durum Raporu</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Yuda No</th>
+                <th>Firma Adı</th>
+                <th>Yuda Tarihi</th>
+                <th>Kaliphane</th>
+                <th>Satış</th>
+                <th>Mekanik İşlem</th>
+                <th>Müşteri Temsilcisi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for yuda in yudaList %}
+                <tr>
+                    <td>{{ yuda.yuda_no }}</td>
+                    <td>{{ yuda.firma_adi }}</td>
+                    <td>{{ yuda.yuda_tarih }}</td>
+                    <td>
+                        {% if yuda.kaliphane_onay_durumu == 1 %}
+                            <span>-</span>
+                        {% elif yuda.kaliphane_onay_durumu == 2 %}
+                            <span>✔</span>
+                        {% elif yuda.kaliphane_onay_durumu == 3 %}
+                            <span>X</span>
+                        {% else %}
+                            Yok
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if yuda.satis_onay_durumu == 1 %}
+                            <span>-</span>
+                        {% elif yuda.satis_onay_durumu == 2 %}
+                            <span>✔</span>
+                        {% elif yuda.satis_onay_durumu == 3 %}
+                            <span>X</span>
+                        {% else %}
+                            Yok
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if yuda.mekanik_islem_onay_durumu == 1 %}
+                            <span>-</span>
+                        {% elif yuda.mekanik_islem_onay_durumu == 2 %}
+                            <span>✔</span>
+                        {% elif yuda.mekanik_islem_onay_durumu == 3 %}
+                            <span>X</span>
+                        {% else %}
+                            Yok
+                        {% endif %}
+                    </td>
+                    <td>{{ yuda.yuda_acan_kisi }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
