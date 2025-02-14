@@ -3985,7 +3985,7 @@ def get_kart_no_list(request):
         print(f"billet_group: {billet_group_dict}")
         # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', 'ProfilNo').distinct()
+        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True).distinct()
         
         # response_data = []
         # for kart_no, profil_no in siparisler:
