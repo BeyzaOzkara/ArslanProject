@@ -59,7 +59,7 @@ from django.core.cache import cache
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
-from .reports import send_report_email
+from .reports import send_report_email_for_all_yudas, send_grouped_yudas_email, get_satis_groups
 # Create your views here.
 
 
@@ -141,8 +141,9 @@ def hareketSave(dieList, lRec, dieTo, request):
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
-    # send_report_email()
-
+    # send_report_email_for_all_yudas()
+    # send_grouped_yudas_email()
+    get_satis_groups()
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
     root_nodes = []
@@ -3956,14 +3957,22 @@ def get_kart_no_list(request):
         start_time = end_time - datetime.timedelta(hours=48)
         # Son 48 saatteki singular_paramsı alıyoruz
         plc_data = PlcData.objects.using('dms').filter(start__gte=start_time).values_list('singular_params', flat=True)
-        profil_listesi = set()
 
+        billet_group_dict = {}
+        profil_listesi = set()
         for singular_params in plc_data:
             if singular_params:
                 die_number = singular_params.get("DieNumber", "")
-                if die_number:
+                # billet_no = singular_params.get("BilletLot", "")
+
+                if die_number: #and billet_no:
                     # "-" karakterinden sonrasını silip boşlukları temizliyoruz
                     cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
+                    # if cleaned_die_number in billet_group_dict:
+                    #     billet_group_dict[die_number].add(billet_no)
+                    # else:
+                    #     billet_group_dict[die_number] = {billet_no}
+            
                     if cleaned_die_number not in profil_listesi:
                         alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
                         if alt_group:
@@ -3973,10 +3982,23 @@ def get_kart_no_list(request):
                                     profil_listesi.add(alternative_die)
                         else:
                             profil_listesi.add(cleaned_die_number)
+        print(f"billet_group: {billet_group_dict}")
         # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True).distinct()
-
+        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', 'ProfilNo').distinct()
+        
+        # response_data = []
+        # for kart_no, profil_no in siparisler:
+        #     for die_number, billet_nos in billet_group_dict.items():
+        #         cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
+        #         if profil_no == cleaned_die_number:
+        #             for billet in billet_nos:
+        #                 response_data.append({
+        #                     "KartNo": kart_no,
+        #                     "DieNumber": die_number,  # Original DieNumber
+        #                     "BilletNo": billet
+        #                 })
+        # print(response_data)
         list_siparisler = list(siparisler)
         return JsonResponse(list_siparisler, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)

@@ -487,6 +487,7 @@ class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     FormModel = models.CharField(null=True, blank=True)
     FormModelId = models.CharField(null=True, blank=True)
+    Kategori = models.CharField(null=True, blank=True)
     Tarih = models.DateTimeField(null=True, blank=True)
     EditTarih = models.DateTimeField(null=True, blank=True)
     Aciklama = models.CharField(null=True, blank=True)
