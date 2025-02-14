@@ -3985,7 +3985,7 @@ def get_kart_no_list(request):
         print(f"billet_group: {billet_group_dict}")
         # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True).distinct()
+        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True ).distinct()
         
         # response_data = []
         # for kart_no, profil_no in siparisler:
@@ -4002,6 +4002,10 @@ def get_kart_no_list(request):
         list_siparisler = list(siparisler)
         return JsonResponse(list_siparisler, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+# def get_kalip_no_list(request):
+#     if request.method == "GET":
+
 
 def get_siparis_info(request):
     if request.method == "GET":
@@ -4146,11 +4150,13 @@ def get_ext_info(request):
                     brüt_imalat=ExpressionWrapper(
                         Sum(Cast(F("singular_params__Billet Length Pusher"), FloatField())) * 0.1367,
                         output_field=FloatField()
-                    )
+                    ),
+                    billet_lot=F("singular_params__BilletLot")
                 )
                 .values(
                     "kart_no",
                     "kalip_no",
+                    "billet_lot"
                 )
                 .annotate(
                     imalat_baslangici=Min("start"),
