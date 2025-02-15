@@ -3971,7 +3971,9 @@ def get_kalip_no_list(request):
                                     profil_listesi.add(alternative_die)
                         else:
                             profil_listesi.add(cleaned_die_number)
-        print(f"profil_listesi: {profil_listesi}")
+        siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True ).distinct()
+        
     return
 
 def get_kart_no_list(request):
@@ -4227,6 +4229,7 @@ def get_sepet_info(request):
             for s in sepet:
                 for item in s['yuklenen']:
                     if item.get("ProfilNo") in alternative_dies:
+                        print(item)
                         elem = {
                             "id": s['id'],
                             "SepetNo": s["sepet_no"],
@@ -4234,6 +4237,17 @@ def get_sepet_info(request):
                             "KartNo": item["KartNo"],
                             "Boy": item["Boy"]
                         }
+                        if item.get("KalipNo"):
+                            print("burda")
+                            elem = {
+                                "id": s['id'],
+                                "SepetNo": s["sepet_no"],
+                                "Adet": item["Adet"],
+                                "KartNo": item["KartNo"],
+                                "KalipNo": item["KalipNo"],
+                                "BilletLot": item["BilletLot"],
+                                "Boy": item["Boy"]
+                            }
                         sepet_data.append(elem)
             return JsonResponse({'success': True, 'sepet_data': sepet_data})
         except Exception as e:
