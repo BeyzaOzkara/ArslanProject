@@ -3951,6 +3951,29 @@ class Stacker4500View(generic.TemplateView):
         else:
             return JsonResponse({'error': 'Sepet No is required'}, status=400)
 
+def get_kalip_no_list(request):
+    if request.method == 'GET':
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=48)
+        plc_data = PlcData.objects.using('dms').filter(start__gte=start_time).values_list('singular_params', flat=True)
+        profil_listesi = set()
+        for singular_params in plc_data:
+            if singular_params:
+                die_number = singular_params.get("DieNumber", "")
+                if die_number:
+                    cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
+                    if cleaned_die_number not in profil_listesi:
+                        alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
+                        if alt_group:
+                            alternative_dies = alt_group.profiller
+                            for alternative_die in alternative_dies:
+                                if alternative_die not in profil_listesi:
+                                    profil_listesi.add(alternative_die)
+                        else:
+                            profil_listesi.add(cleaned_die_number)
+        print(f"profil_listesi: {profil_listesi}")
+    return
+
 def get_kart_no_list(request):
     if request.method == "GET":
         end_time = timezone.now()
@@ -4120,7 +4143,7 @@ class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
         
 # profil no seçti, eğer birden fazla kalıp varsa kalıpta seçmesi lazım 
 # 
-def get_ext_info(request):
+def get_ext_info(request): 
     # her satır için ortalama billet boyu:
     # brüt / (billet sayısı * 1,367)
     if request.method == "GET":
