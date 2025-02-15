@@ -143,7 +143,7 @@ def location(request):
     loc_list = list(loc.values().order_by('id'))
     # send_report_email_for_all_yudas()
     # send_grouped_yudas_email()
-    get_satis_groups()
+    # get_satis_groups()
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
     root_nodes = []

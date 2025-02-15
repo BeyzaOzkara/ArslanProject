@@ -463,6 +463,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                     console.log("Hesaplanan Billet Adeti: ", hesaplananBilletAdeti);
                     var hesaplananBilletBoyu = hesaplananBrut / hesaplananBilletAdeti;
+                    if (hesaplananBilletBoyu > 150) {
+                        hesaplananBilletBoyu = 150;
+                    }
                     console.log("Hesaplanan Billet Boyu: ", hesaplananBilletBoyu);
                     console.log(baslangicSaat);
                     var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
