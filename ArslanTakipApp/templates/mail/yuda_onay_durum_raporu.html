@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yuda Onay Durum Raporu</title>
     <style>
+        body {
+            font-family: 'Calibri';
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-family: 'Calibri';
         }
         table, th, td {
             border: 1px solid rgb(161, 161, 161);
@@ -30,6 +32,15 @@
         .cross {
             color: red;
         }
+        .waiting {
+            color: orange;
+            font-size: large;
+            font-weight: bold;
+        }
+        .empty {
+            font-size: large;
+            font-weight: bold;
+        }
         .even-row {
             background-color: #f2f2f2;
         }
@@ -39,6 +50,10 @@
     </style>
 </head>
 <body>
+    <p>Merhaba,</p>
+    {% if yudaList|length > 0 %}
+    <p>İki iş gününden önce açılmış, onay bekleyen {{yudaList|length}} adet YUDA aşağıda listelenmiştir.</p>
+    <hr>
     <table>
         <thead>
             <tr>
@@ -54,40 +69,42 @@
         <tbody>
             {% for yuda in yudaList %}
                 <tr class="{{ yuda.row_class }}">
-                    <td>{{ yuda.yuda_no }}</td>
+                    <td>
+                        <a href="http://arslan/yudaDetail/{{ yuda.yuda_id }}">{{ yuda.yuda_no }}</a>
+                    </td>
                     <td>{{ yuda.firma_adi }}</td>
                     <td>{{ yuda.yuda_tarih }}</td>
                     <td>
                         {% if yuda.kaliphane_onay_durumu == 1 %}
-                            <span>-</span>
+                            <span class="waiting">&#9719</span>
                         {% elif yuda.kaliphane_onay_durumu == 2 %}
                             <span class="check">✔</span>
                         {% elif yuda.kaliphane_onay_durumu == 3 %}
                             <span class="cross">✘</span>
                         {% else %}
-                            Yok
+                            <span class="empty">-</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if yuda.satis_onay_durumu == 1 %}
-                            <span>-</span>
+                            <span class="waiting">&#9719</span>
                         {% elif yuda.satis_onay_durumu == 2 %}
                             <span class="check">✔</span>
                         {% elif yuda.satis_onay_durumu == 3 %}
                             <span class="cross">✘</span>
                         {% else %}
-                            Yok
+                            <span class="empty">-</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if yuda.mekanik_islem_onay_durumu == 1 %}
-                            <span>-</span>
+                            <span class="waiting">&#9719</span>
                         {% elif yuda.mekanik_islem_onay_durumu == 2 %}
                             <span class="check">✔</span>
                         {% elif yuda.mekanik_islem_onay_durumu == 3 %}
                             <span class="cross">✘</span>
                         {% else %}
-                            Yok
+                            <span class="empty">-</span>
                         {% endif %}
                     </td>
                     <td>{{ yuda.yuda_acan_kisi }}</td>
@@ -96,6 +113,10 @@
         </tbody>
     </table>
     <hr>
-    <p>Son 48 saatte açılan YUDA'lar haricidir.</p>
+    <p><span class="check">✔</span> : Onay verildi | <span class="cross">✘</span> : Reddedildi | <span class="waiting">&#9719</span> : Onay bekleniyor | <span class="empty">-</span> : İşlem yok</p>
+    {% else %}
+    <p>İki iş gününden önce açılmış, onay bekleyen YUDA yoktur. Güncel YUDAları kontrol ediniz.</p>
+    <p>İyi çalışmalar...</p>
+    {% endif %}
 </body>
 </html>

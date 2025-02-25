@@ -234,6 +234,7 @@ class PlcData(models.Model):
     stop = models.DateTimeField(null=True, blank=True)
     event = models.CharField(blank=True, null=True)
     singular_params = models.JSONField(null=True, blank=True)
+    uretim_no = models.BigIntegerField(null=True, blank=True)
 
     class Meta:
         managed = False

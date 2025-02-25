@@ -128,6 +128,8 @@ let loadedData = {
 };
     
 let userID = "{{user.id}}";
+let userIsSuper = "{{ user.is_superuser }}";
+
 var selectedFiles = [];
 
 //define column header menu as column visibility toggle
@@ -230,7 +232,11 @@ function initializeGraphics() {
     var grapDiv = document.getElementById('custom-tabs-two-grafikler');
     grapDiv.innerHTML = '';
     var graphics = `
-        <div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=1" width=100% height="300" frameborder="0"></iframe></div>`;
+        <div class="col-12">
+            <iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&var-KalipNo=${kalipNo}&theme=light&panelId=1" width=100% height="300" frameborder="0"></iframe>
+            <iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&var-KalipNo=${kalipNo}&var-ProfilNo=All&from=${fromTime}&to=${toTime}&theme=light&panelId=4" width="100%" height="300" frameborder="0"></iframe>
+            <iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&var-KalipNo=${kalipNo}&var-ProfilNo=All&from=${fromTime}&to=${toTime}&theme=light&panelId=3" width="100%" height="300" frameborder="0"></iframe>
+            </div>`;
     grapDiv.innerHTML += graphics;
     loadedData.data.graphics = graphics;
 }
@@ -504,7 +510,7 @@ function createButtons(comment) {
     const isViewed = comment.Is_Viewed;
     buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
     buttonHtml.append(createReplyButton(comment.id));
-    if (String(comment.Kullanici_id) === userID) {
+    if (String(comment.Kullanici_id) === userID || userIsSuper) {
         buttonHtml.append(createEditButton(comment.id), createDeleteButton(comment.id));
     }
     return buttonHtml;

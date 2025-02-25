@@ -134,4 +134,8 @@ urlpatterns = [
     path('4500/sepetler/get_sepetler/', views.get_sepetler, name='get_sepetler'),
     path('4500/sepetler/update_sepet/', views.update_sepet, name='update_sepetler'),
     path('4500/sepetler/get_siparis_kart_info/', views.get_siparis_kart_info, name='get_siparis_kart_info'),
+    path('4500/stacker2', views.Stacker4500View2.as_view(), name='stacker2_4500'),
+    path('4500/stacker2/get_kalip_nos/', views.get_kalip_no_list, name='get_kalip_no_list'),
+    path('4500/stacker2/get_billet_lots/', views.get_billet_lot_list, name='get_billet_lot_list'),
+    path('4500/stacker2/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
 ]

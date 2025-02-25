@@ -59,7 +59,7 @@ from django.core.cache import cache
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
-from .reports import send_report_email_for_all_yudas, send_grouped_yudas_email, get_satis_groups
+from .reports import send_report_email_for_all
 # Create your views here.
 
 
@@ -141,8 +141,8 @@ def hareketSave(dieList, lRec, dieTo, request):
 def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
-    # send_report_email_for_all_yudas()
-    # send_grouped_yudas_email()
+    # send_report_email_for_all()
+    # checkYudaOnayDurum(request)
     # get_satis_groups()
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
@@ -2846,11 +2846,11 @@ def format_yuda_details(yList):
         'Tur': 'Tür', 'Marka': 'Marka', 'MarkaRenkKodu': 'Marka Renk Kodu', 'BoyaClass': 'Boya Class', 'Ral': 'RAL', 'BoyaKalinlik': 'Kalınlık', 'BoyaBoy': 'Boy', 'BoyaTemizKesim': 'Temiz Kesim',
         'AhsapKaplama': 'Ahşap Kaplama', 'AhsapBoy': 'Boy', 'AhsapTemizKesim': 'Temiz Kesim',
     }
-
     for i in yList:
         i['Tarih'] = format_date(i['Tarih'])
         for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
             if i[key]:
+                print(i[key])
                 json_data = json.loads(i[key])
                 if key == 'AlasimKondusyon':
                     i[key] = process_alasim(json_data)
@@ -3003,7 +3003,7 @@ def yudaDetail(request, yId):
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
     data = json.dumps(formatted_yuda_details, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-
+    
     onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
     retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
     user_group = request.user.groups.first()
@@ -3194,17 +3194,19 @@ def checkYudaOnayDurum(request):
     yudas = YudaForm.objects.values().order_by('id')
     for y in yudas:
         yuda = YudaForm.objects.get(id=y['id'])
-        yuda_onay_durumu = YudaOnayDurum.objects.filter(yuda_id=y['id']).values('yuda_id', 'kaliphane_onay_durumu', 'satis_onay_durumu', 'mekanik_islem_onay_durumu')[0]
-        
-        kh_durum = yuda_onay_durumu['kaliphane_onay_durumu'] # değer 1 ise null, 2 ise True, 3 ise False
-        satis_durum = yuda_onay_durumu['satis_onay_durumu'] # değer 1 ise null, 2 ise True, 3 ise False
-        mekanik_durum = yuda_onay_durumu['mekanik_islem_onay_durumu'] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
-        durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
-        
-        onay_durumu = determine_onay_durumu(durumlar)
-        print(f"yudaNo: {y['YudaNo']} onay_durumu: {onay_durumu}")
-        yuda.OnayDurumu = onay_durumu
-        # yuda.save()
+        yuda_onay = YudaOnayDurum.objects.filter(yuda_id=y['id']).values('yuda_id', 'kaliphane_onay_durumu', 'satis_onay_durumu', 'mekanik_islem_onay_durumu')
+        if yuda_onay:
+            yuda_onay_durumu = yuda_onay[0]
+            
+            kh_durum = yuda_onay_durumu['kaliphane_onay_durumu'] # değer 1 ise null, 2 ise True, 3 ise False
+            satis_durum = yuda_onay_durumu['satis_onay_durumu'] # değer 1 ise null, 2 ise True, 3 ise False
+            mekanik_durum = yuda_onay_durumu['mekanik_islem_onay_durumu'] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
+            durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
+            
+            onay_durumu = determine_onay_durumu(durumlar)
+            print(f"yudaNo: {y['YudaNo']} onay_durumu: {onay_durumu}")
+            yuda.OnayDurumu = onay_durumu
+            yuda.save()
 
 def yudaDetailAnket(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
@@ -3268,6 +3270,7 @@ def yudaDetailAnket(request):
         durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
         
         onay_durumu = determine_onay_durumu(durumlar)
+        print(f"yuda: {yuda.YudaNo}, durumlar: {durumlar}, onay_durumu: {onay_durumu}")
         yuda.OnayDurumu = onay_durumu
         yuda.save()
 
@@ -3401,6 +3404,7 @@ def yudachange(request, yId):
 
         for key, value in request.POST.items():
             if hasattr(changeYuda, key):
+                print(f"key: {key}, value: {value}")
                 if key == "BirlikteCalisan":
                     value_list = value.split(',')
                     setattr(changeYuda, key, value_list)
@@ -3905,9 +3909,9 @@ def get_ongoing_sepet():
     if ongoing_sepet:
         return ongoing_sepet.latest('id')
     return None
-         
-class Stacker4500View(generic.TemplateView):
-    template_name = '4500/stacker4500.html'
+
+class Stacker4500View2(generic.TemplateView):
+    template_name = '4500/stacker45002.html'
     
     def get_context_data(self, **kwargs):
         sepet = get_ongoing_sepet()
@@ -3954,27 +3958,119 @@ class Stacker4500View(generic.TemplateView):
 def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=144)
         plc_data = PlcData.objects.using('dms').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
+        cleaned_to_original = {} 
         for singular_params in plc_data:
-            if singular_params:
-                die_number = singular_params.get("DieNumber", "")
-                if die_number:
-                    cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-                    if cleaned_die_number not in profil_listesi:
-                        alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
-                        if alt_group:
-                            alternative_dies = alt_group.profiller
-                            for alternative_die in alternative_dies:
-                                if alternative_die not in profil_listesi:
-                                    profil_listesi.add(alternative_die)
-                        else:
-                            profil_listesi.add(cleaned_die_number)
+            if not singular_params:
+                continue
+            die_number = singular_params.get("DieNumber", "")
+            if not die_number:
+                continue
+            cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
+            if cleaned_die_number not in profil_listesi:
+                alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
+                if alt_group:
+                    alternative_dies = set(alt_group.profiller)
+                    alternative_dies.discard(cleaned_die_number)
+                    if alternative_dies:
+                        cleaned_die_number = next(iter(alternative_dies))
+                    # alternative_dies = alt_group.profiller
+                    # for alternative_die in alternative_dies:
+                    #     if alternative_die not in profil_listesi:
+                    #         cleaned_die_number = alternative_die
+                profil_listesi.add(cleaned_die_number)
+                if cleaned_die_number not in cleaned_to_original:
+                    cleaned_to_original[cleaned_die_number] = []
+                cleaned_to_original[cleaned_die_number].append(die_number)
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True ).distinct()
+        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('ProfilNo', flat=True ).distinct()
+        final_list = [
+            original_die for cleaned_die_number, original_dies in cleaned_to_original.items()
+            if cleaned_die_number in siparisler
+            for original_die in original_dies
+        ]
+        print(final_list)
+        return JsonResponse(final_list, safe=False)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def get_billet_lot_list(request):
+    if request.method == 'GET':
+        kalip_no = request.GET.get('kalip_no')
+        print(f"kalip_no: {kalip_no}")
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=144)
+        billet_lot_list = list(PlcData.objects.using('dms').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
+        print(f"billet_lots: {billet_lot_list}")
+        return JsonResponse(billet_lot_list, safe=False)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def get_siparis_no_list(request):
+    if request.method == 'GET':
+        kalip_no = request.GET.get('kalip_no')
+        print(f"siparis kalip: {kalip_no}")
+        profil_no = re.sub(r"-.*$", "", kalip_no).replace(" ", "")
+        print(f"profil: {profil_no}")
+        profil_list = set()
+        alt_profil_list = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
+        if alt_profil_list:
+            alt_profils = alt_profil_list.profiller
+            for alt in alt_profils:
+                profil_list.add(alt)
+        else:
+            profil_list.add(profil_no)
+        print(f"profil_list: {profil_list}")
+        siparis_list = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        kart_list = list(siparis_list.filter(ProfilNo__in=profil_list).values_list('KartNo', flat=True ).distinct())
+        print(kart_list)
+        return JsonResponse(kart_list, safe=False)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
         
-    return
+class Stacker4500View(generic.TemplateView):
+    template_name = '4500/stacker4500.html'
+    
+    def get_context_data(self, **kwargs):
+        sepet = get_ongoing_sepet()
+        
+        context = super().get_context_data(**kwargs)
+
+        if sepet:
+            context['ongoing_sepet_id'] = sepet.id
+            context['ongoing_sepet_no'] = sepet.sepet_no[1:] if sepet.sepet_no.startswith("S") else sepet.sepet_no
+            context['yuklenen_data'] = json.dumps(sepet.yuklenen or [])
+        else:
+            context['yuklenen_data'] = []
+            context['ongoing_sepet_no'] = ''
+            context['ongoing_sepet_id'] = ''
+
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        sepet_id = request.POST.get('sepet_id')
+        sepet_no = request.POST.get('sepet_no')
+        sepet_bitti = request.POST.get('sepet_bitti')
+
+        if sepet_bitti:
+            sepet = Sepet.objects.get(id=sepet_id)
+            sepet.bitis_saati = timezone.now()
+            sepet.save()
+            return JsonResponse({'success': True}, status=200)
+        
+        if sepet_id and sepet_no: # id varsa sepet no değiştiriliyor
+            old_sepet = Sepet.objects.get(id=sepet_id)
+            old_sepet.sepet_no = sepet_no
+            old_sepet.save()
+            return JsonResponse({'sepet_id': sepet_id})
+        elif sepet_no: # yoksa yeni sepet yaratılıyor
+            new_sepet = Sepet.objects.create(
+                sepet_no=sepet_no,
+                baslangic_saati=timezone.now(),
+                pres_kodu = '4500-1'
+            )
+            return JsonResponse({'sepet_id': new_sepet.id})
+        else:
+            return JsonResponse({'error': 'Sepet No is required'}, status=400)
 
 def get_kart_no_list(request):
     if request.method == "GET":
@@ -4007,7 +4103,7 @@ def get_kart_no_list(request):
                                     profil_listesi.add(alternative_die)
                         else:
                             profil_listesi.add(cleaned_die_number)
-        print(f"billet_group: {billet_group_dict}")
+        # print(f"billet_group: {billet_group_dict}")
         # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True ).distinct()
@@ -4027,10 +4123,6 @@ def get_kart_no_list(request):
         list_siparisler = list(siparisler)
         return JsonResponse(list_siparisler, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
-
-# def get_kalip_no_list(request):
-#     if request.method == "GET":
-
 
 def get_siparis_info(request):
     if request.method == "GET":

@@ -75,6 +75,18 @@ def get_results(bolum):
         onay['yuda_tarih'] = format_date(onay['yuda_tarih'])
     return results
 
+def send_mail_for_yuda(to, cc, result):
+    subject = f"Yuda Onay Durum Raporu"
+    try:
+        yudaList = result
+        html_message = render_to_string('mail/yuda_onay_durum_raporu.html', {
+            'yudaList': yudaList,
+        })
+        body = html_message # eğer result yok ise Son 48 saat içinde geçikmiş YUDA yoktur.
+        send_email(to_addresses=to, cc_recipients=cc, subject= subject, body= body)
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
 def get_satis_groups():
     now = datetime.datetime.now() # günlerden pazartesi ise 72 saat 
     start_of_year = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -108,51 +120,30 @@ def get_satis_groups():
 
     grouped_results = dict(grouped_results)
     for id in grouped_results:
-        to_mail = User.objects.get(id=id).email
-        print(to_mail)
+        to_mail = [User.objects.get(id=id).email]
+        yudaList = grouped_results[id]
+        # print(to_mail)
+        send_mail_for_yuda(to_mail, [], yudaList)
 
     return results
-
-def send_mail_for_group(to, cc, result):
-    subject = f"Yuda Onay Durum Raporu"
-    try:
-        yudaList = result
-        html_message = render_to_string('mail/yuda_onay_durum_raporu.html', {
-            'yudaList': yudaList,
-        })
-        body = html_message # eğer result yok ise Son 48 saat içinde geçikmiş YUDA yoktur.
-        send_email(to_addresses=to, cc_recipients=cc, subject= subject, body= body)
-    except Exception as e:
-        print(f"Error sending email: {e}")
 
 def send_grouped_yudas_email():
     sections = {
         'kaliphane': {
-            'to': ['yazilim@arslanaluminyum.com'], # ['songulyurttapan@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'abdullahmeraki@arslanaluminyum.com']
-            'cc': ['ufukizgi@arslanaluminyum.com'], # ['hasanpasa@arslanaluminyum.com', 'faruk@arslanaluminyum.com']
+            'to': ['songulyurttapan@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'abdullahmeraki@arslanaluminyum.com'], # ['yazilim@arslanaluminyum.com']
+            'cc': ['hasanpasa@arslanaluminyum.com', 'faruk@arslanaluminyum.com'], # []
         },
         'mekanik': {
-            'to': ['yazilim@arslanaluminyum.com'], # ['feridecakir@arslanaluminyum.com']
-            'cc': ['ufukizgi@arslanaluminyum.com'], # []
+            'to': ['feridecakir@arslanaluminyum.com'], # ['yazilim@arslanaluminyum.com']
+            'cc': [], # []
         }
     }
 
     for bolum, recipients in sections.items():
         results = get_results(bolum)
-        send_mail_for_group(recipients['to'], recipients['cc'], results)
+        send_mail_for_yuda(recipients['to'], recipients['cc'], results)
 
-def send_report_email_for_all_yudas():
-    to_addresses = ['yazilim@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
-    cc_addresses = []
-    subject = f"Yuda Onay Durum Raporu"
-    try:
-        yudaList = get_yudas()
-        html_message = render_to_string('mail/yuda_onay_durum_raporu.html', {
-            'yudaList': yudaList,
-        })
-        body = html_message
+def send_report_email_for_all():
+    get_satis_groups()
+    send_grouped_yudas_email()
 
-        send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject= subject, body= body)
-    except Exception as e:
-        print(f"Error sending email: {e}")
-    
