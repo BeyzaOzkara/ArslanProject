@@ -847,7 +847,7 @@
             {title:"Boy", field:"YuzeyPresBoy"},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 cell.getRow().delete();
-                $('#yPresTabData').val(yuzeyPresTabulator.getData());
+                $('#yPresTabData').val(JSON.stringify(yuzeyPresTabulator.getData()));
                 checkNull();
             }}
         ]
@@ -870,7 +870,7 @@
             {title:"Kaplama Kalınlığı ID", field:"KaplamaKalinligiID", visible:false},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 cell.getRow().delete();
-                $('#yEloksalTabData').val(eloksalTabulator.getData());
+                $('#yEloksalTabData').val(JSON.stringify(eloksalTabulator.getData()));
                 checkNull();
             }}
         ]
@@ -897,7 +897,7 @@
             {title:"Açıklama", field:"BoyaAciklama"},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 cell.getRow().delete();
-                $('#yBoyaTabData').val(yuzeyBoyaTabulator.getData());
+                $('#yBoyaTabData').val(JSON.stringify(yuzeyBoyaTabulator.getData()));
                 checkNull();
             }}
         ]
@@ -916,7 +916,7 @@
             {title:"Temiz Kesim", field:"AhsapTemizKesim"},
             {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false, cellClick:function (e, cell) {
                 cell.getRow().delete();
-                $('#yAhsapTabData').val(ahsapKaplamaTabulator.getData());
+                $('#yAhsapTabData').val(JSON.stringify(ahsapKaplamaTabulator.getData()));
                 checkNull();
             }}
         ]
