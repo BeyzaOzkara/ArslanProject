@@ -2850,7 +2850,6 @@ def format_yuda_details(yList):
         i['Tarih'] = format_date(i['Tarih'])
         for key in ['AlasimKondusyon', 'YuzeyPres', 'YuzeyEloksal', 'YuzeyBoya', 'YuzeyAhsap']:
             if i[key]:
-                print(i[key])
                 json_data = json.loads(i[key])
                 if key == 'AlasimKondusyon':
                     i[key] = process_alasim(json_data)
@@ -3204,7 +3203,7 @@ def checkYudaOnayDurum(request):
             durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
             
             onay_durumu = determine_onay_durumu(durumlar)
-            print(f"yudaNo: {y['YudaNo']} onay_durumu: {onay_durumu}")
+            # print(f"yudaNo: {y['YudaNo']} onay_durumu: {onay_durumu}")
             yuda.OnayDurumu = onay_durumu
             yuda.save()
 
@@ -3212,12 +3211,10 @@ def yudaDetailAnket(request):
     params = json.loads(unquote(request.GET.get('params', '{}')))
     yudaId = params.get("yId")
     secim = params.get("secim")
-
     if secim == "onay":
         secim = True
     else:
         secim = False
-
     predefined_group_names = [
         'Ust Yonetim Bolumu',
         'Planlama Bolumu',
@@ -3262,15 +3259,15 @@ def yudaDetailAnket(request):
             )
         
         yuda = YudaForm.objects.get(id=yudaId)
-        yuda_onay_durumu = YudaOnayDurum.objects.get(yuda_id=yudaId)
+        yuda_onay_durumu = YudaOnayDurum.objects.filter(yuda_id=yudaId).values("kaliphane_onay_durumu", "mekanik_islem_onay_durumu", "satis_onay_durumu")[0]
         
-        kh_durum = yuda_onay_durumu.kaliphane_onay_durumu # değer 1 ise null, 2 ise True, 3 ise False
-        satis_durum = yuda_onay_durumu.satis_onay_durumu # değer 1 ise null, 2 ise True, 3 ise False
-        mekanik_durum = yuda_onay_durumu.mekanik_islem_onay_durumu # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
+        kh_durum = yuda_onay_durumu["kaliphane_onay_durumu"] # değer 1 ise null, 2 ise True, 3 ise False
+        satis_durum = yuda_onay_durumu["satis_onay_durumu"] # değer 1 ise null, 2 ise True, 3 ise False
+        mekanik_durum = yuda_onay_durumu["mekanik_islem_onay_durumu"] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
         durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
         
         onay_durumu = determine_onay_durumu(durumlar)
-        print(f"yuda: {yuda.YudaNo}, durumlar: {durumlar}, onay_durumu: {onay_durumu}")
+        # print(f"yuda: {yuda.YudaNo}, durumlar: {durumlar}, onay_durumu: {onay_durumu}")
         yuda.OnayDurumu = onay_durumu
         yuda.save()
 

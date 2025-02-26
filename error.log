@@ -55172,3 +55172,99 @@ Traceback (most recent call last):
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 2 (char 1)
 [35;1mHTTP GET /yudaDetail/87 500 [0.07, 127.0.0.1:57909][0m
+Internal Server Error: /yudaDetail/87
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 3004, in yudaDetail
+    formatted_yuda_details = format_yuda_details(yList)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 2854, in format_yuda_details
+    json_data = json.loads(i[key])
+                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 2 (char 1)
+[35;1mHTTP GET /yudaDetail/87 500 [0.10, 127.0.0.1:64610][0m
+Internal Server Error: /yudaDetail/87
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\exception.py", line 42, in inner
+    response = await get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 534, in thread_handler
+    raise exc_info[1]
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\django\core\handlers\base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 479, in __call__
+    ret: _R = await loop.run_in_executor(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\asgiref\sync.py", line 538, in thread_handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 3004, in yudaDetail
+    formatted_yuda_details = format_yuda_details(yList)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 2854, in format_yuda_details
+    json_data = json.loads(i[key])
+                ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 2 (char 1)
+[35;1mHTTP GET /yudaDetail/87 500 [0.06, 127.0.0.1:64611][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.07, 127.0.0.1:64780][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22onay%22%7D 500 [0.04, 127.0.0.1:64805][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.06, 127.0.0.1:64819][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22onay%22%7D 500 [0.05, 127.0.0.1:64833][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22onay%22%7D 500 [0.04, 127.0.0.1:64833][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.04, 127.0.0.1:64884][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.04, 127.0.0.1:64884][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.14, 127.0.0.1:65072][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.05, 127.0.0.1:65172][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.05, 127.0.0.1:65185][0m
+Internal Server Error: /yudaDetailAnket
+[35;1mHTTP GET /yudaDetailAnket?params=%7B%22yId%22%3A87%2C%22secim%22%3A%22ret%22%7D 500 [0.04, 127.0.0.1:65189][0m
