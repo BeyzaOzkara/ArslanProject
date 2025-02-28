@@ -163,6 +163,25 @@
                                   </div>
                                 </div>
                             </div>
+                            {% if not is_in_group %}
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                  <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                      <span class="info-box-text text-center text-bold mb-2">YETKİ</span>
+                                      <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
+                                        <label class="btn btn-outline-danger">
+                                        <input type="radio" class="kaydet" name="Yetki" id="yurtIci" value="Yurt Ici Satis Bolumu" autocomplete="off" required> YURT İÇİ SATIŞ
+                                        </label>
+                                        <label class="btn btn-outline-danger">
+                                        <input type="radio" class="kaydet" name="Yetki" id="yurtDisi" value="Yurt Disi Satis Bolumu" autocomplete="off" required> YURT DIŞI SATIŞ
+                                        </label>
+                                    </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -1295,7 +1314,12 @@
                     formData.append([formElements[i].name], formElements[i].value);
                 }
             };
-                
+
+            console.log("Form Data Entries:");
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
             $.ajax({
                 url: '/yudakaydet',
                 type: 'POST',

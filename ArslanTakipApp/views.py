@@ -2504,6 +2504,17 @@ def billet_firina_at(request):
 class YudaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Check if the user is a member of either group
+        is_in_group = (
+            self.request.user.groups.filter(name="Yurt Disi Satis Bolumu").exists() or
+            self.request.user.groups.filter(name="Yurt Ici Satis Bolumu").exists()
+        )
+        # Add the is_in_group variable to the context
+        context['is_in_group'] = is_in_group
+        return context
+
 #for getting the select options 
 def yuda(request, objId):
     try: 
@@ -2539,13 +2550,17 @@ def yuda_kaydet(request):
             y.Tarih = datetime.datetime.now()
             y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
 
-            for key, value in request.POST.items(): 
+            yetki_group = ""
+            for key, value in request.POST.items():
                 if hasattr(y, key):
                     if key == "BirlikteCalisan":
                         value_list = value.split(',')
                         setattr(y, key, value_list)
                     else:
                         setattr(y, key, value)
+                if key == "Yetki":
+                    yetki_group = value
+                    
             y.save()
 
             group_names = [
@@ -2576,6 +2591,8 @@ def yuda_kaydet(request):
             for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
                 if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
                     if group in request.user.groups.all():
+                        assign_perm("gorme_yuda", group, y)
+                    if yetki_group == group.name:
                         assign_perm("gorme_yuda", group, y)
                 else:
                     assign_perm("gorme_yuda", group, y)
