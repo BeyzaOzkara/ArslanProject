@@ -138,4 +138,5 @@ urlpatterns = [
     path('4500/stacker2/get_kalip_nos/', views.get_kalip_no_list, name='get_kalip_no_list'),
     path('4500/stacker2/get_billet_lots/', views.get_billet_lot_list, name='get_billet_lot_list'),
     path('4500/stacker2/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
+    path('4500/finishsaw', views.saw4500View.as_view(), name='finishsaw_4500'),
 ]

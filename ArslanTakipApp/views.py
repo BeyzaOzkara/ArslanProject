@@ -210,7 +210,7 @@ def send_email_notification(request, dieList, dieTo_press):
             'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com',
             'nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
             'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
-            'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com']
+            'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com'] 
         
         email_mapping = {
             '1100-1': 'eski1100pres@arslanaluminyum.com',
@@ -2597,7 +2597,6 @@ def yuda_kaydet(request):
                 else:
                     assign_perm("gorme_yuda", group, y)
 
-
             # Check field values and assign permissions based on conditions
             for field in y._meta.fields:
                 fname = field.name
@@ -3273,7 +3272,7 @@ def yudaDetailAnket(request):
                 Group=user_group,
                 Yuda_id=yudaId,
                 OnayDurumu=secim
-            )
+            ) # 
         
         yuda = YudaForm.objects.get(id=yudaId)
         yuda_onay_durumu = YudaOnayDurum.objects.filter(yuda_id=yudaId).values("kaliphane_onay_durumu", "mekanik_islem_onay_durumu", "satis_onay_durumu")[0]
@@ -3283,7 +3282,7 @@ def yudaDetailAnket(request):
         mekanik_durum = yuda_onay_durumu["mekanik_islem_onay_durumu"] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
         durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
         
-        onay_durumu = determine_onay_durumu(durumlar)
+        onay_durumu = determine_onay_durumu(durumlar) # 
         # print(f"yuda: {yuda.YudaNo}, durumlar: {durumlar}, onay_durumu: {onay_durumu}")
         yuda.OnayDurumu = onay_durumu
         yuda.save()
@@ -4266,7 +4265,7 @@ def get_ext_info(request):
             for die in alternative_dies:
                 q |= Q(singular_params__DieNumber__startswith=die)
                 # q["singular_params__DieNumber__startswith"] = die
-
+            print(q)
             queryset = (
                 PlcData.objects.using('dms').filter(
                     start__gte=start_time, 
@@ -4309,7 +4308,6 @@ def get_ext_info(request):
                 e['ortalama_billet_boyu'] = round(average_billet_length, 2)
 
             ext_data = list(queryset)
-
             return JsonResponse({'success': True, 'ext_data': ext_data})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -4335,7 +4333,6 @@ def get_sepet_info(request):
             for s in sepet:
                 for item in s['yuklenen']:
                     if item.get("ProfilNo") in alternative_dies:
-                        print(item)
                         elem = {
                             "id": s['id'],
                             "SepetNo": s["sepet_no"],
@@ -4344,7 +4341,6 @@ def get_sepet_info(request):
                             "Boy": item["Boy"]
                         }
                         if item.get("KalipNo"):
-                            print("burda")
                             elem = {
                                 "id": s['id'],
                                 "SepetNo": s["sepet_no"],
@@ -4485,3 +4481,6 @@ def update_sepet(request):
             return JsonResponse({'error': 'Sepet not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+class saw4500View(generic.TemplateView):
+    template_name = '4500/saw.html'
