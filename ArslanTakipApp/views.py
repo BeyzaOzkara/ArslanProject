@@ -4274,7 +4274,7 @@ def get_ext_info(request):
                 )
                 .filter(q)
                 .annotate(
-                    kart_no=Cast(F("singular_params__kartNo"), FloatField()),
+                    kart_no=Cast(F("singular_params__kartNo"), CharField()),
                     kalip_no=F("singular_params__DieNumber"),
                     billet_count=Count(F("singular_params__DieNumber")),
                     brüt_imalat=ExpressionWrapper(
@@ -4296,7 +4296,7 @@ def get_ext_info(request):
                 )
                 .order_by("imalat_baslangici")
             )
-            
+            print(queryset)
             for e in queryset:
                 e['imalat_baslangici_2'] = format_date_time_without_year(e['imalat_baslangici'])
                 e['imalat_sonu_2'] = format_date_time_without_year(e['imalat_sonu'])
