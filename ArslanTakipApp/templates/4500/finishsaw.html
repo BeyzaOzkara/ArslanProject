@@ -54,7 +54,7 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div id="saw-table-card" class="card" style="height: 300px;">
+    <div id="saw-table-card" class="card" style="height: 250px;">
         <div id="saw-table-content" class="divTable"></div>
     </div>
     <div class="row align-items-center">
@@ -86,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var aktarilacakAdetInput = document.getElementById('aktarilacakAdet');
     var secilenKartBoy = 0;
     var kesimBittiButton = document.getElementById('kesimBitti');
-    alert(window.innerHeight);
 
     var tableOrder = new Tabulator("#order-table", {
         height:"195px",
@@ -255,7 +254,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     kesimBittiButton.addEventListener('click', function() {
-
+        $.ajax({
+            url: "/4500/finishsaw/kesim_bitti",
+            type: "GET",
+            dataType: "json",
+            success: function() {
+                window.location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error changing data: ", error);
+            }
+        });
     })
 });
 
