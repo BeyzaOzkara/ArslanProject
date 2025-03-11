@@ -228,6 +228,23 @@ class SiparisList(models.Model):
         managed = False
         db_table = 'View051_ProsesDepoListesi'
 
+class TestereDepo(models.Model):
+    KartNo = models.IntegerField(null=True, blank=True)
+    ProfilNo = models.CharField(null=True, blank=True)
+    BulunduguYer = models.CharField(null=True, blank=True)
+    Aktif = models.IntegerField(null=True, blank=True)
+    Mm = models.FloatField(null=True, blank=True)
+    Adet = models.FloatField(null=True, blank=True)
+    Kg = models.FloatField(null=True, blank=True)
+    BilletTuru = models.CharField(null=True, blank=True)
+    YuzeyOzelligi = models.CharField(null=True, blank=True)
+    PresKodu = models.CharField(null=True, blank=True)
+    SonTermin = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View051_TestereDepoListesi'
+
 class PlcData(models.Model):
     plc = models.CharField(blank=True, null=True)
     start = models.DateTimeField(null=True, blank=True)

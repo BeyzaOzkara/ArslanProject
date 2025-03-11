@@ -30,7 +30,7 @@ from django.views.generic import ListView
 from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PlcData, \
-    PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
+    PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
     QRCode, KartDagilim, KalipMuadil
 from django.template import loader
 from django.template.loader import render_to_string
@@ -40,7 +40,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
 from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
-from django.db.models import Q, Sum, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
+from django.db.models import CharField, Q, Sum, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
 from django.db.models.functions import Cast, Replace
 from django.db import transaction 
 from channels.layers import get_channel_layer
@@ -4484,3 +4484,82 @@ def update_sepet(request):
 
 class saw4500View(generic.TemplateView):
     template_name = '4500/saw.html'
+
+def get_position_data(position):
+    query = PlcData.objects.using('dms').filter(position=position, count__gt = 0).order_by('-id') # node redde order by count desc şeklinde
+    print(query.values('id', 'count'))
+    
+    return query
+
+class FinishSaw4500View(generic.TemplateView):
+    template_name = '4500/finishsaw.html'
+
+def get_saw_table(request):
+    exts = PlcData.objects.using('dms').filter(position="saw table", count__gt=0).order_by('-id')
+    
+    colors = ["#698BAA", "#7DB1CB", "#8DD3DE", "#B1E4F1", "#62A4A0"]
+    color_index = 0
+    last_sarj_no = ""
+    
+    data = []
+    for ext in exts:
+        if ext.singular_params.get('BilletLot') != last_sarj_no:
+            color_index = (color_index + 1) % len(colors)
+            last_sarj_no = ext.singular_params.get('BilletLot')
+
+        data.append({
+            "id": ext.id,
+            "count": ext.count,
+            "len": float(ext.singular_params.get('ProfileLength', 0)),
+            "sarj_no": ext.singular_params.get('BilletLot', ""),
+            "kalip_no": ext.singular_params.get('DieNumber', ""),
+            "figur": int(ext.singular_params.get('figur', 0)),
+            "color": colors[color_index]
+        })
+
+    return JsonResponse({"data": data})
+
+def get_position_data(position):
+    return PlcData.objects.using('dms').filter(position=position, count__gt=0).order_by('-id')
+
+def get_saw_data(request):
+    saw_table = list(get_position_data('saw table').values('id', 'count', 'singular_params'))
+    saw_line = list(get_position_data('saw line').values('id', 'count', 'singular_params'))
+ 
+    return JsonResponse({'saw_table': saw_table, 'saw_line': saw_line})
+
+def kesime_al(request):
+    if request.method == 'GET':
+        try:
+            adet = int(request.GET.get('adet'))
+            
+            record_ids = list(PlcData.objects.using('dms').filter(position='saw table').order_by('id').values_list('id', flat=True)[:adet])            
+            count = PlcData.objects.using('dms').filter(id__in=record_ids).update(position='saw line')
+
+            return JsonResponse({'success': True}, safe=False)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+def testere_tezgahi(request):
+    if request.method == 'GET':
+        try:
+            max_count = PlcData.objects.using('dms').filter(position='saw line').latest('id').count  #aggregate(Max('count'))['count__max']
+            data = get_position_data('saw line').filter(count=max_count).values()
+            return JsonResponse(list(data), safe=False)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+def testere_siparis_list(request):
+    if request.method == 'GET':
+        # position saw line olanların profil nolarını al
+        try:
+            profil_list = list(PlcData.objects.using('dms').filter(position = 'saw line').values_list('singular_params__profiles', flat=True).distinct())
+            # print(profil_list)
+            testere = TestereDepo.objects.using('dies').filter(ProfilNo__in = profil_list, PresKodu='4500-1', BulunduguYer='TESTERE', Adet__gte=1) \
+            .annotate(Bloke=Case(When(Aktif=0, then=Value('AÇIK')), default=Value('BLOKELİ'), output_field=CharField())) \
+            .values('ProfilNo', 'KartNo', 'Mm', 'Adet', 'Kg', 'BilletTuru', 'YuzeyOzelligi', 'PresKodu', 'SonTermin', 'Bloke').order_by('SonTermin', '-Mm')
+            # print(f"testere: {testere}")
+            return JsonResponse(list(testere), safe=False)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})        
+

@@ -138,5 +138,11 @@ urlpatterns = [
     path('4500/stacker2/get_kalip_nos/', views.get_kalip_no_list, name='get_kalip_no_list'),
     path('4500/stacker2/get_billet_lots/', views.get_billet_lot_list, name='get_billet_lot_list'),
     path('4500/stacker2/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
-    path('4500/finishsaw', views.saw4500View.as_view(), name='finishsaw_4500'),
+    path('4500/saw', views.saw4500View.as_view(), name='saw_4500'), # node red 7
+    path('4500/finishsaw', views.FinishSaw4500View.as_view(), name='finishsaw_4500'),
+    path('4500/finishsaw/get_saw_table', views.get_saw_table, name='get_saw_table'),
+    path('4500/finishsaw/get_saw_data', views.get_saw_data, name='get_saw_data'),
+    path('4500/finishsaw/kesime_al', views.kesime_al, name='kesime_al'),
+    path('4500/finishsaw/testere_tezgahi', views.testere_tezgahi, name='testere_tezgahi'),
+    path('4500/finishsaw/testere_siparis_list', views.testere_siparis_list, name='testere_siparis_list'),
 ]

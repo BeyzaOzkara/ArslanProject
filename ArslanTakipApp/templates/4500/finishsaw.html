@@ -1,0 +1,261 @@
+
+{% load static %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_midnight.min.css' %}">
+
+<style>
+    body {
+        background-color: #333;
+    }
+    .card {
+        width: 100%;
+        margin: 10px 0;
+        overflow-y: scroll;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        background-color: #333;
+        background-image: linear-gradient(90deg, rgba(0, 255, 0, .2) .1em, transparent .1em);
+        background-size: 7.8125%;
+        background-position: center right;
+        border: 1px solid rgba(0, 255, 0, .2);
+        border-spacing: 3px;
+        
+    }
+    .card::-webkit-scrollbar {
+        display: none;
+    }
+
+    .divTable {
+        display: table;
+        width: 100%;
+        color: white;
+    }
+
+    .divRow {
+        display: table-row;
+        width: 100%;
+        padding: 0px;
+    }
+
+    .divCell {
+        float: right;
+        border: 1px solid #123479;
+        border-radius: 3px;
+        text-align: center;
+        display: table-column;
+        padding: 5px;
+        background-color: #ccc;
+        margin: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div id="saw-table-card" class="card" style="height: 300px;">
+        <div id="saw-table-content" class="divTable"></div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-10">
+            <input type="text" class="form-control" name="aktarilacakAdet" placeholder="Aktarılacak Adet" id="aktarilacakAdet">
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary" style="width: 100%;" id="kesimeAl">Kesime Al</button>
+        </div>
+    </div>
+    <div id="saw-line-card" class="card" style="max-height: 200px;">
+        <div id="saw-line-content" class="divTable" style="min-height: 50px;"></div>
+    </div>
+    <hr>
+    <div id="orders-card" class="card" style="height: 300px;">
+        <div id="saw-line-stand" class="divTable" style="min-height: 55px;"></div>
+        <div id="order-table"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var kesimeAlButton = document.getElementById('kesimeAl');
+    var aktarilacakAdetInput = document.getElementById('aktarilacakAdet');
+    var secilenKartBoy = 0;
+
+    var tableOrder = new Tabulator("#order-table", {
+        height:"245px",
+        layout:"fitColumns",
+        placeholder:"Sipariş Listesi",
+        ajaxURL:"/4500/finishsaw/testere_siparis_list",
+        filterMode:"remote",
+        selectable:1,
+        ajaxURLGenerator:function(url, config, params){
+            return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+        },
+        columns:[
+            {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                cell.getRow().toggleSelect();
+            }},
+            {title:"BLOKE", field:"Bloke"},
+            {title:"KART NO", field:"KartNo"},
+            {title:"PROFİL NO", field:"ProfilNo"},
+            {title:"BOY", field:"Mm"},
+            {title:"BİLLET", field:"BilletTuru"},
+            {title:"YÜZEY", field:"YuzeyOzelligi"},
+            {title:"ADET", field:"Adet"},
+            {title:"KG", field:"Kg"},
+            
+        ]
+    });
+
+    tableOrder.on('rowSelected', (rows) =>{
+        secilenKartBoy = rows.getData().Mm;
+        loadSawLineStand();
+    });
+
+    tableOrder.on("rowDeselected", function(rows){
+        secilenKartBoy = 0;
+        loadSawLineStand();
+    })
+
+    function loadSawData() {
+        $.ajax({
+            url: "/4500/finishsaw/get_saw_data",
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+                renderSawTable(data.saw_table, "#saw-table-content");
+                renderSawTable(data.saw_line, "#saw-line-content");
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data: ", error);
+            }
+        });
+        loadSawLineStand();
+    }
+
+    function loadSawLineStand() {
+        $.ajax({
+            url: "/4500/finishsaw/testere_tezgahi",
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                renderSawLineStand(data);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data: ", error);
+            }
+        });
+    }
+
+    function renderSawLineStand(data) {
+        let html = "";
+        let row = "";
+        if (data.length > 0 && secilenKartBoy > 0) {
+            var cuttingLength =  parseFloat(secilenKartBoy) / 1000; //(10000)/1000
+            var fullLength = data.reduce((sum, item) => sum + parseFloat(item.singular_params.ProfileLength || 0), 0);
+            fullLength = Math.ceil(fullLength);
+            
+            for (let i = 0; i < data.length; i++) {
+                let profileLength = parseFloat(data[i].singular_params.ProfileLength || 0);
+                let profileQuantity = Math.floor(profileLength / cuttingLength);
+                let scrapLength = Math.floor((profileLength - (profileQuantity * cuttingLength)) * 10 / 2) / 10;
+                console.log("scrapLength: ", scrapLength);
+                let widthScrap = parseFloat(scrapLength) * 100 / fullLength;
+                let widthProfile = parseFloat(cuttingLength) * 100 / fullLength;
+                if (widthScrap < 4) {
+                    widthScrap = 4;
+                    widthProfile = 92 / profileQuantity
+                };
+
+                row += `<div class="divCell" style="width:${widthScrap}%; height:50px; text-align: center; margin:0; background-color:grey;">${scrapLength} m</div>\n`;
+
+                for (var c = 0; c < profileQuantity; c++) {
+                    row += `<div class="divCell" style="width:${widthProfile}%; height:50px; text-align: center; margin:0; background-color:orange;">${cuttingLength} m</div>\n`;
+                }
+
+                row += `<div class="divCell" style="width:${widthScrap}%; height:50px; text-align: center; margin:0; background-color:grey;">${scrapLength} m</div>\n`;
+
+                if (i === data.length - 1 || parseInt(data[i]['count']) !== parseInt(data[i + 1]['count'])) {
+                    html += `<div class="divRow">${row}</div>\n`;
+                    row = "";
+                }
+            }
+        } else {
+            let message = 'Testere Tezgahı Boş'
+            if (data.length>0 && secilenKartBoy <= 0) {
+                message = 'Kart Seçimi Yapılmadı';
+            }
+            html = '<center><h3> '+ message + ' </h3></center>';
+        }
+        
+        $("#saw-line-stand").html(html);
+    }
+
+    function renderSawTable(data, container) {
+        let html = "";
+        let row = "";
+        let lastSarjNo = "";
+        let colorIndex = 0;
+        let colors = ["#698BAA", "#7DB1CB", "#8DD3DE", "#B1E4F1", "#62A4A0"];
+
+        if (data.length < 1) {
+            html = '<center><h3> Boş </h3></center>';
+        } else {
+            for (let i = 0; i < data.length; i++) {
+                let len = parseFloat(data[i].singular_params.ProfileLength || 0);
+                let sarjNo = data[i].singular_params.BilletLot || "";
+                let kalipNo = data[i].singular_params.DieNumber || "";
+                let figur = parseInt(data[i].singular_params.figur || 0);
+                let width = parseInt((len * 100) / 64);
+
+                if (sarjNo !== lastSarjNo) {
+                    colorIndex = (colorIndex + 1) % colors.length;
+                    lastSarjNo = sarjNo;
+                }
+
+                row += `<div class="divCell" style="width:${width}%; background-color:${colors[colorIndex]};">${kalipNo} | ${sarjNo} | ${len.toFixed(2)} m | ${figur} figür</div>\n`;
+
+                if (i === data.length - 1 || data[i].count !== data[i + 1].count) {
+                    html += `<div class="divRow">${row}</div>\n`;
+                    row = "";
+                }
+            }
+        }
+        $(container).html(html);
+    }
+
+    loadSawData();
+    setInterval(loadSawData, 5000); // Refresh every 5 seconds
+    
+    kesimeAlButton.addEventListener('click', function() {
+        var aktarilacakAdet = aktarilacakAdetInput.value;
+        $.ajax({
+            url: "/4500/finishsaw/kesime_al",
+            type: "GET",
+            data: {
+                adet: aktarilacakAdet
+            },
+            dataType: "json",
+            success: function() {
+                loadSawData();
+                aktarilacakAdetInput.value = '';
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data: ", error);
+            }
+        });
+    });
+});
+
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+{% endblock %}
