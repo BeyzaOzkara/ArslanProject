@@ -69,9 +69,12 @@
         <div id="saw-line-content" class="divTable" style="min-height: 50px;"></div>
     </div>
     <hr>
-    <div id="orders-card" class="card" style="height: 300px;">
+    <div id="orders-card" class="card" style="height: 250px;">
         <div id="saw-line-stand" class="divTable" style="min-height: 55px;"></div>
         <div id="order-table"></div>
+    </div>
+    <div class="card">
+        <button class="btn btn-primary">KESİM BİTTİ</button>
     </div>
 </div>
 {% endblock %}
@@ -84,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var secilenKartBoy = 0;
 
     var tableOrder = new Tabulator("#order-table", {
-        height:"245px",
+        height:"195px",
         layout:"fitColumns",
         placeholder:"Sipariş Listesi",
         ajaxURL:"/4500/finishsaw/testere_siparis_list",
