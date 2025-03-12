@@ -145,4 +145,5 @@ urlpatterns = [
     path('4500/finishsaw/kesime_al', views.kesime_al, name='kesime_al'),
     path('4500/finishsaw/testere_tezgahi', views.testere_tezgahi, name='testere_tezgahi'),
     path('4500/finishsaw/testere_siparis_list', views.testere_siparis_list, name='testere_siparis_list'),
+    path('4500/finishsaw/kesim_bitti', views.testere_kesim_bitti, name='kesim_bitti'),
 ]
