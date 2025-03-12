@@ -4563,7 +4563,6 @@ def testere_siparis_list(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})        
 
-
 def testere_kesim_bitti(request):
     if request.method == 'GET':
         try:
@@ -4571,3 +4570,4 @@ def testere_kesim_bitti(request):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
