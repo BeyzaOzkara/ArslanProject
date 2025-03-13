@@ -4532,10 +4532,12 @@ def kesime_al(request):
     if request.method == 'GET':
         try:
             adet = int(request.GET.get('adet'))
-            
-            record_ids = list(PlcData.objects.using('dms').filter(position='saw table').order_by('id').values_list('id', flat=True)[:adet])            
-            count = PlcData.objects.using('dms').filter(id__in=record_ids).update(position='saw line')
-
+            # record_ids = list(PlcData.objects.using('dms').filter(position='saw table').order_by('id').values_list('id', flat=True)[:adet])            
+            # count = PlcData.objects.using('dms').filter(id__in=record_ids).update(position='saw line')
+            unique_counts = list(PlcData.objects.using('dms').filter(position='saw table').order_by('count').values_list('count', flat=True).distinct()[:adet])
+            print(unique_counts)
+            update_position = PlcData.objects.using('dms').filter(count__in = unique_counts).update(position='saw line')
+            # print(update_position)
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -4570,4 +4572,5 @@ def testere_kesim_bitti(request):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
 
