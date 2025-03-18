@@ -7,7 +7,7 @@ class KalipMsRouter:
         model_name = model._meta.model_name
         if model_name == 'KalipMs':
             return self.dies_db
-        elif model._met.app_label == 'DMS':
+        elif model._meta.app_label == 'DMS':
             return 'dms'
         else:
             return None
@@ -17,7 +17,7 @@ class KalipMsRouter:
         model_name = model._meta.model_name
         if model_name == 'KalipMs':
             return 'dies'
-        elif model._met.app_label == 'DMS':
+        elif model._meta.app_label == 'DMS':
             return 'dms'
         else:
             return None
