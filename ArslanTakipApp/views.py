@@ -3923,7 +3923,7 @@ def get_ongoing_sepet():
         return ongoing_sepet.latest('id')
     return None
 
-class Stacker4500View2(generic.TemplateView):
+class Stacker4500View(generic.TemplateView):
     template_name = '4500/stacker45002.html'
     
     def get_context_data(self, **kwargs):
@@ -4004,27 +4004,22 @@ def get_kalip_no_list(request):
             if cleaned_die_number in siparisler
             for original_die in original_dies
         ]
-        print(final_list)
         return JsonResponse(final_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
-        print(f"kalip_no: {kalip_no}")
         end_time = timezone.now()
         start_time = end_time - datetime.timedelta(hours=144)
         billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
-        print(f"billet_lots: {billet_lot_list}")
         return JsonResponse(billet_lot_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 def get_siparis_no_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
-        print(f"siparis kalip: {kalip_no}")
         profil_no = re.sub(r"-.*$", "", kalip_no).replace(" ", "")
-        print(f"profil: {profil_no}")
         profil_list = set()
         alt_profil_list = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
         if alt_profil_list:
@@ -4033,14 +4028,68 @@ def get_siparis_no_list(request):
                 profil_list.add(alt)
         else:
             profil_list.add(profil_no)
-        print(f"profil_list: {profil_list}")
         siparis_list = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         kart_list = list(siparis_list.filter(ProfilNo__in=profil_list).values_list('KartNo', flat=True ).distinct())
-        print(kart_list)
         return JsonResponse(kart_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def update_sepet_yuk(request):
+    if request.method == "POST":
+        sepet_id = request.POST.get('sepet_id')
+        kart_no = request.POST.get('kart_no')
+        kalip_no = request.POST.get('kalip_no')
+        billet_lot = request.POST.get('billet_lot')
+        adet = int(request.POST.get('adet'))
+        try:
+            sepet = Sepet.objects.get(id=sepet_id)
+            
+            # Yuklenende böyle bir kartno var mı bak varsa adetleri topla
+            yuklenen = sepet.yuklenen or []
+            found = False
+            for item in yuklenen:
+                if item['KartNo'] == kart_no and item['KalipNo'] == kalip_no and item['BilletLot'] == billet_lot:
+                    # Kart No varsa adetleri topla
+                    item['Adet'] = int(item['Adet']) + adet
+                    found = True
+                    break
+            siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
+            # Kart no yoksa yeni entry
+            if not found:
+                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo, 'KalipNo':kalip_no, 'BilletLot':billet_lot, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False})
+
+            # Update the yuklenen field
+            sepet.yuklenen = yuklenen
+            sepet.save()
+
+            # Return the updated yuklenen data as a response
+            return JsonResponse({'success': True, 'yuklenen': yuklenen})
+
+        except Sepet.DoesNotExist:
+            return JsonResponse({'error': 'Sepet not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
         
-class Stacker4500View(generic.TemplateView):
+def delete_sepet_yuk(request):
+    if request.method == "POST":
+        sepet_id = request.POST.get('sepet_id')
+        kart_no = request.POST.get('kart_no')
+        kalip_no = request.POST.get('kalip_no')
+        billet_lot = request.POST.get('billet_lot')
+        try:
+            sepet = Sepet.objects.get(id=sepet_id)
+            yuklenen = sepet.yuklenen or []
+            updated_yuklenen = [item for item in yuklenen if item['KartNo'] != kart_no and item['KalipNo']!=kalip_no and item['BilletLot']!=billet_lot]
+            
+            sepet.yuklenen = updated_yuklenen
+            sepet.save()
+
+            return JsonResponse({'success': True})
+        except Sepet.DoesNotExist:
+            return JsonResponse({'error': 'Sepet not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+class Stacker4500View2(generic.TemplateView):
     template_name = '4500/stacker4500.html'
     
     def get_context_data(self, **kwargs):
@@ -4438,6 +4487,7 @@ class Sepetler4500View(generic.TemplateView):
 def get_siparis_kart_info(request):
     if request.method == "GET":
         kart_no = request.GET.get('kart_no')
+        print(f"kart: {kart_no}")
     try:
         orders = SiparisList.objects.using('dies').filter(KartNo=kart_no)
         order_data = [

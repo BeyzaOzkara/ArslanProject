@@ -115,11 +115,20 @@ urlpatterns = [
     path('pres_siparis_takip/<int:id>/', views.pres_siparis_takip, name='pres_siparis_takip'),
     path('pres_siparis_takip/rapor', views.pres_siparis_takip_rapor),
     path('4500/press', views.Press4500View.as_view(), name='pres_4500'),
-    path('4500/stacker', views.Stacker4500View.as_view(), name='stacker_4500'),
-    path('4500/stacker/get_kart_nos/', views.get_kart_no_list, name='get_kart_nos'),
+
+    path('4500/stacker2', views.Stacker4500View2.as_view(), name='stacker2_4500'),
+    path('4500/stacker2/get_kart_nos/', views.get_kart_no_list, name='get_kart_nos'),
     path('4500/stacker/get_siparis_info/', views.get_siparis_info, name='get_siparis_info'),
-    path('4500/stacker/update_sepet_yuklenen/', views.update_sepet_yuklenen, name='update_sepet_yuklenen'),
-    path('4500/stacker/delete_sepet_yuklenen/', views.delete_sepet_yuklenen, name='delete_sepet_yuklenen'),
+    path('4500/stacker2/update_sepet_yuklenen/', views.update_sepet_yuklenen, name='update_sepet_yuklenen'),
+    path('4500/stacker2/delete_sepet_yuklenen/', views.delete_sepet_yuklenen, name='delete_sepet_yuklenen'),
+    
+    path('4500/stacker', views.Stacker4500View.as_view(), name='stacker_4500'),
+    path('4500/stacker/get_kalip_nos/', views.get_kalip_no_list, name='get_kalip_no_list'),
+    path('4500/stacker/update_sepet_yuklenen/', views.update_sepet_yuk, name='update_sepet_yuklenen'),
+    path('4500/stacker/delete_sepet_yuklenen/', views.delete_sepet_yuk, name='delete_sepet_yuklenen'),
+    path('4500/stacker/get_billet_lots/', views.get_billet_lot_list, name='get_billet_lot_list'),
+    path('4500/stacker/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
+
     path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
     path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
     path('kalip/rapor2', views.kalip_rapor2),
@@ -134,10 +143,7 @@ urlpatterns = [
     path('4500/sepetler/get_sepetler/', views.get_sepetler, name='get_sepetler'),
     path('4500/sepetler/update_sepet/', views.update_sepet, name='update_sepetler'),
     path('4500/sepetler/get_siparis_kart_info/', views.get_siparis_kart_info, name='get_siparis_kart_info'),
-    path('4500/stacker2', views.Stacker4500View2.as_view(), name='stacker2_4500'),
-    path('4500/stacker2/get_kalip_nos/', views.get_kalip_no_list, name='get_kalip_no_list'),
-    path('4500/stacker2/get_billet_lots/', views.get_billet_lot_list, name='get_billet_lot_list'),
-    path('4500/stacker2/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
+    
     path('4500/saw', views.saw4500View.as_view(), name='saw_4500'), # node red 7
     path('4500/finishsaw', views.FinishSaw4500View.as_view(), name='finishsaw_4500'),
     path('4500/finishsaw/get_saw_table', views.get_saw_table, name='get_saw_table'),
