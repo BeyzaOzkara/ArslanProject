@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'daphne',
     'ArslanTakipApp',
     'StokApp',
+    'inventory',
+    'DMS',
     'adminlte3',
     'adminlte3_theme',
     'tabulator',
@@ -83,6 +85,11 @@ TEMPLATES = [
     },
 ]
 
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 WSGI_APPLICATION = 'ArslanProject.wsgi.application'
 ASGI_APPLICATION = "ArslanProject.asgi.application"
 
@@ -117,14 +124,22 @@ DATABASES = {
         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
         },
     },
-    'dms': {
+    'plc4': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'fabrika4',
         'USER': 'arslan',
         'PASSWORD': 'gqTYe5HdX0VQ',
         'HOST': '192.168.150.230', 
         'PORT': '5432',
-    }
+    },
+    'dms' : {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dms',
+        'USER': 'arslan',
+        'PASSWORD': 'gqTYe5HdX0VQ',
+        'HOST': '192.168.150.230',
+        'PORT': '5432',
+    },
 }
 
 DATABASE_ROUTERS = [

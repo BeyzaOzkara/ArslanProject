@@ -25,52 +25,6 @@ class Location(models.Model):
 
 #veritabanı isimlerini ingilizce yap
 #blank true eklenecekleri belirle
-class Kalip(models.Model):
-    KalipNo = models.CharField(null=True)
-    ProfilNo = models.CharField(null=True)
-    Kimlik = models.IntegerField(null=True)#profilno ile çoğunda aynı
-    FirmaKodu = models.CharField(null=True)
-    FirmaAdi = models.CharField(null=True)
-    Cinsi = models.CharField(null=True)
-    Miktar = models.FloatField(null=True)
-    Capi = models.FloatField(null=True)
-    UretimTarihi = models.DateTimeField(null=True)
-    GozAdedi = models.IntegerField(null=True)
-    Silindi = models.IntegerField(null=True)
-    SilinmeSebebi = models.CharField(null=True)
-    Bolster = models.CharField(null=True)
-    KalipCevresi = models.FloatField(null=True)
-    KaliteOkey = models.IntegerField(null=True)
-    UreticiFirma = models.CharField(null=True)
-    TeniferOmruMt = models.FloatField(null=True)
-    TeniferOmruKg = models.FloatField(null=True)
-    TeniferKalanOmurKg = models.FloatField(null=True)
-    TeniferNo = models.IntegerField(null=True)
-    SonTeniferTarih = models.DateTimeField(null=True)
-    SonTeniferKg = models.FloatField(null=True)
-    SonTeniferSebebi = models.CharField(null=True)
-    SonUretimTarih = models.DateTimeField(null=True)
-    SonUretimGr = models.FloatField(null=True)
-    UretimTenSonrasiKg = models.FloatField(null=True)
-    UretimToplamKg = models.FloatField(null=True)
-    ResimGramaj = models.FloatField(null=True)
-    KalipAciklama = models.CharField(null=True)
-    SikayetVar = models.IntegerField(null=True)
-    KaliteAciklama = models.CharField(null=True)
-    AktifPasif = models.CharField(null=True)
-    Hatali = models.IntegerField(null=True)
-    PresKodu = models.CharField(null=True)
-    ResimDizini = models.CharField(null=True)
-    PaketBoyu = models.CharField(null=True)
-    kalipLocation = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        verbose_name="Kalıp"
-        verbose_name_plural="Kalıplar"
-
-    def __str__(self):
-        return self.KalipNo
-
 class DiesLocation(models.Model): #Kalıpların son konumları
     kalipNo = models.CharField(primary_key=True, verbose_name="Kalıp Numarası")
     kalipVaris = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
@@ -476,7 +430,7 @@ class Yuda(models.Model):
     #YuklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
 
 class Parameter(models.Model):
-    ParentId = models.ManyToManyField("self", symmetrical=False, null=True, blank=True)
+    ParentId = models.ManyToManyField("self", symmetrical=False, blank=True)
     Isim = models.CharField(null=True, blank=True)
     Tag = models.CharField(null=True, blank=True) #appname-yuda gibi
 
@@ -550,34 +504,6 @@ class LastProcessEmail(models.Model):
 class LastCheckedUretimRaporu(models.Model):
     Siralama = models.IntegerField(null=True)
     TarihSaat = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    
-class UnitOfMeasure(models.Model):
-    name = models.CharField(max_length=250, null=True, blank=True)
-    abbreviation = models.CharField(max_length=250, null=True, blank=True)
-    type = models.CharField(max_length=250, null=True, blank=True)
-    conversion_factor = models.IntegerField(null=True, blank=True)
-    base_uom = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-    precision = models.IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        verbose_name="Birim"
-        verbose_name_plural="Birimler"
-
-class Personel(models.Model): # bölümü eklemeli miyim
-    first_name = models.CharField(max_length=250, null=True, blank=True)
-    last_name = models.CharField(max_length=250, null=True, blank=True)
-    email = models.CharField(max_length=250, null=True, blank=True)
-    department = models.CharField(max_length=250, null=True, blank=True)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-    date_joined = models.DateField(null=True, blank=True)
-
-    class Meta:
-        verbose_name='Personel'
-        verbose_name_plural='Personeller'
 
 class IO_List(models.Model):
     line = models.CharField(max_length=250, null=True, blank=True)
@@ -624,4 +550,16 @@ class Recipe(models.Model):
 #     product_name = models.CharField(max_length=250, null=True, blank=True)
 #     product_type = models.CharField(null=True, blank=True)
 #     unit_of_measure = models.ForeignKey(UnitOfMeasure, on_delete=models.CASCADE, null=True, blank=True)
-    
+
+class Personel(models.Model): # bölümü eklemeli miyim
+    first_name = models.CharField(max_length=250, null=True, blank=True)
+    last_name = models.CharField(max_length=250, null=True, blank=True)
+    email = models.CharField(max_length=250, null=True, blank=True)
+    department = models.CharField(max_length=250, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_joined = models.DateField(null=True, blank=True)
+
+    class Meta:
+        verbose_name='Personel'
+        verbose_name_plural='Personeller'

@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('StokApp.urls')),
     path("accounts/", include("ArslanTakipApp.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path('inventory/', include('inventory.urls')),
 ]
 
 if settings.DEBUG:

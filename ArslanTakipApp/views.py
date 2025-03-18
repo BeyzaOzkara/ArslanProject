@@ -29,7 +29,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import ListView
 from django.utils import timezone
 import urllib3
-from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Kalip, Hareket, KalipMs, DiesLocation, PlcData, \
+from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
     QRCode, KartDagilim, KalipMuadil
 from django.template import loader
@@ -3972,7 +3972,7 @@ def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
         start_time = end_time - datetime.timedelta(hours=144)
-        plc_data = PlcData.objects.using('dms').filter(start__gte=start_time).values_list('singular_params', flat=True)
+        plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
         cleaned_to_original = {} 
         for singular_params in plc_data:
@@ -4014,7 +4014,7 @@ def get_billet_lot_list(request):
         print(f"kalip_no: {kalip_no}")
         end_time = timezone.now()
         start_time = end_time - datetime.timedelta(hours=144)
-        billet_lot_list = list(PlcData.objects.using('dms').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
+        billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         print(f"billet_lots: {billet_lot_list}")
         return JsonResponse(billet_lot_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
@@ -4090,7 +4090,7 @@ def get_kart_no_list(request):
         end_time = timezone.now()
         start_time = end_time - datetime.timedelta(hours=48)
         # Son 48 saatteki singular_paramsı alıyoruz
-        plc_data = PlcData.objects.using('dms').filter(start__gte=start_time).values_list('singular_params', flat=True)
+        plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
 
         billet_group_dict = {}
         profil_listesi = set()
@@ -4217,7 +4217,7 @@ def get_profil_nos(pres):
     end_time = timezone.now()
     start_time = end_time - datetime.timedelta(hours=48)
 
-    ext_list = list(PlcData.objects.using('dms').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
+    ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
  
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
@@ -4267,7 +4267,7 @@ def get_ext_info(request):
                 # q["singular_params__DieNumber__startswith"] = die
             print(q)
             queryset = (
-                PlcData.objects.using('dms').filter(
+                PlcData.objects.using('plc4').filter(
                     start__gte=start_time, 
                     stop__lte=end_time,
                     # singular_params__DieNumber__startswith = profil_no
@@ -4325,7 +4325,7 @@ def get_sepet_info(request):
             q |= Q(singular_params__DieNumber__startswith=die)
             w |= Q(yuklenen__contains=[{'ProfilNo': die, 'Atandi': False}]) 
         
-        start = PlcData.objects.using('dms').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
+        start = PlcData.objects.using('plc4').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
         sepet = Sepet.objects.filter(baslangic_saati__gte=start).filter(w).values().order_by('baslangic_saati') # profil no ile filtrele
         try:
             sepet_data = []
@@ -4486,7 +4486,7 @@ class saw4500View(generic.TemplateView):
     template_name = '4500/saw.html'
 
 def get_position_data(position):
-    query = PlcData.objects.using('dms').filter(position=position, count__gt = 0).order_by('-id') # node redde order by count desc şeklinde
+    query = PlcData.objects.using('plc4').filter(position=position, count__gt = 0).order_by('-id') # node redde order by count desc şeklinde
     print(query.values('id', 'count'))
     
     return query
@@ -4495,7 +4495,7 @@ class FinishSaw4500View(generic.TemplateView):
     template_name = '4500/finishsaw.html'
 
 def get_saw_table(request):
-    exts = PlcData.objects.using('dms').filter(position="saw table", count__gt=0).order_by('-id')
+    exts = PlcData.objects.using('plc4').filter(position="saw table", count__gt=0).order_by('-id')
     
     colors = ["#698BAA", "#7DB1CB", "#8DD3DE", "#B1E4F1", "#62A4A0"]
     color_index = 0
@@ -4520,7 +4520,7 @@ def get_saw_table(request):
     return JsonResponse({"data": data})
 
 def get_position_data(position):
-    return PlcData.objects.using('dms').filter(position=position, count__gt=0).order_by('-id')
+    return PlcData.objects.using('plc4').filter(position=position, count__gt=0).order_by('-id')
 
 def get_saw_data(request):
     saw_table = list(get_position_data('saw table').values('id', 'count', 'singular_params'))
@@ -4532,12 +4532,11 @@ def kesime_al(request):
     if request.method == 'GET':
         try:
             adet = int(request.GET.get('adet'))
-            # record_ids = list(PlcData.objects.using('dms').filter(position='saw table').order_by('id').values_list('id', flat=True)[:adet])            
-            # count = PlcData.objects.using('dms').filter(id__in=record_ids).update(position='saw line')
-            unique_counts = list(PlcData.objects.using('dms').filter(position='saw table').order_by('count').values_list('count', flat=True).distinct()[:adet])
-            print(unique_counts)
-            update_position = PlcData.objects.using('dms').filter(count__in = unique_counts).update(position='saw line')
-            # print(update_position)
+            # record_ids = list(PlcData.objects.using('plc4').filter(position='saw table').order_by('id').values_list('id', flat=True)[:adet])            
+            # count = PlcData.objects.using('plc4').filter(id__in=record_ids).update(position='saw line')
+            unique_counts = list(PlcData.objects.using('plc4').filter(position='saw table').order_by('count').values_list('count', flat=True).distinct()[:adet])
+            update_position = PlcData.objects.using('plc4').filter(count__in = unique_counts).update(position='saw line')
+            
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -4545,7 +4544,7 @@ def kesime_al(request):
 def testere_tezgahi(request):
     if request.method == 'GET':
         try:
-            max_count = PlcData.objects.using('dms').filter(position='saw line').latest('id').count  #aggregate(Max('count'))['count__max']
+            max_count = PlcData.objects.using('plc4').filter(position='saw line').latest('id').count  #aggregate(Max('count'))['count__max']
             data = get_position_data('saw line').filter(count=max_count).values()
             return JsonResponse(list(data), safe=False)
         except Exception as e:
@@ -4555,7 +4554,7 @@ def testere_siparis_list(request):
     if request.method == 'GET':
         # position saw line olanların profil nolarını al
         try:
-            profil_list = list(PlcData.objects.using('dms').filter(position = 'saw line').values_list('singular_params__profiles', flat=True).distinct())
+            profil_list = list(PlcData.objects.using('plc4').filter(position = 'saw line').values_list('singular_params__profiles', flat=True).distinct())
             # print(profil_list)
             testere = TestereDepo.objects.using('dies').filter(ProfilNo__in = profil_list, PresKodu='4500-1', BulunduguYer='TESTERE', Adet__gte=1) \
             .annotate(Bloke=Case(When(Aktif=0, then=Value('AÇIK')), default=Value('BLOKELİ'), output_field=CharField())) \
@@ -4568,7 +4567,7 @@ def testere_siparis_list(request):
 def testere_kesim_bitti(request):
     if request.method == 'GET':
         try:
-            PlcData.objects.using('dms').filter(position='saw line').update(position='stacker')
+            PlcData.objects.using('plc4').filter(position='saw line').update(position='stacker')
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
