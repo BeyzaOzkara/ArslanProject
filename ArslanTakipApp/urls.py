@@ -72,11 +72,15 @@ urlpatterns = [
 #     path('kalipfirini/goz', views.kalipfirini_goz),
     path('baskigecmisi/', login_required(views.BaskiGecmisiView.as_view())),
     path('baskigecmisi/list', views.baskigecmisi_list),
+
     path('yuda/', login_required(views.YudaView.as_view())),
     path('yuda/<str:objId>', views.yuda),
+    path('yuda/profil/', views.yuda_profil),
     path('yudakaydet', views.yuda_kaydet),
+
     path('yudas', login_required(views.YudasView.as_view()), name='yudas'),
     path('yudas/list' ,views.yudas_list),
+
     path('yudaDetail/<str:yId>', views.yudaDetail, name='yudaDetail'),
     path('yudakalipno', views.yudaDetail_kalipno, name='yudaDetailKalipNo'),
     path('yudaDetail2/<str:yId>', views.yudaDetail2, name='yudaDetail2'),
@@ -85,6 +89,7 @@ urlpatterns = [
     path('yudaDCEdit', views.yudaDCEdit),
     path('yudaDetailAnket', views.yudaDetailAnket),
     path('yudaDetailSvg', views.yudaDetailSvg),
+
     path('yudaDelete/<str:yId>', views.yudaDelete, name='yudaDelete'),
     path('yudaEdit/<str:yId>', views.yudaEdit),
     path('yudachange/<str:yId>', views.yudachange),
@@ -92,6 +97,7 @@ urlpatterns = [
     path('deletedYudas', login_required(views.DeletedYudasView.as_view()), name='deletedYudas'),
     path('deletedYudas/list', views.deletedYudas_list),
     path('yudaDeleteCancel/<str:yId>', views.yudaDeleteCancel),
+
     path('uretimplanlama', views.UretimPlanlamaView.as_view()),
     path('get_data_by_press_code/', views.UretimPlanlamaView.as_view(), name='get_data_by_press_code'),
     path('eksiparisdeneme/', login_required(views.eksiparisDenemeView.as_view())),

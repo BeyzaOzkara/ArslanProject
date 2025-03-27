@@ -72,7 +72,8 @@
             <h3 class="card-title p-3">YENİ ÜRÜN DEVREYE ALMA FORMU</h3>
 
             <ul class="nav nav-pills ml-auto p-2">
-              <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Sipariş</a></li>
+              <li class="nav-item"><a class="nav-link active" href="#tab_proje" data-toggle="tab">Proje</a></li>
+              <li class="nav-item"><a class="nav-link" href="#tab_1" data-toggle="tab">Sipariş</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab" onclick="toastClick('info', 'Müşteri Alaşım belirtmediyse 6060 ya da 6063, Kondüsyon belirtmediyse T66 seçin.', 'br')">Alaşım ve Kondüsyon</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" onclick="toastClick('info', 'Müşteri tolerans belirtmediyse EN 755-9 seçin.', 'br')">Tolerans</a></li>
               <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">Yüzey</a></li>
@@ -84,7 +85,44 @@
         <div class="card-body" id="formBody">
         <form enctype="multipart/form-data" action="" method="post" id="yudaForm">
             <div class="tab-content">
-                <div class="tab-pane active" id="tab_1">
+                <div class="tab-pane active" id="tab_proje">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-8" style="margin: auto;">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content">
+                                        <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
+                                            <label class="btn btn-outline-danger">
+                                            <input type="radio" class="kaydet" name="ProjeTipi" id="mevcutProfil" value="MevcutProfil" autocomplete="off" required> MEVCUT PROFİL
+                                            </label>
+                                            <label class="btn btn-outline-danger">
+                                            <input type="radio" class="kaydet" name="ProjeTipi" id="yeniProje" value="YeniProje" autocomplete="off" required> YENİ PROJE
+                                            </label>
+                                        </div>
+                                        </div>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="row" id="profilRow" style="display: none;">
+                                <div class="col-8" style="margin: auto;">
+                                    <div class="info-box bg-light required-info">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-center text-bold">PROFİL*</span>
+                                            <!-- multiselect ile seçilsin select2 -->
+                                            <div class="form-group mt-3">
+                                                <select class="select2bs4 kaydet" multiple="multiple" id="profilSelect" name="MevcutProfil" data-placeholder="Profil Seçiniz" style="width: 100%;">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_1">
                     <div class="card">
                         <div class="card-header">Sipariş Detayları</div>
                         <div class="card-body">
@@ -713,6 +751,47 @@
 
         return allFilled;
     };
+
+    $('input[name="ProjeTipi"]').on('change', function() {
+        if ($('#mevcutProfil').is(':checked')) {
+            document.getElementById('profilRow').style.display = 'block';
+            $("#profilSelect").attr('required', '');
+            $('#profilSelect').select2({
+                placeholder: 'Profil Seçiniz',
+                minimumInputLength: 1,  // Start searching after typing 1 character
+                language: {
+                    inputTooShort: function () {
+                        return "Lütfen en az 1 karakter giriniz..";
+                    }
+                },
+                ajax: {
+                    url: '/yuda/profil/',
+                    dataType: 'json',
+                    delay: 250,  // Wait for 250ms after typing to send the request
+                    data: function(params) {
+                        return {
+                            query: params.term // The search term
+                        };
+                    },
+                    processResults: function(data, params) {
+                        // Map the response data to the required Select2 format
+                        return {
+                            results: data.profiles.map(function(profile) {
+                                return {
+                                    id: profile.id,
+                                    text: profile.name
+                                };
+                            })
+                        };
+                    }
+                }
+            });
+        }
+        else {
+            $("#profilSelect").removeAttr('required');
+            document.getElementById('profilRow').style.display = 'none';
+        }
+    });
 
     $(':input[required]').on('change', function() {
         let allFilled = true;

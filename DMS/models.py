@@ -12,3 +12,9 @@ class EventData(models.Model):
 class TemporalData(models.Model):
     event = models.ForeignKey(EventData, on_delete=models.DO_NOTHING, null=True)
     dynamic_data = models.JSONField(null=True, blank=True)
+
+class RealTimeData(models.Model):
+    event_type = models.CharField(null=True, blank=True)
+    machine_name = models.CharField(null=True, blank=True)
+    timestamp = models.DateTimeField(null=True, blank=True)
+    meta_data = models.JSONField(null=True, blank=True) 

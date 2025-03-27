@@ -101,6 +101,14 @@ class KalipMs(models.Model):
         managed = False
         db_table = 'View020_KalipListe'
 
+class ProfilMs(models.Model):
+    Kimlik = models.IntegerField(null=True, blank=True)
+    ProfilNo = models.CharField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View028_ProfilListe'
+
 class Sepet(models.Model):
     sepet_no = models.CharField(null=True, blank=True)
     baslangic_saati = models.DateTimeField(null=True, blank=True)
@@ -190,6 +198,9 @@ class TestereDepo(models.Model):
     Mm = models.FloatField(null=True, blank=True)
     Adet = models.FloatField(null=True, blank=True)
     Kg = models.FloatField(null=True, blank=True)
+    FirmaAdi = models.CharField(null=True)
+    KondusyonTuru = models.CharField(null=True)
+    Profil_Gramaj = models.FloatField(null=True)
     BilletTuru = models.CharField(null=True, blank=True)
     YuzeyOzelligi = models.CharField(null=True, blank=True)
     PresKodu = models.CharField(null=True, blank=True)
@@ -205,6 +216,7 @@ class PlcData(models.Model):
     stop = models.DateTimeField(null=True, blank=True)
     event = models.CharField(blank=True, null=True)
     singular_params = models.JSONField(null=True, blank=True)
+    timed_params = models.JSONField(null=True, blank=True)
     position = models.CharField(null=True, blank=True)
     count = models.BigIntegerField(null=True, blank=True)
 
@@ -335,7 +347,7 @@ class Termik(models.Model):
     BatchNo = models.CharField(null=True)
 
 class YudaForm(models.Model):
-    YudaNo = models.CharField(null=True, blank=True)
+    YudaNo = models.CharField(unique=True ,null=True, blank=True)
     YeniKalipNo = models.CharField(null=True, blank=True)
     OnayDurumu = models.CharField(null=True, blank=True)
     ProjeYoneticisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_projeyoneticisi", blank=True, null =True)
@@ -368,6 +380,7 @@ class YudaForm(models.Model):
     PaketlemeAciklama = models.CharField(null=True, blank=True)
     Silindi = models.BooleanField(null=True)
     Silindi_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null =True)
+    meta_data = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.YudaNo

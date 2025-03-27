@@ -30,7 +30,7 @@ from django.views.generic import ListView
 from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
-    PresUretimRaporu, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
+    PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
     QRCode, KartDagilim, KalipMuadil
 from django.template import loader
 from django.template.loader import render_to_string
@@ -42,7 +42,7 @@ from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_wit
 from guardian.models import UserObjectPermission, GroupObjectPermission
 from django.db.models import CharField, Q, Sum, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
 from django.db.models.functions import Cast, Replace
-from django.db import transaction 
+from django.db import transaction, IntegrityError
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # from aes_cipher import *
@@ -60,6 +60,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
 from .reports import send_report_email_for_all
+from DMS.models import EventData, TemporalData
 # Create your views here.
 
 
@@ -138,12 +139,9 @@ def hareketSave(dieList, lRec, dieTo, request):
 
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
-def location(request):
+def location(request):  
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
-    # send_report_email_for_all()
-    # checkYudaOnayDurum(request)
-    # get_satis_groups()
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
     root_nodes = []
@@ -2528,141 +2526,157 @@ def yuda(request, objId):
     data = json.dumps(parameters, indent=1)
     return HttpResponse(data)
 
+def yuda_profil(request):
+    query = request.GET.get('query', '')  # Get the search term
+    profiles = ProfilMs.objects.using('dies').filter(ProfilNo__startswith=query).values('Kimlik', 'ProfilNo')[:200]  # Limit to 20 results for performance
+    
+    profiles_data = [{'id': profile['Kimlik'], 'name': profile['ProfilNo']} for profile in profiles]
+    
+    return JsonResponse({'profiles': profiles_data})
+
 @transaction.atomic
 def yuda_kaydet(request):
     if request.method == "POST":
-        try:
-            today = datetime.datetime.now().strftime('%j')
-            year = datetime.datetime.now().strftime('%y')
-            lastOfDay = YudaForm.objects.filter(YudaNo__startswith=year + '-' + today).order_by('-YudaNo').first()
-            if lastOfDay:
-                # Extract the sequential number part from the latest YudaNo and increment it
-                latest_seq_number = int(lastOfDay.YudaNo[-2:]) + 1
-                sequential_number = f'{latest_seq_number:02}'  # Convert to two-digit string
-            else:
-                # If no YudaNo exists for today, start from 01
-                sequential_number = '01'
-            
-            y = YudaForm()
-            y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
-            y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
-            y.YudaAcanKisi = request.user
-            y.Tarih = datetime.datetime.now()
-            y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
-
-            yetki_group = ""
-            for key, value in request.POST.items():
-                if hasattr(y, key):
-                    if key == "BirlikteCalisan":
-                        value_list = value.split(',')
-                        setattr(y, key, value_list)
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            try:
+                today = datetime.datetime.now().strftime('%j')
+                year = datetime.datetime.now().strftime('%y')
+                with transaction.atomic():
+                    lastOfDay = YudaForm.objects.filter(YudaNo__startswith=year + '-' + today).order_by('-YudaNo').first()
+                    if lastOfDay:
+                        # Extract the sequential number part from the latest YudaNo and increment it
+                        latest_seq_number = int(lastOfDay.YudaNo[-2:]) + 1
+                        sequential_number = f'{latest_seq_number:02}'  # Convert to two-digit string
                     else:
-                        setattr(y, key, value)
-                if key == "Yetki":
-                    yetki_group = value
+                        # If no YudaNo exists for today, start from 01
+                        sequential_number = '01'
                     
-            y.save()
+                    y = YudaForm()
+                    y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
+                    y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
+                    y.YudaAcanKisi = request.user
+                    y.Tarih = datetime.datetime.now()
+                    y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
 
-            group_names = [
-                'Ust Yonetim Bolumu',
-                'Planlama Bolumu',
-                'Kalite Bolumu',
-                'Kaliphane Bolumu',
-                'Pres Bolumu',
-                'Paketleme Bolumu',
-                'Yurt Disi Satis Bolumu',
-                'Yurt Ici Satis Bolumu',
-                'Proje Bolumu',
-            ]
+                    yetki_group = "" 
+                    for key, value in request.POST.items():
+                        if hasattr(y, key):
+                            if key == "BirlikteCalisan":
+                                value_list = value.split(',')
+                                setattr(y, key, value_list)
+                            else:
+                                setattr(y, key, value)
+                        if key == "Yetki":
+                            yetki_group = value
+                        elif key == "ProjeTipi" or key == "MevcutProfil":
+                            y.meta_data[key] = value
+                            
+                    y.save()
 
-            group_mapping = {
-                'YuzeyEloksal': 'Eloksal Bolumu',
-                'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
-                'YuzeyBoya': 'Boyahane Bolumu',
-                'TalasliImalat': 'Mekanik Islem Bolumu',
-            }
+                    group_names = [
+                        'Ust Yonetim Bolumu',
+                        'Planlama Bolumu',
+                        'Kalite Bolumu',
+                        'Kaliphane Bolumu',
+                        'Pres Bolumu',
+                        'Paketleme Bolumu',
+                        'Yurt Disi Satis Bolumu',
+                        'Yurt Ici Satis Bolumu',
+                        'Proje Bolumu',
+                    ]
 
-            groups = [Group.objects.get(name=name) for name in group_names]
+                    group_mapping = {
+                        'YuzeyEloksal': 'Eloksal Bolumu',
+                        'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
+                        'YuzeyBoya': 'Boyahane Bolumu',
+                        'TalasliImalat': 'Mekanik Islem Bolumu',
+                    }
 
-            assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
-            assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
-            assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
-            assign_perm("acan_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
-            for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
-                if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
-                    if group in request.user.groups.all():
-                        assign_perm("gorme_yuda", group, y)
-                    if yetki_group == group.name:
-                        assign_perm("gorme_yuda", group, y)
-                else:
-                    assign_perm("gorme_yuda", group, y)
+                    groups = [Group.objects.get(name=name) for name in group_names]
 
-            # Check field values and assign permissions based on conditions
-            for field in y._meta.fields:
-                fname = field.name
-                fvalue = getattr(y, fname)
-                if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat":
-                    group = Group.objects.get(name=group_mapping[fname])
-                    assign_perm("gorme_yuda", group, y)
-                if fname == "TalasliImalat" and fvalue == "Var":
-                    group = Group.objects.get(name=group_mapping[fname])
-                    assign_perm("gorme_yuda", group, y)
+                    assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
+                    assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
+                    assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+                    assign_perm("acan_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+                    for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
+                        if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
+                            if group in request.user.groups.all():
+                                assign_perm("gorme_yuda", group, y)
+                            if yetki_group == group.name:
+                                assign_perm("gorme_yuda", group, y)
+                        else:
+                            assign_perm("gorme_yuda", group, y)
 
-            # Dosyaları ve başlıkları işleyin
-            file_titles = request.POST.getlist('fileTitles[]')
-            for file, title in zip(request.FILES.getlist('files[]'), file_titles):
-                UploadFile.objects.create(
-                    File = file,
-                    FileTitle = title,
-                    FileSize = file.size,
-                    FileModel = "YudaForm",
-                    FileModelId = y.id,
-                    UploadedBy = y.ProjeYoneticisi,
-                    Note = "",
-                )
-            
-            # for user in User.objects.exclude(id=request.user.id):
-            allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
+                    # Check field values and assign permissions based on conditions
+                    for field in y._meta.fields:
+                        fname = field.name
+                        fvalue = getattr(y, fname)
+                        if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat":
+                            group = Group.objects.get(name=group_mapping[fname])
+                            assign_perm("gorme_yuda", group, y)
+                        if fname == "TalasliImalat" and fvalue == "Var":
+                            group = Group.objects.get(name=group_mapping[fname])
+                            assign_perm("gorme_yuda", group, y)
 
-            if request.user.id != 1:
-                for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
-                    notification = Notification.objects.create(
-                        user=u,
-                        message=f'{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
-                        subject=f"Yeni YUDA",
-                        where_id=y.id,
-                        new_made_by = request.user,
-                        col_marked = "#E9ECEF",
-                    )
-                    logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
-                
-                    channel_layer = get_channel_layer()
-                    async_to_sync(channel_layer.group_send)(
-                        f'notifications_{request.user.id}',
-                        {
-                            'type': 'send_notification',
-                            'notification': {
-                                'id': notification.id,
-                                'subject': notification.subject,
-                                'made_by': get_user_full_name(notification.new_made_by_id),
-                                'message': notification.message,
-                                'where_id': notification.where_id,
-                                'is_read': notification.is_read,
-                                'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
-                                'is_marked': notification.is_marked,
-                            },
-                        }
-                    )
-                    logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
-                
+                    # Dosyaları ve başlıkları işleyin
+                    file_titles = request.POST.getlist('fileTitles[]')
+                    for file, title in zip(request.FILES.getlist('files[]'), file_titles):
+                        UploadFile.objects.create(
+                            File = file,
+                            FileTitle = title,
+                            FileSize = file.size,
+                            FileModel = "YudaForm",
+                            FileModelId = y.id,
+                            UploadedBy = y.ProjeYoneticisi,
+                            Note = "",
+                        )
+                    
+                    # for user in User.objects.exclude(id=request.user.id):
+                    allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
-            response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
-        except json.JSONDecodeError:
-            response = JsonResponse({'error': 'Geçersiz JSON formatı'})
-            response.status_code = 500 #server error
-        except Exception as e:
-            response = JsonResponse({'error': str(e)})
-            response.status_code = 500 #server error
+                    if request.user.id != 1:
+                        for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
+                            notification = Notification.objects.create(
+                                user=u,
+                                message=f'{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+                                subject=f"Yeni YUDA",
+                                where_id=y.id,
+                                new_made_by = request.user,
+                                col_marked = "#E9ECEF",
+                            )
+                            logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                        
+                            channel_layer = get_channel_layer()
+                            async_to_sync(channel_layer.group_send)(
+                                f'notifications_{request.user.id}',
+                                {
+                                    'type': 'send_notification',
+                                    'notification': {
+                                        'id': notification.id,
+                                        'subject': notification.subject,
+                                        'made_by': get_user_full_name(notification.new_made_by_id),
+                                        'message': notification.message,
+                                        'where_id': notification.where_id,
+                                        'is_read': notification.is_read,
+                                        'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
+                                        'is_marked': notification.is_marked,
+                                    },
+                                }
+                            )
+                            logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                        
+
+                response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
+            except json.JSONDecodeError:
+                response = JsonResponse({'error': 'Geçersiz JSON formatı'})
+                response.status_code = 500 #server error
+            except IntegrityError:
+                time.sleep(0.1)
+                continue
+            except Exception as e:
+                response = JsonResponse({'error': str(e)})
+                response.status_code = 500 #server error
 
     return response
         
@@ -2671,15 +2685,15 @@ class YudasView(generic.TemplateView):
 
 def yuda_filter(i):
     q = {}
-    if i['field'] == 'Bolum':
-        for bolum in i['value']:
-            if bolum == 'Boya':
+    if i['field'] == 'Islem': # eski adı bölüm, işlem var mı kontrol etmek için
+        for islem in i['value']:
+            if islem == 'Boya':
                 q['YuzeyBoya__gt'] = ""
-            elif bolum == 'Eloksal':
+            elif islem == 'Eloksal':
                 q['YuzeyEloksal__gt'] = ""
-            elif bolum == 'Mekanik Islem':
+            elif islem == 'Mekanik Islem':
                 q['TalasliImalat__exact'] = 'Var'  # Filter where TalasliImalat is 'Var'
-    elif i['field'] == 'Dosya':
+    elif i['field']  == 'Dosya':
         file_ids = UploadFile.objects.filter(File__icontains=i['value']).values_list('FileModelId', flat=True)
         q['id__in'] = list(file_ids)
     elif i['field'] == 'Tarih' or i['field'] == 'GüncelTarih': #type = start date, value=finish date
@@ -2718,14 +2732,16 @@ def yudas_list(request):
 
     y = get_objects_for_user(request.user, "gorme_yuda", YudaForm.objects.all()) #user görme yetkisinin olduğu yudaları görsün
 
-    user_group = request.user.groups.filter(name__endswith=" Bolumu").first()
     if len(filter_list) > 0:
         for i in filter_list:
-            if i['field'] == "bolumOnay":
+            if i['type'] == "BolumOnayFilter":
+                print(i)
+                filter_group = Group.objects.get(name=i['field'])
+                print(filter_group)
                 if i['value'] == "None":
-                    y = y.exclude(yudaonay__Group=user_group)
+                    y = y.exclude(yudaonay__Group=filter_group)
                 else:
-                    q = bolumOnayFilter(q, i['value'], user_group)
+                    q = bolumOnayFilter(q, i['value'], filter_group)
             else:
                 q = yuda_filter(i)
 

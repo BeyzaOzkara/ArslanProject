@@ -67,9 +67,9 @@
                     <select class="form-control mb-2" id="musteriTemsilcisiSelect" name="musteriTemsilcisiSelect" data-placeholder="Seçim Yapınız"></select>
                   </div>
                   <div class="form-group col-lg-6">
-                    <label for="bolumFilter">Bölüm: </label>
-                    <select class="select2bs4 form-control mb-2" multiple="multiple" id="bolumFilter" name="bolumFilter" data-placeholder="Seçim Yapınız" style="width: 100%;">
-                      <option></option>
+                    <label for="islemFilter">İşlem Var Mı: </label>
+                    <select class="select2bs4 form-control mb-2" multiple="multiple" id="islemFilter" name="islemFilter" data-placeholder="Seçim Yapınız" style="width: 100%;">
+                      <option></option> 
                       <option value="Boya">Boya</option>
                       <option value="Eloksal">Eloksal</option>
                       <option value="Mekanik Islem">Mekanik İşlem</option>
@@ -112,8 +112,24 @@
                 </div>
                 <div class="row">
                   <div class="form-group col-lg-6 mt-2">
+                    <label for="bolumFilter">Bölüm: </label>
+                    <select class="form-control mb-2" id="bolumSelect" name="bolumSelect" data-placeholder="Seçim Yapınız">
+                      <option value=""></option>
+                      <option value="Boyahane Bolumu">Boya</option>
+                      <option value="Eloksal Bolumu">Eloksal</option>
+                      <option value="Kaliphane Bolumu">Kalıphane</option>
+                      <option value="Kalite Bolumu">Kalite</option>
+                      <option value="Mekanik Islem Bolumu">Mekanik İşlem</option>
+                      <option value="Paketleme Bolumu">Paketleme</option>
+                      <option value="Planlama Bolumu">Planlama</option>
+                      <option value="Pres Bolumu">Pres</option>
+                      <option value="Yurt Disi Satis Bolumu">Yurt Dışı Satış</option>
+                      <option value="Yurt Ici Satis Bolumu">Yurt İçi Satış</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-lg-6 mt-2">
                     <label for="bolumOnayFilter">Bölümün Onay Durumu: </label>
-                    <select class="form-control mb-2" id="bolumOnaySelect" name="bolumOnaySelect" data-placeholder="Seçim Yapınız">
+                    <select class="form-control mb-2" id="bolumOnaySelect" name="bolumOnaySelect" data-placeholder="Seçim Yapınız" disabled>
                       <option value="All">Hepsi</option>
                       <option value="True">Onay</option>
                       <option value="False">Ret</option>
@@ -194,6 +210,18 @@
   let itemsPerPage = 7;  // Başlangıçta varsayılan değer
   let filterList = [];
   const tableBody = $('#yudaTBody');
+  const bolumSelect = document.getElementById("bolumSelect");
+  const bolumOnaySelect = document.getElementById("bolumOnaySelect");
+
+  bolumSelect.addEventListener("change", function() {
+    if (bolumSelect.value !== "") {
+      // Eğer bolumSelect boş değilse, bolumOnaySelect'i aktif hale getir
+      bolumOnaySelect.disabled = false;
+    } else {
+      // Eğer bolumSelect boşsa, bolumOnaySelect'i disabled yap
+      bolumOnaySelect.disabled = true;
+    }
+  });
 
   function saveState() {
     const state = {
@@ -218,17 +246,24 @@
   }
 
   function applyFiltersFromState() {
+    console.log(filterList)
     $('#yudaNoFilter').val(filterList.find(f => f.field === 'YudaNo')?.value || '');
     $('#musteriFirmaFilter').val(filterList.find(f => f.field === 'MusteriFirmaAdi')?.value || '');
     $('#dosyaFilter').val(filterList.find(f => f.field === 'Dosya')?.value || '');
     $('#cizimFilter').val(filterList.find(f => f.field === 'CizimNo')?.value || '');
 
-    const bolumFilterValues = filterList.find(f => f.field === 'Bolum')?.value || [];
-    $('#bolumFilter').val(bolumFilterValues).trigger('change');
+    const islemFilterValues = filterList.find(f => f.field === 'Islem')?.value || [];
+    $('#islemFilter').val(islemFilterValues).trigger('change');
     const musteriTemsilcisiSelect = filterList.find(f => f.field === 'YudaAcanKisi_id')?.value || '';
     $('#musteriTemsilcisiSelect').val(musteriTemsilcisiSelect).trigger('change');
-    const bolumOnaySelect = filterList.find(f => f.field === 'bolumOnay')?.value || '';
-    $('#bolumOnaySelect').val(bolumOnaySelect).trigger('change');
+    const bolumSelectState = filterList.find(f => f.type === 'BolumOnayFilter')?.field || '';
+    console.log(bolumSelectState)
+    $('#bolumSelect').val(bolumSelectState).trigger('change');
+    const bolumOnaySelectState = filterList.find(f => f.type === 'BolumOnayFilter')?.value || '';
+    if (bolumOnaySelectState != '') {
+      $( "#bolumOnaySelect" ).prop( "disabled", false );
+    }
+    $('#bolumOnaySelect').val(bolumOnaySelectState).trigger('change');
     const tarihFilter = filterList.find(f => f.field === 'Tarih');
     if (tarihFilter) {
         const tarihPicker = $('#tarihFilter').data('daterangepicker');
@@ -257,7 +292,7 @@
   });
 
   var tarihFilterList = {};
-  var guncelTarihFilterList = {};
+  var guncelTarihFilterList = {}; 
   $('#tarihFilter').on('apply.daterangepicker', function(ev, picker) {
     var start = picker.startDate;
     var end = picker.endDate;
@@ -282,9 +317,10 @@
   $('#applyFilter').click(function() {
       const yudaNoFilter = $('#yudaNoFilter').val();
       const musteriFirmaFilter = $('#musteriFirmaFilter').val();
-      const bolumFilter = $('#bolumFilter').val();
+      const islemFilter = $('#islemFilter').val();
       const musteriTemsilcisiSelect = $('#musteriTemsilcisiSelect').val();
-      const bolumOnaySelect = $('#bolumOnaySelect').val();
+      const bolumVal = bolumSelect.value;
+      const bolumOnayVal = bolumOnaySelect.value;
       const dosyaFilter = $('#dosyaFilter').val();
       const cizimFilter = $('#cizimFilter').val();
       const tarihFilter = $('#tarihFilter').val();
@@ -297,19 +333,19 @@
       if (musteriFirmaFilter != ""){
         filterList.push({ field: 'MusteriFirmaAdi', type:'has', value: musteriFirmaFilter });
       };
-      if (bolumFilter.length != 0){
-        if (bolumFilter[0] != '') {
-          filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
+      if (islemFilter.length != 0){
+        if (islemFilter[0] != '') {
+          filterList.push({ field: 'Islem', type:'like', value: islemFilter });
         }
-        else if (bolumFilter[0] == '' && bolumFilter.length != 1){
-          filterList.push({ field: 'Bolum', type:'like', value: bolumFilter });
+        else if (islemFilter[0] == '' && islemFilter.length != 1){
+          filterList.push({ field: 'Islem', type:'like', value: islemFilter });
         }
       };
       if (musteriTemsilcisiSelect != null && musteriTemsilcisiSelect != ""){
         filterList.push({ field: 'YudaAcanKisi_id', type:'=', value: musteriTemsilcisiSelect });
       };
-      if (bolumOnaySelect != null && bolumOnaySelect != ""){
-        filterList.push({ field: 'bolumOnay', type:'=', value: bolumOnaySelect });
+      if (bolumOnayVal != null && bolumOnayVal != "" && bolumVal != null && bolumVal != ""){
+        filterList.push({ field: bolumVal, type:'BolumOnayFilter', value: bolumOnayVal });
       };
       if (dosyaFilter != "") {
         filterList.push({ field: 'Dosya', type:'like', value: dosyaFilter });
@@ -330,8 +366,9 @@
   });
 
   document.getElementById('btnTemizle').addEventListener('click', () => {
-    $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #bolumOnaySelect #cizimFilter, #dosyaFilter, #tarihFilter').val("");
-    $('#bolumFilter').val([]).trigger('change');
+    $('#yudaNoFilter, #musteriFirmaFilter, #musteriTemsilcisiSelect, #islemFilter, #bolumSelect, #bolumOnaySelect, #cizimFilter, #dosyaFilter, #tarihFilter').val("");
+    $( "#bolumOnaySelect" ).prop( "disabled", true );
+    $('#islemFilter').val([]).trigger('change');
     sessionStorage.removeItem('yudaListState');
   });
 
