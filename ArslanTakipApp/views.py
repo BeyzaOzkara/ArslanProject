@@ -2558,7 +2558,8 @@ def yuda_kaydet(request):
                     y.YudaAcanKisi = request.user
                     y.Tarih = datetime.datetime.now()
                     y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
-
+                    
+                    is_old_profile = False # if True: Kalıphane bolumu Onay oyu versin
                     yetki_group = "" 
                     for key, value in request.POST.items():
                         if hasattr(y, key):
@@ -2571,7 +2572,8 @@ def yuda_kaydet(request):
                             yetki_group = value
                         elif key == "ProjeTipi" or key == "MevcutProfil":
                             y.meta_data[key] = value
-                            # 67 idli KaliphaneAdmin kullanıcısı Onay oyu versin
+                            if key == "ProjeTipi" and value == "Mevcut Profil":
+                                is_old_profile = True
                             
                     y.save()
 
@@ -2622,6 +2624,13 @@ def yuda_kaydet(request):
                         if fname == "Paketleme" and fvalue == "Ozel Paketleme":
                             group = Group.objects.get(name=group_mapping[fname])
                             assign_perm("gorme_yuda", group, y)
+
+                    if is_old_profile:
+                        YudaOnay.objects.create(
+                            Group=Group.objects.get(name='Kaliphane Bolumu'),
+                            Yuda_id=y.id,
+                            OnayDurumu=True
+                        )
 
                     # Dosyaları ve başlıkları işleyin
                     file_titles = request.POST.getlist('fileTitles[]')
