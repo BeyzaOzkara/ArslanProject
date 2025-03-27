@@ -2638,7 +2638,7 @@ def yuda_kaydet(request):
                             profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profiller"
 
                         Comment.objects.create(
-                            Kullanici_id = 67,
+                            Kullanici_id = 57,
                             FormModel = "YudaForm",
                             FormModelId = y.id,
                             Tarih = datetime.datetime.now(),
