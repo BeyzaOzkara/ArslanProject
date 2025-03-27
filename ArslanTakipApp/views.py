@@ -2571,6 +2571,8 @@ def yuda_kaydet(request):
                         if key == "Yetki":
                             yetki_group = value
                         elif key == "ProjeTipi" or key == "MevcutProfil":
+                            if y.meta_data is None:
+                                y.meta_data = {}
                             y.meta_data[key] = value
                             if key == "ProjeTipi" and value == "Mevcut Profil":
                                 is_old_profile = True
@@ -2583,13 +2585,13 @@ def yuda_kaydet(request):
                         'Kalite Bolumu',
                         'Kaliphane Bolumu',
                         'Pres Bolumu',
-                        'Paketleme Bolumu',
                         'Yurt Disi Satis Bolumu',
                         'Yurt Ici Satis Bolumu',
                         'Proje Bolumu',
                     ]
 
                     group_mapping = {
+                        'Paketleme': 'Paketleme Bolumu',
                         'YuzeyEloksal': 'Eloksal Bolumu',
                         'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
                         'YuzeyBoya': 'Boyahane Bolumu',
@@ -2615,7 +2617,7 @@ def yuda_kaydet(request):
                     for field in y._meta.fields:
                         fname = field.name
                         fvalue = getattr(y, fname)
-                        if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat" and fname != 'Paketleme':
+                        if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat" and fname != "Paketleme":
                             group = Group.objects.get(name=group_mapping[fname])
                             assign_perm("gorme_yuda", group, y)
                         if fname == "TalasliImalat" and fvalue == "Var":
@@ -2630,6 +2632,17 @@ def yuda_kaydet(request):
                             Group=Group.objects.get(name='Kaliphane Bolumu'),
                             Yuda_id=y.id,
                             OnayDurumu=True
+                        )
+                        profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profil"
+                        if len(y.meta_data['MevcutProfil'])>1:
+                            profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profiller"
+
+                        Comment.objects.create(
+                            Kullanici_id = 67,
+                            FormModel = "YudaForm",
+                            FormModelId = y.id,
+                            Tarih = datetime.datetime.now(),
+                            Aciklama = f"Yeni proje, {profil} için açıldığından, sistem tarafından otomatik olarak Kalıphane onayı verilmiştir."
                         )
 
                     # Dosyaları ve başlıkları işleyin

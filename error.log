@@ -56707,3 +56707,17 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 django.db.utils.ProgrammingError: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
 [35;1mHTTP GET /yuda/profil/?query=1&page=2 500 [0.16, 127.0.0.1:51752][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.04, 127.0.0.1:61677][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.05, 127.0.0.1:61714][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.04, 127.0.0.1:61781][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.06, 127.0.0.1:61818][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.04, 127.0.0.1:61872][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.47, 127.0.0.1:62065][0m
+Internal Server Error: /yudakaydet
+[35;1mHTTP POST /yudakaydet 500 [0.52, 127.0.0.1:62124][0m
