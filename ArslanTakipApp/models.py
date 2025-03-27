@@ -194,6 +194,7 @@ class TestereDepo(models.Model):
     KartNo = models.IntegerField(null=True, blank=True)
     ProfilNo = models.CharField(null=True, blank=True)
     BulunduguYer = models.CharField(null=True, blank=True)
+    KartAktif = models.IntegerField(null=True)
     Aktif = models.IntegerField(null=True, blank=True)
     Mm = models.FloatField(null=True, blank=True)
     Adet = models.FloatField(null=True, blank=True)

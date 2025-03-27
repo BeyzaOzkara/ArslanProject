@@ -4505,17 +4505,17 @@ def get_siparis_kart_info(request):
         kart_no = request.GET.get('kart_no')
         print(f"kart: {kart_no}")
     try:
-        orders = SiparisList.objects.using('dies').filter(KartNo=kart_no)
+        orders = TestereDepo.objects.using('dies').filter(BulunduguYer='TESTERE', Adet__gte=1, KartAktif=1, Aktif=0, KartNo=kart_no).values('ProfilNo', 'Kg', 'Adet', 'FirmaAdi', 'Mm', 'Profil_Gramaj', 'YuzeyOzelligi', 'KondusyonTuru')
         order_data = [
             {
-                "ProfilNo": order.ProfilNo,
-                "Kg": order.Kg,
-                "Adet": order.Adet,
-                "FirmaAdi": order.FirmaAdi,
-                "Boy": order.PlanlananMm,
-                "KondusyonTuru": order.KondusyonTuru,
-                "Profil_Gramaj": order.Profil_Gramaj,
-                "YuzeyOzelligi": order.YuzeyOzelligi,
+                "ProfilNo": order['ProfilNo'],
+                "Kg": order['Kg'],
+                "Adet": order['Adet'],
+                "FirmaAdi": order['FirmaAdi'],
+                "Boy": order['Mm'],
+                "KondusyonTuru": order['KondusyonTuru'],
+                "Profil_Gramaj": order['Profil_Gramaj'],
+                "YuzeyOzelligi": order['YuzeyOzelligi'],
             }
             for order in orders
         ]
