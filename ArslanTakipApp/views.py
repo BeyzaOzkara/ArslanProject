@@ -2571,6 +2571,7 @@ def yuda_kaydet(request):
                             yetki_group = value
                         elif key == "ProjeTipi" or key == "MevcutProfil":
                             y.meta_data[key] = value
+                            # 67 idli KaliphaneAdmin kullanıcısı Onay oyu versin
                             
                     y.save()
 
@@ -2612,10 +2613,13 @@ def yuda_kaydet(request):
                     for field in y._meta.fields:
                         fname = field.name
                         fvalue = getattr(y, fname)
-                        if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat":
+                        if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat" and fname != 'Paketleme':
                             group = Group.objects.get(name=group_mapping[fname])
                             assign_perm("gorme_yuda", group, y)
                         if fname == "TalasliImalat" and fvalue == "Var":
+                            group = Group.objects.get(name=group_mapping[fname])
+                            assign_perm("gorme_yuda", group, y)
+                        if fname == "Paketleme" and fvalue == "Ozel Paketleme":
                             group = Group.objects.get(name=group_mapping[fname])
                             assign_perm("gorme_yuda", group, y)
 
@@ -4505,7 +4509,8 @@ def get_siparis_kart_info(request):
         kart_no = request.GET.get('kart_no')
         print(f"kart: {kart_no}")
     try:
-        orders = TestereDepo.objects.using('dies').filter(BulunduguYer='TESTERE', Adet__gte=1, KartAktif=1, Aktif=0, KartNo=kart_no).values('ProfilNo', 'Kg', 'Adet', 'FirmaAdi', 'Mm', 'Profil_Gramaj', 'YuzeyOzelligi', 'KondusyonTuru')
+        orders = TestereDepo.objects.using('dies').filter(BulunduguYer='TESTERE', Adet__gte=1, KartAktif=1, Aktif=0, KartNo=kart_no) \
+        .values('ProfilNo', 'Kg', 'Adet', 'FirmaAdi', 'Mm', 'Profil_Gramaj', 'YuzeyOzelligi', 'KondusyonTuru').order_by('SonTermin')
         order_data = [
             {
                 "ProfilNo": order['ProfilNo'],
