@@ -31,7 +31,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil
+    QRCode, KartDagilim, KalipMuadil, Termik
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -139,7 +139,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
-def location(request):  
+def location(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
@@ -4013,7 +4013,7 @@ class Stacker4500View(generic.TemplateView):
 def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=120)
         plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
         cleaned_to_original = {} 
@@ -4053,7 +4053,7 @@ def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=120)
         billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
@@ -4131,182 +4131,9 @@ def delete_sepet_yuk(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
-class Stacker4500View2(generic.TemplateView):
-    template_name = '4500/stacker4500.html'
-    
-    def get_context_data(self, **kwargs):
-        sepet = get_ongoing_sepet()
-        
-        context = super().get_context_data(**kwargs)
-
-        if sepet:
-            context['ongoing_sepet_id'] = sepet.id
-            context['ongoing_sepet_no'] = sepet.sepet_no[1:] if sepet.sepet_no.startswith("S") else sepet.sepet_no
-            context['yuklenen_data'] = json.dumps(sepet.yuklenen or [])
-        else:
-            context['yuklenen_data'] = []
-            context['ongoing_sepet_no'] = ''
-            context['ongoing_sepet_id'] = ''
-
-        return context
-    
-    def post(self, request, *args, **kwargs):
-        sepet_id = request.POST.get('sepet_id')
-        sepet_no = request.POST.get('sepet_no')
-        sepet_bitti = request.POST.get('sepet_bitti')
-
-        if sepet_bitti:
-            sepet = Sepet.objects.get(id=sepet_id)
-            sepet.bitis_saati = timezone.now()
-            sepet.save()
-            return JsonResponse({'success': True}, status=200)
-        
-        if sepet_id and sepet_no: # id varsa sepet no değiştiriliyor
-            old_sepet = Sepet.objects.get(id=sepet_id)
-            old_sepet.sepet_no = sepet_no
-            old_sepet.save()
-            return JsonResponse({'sepet_id': sepet_id})
-        elif sepet_no: # yoksa yeni sepet yaratılıyor
-            new_sepet = Sepet.objects.create(
-                sepet_no=sepet_no,
-                baslangic_saati=timezone.now(),
-                pres_kodu = '4500-1'
-            )
-            return JsonResponse({'sepet_id': new_sepet.id})
-        else:
-            return JsonResponse({'error': 'Sepet No is required'}, status=400)
-
-def get_kart_no_list(request):
-    if request.method == "GET":
-        end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
-        # Son 48 saatteki singular_paramsı alıyoruz
-        plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
-
-        billet_group_dict = {}
-        profil_listesi = set()
-        for singular_params in plc_data:
-            if singular_params:
-                die_number = singular_params.get("DieNumber", "")
-                # billet_no = singular_params.get("BilletLot", "")
-
-                if die_number: #and billet_no:
-                    # "-" karakterinden sonrasını silip boşlukları temizliyoruz
-                    cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-                    # if cleaned_die_number in billet_group_dict:
-                    #     billet_group_dict[die_number].add(billet_no)
-                    # else:
-                    #     billet_group_dict[die_number] = {billet_no}
-            
-                    if cleaned_die_number not in profil_listesi:
-                        alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
-                        if alt_group:
-                            alternative_dies = alt_group.profiller
-                            for alternative_die in alternative_dies:
-                                if alternative_die not in profil_listesi:
-                                    profil_listesi.add(alternative_die)
-                        else:
-                            profil_listesi.add(cleaned_die_number)
-        # print(f"billet_group: {billet_group_dict}")
-        # siparis queryi profilnolarına göre filtreliyoruz, preskoduna göre filtrelemekten vazgeçtik
-        siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('KartNo', flat=True ).distinct()
-        
-        # response_data = []
-        # for kart_no, profil_no in siparisler:
-        #     for die_number, billet_nos in billet_group_dict.items():
-        #         cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-        #         if profil_no == cleaned_die_number:
-        #             for billet in billet_nos:
-        #                 response_data.append({
-        #                     "KartNo": kart_no,
-        #                     "DieNumber": die_number,  # Original DieNumber
-        #                     "BilletNo": billet
-        #                 })
-        # print(response_data)
-        list_siparisler = list(siparisler)
-        return JsonResponse(list_siparisler, safe=False)
-    return JsonResponse({"error": "Invalid request method"}, status=400)
-
-def get_siparis_info(request):
-    if request.method == "GET":
-        kart_no = request.GET.get('kart_no')
-    try:
-        orders = SiparisList.objects.using('dies').filter(Q(KartNo=kart_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        order_data = [
-            {
-                "ProfilNo": order.ProfilNo,
-                "Kg": order.Kg,
-                "Adet": order.Adet,
-                "FirmaAdi": order.FirmaAdi,
-                "KondusyonTuru": order.KondusyonTuru,
-                "BilletTuru": order.BilletTuru,
-                "Profil_Gramaj": order.Profil_Gramaj,
-                "YuzeyOzelligi": order.YuzeyOzelligi,
-            }
-            for order in orders
-        ]
-        return JsonResponse({'success': True, 'orders': order_data})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
-
-def update_sepet_yuklenen(request):
-    if request.method == "POST":
-        sepet_id = request.POST.get('sepet_id')
-        kart_no = request.POST.get('kart_no')
-        adet = int(request.POST.get('adet'))
-
-        try:
-            sepet = Sepet.objects.get(id=sepet_id)
-            
-            # Yuklenende böyle bir kartno var mı bak varsa adetleri topla
-            yuklenen = sepet.yuklenen or []
-            found = False
-            for item in yuklenen:
-                if item['KartNo'] == kart_no:
-                    # Kart No varsa adetleri topla
-                    item['Adet'] = int(item['Adet']) + adet
-                    found = True
-                    break
-            siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
-            # Kart no yoksa yeni entry
-            if not found:
-                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False})
-
-            # Update the yuklenen field
-            sepet.yuklenen = yuklenen
-            sepet.save()
-
-            # Return the updated yuklenen data as a response
-            return JsonResponse({'success': True, 'yuklenen': yuklenen})
-
-        except Sepet.DoesNotExist:
-            return JsonResponse({'error': 'Sepet not found'}, status=404)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-def delete_sepet_yuklenen(request):
-    if request.method == "POST":
-        sepet_id = request.POST.get('sepet_id')
-        kart_no = request.POST.get('kart_no')
-
-        try:
-            sepet = Sepet.objects.get(id=sepet_id)
-            yuklenen = sepet.yuklenen or []
-            updated_yuklenen = [item for item in yuklenen if item['KartNo'] != kart_no]
-            
-            sepet.yuklenen = updated_yuklenen
-            sepet.save()
-
-            return JsonResponse({'success': True})
-        except Sepet.DoesNotExist:
-            return JsonResponse({'error': 'Sepet not found'}, status=404)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
-
 def get_profil_nos(pres):
     end_time = timezone.now()
-    start_time = end_time - datetime.timedelta(hours=48)
+    start_time = end_time - datetime.timedelta(hours=120)
 
     ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
  
@@ -4347,7 +4174,7 @@ def get_ext_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=120)
 
         try:
             alternative_dies = get_alternative_profiles(profil_no)
@@ -4407,7 +4234,7 @@ def get_sepet_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        end_48_time = end_time - datetime.timedelta(hours=48)
+        end_48_time = end_time - datetime.timedelta(hours=120)
         
         alternative_dies = get_alternative_profiles(profil_no)
         q = Q()

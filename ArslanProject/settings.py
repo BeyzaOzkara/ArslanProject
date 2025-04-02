@@ -135,7 +135,7 @@ DATABASES = {
         'PASSWORD': 'gqTYe5HdX0VQ',
         'HOST': '192.168.150.230',
         'PORT': '5432',
-    },
+    }
 }
 
 DATABASE_ROUTERS = [
