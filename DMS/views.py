@@ -6,8 +6,6 @@ from ArslanTakipApp.models import Termik
 
 
 def event_deneme(request):
-    print("deneme")
-
     json_file_path = 'C:\\Users\\beyza.ozkara\\Desktop\\termik_data\\NodeRed.Termik.json'
 
     with open(json_file_path, 'r') as f:
@@ -30,6 +28,10 @@ def event_deneme(request):
         )
         
         real_time_data.save()
+        
+        print(f"Transferred: {oven_name} at {sample_time}")
+
+    print("Data transfer complete!")
 
 def transfer_termik_to_realtime():
     termik_records = Termik.objects.all().exclude(OvenName='Y1600')

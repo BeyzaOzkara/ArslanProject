@@ -30,6 +30,13 @@
         display: flex; /* Use flexbox */
         align-items: center; /* Align items vertically center */
     }
+    .sepet-container .row {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%; /* Ensure it doesn’t exceed its parent */
+        
+        gap: 5px; /* Adjust spacing */
+    }
 
     .kart-ekle-container {
         display: flex; /* Align elements horizontally */
@@ -52,6 +59,11 @@
     .btn-ok {
         margin-left: 10px;
     }
+
+    .show-con {
+        display: none;
+    }
+    
 </style>
 {% endblock %}
 
@@ -71,15 +83,23 @@
         <button id="okButton" class="btn btn-primary btn-ok disabled" disabled>✔</button>
     </div>
     <div class="sepet-container" style="display: none;">
-        <div class="kart-ekle-container">
-            <label for="kartNoSelect">Sipariş Kart No:</label>
-            <select name="KartNoSelect" class="form-control" id="kartNoSelect">
+        <div class="row">
+
+            <select name="KalipNoSelect" class="form-control col" id="kalipNoSelect">
+                <option value="" id="kalipNoSelected" selected disabled>Kalıp No* </option>
+                
+            </select>
+            <select name="BilletLot" class="form-control show-con col" id="billetLotSelect">
+                <option value="" id="billetLotSelected" selected disabled>Şarj No* </option>
+
+            </select>
+            <select name="KartNoSelect" class="form-control show-con col" id="kartNoSelect">
                 <option value="" id="kartNoSelected" selected disabled>Kart No* </option>
                 
             </select>
-            <label for="adet">Adet:</label>
-            <input type="text" id="adet" class="form-control" placeholder="Adet">
-            <button id="ekleButton" class="btn btn-primary" disabled>Yükle</button>
+            <input type="text" id="adet" class="form-control show-con col" placeholder="Adet">
+            <button id="ekleButton" class="btn btn-primary show-con col" disabled>Yükle</button>
+        </div>
         </div>
         <div id="siparisInfo">
             <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
@@ -117,8 +137,11 @@
         var sepetNoInput = document.getElementById("sepetNo");
         var okButton = document.getElementById("okButton");
         var sepetContainer = document.querySelector(".sepet-container");
+        var showContainer = document.querySelectorAll(".show-con");
 
+        var kalipNoSelect = document.getElementById("kalipNoSelect");
         var kartNoSelect = document.getElementById("kartNoSelect");
+        var billetLotSelect = document.getElementById("billetLotSelect");
         var adetInput = document.getElementById("adet");
         var ekleButton = document.getElementById("ekleButton");
         var dolduButton = document.getElementById("dolduButton");
@@ -140,7 +163,7 @@
             sepetNoInput.value = sepet_no_data;
             sepetNoInput.disabled = true;
             okButton.textContent = "Düzenle";
-            getKartNoList();
+            getKalipNoList();
             sepetContainer.style.display = "block";
         }
 
@@ -154,18 +177,43 @@
             }
         }
 
+        function getKalipNoList() {
+            $.ajax({
+                url: "/4500/stacker/get_kalip_nos/",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    populateKalipNoSelect(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching KartNo list:", error);
+                }
+            });
+        }
+
         function getKartNoList() {
             $.ajax({
                 url: "/4500/stacker/get_kart_nos/",
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
-                    console.log(sepet_id)
+                    console.log(sepet_id);
+
                     populateKartNoSelect(data);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching KartNo list:", error);
                 }
+            });
+        }
+
+        function populateKalipNoSelect(data) {
+            kalipNoSelect.innerHTML = `<option value="" id="kalipNoSelected" selected disabled>Kalıp No Seçiniz</option>`;
+            data.forEach(kalipNo => {
+                const option = document.createElement("option");
+                option.value = kalipNo;
+                option.textContent = kalipNo;
+                kalipNoSelect.appendChild(option);
             });
         }
 
@@ -179,6 +227,60 @@
                 kartNoSelect.appendChild(option);
             });
         }
+
+        function populateSarjNoSelect(data) {
+            billetLotSelect.innerHTML = `<option value="" id="billetLotSelected" selected disabled>Şarj No Seçiniz</option>`;
+            data.forEach(sarjNo => {
+                const option = document.createElement("option");
+                option.value = sarjNo;
+                option.textContent = sarjNo;
+                billetLotSelect.appendChild(option);
+            });
+        }
+
+        kalipNoSelect.addEventListener("change", function () {
+            toggleEkleButtonState;
+            var selectedKalipNo = this.value;
+            if (selectedKalipNo) {
+                $.ajax({
+                    url: '/4500/stacker/get_billet_lots/',
+                    type: 'GET',
+                    data: {
+                        kalip_no: selectedKalipNo
+                    },
+                    success: function (data) {
+                        console.log(data)
+                        populateSarjNoSelect(data);
+                        var index = 0, length = showContainer.length;
+                        for ( ; index < length; index++) {
+                            showContainer[index].style.display = "block";
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching billet lots:", error);
+                    }
+                });
+                $.ajax({
+                    url: '/4500/stacker/get_siparis_nos/',
+                    type: 'GET',
+                    data: {
+                        kalip_no: selectedKalipNo
+                    },
+                    success: function (data) {
+                        console.log(data)
+                        populateKartNoSelect(data);
+                        // showContainer.style.display = 'block';
+                        var index = 0, length = showContainer.length;
+                        for ( ; index < length; index++) {
+                            showContainer[index].style.display = "block";
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching siparis nos:", error);
+                    }
+                });
+            }
+        })
 
         okButton.addEventListener("click", function () {
             var sepetNo = sepetNoInput.value.trim();
@@ -204,7 +306,7 @@
                 });
                 okButton.textContent = "Düzenle";
                 sepetNoInput.disabled = true;
-                getKartNoList();
+                getKalipNoList();
                 sepetContainer.style.display = "block";
             } else if (okButton.textContent === "Düzenle") {
                 // Enable input and change button text back to "Değişikliği Onayla"
@@ -242,7 +344,7 @@
         sepetNoInput.addEventListener("input", toggleButtonState);
 
         function toggleEkleButtonState() {
-            if (kartNoSelect.value && adetInput.value && parseInt(adetInput.value) > 0) {
+            if (kalipNoSelect.value && kartNoSelect.value && adetInput.value && parseInt(adetInput.value) > 0) {
                 ekleButton.disabled = false;
             } else {
                 ekleButton.disabled = true;
@@ -302,12 +404,17 @@
             var selectedKartNo = document.getElementById("kartNoSelect").value;
             var adet = document.getElementById("adet").value;
 
+            var selectedKalipNo = kalipNoSelect.value;
+            var selectedKartNo = kartNoSelect.value;
+            var selectedBilletLot = billetLotSelect.value;
             $.ajax({
                 url: '/4500/stacker/update_sepet_yuklenen/',
                 type: 'POST',
                 data: {
                     sepet_id: sepet_id,
                     kart_no: selectedKartNo,
+                    kalip_no: selectedKalipNo,
+                    billet_lot: selectedBilletLot,
                     adet: adet,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
@@ -316,6 +423,9 @@
                         updateTabulator(response.yuklenen);
                         kartNoSelect.value = "";
                         adetInput.value = "";
+                        kalipNoSelect.value = "";
+                        billetLotSelect.value = "";
+                        
 
                         ekleButton.disabled = true;
                     }
@@ -326,7 +436,7 @@
             });
         });
 
-        dolduButton.addEventListener("click", function () {
+        dolduButton.addEventListener("click", function () { // sepet doldu dedikten sonra post etmeden önce bir modal açılsın ve kullanıcıya hangi termik olduğu sorulsun
             if (sepet_id) {
                 $.ajax({
                     url: "",
@@ -361,25 +471,32 @@
                 placeholder: "Sepettekiler",
                 data: JSON.parse(data || '[]'), // Initialize with existing yuklenen data, or empty data if none
                 columns: [
-                    { title: "KartNo", field: "KartNo" },
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Kalıp No", field: "KalipNo" },
+                    { title: "Şarj No", field: "BilletLot" },
                     { title: "Adet", field: "Adet" },
                     {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
-                        var kartNo = cell.getRow().getData().KartNo;
+                        var tableData = cell.getRow().getData()
+                        var kartNo = tableData.KartNo;
+                        var kalipNo = tableData.KalipNo;
+                        var billetLot = tableData.BilletLot;
                         if (confirm("Silmek istediğinizden emin misiniz?")) {
-                            deleteItem(kartNo, cell);
+                            deleteItem(kartNo, kalipNo, billetLot, cell);
                         }
                     }},
                 ]
             });
         }
 
-        function deleteItem(kartNo, cell) {
+        function deleteItem(kartNo, kalipNo, billetLot, cell) {
             $.ajax({
                 url: '/4500/stacker/delete_sepet_yuklenen/',
                 type: 'POST',
                 data: {
                     sepet_id: sepet_id,
                     kart_no: kartNo,
+                    billet_lot: billetLot,
+                    kalip_no: kalipNo,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function (response) {

@@ -1,0 +1,81 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}
+  {% block bodyclass %}
+    sidebar-collapse
+  {% endblock %}
+{% endblock %}
+
+{% load static %}
+
+{% block title %}
+    Hata - Yuda
+{% endblock %}
+
+{% block stylesheets %}
+  {% include 'adminlte/lib/_styles.html' %}
+  <style>
+    /* styles.css */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 80%;
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2em;
+        color: #e74c3c;
+    }
+
+    p {
+        font-size: 1.2em;
+        margin: 20px 0;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1em;
+    }
+
+    .btn:hover {
+        background-color: #2980b9;
+    }
+
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Hata</h1>
+    <p>{{ error_message }}</p>  <!-- Görünümden gelen dinamik hata mesajı burada gösterilir -->
+    <p>Eğer bunun bir hata olduğunu düşünüyorsanız, lütfen destek ile iletişime geçin.</p>
+    <a href="{% url 'ArslanTakipApp:yudas' %}" class="btn btn-primary">Yuda Listesine Dön</a> <!-- Ana sayfaya veya istediğiniz başka bir sayfaya yönlendirme -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}

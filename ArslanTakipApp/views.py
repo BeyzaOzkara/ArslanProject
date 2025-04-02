@@ -3048,6 +3048,14 @@ def format_row(row):
     return formatted_data
 
 def yudaDetail(request, yId):
+    yudaD = YudaForm.objects.filter(id=yId)
+    
+    if yudaD.exists() and yudaD[0].Silindi:
+        # Redirect to another page or show an error message if Silindi is True
+        return render(request, 'ArslanTakipApp/yuda_error_page.html', {
+            'error_message': 'Bu Yuda kaydı silinmiş ve artık kullanılamaz.'
+        })
+    
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     
@@ -3055,7 +3063,7 @@ def yudaDetail(request, yId):
     yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
-    yudaDetails = YudaForm.objects.filter(id = yId).values()
+    yudaDetails = yudaD.values()
     
     yList = list(yudaDetails)
     formatted_yuda_details = format_yuda_details(yList)
@@ -3966,7 +3974,7 @@ def get_ongoing_sepet():
     return None
 
 class Stacker4500View(generic.TemplateView):
-    template_name = '4500/stacker45002.html'
+    template_name = '4500/stacker4500.html'
     
     def get_context_data(self, **kwargs):
         sepet = get_ongoing_sepet()
