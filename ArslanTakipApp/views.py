@@ -4045,9 +4045,14 @@ def get_kalip_no_list(request):
                     #     if alternative_die not in profil_listesi:
                     #         cleaned_die_number = alternative_die
                 profil_listesi.add(cleaned_die_number)
-                if cleaned_die_number not in cleaned_to_original:
-                    cleaned_to_original[cleaned_die_number] = []
-                cleaned_to_original[cleaned_die_number].append(die_number)
+                # if cleaned_die_number not in cleaned_to_original:
+                #     cleaned_to_original[cleaned_die_number] = []
+                # cleaned_to_original[cleaned_die_number].append(die_number)
+            if cleaned_die_number not in cleaned_to_original:
+                cleaned_to_original[cleaned_die_number] = set()  # Use a set to avoid duplicates
+            
+            # Add the original die_number to the set
+            cleaned_to_original[cleaned_die_number].add(die_number)
         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('ProfilNo', flat=True ).distinct()
         final_list = [
