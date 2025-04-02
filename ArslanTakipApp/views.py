@@ -2740,6 +2740,9 @@ def bolumOnayFilter(q, val, group):
         elif val == "False":
             q['yudaonay__OnayDurumu'] = False
             q['yudaonay__Group'] = group
+        # elif val == "None":
+        #     q['yudaonay__OnayDurumu__isnull'] = False
+        #     q['yudaonay__Group'] = group
     return q
 
 def yudas_list(request):
@@ -3051,7 +3054,6 @@ def yudaDetail(request, yId):
     yudaD = YudaForm.objects.filter(id=yId)
     
     if yudaD.exists() and yudaD[0].Silindi:
-        # Redirect to another page or show an error message if Silindi is True
         return render(request, 'ArslanTakipApp/yuda_error_page.html', {
             'error_message': 'Bu Yuda kaydı silinmiş ve artık kullanılamaz.'
         })
