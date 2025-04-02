@@ -437,12 +437,18 @@
         });
 
         dolduButton.addEventListener("click", function () { // sepet doldu dedikten sonra post etmeden önce bir modal açılsın ve kullanıcıya hangi termik olduğu sorulsun
+            // modal aç ve termik seç
+            
+        });
+
+        kaydetButton.addEventListener("click", function () {
             if (sepet_id) {
                 $.ajax({
                     url: "",
                     type: "POST",
                     data: {
                         sepet_id: sepet_id,
+                        sepet_termik: "", // seçilen termik gönderilsin.
                         sepet_bitti: true,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
@@ -459,7 +465,7 @@
             } else {
                 console.error("Sepet ID is missing.");
             }
-        });
+        })
 
         function initializeTabulator(data) {
             var deleteIcon = function(cell, formatterParams, onRendered){ 

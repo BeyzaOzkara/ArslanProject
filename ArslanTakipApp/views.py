@@ -2534,7 +2534,6 @@ def yuda_profil(request):
     
     return JsonResponse({'profiles': profiles_data})
 
-@transaction.atomic
 def yuda_kaydet(request):
     if request.method == "POST":
         max_attempts = 5
@@ -2697,12 +2696,14 @@ def yuda_kaydet(request):
             except json.JSONDecodeError:
                 response = JsonResponse({'error': 'Geçersiz JSON formatı'})
                 response.status_code = 500 #server error
+                break
             except IntegrityError:
                 time.sleep(0.1)
                 continue
             except Exception as e:
                 response = JsonResponse({'error': str(e)})
                 response.status_code = 500 #server error
+                break
 
     return response
         
