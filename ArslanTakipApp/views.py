@@ -38,7 +38,7 @@ from django.utils.html import strip_tags
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
-from guardian.shortcuts import get_objects_for_user, assign_perm, get_groups_with_perms
+from guardian.shortcuts import get_objects_for_user, get_objects_for_group, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
 from django.db.models import CharField, Q, Sum, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
 from django.db.models.functions import Cast, Replace
@@ -2740,9 +2740,7 @@ def bolumOnayFilter(q, val, group):
         elif val == "False":
             q['yudaonay__OnayDurumu'] = False
             q['yudaonay__Group'] = group
-        # elif val == "None":
-        #     q['yudaonay__OnayDurumu__isnull'] = False
-        #     q['yudaonay__Group'] = group
+        
     return q
 
 def yudas_list(request):
@@ -2766,8 +2764,8 @@ def yudas_list(request):
             if i['type'] == "BolumOnayFilter":
                 print(i)
                 filter_group = Group.objects.get(name=i['field'])
-                print(filter_group)
-                if i['value'] == "None":
+                if i['value'] == "None": # 
+                    y = get_objects_for_group(filter_group, "gorme_yuda", y)
                     y = y.exclude(yudaonay__Group=filter_group)
                 else:
                     q = bolumOnayFilter(q, i['value'], filter_group)
