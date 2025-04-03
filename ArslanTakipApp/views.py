@@ -2536,13 +2536,12 @@ def yuda_profil(request):
 
 def yuda_kaydet(request):
     if request.method == "POST":
-        max_attempts = 5
-        for attempt in range(max_attempts):
+        for attempt in range(2):
             try:
                 today = datetime.datetime.now().strftime('%j')
                 year = datetime.datetime.now().strftime('%y')
                 with transaction.atomic():
-                    lastOfDay = YudaForm.objects.filter(YudaNo__startswith=year + '-' + today).order_by('-YudaNo').first()
+                    lastOfDay = YudaForm.objects.filter(YudaNo__startswith=year + '-' + today).select_for_update(skip_locked=True).order_by('-YudaNo').first() # select for update
                     if lastOfDay:
                         # Extract the sequential number part from the latest YudaNo and increment it
                         latest_seq_number = int(lastOfDay.YudaNo[-2:]) + 1
@@ -4321,8 +4320,8 @@ def sepete_dagit(request):
 
             for sepet in gelen_sepetler:
                 sepet_id = sepet["id"]
-                kart_no = sepet["KartNo"]    
-                print(sepet)
+                kart_no = sepet["KartNo"]
+
                 if sepet_id not in sepetler_grouped:
                     sepetler_grouped[sepet_id] = []
                 siparis = siparis_list.get(kart_no) # SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
