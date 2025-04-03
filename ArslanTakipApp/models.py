@@ -115,6 +115,7 @@ class Sepet(models.Model):
     bitis_saati = models.DateTimeField(null=True, blank=True)
     pres_kodu = models.CharField(null=True, blank=True)
     yuklenen = models.JSONField(null=True, blank=True)
+    meta_data = models.JSONField(null=True, blank=True)
 
     class Meta:
         permissions = [("view_4500_uretim", "Uretim Gorme Yetkisi Var")]

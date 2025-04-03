@@ -4197,7 +4197,6 @@ def get_ext_info(request):
             for die in alternative_dies:
                 q |= Q(singular_params__DieNumber__startswith=die)
                 # q["singular_params__DieNumber__startswith"] = die
-            print(q)
             queryset = (
                 PlcData.objects.using('plc4').filter(
                     start__gte=start_time, 
@@ -4228,7 +4227,6 @@ def get_ext_info(request):
                 )
                 .order_by("imalat_baslangici")
             )
-            print(queryset)
             for e in queryset:
                 e['imalat_baslangici_2'] = format_date_time_without_year(e['imalat_baslangici'])
                 e['imalat_sonu_2'] = format_date_time_without_year(e['imalat_sonu'])
@@ -4324,7 +4322,7 @@ def sepete_dagit(request):
             for sepet in gelen_sepetler:
                 sepet_id = sepet["id"]
                 kart_no = sepet["KartNo"]    
-
+                print(sepet)
                 if sepet_id not in sepetler_grouped:
                     sepetler_grouped[sepet_id] = []
                 siparis = siparis_list.get(kart_no) # SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
@@ -4333,7 +4331,7 @@ def sepete_dagit(request):
                                                    "BilletLot": sepet["BilletLot"], "KalipNo":sepet["KalipNo"], "Kondusyon": siparis.KondusyonTuru, "Atandi": True})
 
             grouped_sepetler = [{"id": sepet_id, "items": items} for sepet_id, items in sepetler_grouped.items()]
-
+            print(grouped_sepetler)
             with transaction.atomic():
                 for sepetler in grouped_sepetler:
                     sepet = Sepet.objects.get(id=sepetler['id']) 
@@ -4401,7 +4399,7 @@ def update_sepet(request):
             sepet = Sepet.objects.get(id=sepet_id)
             sepet.sepet_no = sepet_no
             for y in yuklenen_data:
-                siparis = SiparisList.objects.using('dies').filter(KartNo=y['KartNo'])[0]
+                siparis = SiparisList.objects.using('dies').filter(KartNo=y['KartNo'])[0] # kalipno, billetlot ve kart no seçilsin
                 row = {"KartNo": y['KartNo'], "Adet": y['Adet'], 'ProfilNo': siparis.ProfilNo, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False}
                 new_data.append(row)
             

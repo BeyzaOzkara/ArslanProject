@@ -533,7 +533,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (yazilacak>0) {
                         sonuc[j].hesapAdet -= yazilacak;
                         sepet[i].Adet -= yazilacak;
-                        var row = {"id": sepet[i].id, "SepetNo":sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy};
+                        var row = {"id": sepet[i].id, "SepetNo":sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy, "KalipNo": sepet[i].KalipNo, "BilletLot": sepet[i].BilletLot};
                         dagilan.push(row);
                     }
                 }
