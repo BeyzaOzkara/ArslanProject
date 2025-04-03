@@ -2536,7 +2536,7 @@ def yuda_profil(request):
 
 def yuda_kaydet(request):
     if request.method == "POST":
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 today = datetime.datetime.now().strftime('%j')
                 year = datetime.datetime.now().strftime('%y')
@@ -2600,30 +2600,32 @@ def yuda_kaydet(request):
 
                     assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
                     assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
-                    assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
-                    assign_perm("acan_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
-                    for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
-                        if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
-                            if group in request.user.groups.all():
+                    
+                    if y.MusteriFirmaAdi != "DENEME":
+                        assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+                        assign_perm("acan_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+                        for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
+                            if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
+                                if group in request.user.groups.all():
+                                    assign_perm("gorme_yuda", group, y)
+                                if yetki_group == group.name:
+                                    assign_perm("gorme_yuda", group, y)
+                            else:
                                 assign_perm("gorme_yuda", group, y)
-                            if yetki_group == group.name:
-                                assign_perm("gorme_yuda", group, y)
-                        else:
-                            assign_perm("gorme_yuda", group, y)
 
-                    # Check field values and assign permissions based on conditions
-                    for field in y._meta.fields:
-                        fname = field.name
-                        fvalue = getattr(y, fname)
-                        if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat" and fname != "Paketleme":
-                            group = Group.objects.get(name=group_mapping[fname])
-                            assign_perm("gorme_yuda", group, y)
-                        if fname == "TalasliImalat" and fvalue == "Var":
-                            group = Group.objects.get(name=group_mapping[fname])
-                            assign_perm("gorme_yuda", group, y)
-                        if fname == "Paketleme" and fvalue == "Ozel Paketleme":
-                            group = Group.objects.get(name=group_mapping[fname])
-                            assign_perm("gorme_yuda", group, y)
+                        # Check field values and assign permissions based on conditions
+                        for field in y._meta.fields:
+                            fname = field.name
+                            fvalue = getattr(y, fname)
+                            if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat" and fname != "Paketleme":
+                                group = Group.objects.get(name=group_mapping[fname])
+                                assign_perm("gorme_yuda", group, y)
+                            if fname == "TalasliImalat" and fvalue == "Var":
+                                group = Group.objects.get(name=group_mapping[fname])
+                                assign_perm("gorme_yuda", group, y)
+                            if fname == "Paketleme" and fvalue == "Ozel Paketleme":
+                                group = Group.objects.get(name=group_mapping[fname])
+                                assign_perm("gorme_yuda", group, y)
 
                     if is_old_profile:
                         YudaOnay.objects.create(
@@ -2691,7 +2693,7 @@ def yuda_kaydet(request):
                             logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
                         
 
-                response = JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
+                return JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
             except json.JSONDecodeError:
                 response = JsonResponse({'error': 'Geçersiz JSON formatı'})
                 response.status_code = 500 #server error
