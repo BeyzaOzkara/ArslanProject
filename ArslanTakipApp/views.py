@@ -4089,7 +4089,7 @@ def get_siparis_no_list(request):
         return JsonResponse(kart_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
-def update_sepet_yuk(request):
+def update_sepet_yuklenen(request):
     if request.method == "POST":
         sepet_id = request.POST.get('sepet_id')
         kart_no = request.POST.get('kart_no')
@@ -4125,7 +4125,7 @@ def update_sepet_yuk(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
         
-def delete_sepet_yuk(request):
+def delete_sepet_yuklenen(request):
     if request.method == "POST":
         sepet_id = request.POST.get('sepet_id')
         kart_no = request.POST.get('kart_no')
@@ -4330,7 +4330,7 @@ def sepete_dagit(request):
                 siparis = siparis_list.get(kart_no) # SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
                 if siparis:
                     sepetler_grouped[sepet_id].append({"KartNo": kart_no, "Adet":sepet["Adet"], "Boy": sepet["Boy"], "ProfilNo":profil_no, "Yuzey": siparis.YuzeyOzelligi, 
-                                                   "Kondusyon": siparis.KondusyonTuru, "Atandi": True})
+                                                   "BilletLot": sepet["BilletLot"], "KalipNo":sepet["KalipNo"], "Kondusyon": siparis.KondusyonTuru, "Atandi": True})
 
             grouped_sepetler = [{"id": sepet_id, "items": items} for sepet_id, items in sepetler_grouped.items()]
 
