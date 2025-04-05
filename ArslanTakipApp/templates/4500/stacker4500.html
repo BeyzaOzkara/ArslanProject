@@ -38,24 +38,6 @@
         gap: 5px; /* Adjust spacing */
     }
 
-    .kart-ekle-container {
-        display: flex; /* Align elements horizontally */
-        align-items: center; /* Align items vertically center */
-        gap: 10px; /* Optional: Adjust spacing between elements */
-        width: 100%; /* Make the container full width */
-    }
-
-    .kart-ekle-container label {
-        margin-right: 10px; /* Adjust spacing between the label and input/select */
-    }
-
-    .kart-ekle-container input, .kart-ekle-container select {
-        flex: 1; /* Allow inputs to stretch evenly */
-    }
-    .kart-ekle-container button {
-        flex: 0; /* Keep the button at its natural size */
-    }
-
     .btn-ok {
         margin-left: 10px;
     }
@@ -177,29 +159,13 @@
             }
         }
 
-        function getKalipNoList() {
+        function getKalipNoList() { 
             $.ajax({
                 url: "/4500/stacker/get_kalip_nos/",
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
                     populateKalipNoSelect(data);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching KartNo list:", error);
-                }
-            });
-        }
-
-        function getKartNoList() {
-            $.ajax({
-                url: "/4500/stacker/get_kart_nos/",
-                type: "GET",
-                dataType: "json",
-                success: function (data) {
-                    console.log(sepet_id);
-
-                    populateKartNoSelect(data);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching KartNo list:", error);
@@ -342,7 +308,7 @@
         toggleButtonState();
         // Enable/Disable the Okay button based on input field content
         sepetNoInput.addEventListener("input", toggleButtonState);
-
+  
         function toggleEkleButtonState() {
             if (kalipNoSelect.value && kartNoSelect.value && adetInput.value && parseInt(adetInput.value) > 0) {
                 ekleButton.disabled = false;

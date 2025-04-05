@@ -15,22 +15,15 @@
         align-items: center;
         gap: 10px;
     }
-    .kart-ekle-container {
-        display: flex; /* Align elements horizontally */
-        align-items: center; /* Align items vertically center */
-        gap: 10px; /* Optional: Adjust spacing between elements */
-        width: 100%; /* Make the container full width */
+    .sepet-container .row {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%; /* Ensure it doesn’t exceed its parent */
+        
+        gap: 5px; /* Adjust spacing */
     }
-
-    .kart-ekle-container label {
-        margin-right: 10px; /* Adjust spacing between the label and input/select */
-    }
-
-    .kart-ekle-container input, .kart-ekle-container select {
-        flex: 1; /* Allow inputs to stretch evenly */
-    }
-    .kart-ekle-container button {
-        flex: 0; /* Keep the button at its natural size */
+    .show-con {
+        display: none;
     }
 </style>
 {% endblock %}
@@ -62,12 +55,20 @@
                     </div>
                 </div>
                 <div class="sepet-container">
-                    <div class="kart-ekle-container mb-3">
-                        <label for="kartNo">Sipariş Kart No:</label>
-                        <input type="text" class="form-control" id="kartNo" placeholder="Sipariş Kart No" onfocusout="checkKartNo()">
-                        <label for="adet">Adet:</label>
-                        <input type="text" id="adet" class="form-control" placeholder="Adet">
-                        <button id="ekleButton" class="btn btn-primary">Yükle</button>
+                    <div class="row">
+                        <select class="form-control col" id="kalipNoSelect" name="KalipNoSelect" data-placeholder="Kalıp Numarası Seçiniz">
+                            <option value=""></option>
+                        </select>
+                        <select name="BilletLot" class="form-control show-con col" id="billetLotSelect">
+                            <option value="" id="billetLotSelected" selected disabled>Şarj No* </option>
+            
+                        </select>
+                        <select name="KartNoSelect" class="form-control show-con col" id="kartNoSelect">
+                            <option value="" id="kartNoSelected" selected disabled>Kart No* </option>
+                            
+                        </select>
+                        <input type="text" id="adet" class="form-control show-con col" placeholder="Adet">
+                        <button id="ekleButton" class="btn btn-primary show-con col" disabled>Yükle</button>
                     </div>
                     <div id="siparisInfo">
                         <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
@@ -150,18 +151,22 @@
     }
     var sepetTable = null;
     var sepet_id = 0;
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () { 
         var sepetNoInput = document.getElementById('sepetNo');
-        var kartNo = document.getElementById('kartNo');
+        var kalipNoSelect = document.getElementById('kalipNoSelect');
+        var kartNoSelect = document.getElementById('kartNoSelect');
+        var billetLotSelect = document.getElementById('billetLotSelect');
         var adet = document.getElementById('adet');
+        var showContainer = document.querySelectorAll(".show-con");
         var duzenleButton = document.getElementById('duzenleButton');
         var ekleButton = document.getElementById('ekleButton');
         var kaydetButton = document.getElementById('btnSepetKaydet');
-
+        
         function fillModal(data) {
             sepetNoInput.value = data.sepet_no.slice(1);
             sepet_id = data.id;
             initializeTabulator(data.yuklenen);
+            getKalipNoList();
         }
         var editIcon = function(cell, formatterParams, onRendered){ 
             return "<i class='fa fa-edit'></i>";
@@ -174,7 +179,6 @@
             columns: [
                 {formatter:editIcon, width:80, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
                     var data = cell.getData();
-                    console.log(data.yuklenen)
                     fillModal(data);
                     $('#sepetModal').modal('show');
                 }},
@@ -192,6 +196,103 @@
             ]
         });
 
+        function getKalipNoList() { 
+            $.ajax({
+                url: "/4500/sepetler/get_kalip_nos/",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    populateKalipNoSelect(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching KartNo list:", error);
+                }
+            });
+        }
+
+        function populateKalipNoSelect(data) {
+            kalipNoSelect.innerHTML = `<option value="" id="kalipNoSelected" selected disabled>Kalıp No Seçiniz</option>`;
+            data.forEach(kalipNo => {
+                const option = document.createElement("option");
+                option.value = kalipNo;
+                option.textContent = kalipNo;
+                kalipNoSelect.appendChild(option);
+            });
+        }
+
+        function populateKartNoSelect(data) {
+            // Clear existing options
+            kartNoSelect.innerHTML = `<option value="" id="kartNoSelected" selected disabled>Kart No Seçiniz</option>`;
+            data.forEach(kartNo => {
+                const option = document.createElement("option");
+                option.value = kartNo;
+                option.textContent = kartNo;
+                kartNoSelect.appendChild(option);
+            });
+        }
+
+        function populateSarjNoSelect(data) {
+            billetLotSelect.innerHTML = `<option value="" id="billetLotSelected" selected disabled>Şarj No Seçiniz</option>`;
+            data.forEach(sarjNo => {
+                const option = document.createElement("option");
+                option.value = sarjNo;
+                option.textContent = sarjNo;
+                billetLotSelect.appendChild(option);
+            });
+        }
+
+        function toggleEkleButtonState() {
+            if (kalipNoSelect.value && kartNoSelect.value && billetLotSelect.value && adet.value && parseInt(adet.value) > 0) {
+                ekleButton.disabled = false;
+            } else {
+                ekleButton.disabled = true;
+            }
+        }
+        $("select, input").change(function(){
+            toggleEkleButtonState();
+        });
+        
+        kalipNoSelect.addEventListener("change", function () {
+            var selectedKalipNo = this.value;
+            if (selectedKalipNo) {
+                $.ajax({
+                    url: '/4500/sepetler/get_billet_lots/',
+                    type: 'GET',
+                    data: {
+                        kalip_no: selectedKalipNo
+                    },
+                    success: function (data) {
+                        populateSarjNoSelect(data);
+                        var index = 0, length = showContainer.length;
+                        for ( ; index < length; index++) {
+                            showContainer[index].style.display = "block";
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching billet lots:", error);
+                    }
+                });
+                $.ajax({
+                    url: '/4500/sepetler/get_siparis_nos/',
+                    type: 'GET',
+                    data: {
+                        kalip_no: selectedKalipNo
+                    },
+                    success: function (data) {
+                        populateKartNoSelect(data);
+                        var index = 0, length = showContainer.length;
+                        for ( ; index < length; index++) {
+                            showContainer[index].style.display = "block";
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching siparis nos:", error);
+                    }
+                });
+            }
+        })
+
+        
         function initializeTabulator(data) { 
             var deleteIcon = function(cell, formatterParams, onRendered){ 
                 return "<i class='fa fa-trash'></i>";
@@ -202,7 +303,9 @@
                 placeholder: "Sepet",
                 data: data || '[]',
                 columns: [
-                    { title: "KartNo", field: "KartNo" },
+                    { title: "Kalıp No", field: "KalipNo" },
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Şarj No", field: "BilletLot" },
                     { title: "Adet", field: "Adet" },
                     {formatter:deleteIcon, width:40, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
                         var kartNo = cell.getRow().getData().KartNo;
@@ -216,11 +319,11 @@
 
         ekleButton.addEventListener('click', function() {
             // Kart No ve Adet var mı kontrol et
-            if (kartNo.value == "" || adet.value == "") {
+            if (kalipNoSelect.value == "" || kartNoSelect.value == "" || billetLotSelect.value == "" || adet.value == "") {
                 alert("Lütfen boş alan bırakmayınız.");
                 return;
             }
-            sepetTable.addData([{"KartNo": kartNo.value, "Adet": adet.value}], true);
+            sepetTable.addData([{"KalipNo": kalipNoSelect.value, "KartNo": kartNoSelect.value, "BilletLot": billetLotSelect.value, "Adet": adet.value}], true);
         });
     
         kaydetButton.addEventListener('click', function(){

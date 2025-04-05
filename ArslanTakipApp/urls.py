@@ -128,6 +128,7 @@ urlpatterns = [
     path('4500/stacker/delete_sepet_yuklenen/', views.delete_sepet_yuklenen, name='delete_sepet_yuklenen'),
     path('4500/stacker/get_billet_lots/', views.get_billet_lot_list, name='get_billet_lot_list'),
     path('4500/stacker/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
+    path('4500/stacker/get_siparis_info/', views.get_siparis_kart_info, name='get_siparis_info'),
 
     path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
     path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
@@ -139,9 +140,13 @@ urlpatterns = [
     path('4500/hesaplama/get_sepet_info/', views.get_sepet_info, name='get_sepet_info'),
     path('4500/hesaplama/get_kart_info/', views.get_kart_info, name='get_kart_info'),
     path('4500/hesaplama/sepete_dagit/', views.sepete_dagit, name='sepete_dagit'),
+
     path('4500/sepetler', views.Sepetler4500View.as_view(), name='sepetler_4500'),
     path('4500/sepetler/get_sepetler/', views.get_sepetler, name='get_sepetler'),
     path('4500/sepetler/update_sepet/', views.update_sepet, name='update_sepetler'),
+    path('4500/sepetler/get_kalip_nos/', views.sepet_get_kalip_no_list, name='sepet_get_kalip_no_list'),
+    path('4500/sepetler/get_billet_lots/', views.sepet_get_billet_lot_list, name='sepet_get_billet_lot_list'),
+    path('4500/sepetler/get_siparis_nos/', views.sepet_get_siparis_no_list, name='sepet_get_siparis_no_list'),
     path('4500/sepetler/get_siparis_kart_info/', views.get_siparis_kart_info, name='get_siparis_kart_info'),
     
     path('4500/saw', views.saw4500View.as_view(), name='saw_4500'), # node red 7
