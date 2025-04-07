@@ -4177,7 +4177,7 @@ def delete_sepet_yuklenen(request):
 
 def get_profil_nos(pres):
     end_time = timezone.now()
-    start_time = end_time - datetime.timedelta(hours=120)
+    start_time = end_time - datetime.timedelta(hours=48)
 
     ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
  
