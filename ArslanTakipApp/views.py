@@ -4000,7 +4000,11 @@ class Stacker4500View(generic.TemplateView):
         sepet_bitti = request.POST.get('sepet_bitti')
 
         if sepet_bitti:
+            sepet_termik = request.POST.get('sepet_termik')
             sepet = Sepet.objects.get(id=sepet_id)
+            meta_data = sepet.meta_data or []
+            meta_data.append({'Termik': sepet_termik})
+            sepet.meta_data = meta_data
             sepet.bitis_saati = timezone.now()
             sepet.save()
             return JsonResponse({'success': True}, status=200)
@@ -4214,7 +4218,7 @@ def get_ext_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=120)
+        start_time = end_time - datetime.timedelta(hours=48)
 
         try:
             alternative_dies = get_alternative_profiles(profil_no)
@@ -4272,7 +4276,7 @@ def get_sepet_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        end_48_time = end_time - datetime.timedelta(hours=120)
+        end_48_time = end_time - datetime.timedelta(hours=48)
         
         alternative_dies = get_alternative_profiles(profil_no)
         q = Q()
@@ -4489,6 +4493,7 @@ def get_position_data(position):
 
 class FinishSaw4500View(generic.TemplateView):
     template_name = '4500/finishsaw.html'
+
 
 def get_saw_table(request):
     exts = PlcData.objects.using('plc4').filter(position="saw table", count__gt=0).order_by('-id')

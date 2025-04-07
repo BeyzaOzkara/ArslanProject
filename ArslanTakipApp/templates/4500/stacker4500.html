@@ -81,30 +81,51 @@
             </select>
             <input type="text" id="adet" class="form-control show-con col" placeholder="Adet">
             <button id="ekleButton" class="btn btn-primary show-con col" disabled>Yükle</button>
-        </div>
-        </div>
-        <div id="siparisInfo">
-            <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
-                <thead>
-                    <tr>
-                        <th>Profil No</th>
-                        <th>Kalan Kg</th>
-                        <th>Kalan Adet</th>
-                        <th>Kondusyon Turu</th>
-                        <th>Billet Turu</th>
-                        <th>Yuzey Ozelligi</th>
-                        <th>Profil Gramaj</th>
-                        <th>Firma Adi</th>
-                    </tr>
-                </thead>
-                <tbody id="siparisTableBody">
-                    <!-- Dynamic rows will be inserted here -->
-                </tbody>
-            </table>
-        </div>
-        <div class="sepet-tabulator mt-3"></div>
-        <div class="sepet-doldu-container mt-2">
-            <button id="dolduButton" class="btn btn-primary form-control">SEPET DOLDU</button>
+        </div> 
+    </div>
+    <div id="siparisInfo">
+        <table class="table table-bordered" id="siparisTable" style="width: 100%; display: none;">
+            <thead>
+                <tr>
+                    <th>Profil No</th>
+                    <th>Kalan Kg</th>
+                    <th>Kalan Adet</th>
+                    <th>Kondusyon Turu</th>
+                    <th>Billet Turu</th>
+                    <th>Yuzey Ozelligi</th>
+                    <th>Profil Gramaj</th>
+                    <th>Firma Adi</th>
+                </tr>
+            </thead>
+            <tbody id="siparisTableBody">
+                <!-- Dynamic rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+    <div class="sepet-tabulator mt-3"></div>
+    <div class="sepet-doldu-container mt-2">
+        <button id="dolduButton" class="btn btn-primary form-control">SEPET DOLDU</button>
+    </div>
+    <div class="modal fade" id="termikSecModal" tabindex="-1" aria-labelledby="termikSecModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Termik Seçimi</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <select name="termikSelect" id="termikSelect" class="form-control">
+                        <option value="" disabled selected>Termik Seçiniz</option>
+                        <option value="Termik 1B">Termik 1B</option>
+                        <option value="Termik 2K">Termik 2K</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="kaydetButton" class="btn btn-primary">Kaydet</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -113,7 +134,6 @@
 {% block extra_js %}
 <script>
     var sepet_id = "";
-    var table = null;  // Tabulator instance
 
     document.addEventListener("DOMContentLoaded", function () {
         var sepetNoInput = document.getElementById("sepetNo");
@@ -131,6 +151,7 @@
         var yuklenenData = '{{ yuklenen_data|safe }}';
         var sepet_no_data = '{{ ongoing_sepet_no|safe }}';
         sepet_id = '{{ ongoing_sepet_id|safe }}';
+        var table = null;  // Tabulator instance
 
         function toggleDolduButtonState() {
             if (table.getData().length === 0) {
@@ -149,7 +170,7 @@
             sepetContainer.style.display = "block";
         }
 
-        function toggleButtonState() {
+        function toggleOkButtonState() {
             if (sepetNoInput.value.trim() !== "") {
                 okButton.disabled = false;
                 okButton.classList.remove("disabled");
@@ -305,9 +326,9 @@
         });
 
         // Initialize button state on page load
-        toggleButtonState();
+        toggleOkButtonState();
         // Enable/Disable the Okay button based on input field content
-        sepetNoInput.addEventListener("input", toggleButtonState);
+        sepetNoInput.addEventListener("input", toggleOkButtonState);
   
         function toggleEkleButtonState() {
             if (kalipNoSelect.value && kartNoSelect.value && adetInput.value && parseInt(adetInput.value) > 0) {
@@ -404,13 +425,19 @@
 
         dolduButton.addEventListener("click", function () { // sepet doldu dedikten sonra post etmeden önce bir modal açılsın ve kullanıcıya hangi termik olduğu sorulsun
             // modal aç ve termik seç
+            $('#termikSecModal').modal('show');
+        });
+
+        kaydetButton.addEventListener("click", function () {
+            var termik = document.getElementById("termikSelect").value;
+            console.log(termik);
             if (sepet_id) {
                 $.ajax({
                     url: "",
                     type: "POST",
                     data: {
                         sepet_id: sepet_id,
-                        sepet_termik: "", // seçilen termik gönderilsin.
+                        sepet_termik: termik, // seçilen termik gönderilsin.
                         sepet_bitti: true,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
@@ -427,11 +454,7 @@
             } else {
                 console.error("Sepet ID is missing.");
             }
-        });
-
-        // kaydetButton.addEventListener("click", function () {
-            
-        // })
+        })
 
         function initializeTabulator(data) {
             var deleteIcon = function(cell, formatterParams, onRendered){ 
@@ -456,8 +479,9 @@
                             deleteItem(kartNo, kalipNo, billetLot, cell);
                         }
                     }},
-                ]
+                ],
             });
+            toggleDolduButtonState(); // Check table data on initialization
         }
 
         function deleteItem(kartNo, kalipNo, billetLot, cell) {
