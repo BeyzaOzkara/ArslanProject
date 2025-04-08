@@ -155,10 +155,8 @@
 
         function toggleDolduButtonState() {
             if (table.getData().length === 0) {
-                console.log("dis")
                 dolduButton.disabled = true;
             } else {
-                console.log("able")
                 dolduButton.disabled = false;
             }
         }
@@ -414,9 +412,12 @@
                         adetInput.value = "";
                         kalipNoSelect.value = "";
                         billetLotSelect.value = "";
-                        
-
                         ekleButton.disabled = true;
+                        
+                        var siptable = document.getElementById('siparisTable');
+                        siptable.style.display = "none";
+                        var siptableBody = document.getElementById('siparisTableBody');
+                        siptableBody.innerHTML = "";
                     }
                 },
                 error: function (xhr, status, error) {
@@ -459,8 +460,6 @@
         })
 
         function initializeTabulator(data) {
-            console.log("ini")
-            console.log(data)
             var deleteIcon = function(cell, formatterParams, onRendered){ 
                 return "<i class='fa fa-trash'></i>";
             };
