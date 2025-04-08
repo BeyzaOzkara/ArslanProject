@@ -2530,7 +2530,7 @@ def yuda_profil(request):
     query = request.GET.get('query', '')  # Get the search term
     profiles = ProfilMs.objects.using('dies').filter(ProfilNo__startswith=query).values('Kimlik', 'ProfilNo')[:200]  # Limit to 20 results for performance
     
-    profiles_data = [{'id': profile['Kimlik'], 'name': profile['ProfilNo']} for profile in profiles]
+    profiles_data = [{'id': profile['ProfilNo'], 'name': profile['ProfilNo']} for profile in profiles]
     
     return JsonResponse({'profiles': profiles_data})
 
@@ -2558,6 +2558,7 @@ def yuda_kaydet(request):
                     y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
                     
                     is_old_profile = False # if True: Kalıphane bolumu Onay oyu versin
+                    has_mekanik = 0 # mekanik işlem yok
                     yetki_group = "" 
                     for key, value in request.POST.items():
                         if hasattr(y, key):
@@ -2566,6 +2567,8 @@ def yuda_kaydet(request):
                                 setattr(y, key, value_list)
                             else:
                                 setattr(y, key, value)
+                                if key == "TalasliImalat" and value == "Var":
+                                    has_mekanik = 1
                         if key == "Yetki":
                             yetki_group = value
                         elif key == "ProjeTipi" or key == "MevcutProfil":
@@ -2574,6 +2577,10 @@ def yuda_kaydet(request):
                             y.meta_data[key] = value
                             if key == "ProjeTipi" and value == "Mevcut Profil":
                                 is_old_profile = True
+                    if is_old_profile:
+                        durumlar = {'kaliphane': 2, 'mekanik': has_mekanik, 'satis': 1}
+                        onay_durumu = determine_onay_durumu(durumlar)
+                        y.OnayDurumu = onay_durumu
                             
                     y.save()
 
@@ -2633,6 +2640,7 @@ def yuda_kaydet(request):
                             Yuda_id=y.id,
                             OnayDurumu=True
                         )
+
                         profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profil"
                         if len(y.meta_data['MevcutProfil'])>1:
                             profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profiller"
@@ -4097,7 +4105,6 @@ def get_siparis_no_list(request):
 def get_siparis_kart_info(request):
     if request.method == "GET":
         kart_no = request.GET.get('kart_no')
-        print(f"kart: {kart_no}")
     try:
         orders = TestereDepo.objects.using('dies').filter(BulunduguYer='TESTERE', Adet__gte=1, KartAktif=1, Aktif=0, KartNo=kart_no) \
         .values('ProfilNo', 'Kg', 'Adet', 'FirmaAdi', 'Mm', 'Profil_Gramaj', 'YuzeyOzelligi', 'KondusyonTuru', 'BilletTuru').order_by('SonTermin')
