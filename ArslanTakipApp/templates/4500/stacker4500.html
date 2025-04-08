@@ -155,8 +155,10 @@
 
         function toggleDolduButtonState() {
             if (table.getData().length === 0) {
+                console.log("dis")
                 dolduButton.disabled = true;
             } else {
+                console.log("able")
                 dolduButton.disabled = false;
             }
         }
@@ -457,6 +459,8 @@
         })
 
         function initializeTabulator(data) {
+            console.log("ini")
+            console.log(data)
             var deleteIcon = function(cell, formatterParams, onRendered){ 
                 return "<i class='fa fa-trash'></i>";
             };
@@ -480,8 +484,10 @@
                         }
                     }},
                 ],
+                dataLoaded: function() {
+                    toggleDolduButtonState(); // This ensures the button state is toggled after data is loaded
+                },
             });
-            toggleDolduButtonState(); // Check table data on initialization
         }
 
         function deleteItem(kartNo, kalipNo, billetLot, cell) {
