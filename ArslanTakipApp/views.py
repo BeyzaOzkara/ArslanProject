@@ -2528,7 +2528,7 @@ def yuda(request, objId):
 
 def yuda_profil(request):
     query = request.GET.get('query', '')  # Get the search term
-    profiles = ProfilMs.objects.using('dies').filter(ProfilNo__startswith=query).values('Kimlik', 'ProfilNo')[:200]  # Limit to 20 results for performance
+    profiles = ProfilMs.objects.using('dies').filter(ProfilNo__startswith=query).values('Kimlik', 'ProfilNo')[:200]  # Limit to 200 results for performance
     
     profiles_data = [{'id': profile['ProfilNo'], 'name': profile['ProfilNo']} for profile in profiles]
     
@@ -2641,9 +2641,11 @@ def yuda_kaydet(request):
                             OnayDurumu=True
                         )
 
-                        profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profil"
-                        if len(y.meta_data['MevcutProfil'])>1:
-                            profil=f"{y.meta_data['MevcutProfil']} numaralı mevcut profiller"
+                        mevcut_profil = y.meta_data['MevcutProfil']
+                        profil=f"'{mevcut_profil}' numaralı mevcut profil"
+                        if ',' in y.meta_data['MevcutProfil']:
+                            mevcut_profil = mevcut_profil.replace(",", "', '")
+                            profil=f"'{mevcut_profil}' numaralı mevcut profiller"
 
                         Comment.objects.create(
                             Kullanici_id = 57,
