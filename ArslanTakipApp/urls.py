@@ -73,6 +73,9 @@ urlpatterns = [
     path('baskigecmisi/', login_required(views.BaskiGecmisiView.as_view())),
     path('baskigecmisi/list', views.baskigecmisi_list),
 
+    path('new_yuda/', login_required(views.YudaNewView.as_view())),
+    path('new_yuda/profil', views.yuda_get_profil_list),
+
     path('yuda/', login_required(views.YudaView.as_view())),
     path('yuda/<str:objId>', views.yuda),
     path('yuda/profil/', views.yuda_profil),

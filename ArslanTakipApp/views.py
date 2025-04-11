@@ -2792,7 +2792,9 @@ def yudas_list(request):
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
         if o['GüncelTarih'] != None:
-            o['GüncelTarih'] = format_date_time(o['GüncelTarih'])
+            o_comment = Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id']).exclude(Silindi=True).order_by('-Tarih').values()[0]
+            o_comment_user = get_user_full_name(o_comment['Kullanici_id'])
+            o['GüncelTarih'] = o_comment_user + "<br>" + format_date_time_without_year(o['GüncelTarih'])
         else: o['GüncelTarih'] = ""
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
@@ -4582,4 +4584,30 @@ def testere_kesim_bitti(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+class YudaNewView(generic.TemplateView):
+    template_name = 'Yuda/yuda.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Check if the user is a member of either group
+        is_in_group = (
+            self.request.user.groups.filter(name="Yurt Disi Satis Bolumu").exists() or
+            self.request.user.groups.filter(name="Yurt Ici Satis Bolumu").exists()
+        )
+        # Add the is_in_group variable to the context
+        context['is_in_group'] = is_in_group
+        return context
+
+def yuda_create(request):
+    if request.method == 'POST':
+        
+        return
+
+def yuda_get_profil_list(request):
+    query = request.GET.get('query', '')  # Get the search term
+    profiles = ProfilMs.objects.using('dies').filter(ProfilNo__startswith=query).values('Kimlik', 'ProfilNo')[:200]  # Limit to 200 results for performance
+    
+    profiles_data = [{'id': profile['ProfilNo'], 'name': profile['ProfilNo']} for profile in profiles]
+    
+    return JsonResponse({'profiles': profiles_data})
 

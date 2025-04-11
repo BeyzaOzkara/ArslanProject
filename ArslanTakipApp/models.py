@@ -411,8 +411,16 @@ class YudaOnayDurum(models.Model):
         db_table = 'view1_yudadurum4'
 
 class Yuda(models.Model):
+    yuda_no = models.CharField(unique=True, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name="created_by")
+    deleted = models.BooleanField(default=False, blank=True, null=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name="deleted_by")
+    create_time = models.DateTimeField(auto_created=True, blank=True, null=True)
+    edit_time = models.DateTimeField(auto_now=True, blank=True, null=True)
+    meta_data = models.JSONField(null=True, blank=True) # last_comment_time burada mı olmalı yoksa dışarıda mı olmalı 
+    #  
     """ IstekYapanBolum = models.CharField(null=True, blank=True)
-    IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True) #foreignkey user yapılabilir ufuk beye sor
+    IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True)
     OnemliYuzeyler = models.CharField(null=True, blank=True)
     OnemliOlculerVeToleranslar = models.CharField(null=True, blank=True)
     CizimNo = models.CharField(null=True, blank=True)
