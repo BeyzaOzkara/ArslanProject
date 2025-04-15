@@ -31,7 +31,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik
+    QRCode, KartDagilim, KalipMuadil, Termik, Yuda
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -4040,7 +4040,8 @@ def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
         start_time = end_time - datetime.timedelta(hours=48)
-        plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
+        plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time, event_type='Extrusion').values_list('static_data', flat=True)
+        # plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
         cleaned_to_original = {} 
         for singular_params in plc_data:
@@ -4084,8 +4085,9 @@ def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=120)
-        billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
+        start_time = end_time - datetime.timedelta(hours=48)
+        billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
+        # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
@@ -4190,7 +4192,8 @@ def get_profil_nos(pres):
     end_time = timezone.now()
     start_time = end_time - datetime.timedelta(hours=48)
 
-    ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
+    ext_list = list(EventData.objects.using('dms').filter(machine_name=pres, start_time__gte=start_time, end_time__lte=end_time).values_list("static_data__DieNumber", flat=True).distinct())
+    # ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
  
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
@@ -4236,24 +4239,26 @@ def get_ext_info(request):
 
             q = Q()
             for die in alternative_dies:
-                q |= Q(singular_params__DieNumber__startswith=die)
+                q |= Q(static_data__DieNumber__startswith=die)
                 # q["singular_params__DieNumber__startswith"] = die
             queryset = (
-                PlcData.objects.using('plc4').filter(
-                    start__gte=start_time, 
-                    stop__lte=end_time,
-                    # singular_params__DieNumber__startswith = profil_no
+                # PlcData.objects.using('plc4').filter(
+                #     start__gte=start_time, 
+                #     stop__lte=end_time,
+                # )
+                EventData.objects.using('dms').filter(
+                    start_time__gte=start_time, end_time__lte=end_time
                 )
                 .filter(q)
                 .annotate(
-                    kart_no=Cast(F("singular_params__kartNo"), CharField()),
-                    kalip_no=F("singular_params__DieNumber"),
-                    billet_count=Count(F("singular_params__DieNumber")),
+                    kart_no=Cast(F("static_data__kartNo"), CharField()),
+                    kalip_no=F("static_data__DieNumber"),
+                    billet_count=Count(F("static_data__DieNumber")),
                     brüt_imalat=ExpressionWrapper(
-                        Sum(Cast(F("singular_params__Billet Length Pusher"), FloatField())) * 0.1367,
+                        Sum(Cast(F("static_data__Billet Length Pusher"), FloatField())) * 0.1367,
                         output_field=FloatField()
                     ),
-                    billet_lot=F("singular_params__BilletLot")
+                    billet_lot=F("static_data__BilletLot")
                 )
                 .values(
                     "kart_no",
@@ -4261,8 +4266,8 @@ def get_ext_info(request):
                     "billet_lot"
                 )
                 .annotate(
-                    imalat_baslangici=Min("start"),
-                    imalat_sonu=Max("stop"),
+                    imalat_baslangici=Min("start_time"),
+                    imalat_sonu=Max("end_time"),
                     billet_count=F("billet_count"),
                     brüt_imalat=F("brüt_imalat")
                 )
@@ -4293,10 +4298,11 @@ def get_sepet_info(request):
         q = Q()
         w = Q()
         for die in alternative_dies:
-            q |= Q(singular_params__DieNumber__startswith=die)
+            q |= Q(static_data__DieNumber__startswith=die)
             w |= Q(yuklenen__contains=[{'ProfilNo': die, 'Atandi': False}]) 
         
-        start = PlcData.objects.using('plc4').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
+        start = EventData.objects.using('dms').filter(start_time__gte=end_48_time, end_time__lte=end_time).filter(q).values('start_time', 'end_time').order_by('start_time')[0]['start_time']
+        # start = PlcData.objects.using('plc4').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
         sepet = Sepet.objects.filter(baslangic_saati__gte=start).filter(w).values().order_by('baslangic_saati') # profil no ile filtrele
         try:
             sepet_data = []
@@ -4409,8 +4415,9 @@ class Sepetler4500View(generic.TemplateView):
 def sepet_get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=120)
-        plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
+        start_time = end_time - datetime.timedelta(hours=48)
+        plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time).values_list('static_data', flat=True)
+        # plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
         cleaned_to_original = {} 
         for singular_params in plc_data:
@@ -4446,8 +4453,9 @@ def sepet_get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=120)
-        billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
+        start_time = end_time - datetime.timedelta(hours=48)
+        billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
+        # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
@@ -4497,7 +4505,8 @@ class saw4500View(generic.TemplateView):
     template_name = '4500/saw.html'
 
 def get_position_data(position):
-    query = PlcData.objects.using('plc4').filter(position=position, count__gt = 0).order_by('-id') # node redde order by count desc şeklinde
+    query = EventData.objects.using('dms').filter(static_data__position=position, static_data__count__gt = 0).order_by('-id')
+    # query = PlcData.objects.using('plc4').filter(position=position, count__gt = 0).order_by('-id') # node redde order by count desc şeklinde
     print(query.values('id', 'count'))
     
     return query
@@ -4507,7 +4516,8 @@ class FinishSaw4500View(generic.TemplateView):
 
 
 def get_saw_table(request):
-    exts = PlcData.objects.using('plc4').filter(position="saw table", count__gt=0).order_by('-id')
+    exts = EventData.objects.using('dms').filter(static_data__position="saw table", static_data__count__gt=0).order_by('-id')
+    # exts = PlcData.objects.using('plc4').filter(position="saw table", count__gt=0).order_by('-id')
     
     colors = ["#698BAA", "#7DB1CB", "#8DD3DE", "#B1E4F1", "#62A4A0"]
     color_index = 0
@@ -4515,28 +4525,30 @@ def get_saw_table(request):
     
     data = []
     for ext in exts:
-        if ext.singular_params.get('BilletLot') != last_sarj_no:
+        print(ext)
+        if ext.static_data.get('BilletLot') != last_sarj_no:
             color_index = (color_index + 1) % len(colors)
-            last_sarj_no = ext.singular_params.get('BilletLot')
+            last_sarj_no = ext.static_data.get('BilletLot')
 
         data.append({
             "id": ext.id,
-            "count": ext.count,
-            "len": float(ext.singular_params.get('ProfileLength', 0)),
-            "sarj_no": ext.singular_params.get('BilletLot', ""),
-            "kalip_no": ext.singular_params.get('DieNumber', ""),
-            "figur": int(ext.singular_params.get('figur', 0)),
+            "count": ext.static_data.get('count'),
+            "len": float(ext.static_data.get('ProfileLength', 0)),
+            "sarj_no": ext.static_data.get('BilletLot', ""),
+            "kalip_no": ext.static_data.get('DieNumber', ""),
+            "figur": int(ext.static_data.get('figur', 0)),
             "color": colors[color_index]
         })
 
     return JsonResponse({"data": data})
 
 def get_position_data(position):
-    return PlcData.objects.using('plc4').filter(position=position, count__gt=0).order_by('-id')
+    return EventData.objects.using('dms').filter(static_data__position=position, static_data__count__gt=0).order_by('-id')
+    # return PlcData.objects.using('plc4').filter(position=position, count__gt=0).order_by('-id')
 
 def get_saw_data(request):
-    saw_table = list(get_position_data('saw table').values('id', 'count', 'singular_params'))
-    saw_line = list(get_position_data('saw line').values('id', 'count', 'singular_params'))
+    saw_table = list(get_position_data('saw table').values('id', 'static_data__count', 'static_data'))
+    saw_line = list(get_position_data('saw line').values('id', 'static_data__count', 'static_data'))
  
     return JsonResponse({'saw_table': saw_table, 'saw_line': saw_line})
 
@@ -4546,8 +4558,15 @@ def kesime_al(request):
             adet = int(request.GET.get('adet'))
             # record_ids = list(PlcData.objects.using('plc4').filter(position='saw table').order_by('id').values_list('id', flat=True)[:adet])            
             # count = PlcData.objects.using('plc4').filter(id__in=record_ids).update(position='saw line')
-            unique_counts = list(PlcData.objects.using('plc4').filter(position='saw table').order_by('count').values_list('count', flat=True).distinct()[:adet])
-            update_position = PlcData.objects.using('plc4').filter(count__in = unique_counts).update(position='saw line')
+            unique_counts = list(EventData.objects.using('dms').filter(static_data__position='saw table').order_by('static_data__count').values_list('static_data__count', flat=True).distinct()[:adet])
+            for obj in EventData.objects.using('dms').filter(static_data__count__in = unique_counts): #.update(static_data__position='saw line')
+                static_data = obj.static_data
+                static_data['position'] = 'saw line'
+
+                obj.static_data = static_data
+                obj.save()
+            # unique_counts = list(PlcData.objects.using('plc4').filter(position='saw table').order_by('count').values_list('count', flat=True).distinct()[:adet])
+            # update_position = PlcData.objects.using('plc4').filter(count__in = unique_counts).update(position='saw line')
             
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
@@ -4556,8 +4575,9 @@ def kesime_al(request):
 def testere_tezgahi(request):
     if request.method == 'GET':
         try:
-            max_count = PlcData.objects.using('plc4').filter(position='saw line').latest('id').count  #aggregate(Max('count'))['count__max']
-            data = get_position_data('saw line').filter(count=max_count).values()
+            max_count = EventData.objects.using('dms').filter(static_data__position='saw line').latest('id').count
+            # max_count = PlcData.objects.using('plc4').filter(position='saw line').latest('id').count  #aggregate(Max('count'))['count__max']s
+            data = get_position_data('saw line').filter(static_data__count=max_count).values()
             return JsonResponse(list(data), safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -4566,8 +4586,8 @@ def testere_siparis_list(request):
     if request.method == 'GET':
         # position saw line olanların profil nolarını al
         try:
-            profil_list = list(PlcData.objects.using('plc4').filter(position = 'saw line').values_list('singular_params__profiles', flat=True).distinct())
-            # print(profil_list)
+            profil_list = list(EventData.objects.using('dms').filter(static_data__position = 'saw line').values_list('static_data__profiles', flat=True).distinct())
+            # profil_list = list(PlcData.objects.using('plc4').filter(position = 'saw line').values_list('singular_params__profiles', flat=True).distinct())
             testere = TestereDepo.objects.using('dies').filter(ProfilNo__in = profil_list, PresKodu='4500-1', BulunduguYer='TESTERE', Adet__gte=1) \
             .annotate(Bloke=Case(When(Aktif=0, then=Value('AÇIK')), default=Value('BLOKELİ'), output_field=CharField())) \
             .values('ProfilNo', 'KartNo', 'Mm', 'Adet', 'Kg', 'BilletTuru', 'YuzeyOzelligi', 'PresKodu', 'SonTermin', 'Bloke').order_by('SonTermin', '-Mm')
@@ -4579,7 +4599,8 @@ def testere_siparis_list(request):
 def testere_kesim_bitti(request):
     if request.method == 'GET':
         try:
-            PlcData.objects.using('plc4').filter(position='saw line').update(position='stacker')
+            EventData.objects.using('dms').filter(static_data__position='saw line').update(static_data__position='stacker')
+            # PlcData.objects.using('plc4').filter(position='saw line').update(position='stacker')
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -4598,10 +4619,258 @@ class YudaNewView(generic.TemplateView):
         context['is_in_group'] = is_in_group
         return context
 
+def generate_yuda_no(parent: Yuda = None) -> str:
+    now = datetime.datetime.now()
+    year = now.year
+    today = now.strftime("%m%d")
+
+    if parent:
+        # Count how many children the parent already has
+        child_count = parent.children.count()
+        return f"{parent.yuda_no}-{str(child_count + 1).zfill(3)}"
+    else:
+        # Count today's top-level yudas (without a parent)
+        count_today = Yuda.objects.filter(create_time__date=now.date(), parent__isnull=True).count()
+        sequential_number = str(count_today + 1).zfill(3)
+        return f"{year}-{today}-{sequential_number}"
+
 def yuda_create(request):
     if request.method == 'POST':
-        
-        return
+        for attempt in range(3):
+            try:
+                with transaction.atomic():
+                    yuda = Yuda()
+                    yuda.created_by = request.user
+                    meta_data = {}
+                    meta_data["OnayDurumu"] = "Kalıphane Onayı Bekleniyor"
+                    is_old_profile = False
+                    has_mekanik = 0
+                    satis_yetki = ""
+                    parent_id = request.POST.get("parent_id")
+                    parent = None
+                    if parent_id:
+                        parent = get_object_or_404(Yuda, id = parent_id)
+
+                    yuda.parent = parent
+                    yuda.yuda_no = generate_yuda_no(parent)
+                    
+                    for key, value in request.POST.items():
+                        if key == "ProjeTipi" or key == "MevcutProfil":
+                            meta_data[key] = value
+                            if value == "Mevcut Profil":
+                                is_old_profile = True
+                        elif key == "TalasliImalat" and value == "Var":
+                            has_mekanik = 1
+                        elif key == "BirlikteCalisan":  # include other special keys here
+                            meta_data[key] = value.split(',')
+                        elif key != "parent_id":
+                            meta_data[key] = value
+                        elif key == "Yetki":
+                            satis_yetki = value
+                    
+                    if is_old_profile:
+                        onay_durumu = determine_onay_durumu({'kaliphane': 2, 'mekanik': has_mekanik, 'satis': 1})
+                        meta_data["OnayDurumu"] = onay_durumu
+                        
+                    yuda.meta_data = meta_data
+                    yuda.save()
+
+                    if meta_data['MusteriFirmaAdi']!='DENEME':
+                        print()
+
+                
+                
+            except json.JSONDecodeError:
+                return JsonResponse({'error': 'Geçersiz JSON formatı', 'status': 'false'}, status=500)
+            except IntegrityError:
+                time.sleep(0.1)
+                continue
+            except Exception as e:
+                return JsonResponse({'error': str(e), 'status':'false'}, status = 500)
+    
+    if request.method == "POST":
+        for attempt in range(3):
+            try:
+                today = datetime.datetime.now().strftime('%j')
+                year = datetime.datetime.now().strftime('%y')
+                with transaction.atomic():
+                    lastOfDay = YudaForm.objects.filter(YudaNo__startswith=year + '-' + today).select_for_update(skip_locked=True).order_by('-YudaNo').first() # select for update
+                    if lastOfDay:
+                        # Extract the sequential number part from the latest YudaNo and increment it
+                        latest_seq_number = int(lastOfDay.YudaNo[-2:]) + 1
+                        sequential_number = f'{latest_seq_number:02}'  # Convert to two-digit string
+                    else:
+                        # If no YudaNo exists for today, start from 01
+                        sequential_number = '01'
+                    
+                    y = YudaForm()
+                    y.YudaNo = f'{year}-{today}-{sequential_number}' #year+"-"+today+"-NN"
+                    y.ProjeYoneticisi = User.objects.get(id=44) # proje yöneticisi harun bey olacak
+                    y.YudaAcanKisi = request.user
+                    
+                    y.Tarih = datetime.datetime.now()
+                    y.OnayDurumu = 'Kalıphane Onayı Bekleniyor'
+                    
+                    is_old_profile = False # if True: Kalıphane bolumu Onay oyu versin
+                    has_mekanik = 0 # mekanik işlem yok
+                    yetki_group = "" 
+                    for key, value in request.POST.items():
+                        if hasattr(y, key):
+                            if key == "BirlikteCalisan":
+                                value_list = value.split(',')
+                                setattr(y, key, value_list)
+                            else:
+                                setattr(y, key, value)
+                                if key == "TalasliImalat" and value == "Var":
+                                    has_mekanik = 1
+                        if key == "Yetki":
+                            yetki_group = value
+                        elif key == "ProjeTipi" or key == "MevcutProfil":
+                            if y.meta_data is None:
+                                y.meta_data = {}
+                            y.meta_data[key] = value
+                            if key == "ProjeTipi" and value == "Mevcut Profil":
+                                is_old_profile = True
+                    if is_old_profile:
+                        durumlar = {'kaliphane': 2, 'mekanik': has_mekanik, 'satis': 1}
+                        onay_durumu = determine_onay_durumu(durumlar)
+                        y.OnayDurumu = onay_durumu
+                            
+                    y.save()
+
+                    group_names = [
+                        'Ust Yonetim Bolumu',
+                        'Planlama Bolumu',
+                        'Kalite Bolumu',
+                        'Kaliphane Bolumu',
+                        'Pres Bolumu',
+                        'Yurt Disi Satis Bolumu',
+                        'Yurt Ici Satis Bolumu',
+                        'Proje Bolumu',
+                    ]
+
+                    group_mapping = {
+                        'Paketleme': 'Paketleme Bolumu',
+                        'YuzeyEloksal': 'Eloksal Bolumu',
+                        'YuzeyAhsap': 'Ahsap Kaplama Bolumu',
+                        'YuzeyBoya': 'Boyahane Bolumu',
+                        'TalasliImalat': 'Mekanik Islem Bolumu',
+                    }
+
+                    groups = [Group.objects.get(name=name) for name in group_names]
+
+                    assign_perm("gorme_yuda", request.user, y) # Assign permission to the current user
+                    assign_perm("acan_yuda", request.user, y) # Yudayı açan kişiye değiştirme ve görme yetkisi ver
+                    
+                    if y.MusteriFirmaAdi != "DENEME":
+                        assign_perm("gorme_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+                        assign_perm("acan_yuda", y.ProjeYoneticisi, y) # Assign permission to the current user
+                        for group in groups: #groups içinde olanların hepsinin bütün projeleri görme yetkisi var
+                            if group.name == "Yurt Ici Satis Bolumu" or group.name == "Yurt Disi Satis Bolumu":
+                                if group in request.user.groups.all():
+                                    assign_perm("gorme_yuda", group, y)
+                                if yetki_group == group.name:
+                                    assign_perm("gorme_yuda", group, y)
+                            else:
+                                assign_perm("gorme_yuda", group, y)
+
+                        # Check field values and assign permissions based on conditions
+                        for field in y._meta.fields:
+                            fname = field.name
+                            fvalue = getattr(y, fname)
+                            if fname in group_mapping and fvalue is not None and fvalue != "" and fname != "TalasliImalat" and fname != "Paketleme":
+                                group = Group.objects.get(name=group_mapping[fname])
+                                assign_perm("gorme_yuda", group, y)
+                            if fname == "TalasliImalat" and fvalue == "Var":
+                                group = Group.objects.get(name=group_mapping[fname])
+                                assign_perm("gorme_yuda", group, y)
+                            if fname == "Paketleme" and fvalue == "Ozel Paketleme":
+                                group = Group.objects.get(name=group_mapping[fname])
+                                assign_perm("gorme_yuda", group, y)
+
+                    if is_old_profile:
+                        YudaOnay.objects.create(
+                            Group=Group.objects.get(name='Kaliphane Bolumu'),
+                            Yuda_id=y.id,
+                            OnayDurumu=True
+                        )
+
+                        mevcut_profil = y.meta_data['MevcutProfil']
+                        profil=f"'{mevcut_profil}' numaralı mevcut profil"
+                        if ',' in y.meta_data['MevcutProfil']:
+                            mevcut_profil = mevcut_profil.replace(",", "', '")
+                            profil=f"'{mevcut_profil}' numaralı mevcut profiller"
+
+                        Comment.objects.create(
+                            Kullanici_id = 57,
+                            FormModel = "YudaForm",
+                            FormModelId = y.id,
+                            Tarih = datetime.datetime.now(),
+                            Aciklama = f"Yeni proje, {profil} için açıldığından, sistem tarafından otomatik olarak Kalıphane onayı verilmiştir."
+                        )
+
+                    # Dosyaları ve başlıkları işleyin
+                    file_titles = request.POST.getlist('fileTitles[]')
+                    for file, title in zip(request.FILES.getlist('files[]'), file_titles):
+                        UploadFile.objects.create(
+                            File = file,
+                            FileTitle = title,
+                            FileSize = file.size,
+                            FileModel = "YudaForm",
+                            FileModelId = y.id,
+                            UploadedBy = y.ProjeYoneticisi,
+                            Note = "",
+                        )
+                    
+                    # for user in User.objects.exclude(id=request.user.id):
+                    allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
+
+                    if request.user.id != 1:
+                        for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
+                            notification = Notification.objects.create(
+                                user=u,
+                                message=f'{y.MusteriFirmaAdi[:11]}.. için bir YUDA ekledi.',
+                                subject=f"Yeni YUDA",
+                                where_id=y.id,
+                                new_made_by = request.user,
+                                col_marked = "#E9ECEF",
+                            )
+                            logger.debug(f"YUDA Notification is created. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                        
+                            channel_layer = get_channel_layer()
+                            async_to_sync(channel_layer.group_send)(
+                                f'notifications_{request.user.id}',
+                                {
+                                    'type': 'send_notification',
+                                    'notification': {
+                                        'id': notification.id,
+                                        'subject': notification.subject,
+                                        'made_by': get_user_full_name(notification.new_made_by_id),
+                                        'message': notification.message,
+                                        'where_id': notification.where_id,
+                                        'is_read': notification.is_read,
+                                        'timestamp': notification.timestamp.strftime('%d-%m-%y %H:%M'),
+                                        'is_marked': notification.is_marked,
+                                    },
+                                }
+                            )
+                            logger.debug(f"YUDA Notification is sent. ID: {notification.id}, Time: {notification.timestamp.strftime('%d-%m-%y %H:%M')}")
+                        
+
+                return JsonResponse({'message': 'Kayıt başarılı', 'id': y.id})
+            except json.JSONDecodeError:
+                response = JsonResponse({'error': 'Geçersiz JSON formatı'})
+                response.status_code = 500 #server error
+                break
+            except IntegrityError:
+                time.sleep(0.1)
+                continue
+            except Exception as e:
+                response = JsonResponse({'error': str(e)})
+                response.status_code = 500 #server error
+                break
+
+    return response
 
 def yuda_get_profil_list(request):
     query = request.GET.get('query', '')  # Get the search term

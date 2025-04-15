@@ -412,12 +412,13 @@ class YudaOnayDurum(models.Model):
 
 class Yuda(models.Model):
     yuda_no = models.CharField(unique=True, blank=True, null=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name="created_by")
-    deleted = models.BooleanField(default=False, blank=True, null=True)
-    deleted_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name="deleted_by")
-    create_time = models.DateTimeField(auto_created=True, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name="yuda_creater")
+    deleted = models.BooleanField(default=False, blank=True, null=False)
+    deleted_by = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name="yuda_deleter")
+    create_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     edit_time = models.DateTimeField(auto_now=True, blank=True, null=True)
-    meta_data = models.JSONField(null=True, blank=True) # last_comment_time burada mı olmalı yoksa dışarıda mı olmalı 
+    meta_data = models.JSONField(null=True, blank=True) # last_comment_time burada mı olmalı yoksa dışarıda mı olmalı
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', blank=True, null=True) # child yudaları getir-> parent_instance.children.all() 
     #  
     """ IstekYapanBolum = models.CharField(null=True, blank=True)
     IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True)

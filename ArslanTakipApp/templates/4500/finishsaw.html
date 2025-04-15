@@ -159,11 +159,11 @@ document.addEventListener("DOMContentLoaded", function() {
         let row = "";
         if (data.length > 0 && secilenKartBoy > 0) {
             var cuttingLength =  parseFloat(secilenKartBoy) / 1000; //(10000)/1000
-            var fullLength = data.reduce((sum, item) => sum + parseFloat(item.singular_params.ProfileLength || 0), 0);
+            var fullLength = data.reduce((sum, item) => sum + parseFloat(item.static_data.ProfileLength || 0), 0);
             fullLength = Math.ceil(fullLength);
             
             for (let i = 0; i < data.length; i++) {
-                let profileLength = parseFloat(data[i].singular_params.ProfileLength || 0);
+                let profileLength = parseFloat(data[i].static_data.ProfileLength || 0);
                 let profileQuantity = Math.floor(profileLength / cuttingLength);
                 let scrapLength = Math.floor((profileLength - (profileQuantity * cuttingLength)) * 10 / 2) / 10;
                 console.log("scrapLength: ", scrapLength);
@@ -209,10 +209,10 @@ document.addEventListener("DOMContentLoaded", function() {
             html = '<center><h3> Boş </h3></center>';
         } else {
             for (let i = 0; i < data.length; i++) {
-                let len = parseFloat(data[i].singular_params.ProfileLength || 0);
-                let sarjNo = data[i].singular_params.BilletLot || "";
-                let kalipNo = data[i].singular_params.DieNumber || "";
-                let figur = parseInt(data[i].singular_params.figur || 0);
+                let len = parseFloat(data[i].static_data.ProfileLength || 0);
+                let sarjNo = data[i].static_data.BilletLot || "";
+                let kalipNo = data[i].static_data.DieNumber || "";
+                let figur = parseInt(data[i].static_data.figur || 0);
                 let width = parseInt((len * 100) / 64);
 
                 if (sarjNo !== lastSarjNo) {
