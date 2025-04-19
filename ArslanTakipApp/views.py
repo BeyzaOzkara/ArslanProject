@@ -225,7 +225,7 @@ def send_email_notification(request, dieList, dieTo_press):
             '2. Fabrika Kalıp Arşivi': 'kaliparsivi@arslanaluminyum.com'
         }
         
-        to_addresses = [request.user.email]
+        to_addresses = [request.user.email, 'hasanpasa@arslanaluminyum.com']
         if dieTo_press in email_mapping:
             to_addresses.append(email_mapping[dieTo_press])
 
@@ -4224,8 +4224,6 @@ class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
 
         return context
         
-# profil no seçti, eğer birden fazla kalıp varsa kalıpta seçmesi lazım 
-# 
 def get_ext_info(request): 
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
@@ -4311,7 +4309,6 @@ def get_ext_info(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
         
-
 def get_ext_info_old(request): 
     # her satır için ortalama billet boyu:
     # brüt / (billet sayısı * 1,367)

@@ -327,6 +327,62 @@ document.addEventListener("DOMContentLoaded", function () {
  
     }
 
+    // hesaplaButton.addEventListener("click", function () { 
+    //     var ext = JSON.parse(JSON.stringify(extTable.getSelectedData()));
+    //     var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
+    //     var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
+    //     var gramaj = gramajInp.value;
+    //     var sonuc = [];
+
+    //     if (!gramaj) {
+    //         alert("Lütfen gramaj girin.");
+    //         return;
+    //     }
+
+    //     if (ext.length === 0 || sepet.length === 0 || siparis.length === 0) {
+    //         alert("Lütfen her tablodan seçim yapın.");
+    //         return;
+    //     }
+
+    //     var extGroupedByKalipBillet = new Map();
+    //     for (var i = 0; i < ext.length; i++) {
+    //         var key = ext[i].kalip_no + "_" + ext[i].billet_lot;
+    //         if (!extGroupedByKalipBillet.has(key)) {
+    //             extGroupedByKalipBillet.set(key, []);
+    //         }
+    //         extGroupedByKalipBillet.get(key).push(ext[i]);
+    //     }
+
+    //     var sepetGroupedByBoy = new Map();
+    //     for (var i = 0; i < sepet.length; i++) {
+    //         var boy = sepet[i].Boy;
+    //         if (!sepetGroupedByBoy.has(boy)) {
+    //             sepetGroupedByBoy.set(boy, new Map());
+    //         }
+    //         var key = sepet[i].KalipNo + "_" + sepet[i].BilletLot;
+    //         if (!sepetGroupedByBoy.get(boy).has(key)) {
+    //             sepetGroupedByBoy.get(boy).set(key, []);
+    //         }
+    //         sepetGroupedByBoy.get(boy).get(key).push(sepet[i]);
+    //     }
+
+    //     var siparisByBoy = new Map();
+    //     for (var i = 0; i < siparis.length; i++) {
+    //         var boy = siparis[i].PlanlananMm;
+    //         if (!siparisByBoy.has(boy)) {
+    //             siparisByBoy.set(boy, []);
+    //         }
+    //         siparisByBoy.get(boy).push(siparis[i]);
+    //     }
+
+    //     for (let [boy, siparisler] of siparisByBoy) {
+            
+    //     }
+        
+
+        
+    // });
+
     hesaplaButton.addEventListener("click", function () { 
         // 3 tabulatorden de seçim yapılmış mı kontrol et.
         // yapılmayan varsa alert ile uyar işlem yapma.
@@ -394,7 +450,6 @@ document.addEventListener("DOMContentLoaded", function () {
         var ortBilletBoyu = brutExt / toplamBilletAdet / 1.367;
         console.log("Ortalama Billet Boyu: ", ortBilletBoyu);
 
-        // var siparisByBoy = {};
         var siparisByBoy = new Map();
         // Boylara göre grupla
         for (var i = 0; i < siparis.length; i++) {
@@ -406,14 +461,9 @@ document.addEventListener("DOMContentLoaded", function () {
             
             // Push the current order (siparis[i]) to the respective group, preserving FIFO order
             siparisByBoy.get(boy).push(siparis[i]);
-            // if (!siparisByBoy[boy]) {
-            //     siparisByBoy[boy] = [];
-            // }
-            // siparisByBoy[boy].push(siparis[i]);
         }
         console.log("siparisByBoy (FIFO Order):", Array.from(siparisByBoy.entries()));
 
-        // for(var boy in siparisByBoy) {
         for (let [boy, siparisler] of siparisByBoy) {
             console.log("siparisByBoy: ", boy);
             // var siparisler = siparisByBoy[boy];
@@ -486,31 +536,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
         
-        initializeKartSonuc(sonuc);
+        initializeKartSonuc(sonuc); 
         // kartSonucTable.replaceData(sonuc);
         secimDiv.style.display = 'none';
         kartSonucDiv.style.display = 'block';
         sendKartDagilimi(JSON.stringify(sonuc));
-        // + net = seçili her sepet için adet*boy*gramaj hesaplanır ve toplanır
-        // + brüt = seçili üretimlerin toplam brütü
-        // + verim = net / brüt
-        // + süre = seçili üretimlerin bitiş max - başlangıç min (dk cinsinden)
-        // + toplam net boy = sepetlerin (adet * boy / 1000) hesaplanıp toplamı 
-        // + net üretim hızı = süre / toplam net boy  (dk/m)
-        // + ortalama billet boyu = brüt / toplam billet adeti
-        // (kart her boy için for)
-        //     + fazla üretim =  seçili sepetlerin toplam adeti / seçili kartların toplam adeti
-        //     if fazla üretim > 1 (fazla üretim her karta eşit dağıtılır)
-        //     (her kart için for)
-        //         üretilen adet = sipariş adeti * fazla üretim (tam sayıya yuvarla)
-        //         hesaplanan süre = (her kart için for) üretilen adet * net üretim hızı
-        //         hesaplanan brüt = (üretilen adet*boy*gramaj) / (verim * 1.367)
-        //         hesaplanan billet adeti = hesaplanan brüt / ortalama billet boyu (tam sayıya yuvarla)
-        //         hesaplanan billet boyu = hesaplanan brüt / hesaplanan billet adeti (iki basamak decimal)
-        //     else: (termini en geç kartın üretilen adeti eksik kalır)
-        //     (her kart için for)
-        //     üretilen adet = sipariş adeti * 1,05
-        //     geri kalan hesaplanan değerler aynı
     
     });
 
