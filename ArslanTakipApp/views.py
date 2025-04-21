@@ -4228,7 +4228,7 @@ def get_ext_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=72)
 
         # group by common DieNumber, BilletLot, and kartNo, but also ensure that the events are sequential.
         try:
