@@ -171,7 +171,8 @@ def location(request):
             if gozCapacity == None:
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
                 if int(dieTo) in checkList and request.user.id != 1:
-                    check_last_location_press(request, dieList, dieTo) 
+                    check_last_location_press(request, dieList, dieTo)
+                # check_test_dies(request, dieList, int(dieTo))
                 hareketSave(dieList, lRec, dieTo, request)
                 # 1.fabrikaya kalıp gönderiliyorsa
             else:
@@ -200,6 +201,15 @@ def check_last_location_press(request, dieList, dieTo):
         send_email_notification(request, dies_to_notify, dieTo_press)
     else:
         print("don't send mail")
+
+def check_test_dies(request, dieList, dieTo):
+    die_location = get_object_or_404(Location, id=dieTo)
+    if die_location.locationName == "TEST":
+        for die_no in dieList:
+            profil_no = die_no.strip().split('-')[0].strip()
+            print(profil_no)
+            siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+
 
 def send_email_notification(request, dieList, dieTo_press):
     try:
@@ -4228,7 +4238,7 @@ def get_ext_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=72)
+        start_time = end_time - datetime.timedelta(hours=50)
 
         # group by common DieNumber, BilletLot, and kartNo, but also ensure that the events are sequential.
         try:
@@ -4370,7 +4380,7 @@ def get_sepet_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        end_48_time = end_time - datetime.timedelta(hours=48)
+        end_48_time = end_time - datetime.timedelta(hours=50)
         
         alternative_dies = get_alternative_profiles(profil_no)
         q = Q()
