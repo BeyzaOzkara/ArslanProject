@@ -213,14 +213,13 @@ def send_single_die_report(die, press, user_info):
         # Eğer profil ile ilgili hiç sipariş yoksa
         order_status = 'Sipariş Açık Değil'
 
+    result_list = [{'die': die.KalipNo, 'profile': profile_no, 'order_status': order_status, 'representative':client_rep}]
+
     subject = f"Test alınması gereken kalıp - {date.today().strftime('%d.%m %H:%M')}"
     html_message = render_to_string('mail/single_die_report.html', { # artık bu template değil, kullanılacaksa yeni template gerekli.
-        'user': user_info,
-        'die': die.KalipNo, 
-        'profile': profile_no, 
+        'user_info': user_info,
         'press': press, 
-        'order_status': order_status, 
-        'representative':client_rep
+        'result_list': result_list,
     })
 
     send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
