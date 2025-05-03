@@ -4046,13 +4046,15 @@ def get_kalip_no_list(request):
                 alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
                 if alt_group:
                     alternative_dies = set(alt_group.profiller)
-                    alternative_dies.discard(cleaned_die_number)
-                    if alternative_dies:
-                        cleaned_die_number = next(iter(alternative_dies))
+                    # alternative_dies.discard(cleaned_die_number)
+                    # print(f"second alternative dies: {alternative_dies}")
+                    # if alternative_dies:
+                    #     cleaned_die_number = next(iter(alternative_dies))
                     # alternative_dies = alt_group.profiller
-                    # for alternative_die in alternative_dies:
-                    #     if alternative_die not in profil_listesi:
-                    #         cleaned_die_number = alternative_die
+                    for alternative_die in alternative_dies:
+                        if alternative_die not in profil_listesi:
+                            cleaned_die_number = alternative_die
+                            print(f"cleaned_die_number: {cleaned_die_number}")
                 profil_listesi.add(cleaned_die_number)
                 # if cleaned_die_number not in cleaned_to_original:
                 #     cleaned_to_original[cleaned_die_number] = []
