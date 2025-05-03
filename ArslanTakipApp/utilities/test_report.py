@@ -213,9 +213,6 @@ def send_single_die_report(die, press, user_info):
         # Eğer profil ile ilgili hiç sipariş yoksa
         order_status = 'Sipariş Açık Değil'
 
-    cc_addresses = ['yazilim@arslanaluminyum.com']
-    to_addresses = ['ai@arslanaluminyum.com']
-
     subject = f"Test alınması gereken kalıp - {date.today().strftime('%d.%m %H:%M')}"
     html_message = render_to_string('mail/single_die_report.html', { # artık bu template değil, kullanılacaksa yeni template gerekli.
         'user': user_info,
@@ -226,5 +223,5 @@ def send_single_die_report(die, press, user_info):
         'representative':client_rep
     })
 
-    # send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
+    send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
 
