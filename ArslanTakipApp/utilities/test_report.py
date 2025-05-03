@@ -1,7 +1,7 @@
 from ..models import Location, DiesLocation, KalipMs, SiparisList, MusteriFirma
 from django.contrib.auth.models import User
 from django.db.models import Func, F, Q
-from datetime import date
+from datetime import datetime, date
 from django.template.loader import render_to_string
 from ..email_utils import send_email
 
@@ -108,7 +108,7 @@ def send_daily_test_report_for_all():
     cc_addresses = ['yazilim@arslanaluminyum.com']
     to_addresses = ['ai@arslanaluminyum.com']
 
-    subject = f"Güncel Test Raporu - {date.today().strftime('%d.%m.%Y')}"
+    subject = f"Güncel Test Raporu - {datetime.now().strftime('%d.%m.%Y')}"
     html_message = render_to_string('mail/daily_test_report.html', {
         'result_list': result_list,
     })
@@ -157,7 +157,7 @@ def send_test_report(dieList, press, user_info):
 
     result_list = sorted(result_list, key=lambda x: x['representative'])
  
-    subject = f"Güncel Test Raporu - {date.today().strftime('%d.%m.%Y')}"
+    subject = f"Güncel Test Raporu - {datetime.now().strftime('%d.%m.%Y')}"
     html_message = render_to_string('mail/single_die_report.html', {
         'result_list': result_list,
         'press': press
@@ -172,7 +172,6 @@ def send_single_die_report(die, press, user_info):
     client_rep = client_obj['MusteriTemsilcisi'] if client_obj else "Tanımsız"
     
     reps = [rep.strip() for rep in client_obj['MusteriTemsilcisi'].split(',')] # ['TUNCAY KURTULMUŞ', 'N.HAYDAR']  ya da ['FATMA DENİZ']
-    print(f"reps: {reps}")
 
     recipients = email_mapping[press]
     to_addresses = recipients['to']
@@ -185,14 +184,10 @@ def send_single_die_report(die, press, user_info):
             last_name = last_name.split(".")[-1]
         rep_user = User.objects.filter(last_name__istartswith=last_name, last_name__iendswith=last_name)
         in_group_user = rep_user.filter(Q(groups__name="Yurt Ici Satis Bolumu") | Q(groups__name="Yurt Disi Satis Bolumu"))
-        print(in_group_user.values())
         if in_group_user.exists():
-            print("burda")
             rep_mail = in_group_user[0]['email']
-            print(f"rep_email: {rep_mail}")
             to_addresses.append(rep_mail)
 
-    print(to_addresses)
     order_status = ''
     siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
 
@@ -215,7 +210,7 @@ def send_single_die_report(die, press, user_info):
 
     result_list = [{'die': die.KalipNo, 'profile': profile_no, 'order_status': order_status, 'representative':client_rep}]
 
-    subject = f"Test alınması gereken kalıp - {date.today().strftime('%d.%m %H:%M')}"
+    subject = f"Test alınması gereken kalıp - {datetime.now().strftime('%d.%m %H:%M')}"
     html_message = render_to_string('mail/single_die_report.html', { # artık bu template değil, kullanılacaksa yeni template gerekli.
         'user_info': user_info,
         'press': press, 
