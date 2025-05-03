@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kalıp Test Bildirimi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+        .container {
+            margin: 20px;
+        }
+        h2 {
+            color: #005aa7;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3f3f3;
+            font-weight: bold;
+        }
+        .info {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>Merhabalar,</p>
+        <p>{{ user_info }} tarafından, {{ press }} konumuna yeni bir <span style="color: red;">TEST</span> kalıp transferi yapılmıştır.</p>
+
+        {% if result_list %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Kalıp No</th>
+                    <th>Profil No</th>
+                    <th>Sipariş Durumu</th>
+                    <th>Müşteri Temsilcisi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in result_list %}
+                <tr>
+                    <td>{{ item.die }}</td>
+                    <td>{{ item.profile }}</td>
+                    <td>{{ item.order_status }}</td>
+                    <td>{{ item.representative }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Bugün için raporlanacak test verisi bulunmamaktadır.</p>
+        {% endif %}
+        
+        <p>Yukarıda yer alan kalıplardan, siparişi açık olmayanlar için <span style="color: red;">DENEME</span> siparişi açılmasını ve tüm kalıplar için baskı süreçlerinin takip edilmesini rica ederim.</p>
+        <p>İyi çalışmalar dilerim.</p>
+    </div>
+</body>
+</html>

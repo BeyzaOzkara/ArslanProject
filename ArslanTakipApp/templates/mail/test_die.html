@@ -2,17 +2,17 @@
 <head>
     <title>Test alınması gereken kalıplar listesi hk.</title>
 </head>
-<body>
+<body style="font-size:12.0pt; font-family:Arial,sans-serif;">
     <p>Merhabalar,</p>
     <p>{{ user_info }} tarafından, {{ die_location }} konumuna yeni bir <span style="color: red;">TEST</span> kalıbı transferi yapılmıştır.</p>
 
-    <p>Aşağıda transfer edilen <span style="color: red;">TEST</span> kalıpların listesi bulunmaktadır:</p>
+    <p>Aşağıda bu konumdaki <span style="color: red;">TEST</span> kalıplarının güncel listesi bulunmaktadır:</p>
     <ul>
         {% for die in dieList %}
-            <li>{{ die }}</li>
+            <li>{{ die.die }} - {{ die.has_open_order }}</li>
         {% endfor %}
     </ul>
-    <p>Yukarıda yer alan kalıplar için <span style="color: red;">DENEME</span> siparişi açılmasını ve baskılarının takip edilmesini rica ederim.</p>
+    <p>Yukarıda yer alan kalıplardan, siparişi açık olmayanlar için <span style="color: red;">DENEME</span> siparişi açılmasını ve tüm kalıplar için baskı süreçlerinin takip edilmesini rica ederim.</p>
     <p>İyi çalışmalar dilerim.</p>
 </body>
 </html>

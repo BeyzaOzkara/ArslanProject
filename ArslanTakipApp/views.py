@@ -31,7 +31,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik, Yuda
+    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -61,6 +61,8 @@ from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
 from .reports import send_report_email_for_all
 from DMS.models import EventData, TemporalData
+from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report
+from django.db.models import Func
 # Create your views here.
 
 
@@ -170,9 +172,8 @@ def location(request):
                 
             if gozCapacity == None:
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
-                if int(dieTo) in checkList and request.user.id != 1:
+                if int(dieTo) in checkList and request.user.id != 1 and lRec.locationName != "TEST":
                     check_last_location_press(request, dieList, dieTo)
-                # check_test_dies(request, dieList, int(dieTo))
                 hareketSave(dieList, lRec, dieTo, request)
                 # 1.fabrikaya kalıp gönderiliyorsa
             else:
@@ -180,6 +181,13 @@ def location(request):
                 if firinKalipSayisi < gozCapacity:
                     if not (firinKalipSayisi + len(dieList)) > gozCapacity:
                         hareketSave(dieList, lRec, dieTo, request)
+            if lRec.locationName == "TEST":
+                user_info = get_user_full_name(request.user.id)
+                kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
+                clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
+                dies = kalipList.filter(trimmed_kalipno__in=clean_dieList)
+                for die in dies:
+                    send_single_die_report(die, lRec.presKodu, user_info)
             response = JsonResponse({'message': "Kalıplar Başarıyla Gönderildi."})
         except Exception as e:
             response = JsonResponse({'error':  'İşlem gerçekleştirilemedi. ' + str(e)})
@@ -201,15 +209,6 @@ def check_last_location_press(request, dieList, dieTo):
         send_email_notification(request, dies_to_notify, dieTo_press)
     else:
         print("don't send mail")
-
-def check_test_dies(request, dieList, dieTo):
-    die_location = get_object_or_404(Location, id=dieTo)
-    if die_location.locationName == "TEST":
-        for die_no in dieList:
-            profil_no = die_no.strip().split('-')[0].strip()
-            print(profil_no)
-            siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
-
 
 def send_email_notification(request, dieList, dieTo_press):
     try:
@@ -1427,29 +1426,6 @@ def kalipPresCheck(sId): # EkSiparisKalip kontrol edilsin ona göre butonlar get
         return 3  # Kalıp exists in Fırında, start production
 
     return 2  # Boş
-    # try:
-    #     pres = Location.objects.get(id=presId)
-    #     location = DiesLocation.objects.filter(kalipVaris=pres).first()
-    #     if location: # preste kalıp var mı
-    #         die = KalipMs.objects.using('dies').filter(KalipNo=location.kalipNo).first()
-    #         if die and die.ProfilNo == pNo: # siparişin kalıbı mı
-    #             return 1 # üretimi bitir
-    #         else:
-    #             gozler = Location.objects.filter(locationRelationID=firinId)
-    #             kalipList = DiesLocation.objects.filter(kalipVaris__in=gozler).values_list('kalipNo', flat=True)
-    #             kaliplar = KalipMs.objects.using('dies').filter(KalipNo__in= list(kalipList), ProfilNo=pNo).values_list('KalipNo', flat=True)
-    #             if len(kaliplar) >= 1:
-    #                 return 4
-    #             return 2 # boş
-    #     else: # fırında uyumlu kalıp var mı
-    #         gozler = Location.objects.filter(locationRelationID=firinId)
-    #         kalipList = DiesLocation.objects.filter(kalipVaris__in=gozler).values_list('kalipNo', flat=True)
-    #         kaliplar = KalipMs.objects.using('dies').filter(KalipNo__in= list(kalipList), ProfilNo=pNo).values_list('KalipNo', flat=True)
-    #         if len(kaliplar) >= 1:
-    #             return 3 # üretime başla
-    #         else: return 2 #boş
-    # except Location.DoesNotExist:
-    #     return None
     
 def eksiparis_uretim(request): # Üretime Başla
     params = json.loads(unquote(request.GET.get('params')))

@@ -59,7 +59,16 @@ class Hareket(models.Model):
 #Hareket object ne gözüksün??    
     def __str__(self):
         return str(self.kalipNo)
-    
+
+class MusteriFirma(models.Model):
+    FirmaKodu = models.CharField(blank=True, primary_key=True)
+    FirmaAdi = models.CharField(null=True, blank=True)
+    MusteriTemsilcisi = models.CharField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View009_FirmaListesi'
+
 class KalipMs(models.Model):
     KalipNo = models.CharField(primary_key=True)
     ProfilNo = models.CharField(null=True)
@@ -173,6 +182,7 @@ class SiparisList(models.Model):
     BulunduguYer = models.CharField(null=True)
     KartAktif = models.IntegerField(null=True)
     SiparisTamam = models.CharField(null=True)
+    SiparisDurum = models.CharField(null=True)
     GirenKg = models.FloatField(null=True, verbose_name="Sipariş Kg")
     GirenAdet = models.FloatField(null=True)
     Kg = models.FloatField(null=True, verbose_name="Kalan Kg")
