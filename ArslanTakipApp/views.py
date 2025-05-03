@@ -2485,7 +2485,7 @@ def billet_firina_at(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
 
-class YudaView(generic.TemplateView):
+class YudaView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'ArslanTakipApp/yuda2.html'
 
     def get_context_data(self, **kwargs):
@@ -2500,6 +2500,7 @@ class YudaView(generic.TemplateView):
         return context
 
 #for getting the select options 
+@login_required
 def yuda(request, objId):
     try: 
         int(objId)
@@ -2704,7 +2705,7 @@ def yuda_kaydet(request):
 
     return response
         
-class YudasView(generic.TemplateView):
+class YudasView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'ArslanTakipApp/yudaList.html'
 
 def yuda_filter(i):
@@ -3048,6 +3049,7 @@ def format_row(row):
 
     return formatted_data
 
+@login_required
 def yudaDetail(request, yId):
     yudaD = YudaForm.objects.filter(id=yId)
     
@@ -3102,6 +3104,7 @@ def yudaDetail_kalipno(request):
     except YudaForm.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Yuda bulunamadı'})
 
+@login_required
 def yudaDetail2(request, yId):
     #veritabanından yuda no ile ilişkili dosyaların isimlerini al
     yudaFiles = getFiles("YudaForm", yId)
@@ -3409,6 +3412,7 @@ def yudaDelete(request, yId):
     yuda.save()
     return HttpResponseRedirect("/yudas")
 
+@login_required
 def yudaEdit(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -3506,6 +3510,7 @@ def yudachange(request, yId):
     response = JsonResponse({'message': 'Değişiklikler başarıyla kaydedildi.\nDetay sayfasına yönlendiriliyorsunuz.'})
     return response
 
+@login_required
 def yudaCopy(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -4668,7 +4673,6 @@ def testere_kesim_bitti(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-
 class YudaNewView(generic.TemplateView): 
     template_name = 'Yuda/yuda.html'
 
@@ -4859,3 +4863,11 @@ def yuda_create(request):
             except Exception as e:
                 return JsonResponse({'error': str(e), 'status':'false'}, status = 500)
 
+class KaliphaneIsEmriView(generic.TemplateView):
+    template_name = 'Kaliphane/is_emri_kg.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # context['is_in_group'] = is_in_group
+        return context
