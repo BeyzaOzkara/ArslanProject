@@ -173,9 +173,8 @@ def location(request):
             if gozCapacity == None:
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
                 if int(dieTo) in checkList and request.user.id != 1 and lRec.locationName != "TEST":
-                    print("burda")
-                    # check_last_location_press(request, dieList, dieTo)
-                # hareketSave(dieList, lRec, dieTo, request)
+                    check_last_location_press(request, dieList, dieTo)
+                hareketSave(dieList, lRec, dieTo, request)
                 # 1.fabrikaya kalıp gönderiliyorsa
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
@@ -183,12 +182,10 @@ def location(request):
                     if not (firinKalipSayisi + len(dieList)) > gozCapacity:
                         hareketSave(dieList, lRec, dieTo, request)
             if lRec.locationName == "TEST":
-                print("test")
                 user_info = get_user_full_name(request.user.id)
                 kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
                 clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
                 dies = kalipList.filter(trimmed_kalipno__in=clean_dieList)
-                print(dies)
                 for die in dies:
                     send_single_die_report(die, lRec.presKodu, user_info)
             response = JsonResponse({'message': "Kalıplar Başarıyla Gönderildi."})
