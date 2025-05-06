@@ -69,7 +69,7 @@ def send_daily_test_report_for_all():
     
     result_list = []
     kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
-    test_locations = Location.objects.filter(locationName="TEST")
+    test_locations = Location.objects.filter(locationName="TEST") #.exclude(presKodu='1600-2')
 
     for location in test_locations:
         dieList = list(DiesLocation.objects.filter(kalipVaris=location).values_list('kalipNo', flat=True))
@@ -103,17 +103,21 @@ def send_daily_test_report_for_all():
                 # Eğer profil ile ilgili hiç sipariş yoksa
                 result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri})
 
-    result_list = sorted(result_list, key=lambda x: x['press'])
+    if len(result_list) >= 1:
+        result_list = sorted(result_list, key=lambda x: x['press'])
+        # to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com' 'kevsermolla@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
+        #                  'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com']
+        # cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
 
-    cc_addresses = ['yazilim@arslanaluminyum.com']
-    to_addresses = ['ai@arslanaluminyum.com']
+        cc_addresses = ['yazilim@arslanaluminyum.com']
+        to_addresses = ['ai@arslanaluminyum.com']
 
-    subject = f"Güncel Test Raporu - {datetime.now().strftime('%d.%m.%Y')}"
-    html_message = render_to_string('mail/daily_test_report.html', {
-        'result_list': result_list,
-    })
+        subject = f"Güncel Test Raporu - {datetime.now().strftime('%d.%m.%Y')}"
+        html_message = render_to_string('mail/daily_test_report.html', {
+            'result_list': result_list,
+        })
 
-    send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
+        send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
 
 # her hareketten sonra gönderilen
 def send_test_report(dieList, press, user_info):
