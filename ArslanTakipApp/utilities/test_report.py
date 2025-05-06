@@ -105,12 +105,12 @@ def send_daily_test_report_for_all():
 
     if len(result_list) >= 1:
         result_list = sorted(result_list, key=lambda x: x['press'])
-        # to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com' 'kevsermolla@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
-        #                  'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com']
-        # cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
+        to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com' 'kevsermolla@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
+                         'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com']
+        cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
 
-        cc_addresses = ['yazilim@arslanaluminyum.com']
-        to_addresses = ['ai@arslanaluminyum.com']
+        # cc_addresses = ['yazilim@arslanaluminyum.com']
+        # to_addresses = ['ai@arslanaluminyum.com']
 
         subject = f"Güncel Test Raporu - {datetime.now().strftime('%d.%m.%Y')}"
         html_message = render_to_string('mail/daily_test_report.html', {

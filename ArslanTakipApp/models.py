@@ -430,37 +430,7 @@ class Yuda(models.Model):
     meta_data = models.JSONField(null=True, blank=True) # last_comment_time burada mı olmalı yoksa dışarıda mı olmalı
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', blank=True, null=True) # child yudaları getir-> parent_instance.children.all() 
     #  
-    """ IstekYapanBolum = models.CharField(null=True, blank=True)
-    IstekYapanKisi = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="yuda_istekyapan", null=True, blank=True)
-    OnemliYuzeyler = models.CharField(null=True, blank=True)
-    OnemliOlculerVeToleranslar = models.CharField(null=True, blank=True)
-    CizimNo = models.CharField(null=True, blank=True)
-    YillikProfilSiparisi = models.CharField(null=True, blank=True)
-    TalasliImalat = models.CharField(null=True, blank=True)
-    TalasliImalatBoyaYadaEloksaldan = models.CharField(null=True, blank=True)
-    MusteriYuzeyVeyaTalasliIslem = models.CharField(null=True, blank=True)
-    BirlikteCalisanAparati = models.CharField(null=True, blank=True)
-    OzelPaketleme = models.CharField(null=True, blank=True)
-    OzelPaketlemeAciklama = models.CharField(null=True, blank=True)
-    KalipDurumu = models.CharField(null=True, blank=True) #Profilin kullanıldığı yer
-    BilletCinsi = models.CharField(null=True, blank=True)
-    Kondusyon = models.CharField(null=True, blank=True)
-    DinToleransi = models.CharField(null=True, blank=True)
-    YuzeyDurumu = models.CharField(null=True, blank=True)
-    MetreAgirlikTalebi = models.CharField(null=True, blank=True)
-    MetreAgirlikTalebiMiktar = models.CharField(null=True, blank=True)
-    AskiIzi = models.CharField(null=True, blank=True)
-    IstenilenStandartBoy = models.CharField(null=True, blank=True)
-    MinKullanimBoyu = models.CharField(null=True, blank=True)
-    Folyo = models.CharField(null=True, blank=True)
-    Bariyerleme = models.CharField(null=True, blank=True)
-    MusteriOdemeVadesi = models.CharField(null=True, blank=True)
-    SatisBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_satis")
-    KaliphaneBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_kaliphane")
-    UretimBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_uretim")
-    KaliteBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_kalite")
-    YuzeyIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_yuzey")
-    MekanikIslemBolumuOnay = models.ForeignKey(YudaOnay, on_delete=models.CASCADE, blank=True, null=True, related_name="onay_mekanik") """
+
     #YuklenenDosyalar = models.FileField(max_length=250, upload_to='media/', blank=True, null=True)
 
 class Parameter(models.Model):
@@ -597,3 +567,36 @@ class Personel(models.Model): # bölümü eklemeli miyim
     class Meta:
         verbose_name='Personel'
         verbose_name_plural='Personeller'
+
+
+class KaliphaneIsEmri(models.Model):
+    KartNo = models.CharField(null=True, blank=True)
+    Kimlik = models.IntegerField(null=True, blank=True) #UrtKimlik aynı olanların kimlikleri, unique değil
+    UrtKimlik = models.IntegerField(null=True, blank=True)
+    Tree_StokKodu = models.CharField(null=True, blank=True) # ProfilNo
+    StokKodu = models.CharField(null=True, blank=True)
+    OperasyonGrupKodu = models.CharField(null=True, blank=True)
+    OperasyonKodu = models.CharField(null=True, blank=True)
+    OperasyonAdi = models.CharField(null=True, blank=True)
+    Durum = models.CharField(null=True, blank=True)
+    Bolum = models.CharField(null=True, blank=True)
+    UrtSiparisNo = models.CharField(null=True, blank=True)
+    Operasyon = models.CharField(null=True, blank=True)
+    SiparisNo = models.CharField(null=True, blank=True)
+    Aciklama = models.CharField(null=True, blank=True)
+    Varyant1 = models.CharField(null=True, blank=True) # pres
+    Varyant2 = models.CharField(null=True, blank=True) # figür
+    Varyant3 = models.CharField(null=True, blank=True) # çap
+    Varyant4 = models.CharField(null=True, blank=True) # hazne
+    Varyant5 = models.CharField(null=True, blank=True) # sadece kalıp
+    Varyant6 = models.CharField(null=True, blank=True) # kapak
+    Varyant7 = models.CharField(null=True, blank=True) # köprü
+    Varyant8 = models.CharField(null=True, blank=True) # destek
+    Varyant9 = models.CharField(null=True, blank=True) # yan no
+    Varyant10 = models.CharField(null=True, blank=True) # bolster
+    Varyant11 = models.CharField(null=True, blank=True) # mühre paket boy
+
+    class Meta:
+        managed = False
+        db_table = 'View_URT_IsEmri'  # KALIPHANE 'kh' db
+

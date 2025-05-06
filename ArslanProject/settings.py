@@ -120,6 +120,16 @@ DATABASES = {
         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
         },
     },
+    'kh': {
+        'ENGINE': 'mssql',
+        'NAME': 'KALIPHANE',
+        'USER': 'arsbyz',
+        'PASSWORD': '123',
+        'HOST': '192.168.180.200', 
+        'PORT': '1433',
+        "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
+        },
+    },
     'plc4': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'fabrika4',
@@ -235,7 +245,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'send-test-email': {
         'task': 'ArslanTakipApp.tasks.start_test_report_listener',
-        'schedule': crontab(minute='51', hour='10'),
+        'schedule': crontab(minute=0, hour='7'),
     }
 }
 
