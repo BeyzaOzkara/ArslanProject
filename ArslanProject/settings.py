@@ -235,7 +235,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'send-test-email': {
         'task': 'ArslanTakipApp.tasks.start_test_report_listener',
-        'schedule': crontab(minute='47', hour='10'),
+        'schedule': crontab(minute='51', hour='10'),
     }
 }
 
