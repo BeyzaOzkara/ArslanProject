@@ -69,7 +69,7 @@ def send_daily_test_report_for_all():
     
     result_list = []
     kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
-    test_locations = Location.objects.filter(locationName="TEST").exclude(presKodu='1600-2')
+    test_locations = Location.objects.filter(locationName="TEST") #.exclude(presKodu='1600-2')
 
     for location in test_locations:
         dieList = list(DiesLocation.objects.filter(kalipVaris=location).values_list('kalipNo', flat=True))
