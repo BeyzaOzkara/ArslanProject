@@ -183,13 +183,13 @@ def send_single_die_report(die, press, user_info):
 
     for rep in reps:
         name_parts = rep.split()
-        last_name = name_parts[-1].lower()
+        last_name = name_parts[-1].upper()
         if '.' in last_name:
             last_name = last_name.split(".")[-1]
         rep_user = User.objects.filter(last_name__istartswith=last_name, last_name__iendswith=last_name)
         in_group_user = rep_user.filter(Q(groups__name="Yurt Ici Satis Bolumu") | Q(groups__name="Yurt Disi Satis Bolumu"))
         if in_group_user.exists():
-            rep_mail = in_group_user[0]['email']
+            rep_mail = in_group_user.values()[0]['email']
             to_addresses.append(rep_mail)
 
     order_status = ''

@@ -160,4 +160,8 @@ urlpatterns = [
     path('4500/finishsaw/testere_tezgahi', views.testere_tezgahi, name='testere_tezgahi'),
     path('4500/finishsaw/testere_siparis_list', views.testere_siparis_list, name='testere_siparis_list'),
     path('4500/finishsaw/kesim_bitti', views.testere_kesim_bitti, name='kesim_bitti'),
+
+    path('kaliphane/is_emri', views.KaliphaneIsEmriView.as_view(), name='kaliphane_is_emri'),
+    path('kaliphane/is_emri/tab_info', views.kaliphane_get_tab_info, name='kaliphane_get_is_emri'),
+    
 ]

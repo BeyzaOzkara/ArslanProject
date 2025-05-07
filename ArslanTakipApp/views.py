@@ -31,7 +31,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma
+    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -4868,8 +4868,34 @@ def yuda_create(request):
 class KaliphaneIsEmriView(generic.TemplateView):
     template_name = 'Kaliphane/is_emri_kg.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # context['is_in_group'] = is_in_group
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     # sayfanın tablerini getirmek için kullanılabilir. 
+    #     # context['is_in_group'] = is_in_group
+    #     return context
+
+stok_kodu_map = {
+    'PORTOL DİŞİ': 'Varyant6',
+    'PORTOL KÖPRÜ': 'Varyant7',
+    'DESTEK': 'Varyant8',
+    '': 'Varyant',
+    '': 'Varyant',
+    '': 'Varyant',
+}
+    
+def kaliphane_get_tab_info(request):
+    if request.method == 'GET':
+        # operasyon = request.GET.get('operasyon') # TESTERE ya da ISIL İŞLEM olacak
+        # hangi operasyon? 
+        # hangi operasyonsa bu operasyonun başlatılmış iş emri var mı ona bak
+        # yoksa açık iş emirlerinin bir listesini getir
+        # varsa başlatılmış iş emri gösterilsin 
+        # isemri durum = 'BASLAMADI' ise İş Emri eklenmiş fakat henüz üretime başlanmamış
+        # varyant1=pres, varyant2=figür, varyant3=çap, varyant4=hazne, varyant5=sadecekalıp, varyant6=kapak, 
+        # varyant7=köprü, varyant8=destek, varyant9=yanno, varyant10=bolster, varyant11=mührepaketboyu
+        # iş emri listesinde gösterilecek olan sütunlar:
+        # UrtKimlik, Tree_StokKodu, Varyant9, Çap, StokKodu, StokKoduna bağlı varyant as Kesim Boyu, Kesim Boyu-5 as Gerçek Ölçü
+        is_emris = KaliphaneIsEmri.objects.using('kh').filter(Durum='BASLAMADI', OperasyonKodu='TESTERE').values()
+        for emir in is_emris:
+                emir['KesimBoyu'] = stok_kodu_map(emir['StokKodu'])
+                emir['GercekOlcu'] = emir['KesimBoyu'] - 5

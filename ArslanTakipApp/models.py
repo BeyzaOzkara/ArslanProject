@@ -570,7 +570,7 @@ class Personel(models.Model): # bölümü eklemeli miyim
 
 
 class KaliphaneIsEmri(models.Model):
-    KartNo = models.CharField(null=True, blank=True)
+    KartNo = models.CharField(primary_key=True, blank=True)
     Kimlik = models.IntegerField(null=True, blank=True) #UrtKimlik aynı olanların kimlikleri, unique değil
     UrtKimlik = models.IntegerField(null=True, blank=True)
     Tree_StokKodu = models.CharField(null=True, blank=True) # ProfilNo
