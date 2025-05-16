@@ -180,8 +180,8 @@ def send_single_die_report(die, press, user_info):
     reps = [rep.strip() for rep in client_obj['MusteriTemsilcisi'].split(',')] # ['TUNCAY KURTULMUŞ', 'N.HAYDAR']  ya da ['FATMA DENİZ']
 
     recipients = email_mapping[press]
-    to_addresses = recipients['to']
-    cc_addresses = recipients['cc']
+    to_addresses = set(recipients['to'])
+    cc_addresses = set(recipients['cc'])
 
     for rep in reps:
         name_parts = rep.split()
@@ -192,7 +192,8 @@ def send_single_die_report(die, press, user_info):
         in_group_user = rep_user.filter(Q(groups__name="Yurt Ici Satis Bolumu") | Q(groups__name="Yurt Disi Satis Bolumu"))
         if in_group_user.exists():
             rep_mail = in_group_user.values()[0]['email']
-            to_addresses.append(rep_mail)
+            # to_addresses.append(rep_mail)
+            to_addresses.add(rep_mail)
 
     order_status = ''
     siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
@@ -223,5 +224,5 @@ def send_single_die_report(die, press, user_info):
         'result_list': result_list,
     })
 
-    send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
+    send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
 
