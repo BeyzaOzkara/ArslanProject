@@ -4030,7 +4030,7 @@ class Stacker4500View(generic.TemplateView):
 def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=72)
         plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time, event_type='Extrusion').values_list('static_data', flat=True)
         # plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
@@ -4078,7 +4078,7 @@ def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=72)
         billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
         # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
