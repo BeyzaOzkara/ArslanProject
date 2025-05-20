@@ -178,7 +178,7 @@
     <div id="meydan-kalip-tabulator" class="mt-3"></div>
 </div>
 
-<div class="modal fade" id="kalipModal" data-goz-count="{{ gozData|length }}" tabindex="-1" aria-labelledby="kalipModalLabel" style="display: none;" aria-hidden="true">
+<div class="modal fade" id="kalipModal" data-goz-count="{{ totalLocations }}" tabindex="-1" aria-labelledby="kalipModalLabel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -311,12 +311,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function showKalipModal() {
         var modalElement = document.getElementById('kalipModal');
-        var gozCount = modalElement.getAttribute('data-goz-count');
+        var totalLocations = modalElement.getAttribute('data-goz-count');
         var gozRadioList = document.getElementById('gozRadioList');
         gozRadioList.innerHTML = '';  // Clear previous options;
-        var flexBasis = `${100 / gozCount}%`;
+        var flexBasis = `${100 / totalLocations}%`;
 
-        for (var j = 1; j <= gozCount; j++) {
+        for (var j = 1; j <= totalLocations; j++) {
             const gozCard = `
             <div class="card-container">
                 <div class="card bg-info text-white">
