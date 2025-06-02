@@ -43,16 +43,20 @@
                 <th>Profil No</th>
                 <th>Sipariş Durumu</th>
                 <th>Müşteri Temsilcisi</th>
+                <th>Hareket Tarihi</th>
+                <th>Bekleme Süresi</th>
             </tr>
         </thead>
         <tbody>
             {% for item in result_list %}
-            <tr>
+            <tr {% if item.wait_time > 3 %}style="color: red;"{% endif %}>
                 <td>{{ item.press }}</td>
                 <td>{{ item.die }}</td>
                 <td>{{ item.profile }}</td>
                 <td>{{ item.order_status }}</td>
                 <td>{{ item.representative }}</td>
+                <td>{{ item.move_date }}</td>
+                <td>{{ item.wait_time }}</td>
             </tr>
             {% endfor %}
         </tbody>

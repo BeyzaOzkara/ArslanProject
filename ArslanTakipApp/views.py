@@ -2228,7 +2228,7 @@ class KalipFirinView(PermissionRequiredMixin, generic.TemplateView):
         total_locations = len(gozler)
         context['totalLocations'] = total_locations
         context['gozData'] = gozData
-        
+
         return context
     
     def post(self, request, *args, **kwargs):
@@ -3090,7 +3090,7 @@ def yudaDetail(request, yId):
     kaliphane_grup = request.user.groups.filter(name='Kaliphane Bolumu').exists()
     kaliphane_onay = YudaOnay.objects.filter(Group__name='Kaliphane Bolumu', Yuda_id=yId, OnayDurumu=True).exists()
 
-    kalip_onay = satis_onay and kaliphane_grup and kaliphane_onay
+    kalip_onay = False #satis_onay and kaliphane_grup and kaliphane_onay
     # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
     return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim, 'kalip_onay':kalip_onay})
 
@@ -3102,7 +3102,9 @@ def yudaDetail_kalipno(request):
     try:
         yuda = YudaForm.objects.get(id=yuda_id)
         print(yuda)
-        # yuda.YeniKalipNo = kalip_no
+        if yuda.meta_data is None:
+            yuda.meta_data = {}
+        yuda.meta_data['KalipNo'] = kalip_no
         # yuda.save()
         return JsonResponse({'status': 'success'})
     except YudaForm.DoesNotExist:
@@ -4185,9 +4187,25 @@ def delete_sepet_yuklenen(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+def get_the_latest_data(queryset, datetime_field='start'):
+    # send the queryset parameter ordered by datetime asc
+    # bugün hariç son baskı sonundan 24 saat önce olan kayıtları getir
+    now = timezone.now()
+    today = now.date()
+    queryset = queryset.exclude(**{f"{datetime_field}__date": today})
+    print(queryset.count())
+    latest_entry = queryset.order_by(f"-{datetime_field}").first()
+    if not latest_entry:
+        return queryset.none()
+    print(latest_entry)
+    latest_time = getattr(latest_entry, datetime_field)
+    # time_24_hours_before = latest_time - timedelta(hours=24) #datetime
+
+
 def get_profil_nos(pres):
     end_time = timezone.now()
     start_time = end_time - datetime.timedelta(hours=48)
+    # get_the_latest_data(EventData.objects.using('dms').values(), 'start_time')
 
     ext_list = list(EventData.objects.using('dms').filter(machine_name=pres, start_time__gte=start_time, end_time__lte=end_time).values_list("static_data__DieNumber", flat=True).distinct())
     # ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())

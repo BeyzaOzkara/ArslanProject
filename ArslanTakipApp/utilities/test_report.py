@@ -1,4 +1,4 @@
-from ..models import Location, DiesLocation, KalipMs, SiparisList, MusteriFirma
+from ..models import Location, DiesLocation, KalipMs, SiparisList, MusteriFirma, Hareket
 from django.contrib.auth.models import User
 from django.db.models import Func, F, Q
 from datetime import datetime, date
@@ -78,8 +78,16 @@ def send_daily_test_report_for_all():
         # replace spaces from dieList
         clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
         dies = kalipList.filter(trimmed_kalipno__in=clean_dieList)
-
+        today = datetime.now().date() 
         for die in dies:
+            kalip_no = die.KalipNo
+            last_move_date = Hareket.objects.filter(kalipNo=kalip_no).latest('hareketTarihi').hareketTarihi
+            move_date = last_move_date.strftime("%d-%m-%Y %H:%M")
+            print(move_date)
+            wait_time = (today - last_move_date.date()).days
+            print(wait_time)
+            if (wait_time) > 3:
+                print("burda")
             profil_no = die.ProfilNo
             musteri_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi').first()
             musteri = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız"
@@ -91,17 +99,17 @@ def send_daily_test_report_for_all():
                 has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
                 
                 if has_open_order:
-                    result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık', 'representative':musteri})
+                    result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
                 else: 
                     # Eğer 'ACIK' durumu yoksa, 'BLOKE' durumuna bakıyoruz
                     has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
                     if has_blocked_order:
-                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Bloke', 'representative':musteri})
+                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Bloke', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
                     else:
-                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri})
+                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
             else:
                 # Eğer profil ile ilgili hiç sipariş yoksa
-                result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri})
+                result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
 
     if len(result_list) >= 1:
         result_list = sorted(result_list, key=lambda x: x['press'])
