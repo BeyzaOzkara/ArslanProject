@@ -4036,7 +4036,7 @@ class Stacker4500View(generic.TemplateView):
 def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=192)
         plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time, event_type='Extrusion').values_list('static_data', flat=True)
         # plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
@@ -4084,7 +4084,7 @@ def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=192)
         billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
         # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
@@ -4204,7 +4204,7 @@ def get_the_latest_data(queryset, datetime_field='start'):
 
 def get_profil_nos(pres):
     end_time = timezone.now()
-    start_time = end_time - datetime.timedelta(hours=48)
+    start_time = end_time - datetime.timedelta(hours=192)
     # get_the_latest_data(EventData.objects.using('dms').values(), 'start_time')
 
     ext_list = list(EventData.objects.using('dms').filter(machine_name=pres, start_time__gte=start_time, end_time__lte=end_time).values_list("static_data__DieNumber", flat=True).distinct())
@@ -4243,7 +4243,7 @@ def get_ext_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=50)
+        start_time = end_time - datetime.timedelta(hours=192)
 
         # group by common DieNumber, BilletLot, and kartNo, but also ensure that the events are sequential.
         try:
@@ -4330,7 +4330,7 @@ def get_ext_info_old(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=192)
         
         try:
             alternative_dies = get_alternative_profiles(profil_no)
@@ -4385,7 +4385,7 @@ def get_sepet_info(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
-        end_48_time = end_time - datetime.timedelta(hours=50)
+        end_48_time = end_time - datetime.timedelta(hours=192)
         
         alternative_dies = get_alternative_profiles(profil_no)
         q = Q()
@@ -4508,7 +4508,7 @@ class Sepetler4500View(generic.TemplateView):
 def sepet_get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=192)
         plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time).values_list('static_data', flat=True)
         # plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
         profil_listesi = set()
@@ -4546,7 +4546,7 @@ def sepet_get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=48)
+        start_time = end_time - datetime.timedelta(hours=192)
         billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
         # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
