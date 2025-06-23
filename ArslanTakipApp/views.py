@@ -4534,7 +4534,7 @@ def get_kart_info(request):
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
             alternative_dies = get_alternative_profiles(profil_no)
 
-            siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) ) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+            siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
             siparisler = siparis_query.filter(ProfilNo__in=alternative_dies).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin', '-PlanlananMm')
             # siparisler = SiparisList.objects.using('dies').filter(KartNo__in = ['312578', '312579', '312580', '312581', '312582', '312583', '312584']).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
             for s in siparisler:
