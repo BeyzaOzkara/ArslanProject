@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import Counter, OrderedDict, defaultdict
 import csv
 import logging
 import os
@@ -139,9 +139,112 @@ def hareketSave(dieList, lRec, dieTo, request):
             else:
                 print("Hareket not saved")
 
+
+def get_new_unique_dies():
+    # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
+    date_filter = datetime(2025, 1, 1)
+    queryset = (
+        KalipMs.objects.using('dies')
+        .values('ProfilNo')
+        .annotate(
+            CountKalip=Count('KalipNo'),
+            SumUretim=Sum('UretimToplamKg'),
+            CreateTime=Max('Create_Time')
+        )
+        .filter(SumUretim=0, CreateTime__gt=date_filter)
+    )
+
+    # kaliplar = list(DiesLocation.objects.filter(kalipVaris_id=48).values_list('kalipNo', flat=True))
+    # print(f"kaliplar: {len(kaliplar)}")
+    # if len(kaliplar)<=0:
+    #     return   
+    # def extract_profil_no(kalip_no):
+    #     if not kalip_no:
+    #         return None
+    #     kalip_no = kalip_no.strip()
+    #     return kalip_no.split("-")[0] if "-" in kalip_no else kalip_no
+
+    # # Only process non-empty strings
+    # profil_nolari = [extract_profil_no(k) for k in kaliplar if k and isinstance(k, str) and k.strip()]
+
+    # profil_sayaci = Counter(profil_nolari)
+    # unique_profiller = [profil for profil, adet in profil_sayaci.items() if adet == 1]
+    
+    # # Clean again, make sure there are no None values
+    # clean_unique_profiller = [
+    #     str(p).strip()
+    #     for p in unique_profiller
+    #     if isinstance(p, str)
+    #     and p.strip().lower() != 'none'
+    #     and p.strip() != ''
+    #     and p is not None
+    # ]
+    # print("---- ProfilNos to be queried ----")
+    # for i, p in enumerate(clean_unique_profiller):
+    #     if type(p) == NoneType:
+    #         print("burda")
+    #     print(f"{i}: {repr(p)}  (type={type(p)})")
+
+    # # If the list is empty, avoid querying with an empty IN clause
+    # if not clean_unique_profiller:
+    #     print("No valid unique profiles found.")
+    #     return
+
+    # siparisli_profiller = SiparisList.objects.using('dies').filter(
+    #     ProfilNo__in=clean_unique_profiller).values_list('ProfilNo', flat=True)
+    # print(siparisli_profiller)
+    # siparisli_profiller_set = set(siparisli_profiller)
+
+    # 6. Siparişi olmayanları filtrele
+    # siparissiz_profiller = [p for p in unique_profiller if p not in siparisli_profiller_set]
+
+    # 7. Sonuç
+    print("Siparişi olmayan (ve benzersiz) profil numaraları:")
+    # print(siparissiz_profiller)
+
+
+    # all_dies = DiesLocation.objects.filter(kalipVaris_id=48)
+    # profil_dict = defaultdict(list)
+
+    # def get_profil_no(kalip_no):
+    #     return kalip_no.split('-')[0].strip()
+    
+    # # Count how many times each profilNo appears
+    # profilnos = [get_profil_no(kalip.kalipNo) for kalip in all_dies]
+    # profilno_counts = Counter(profilnos)
+
+    # # Only keep profilNos that appear once
+    # unique_profilnos = [profil_no for profil_no, count in profilno_counts.items() if count == 1]
+    # print(unique_profilnos) 
+    # return unique_profilnos
+
+    # eski
+
+    # for kalip in all_dies:
+    #     profil_no = get_profil_no(kalip.kalipNo)
+    #     profil_dict[profil_no].append(kalip)
+    # print(profil_dict)
+    # filtered_list = []
+    # # Birden fazla kalıba sahip profil numaralarını dışla
+    # for profil_no, kaliplar in profil_dict.items():
+    #     if len(kaliplar) == 1:
+    #         # Sadece bu profil numarasına ait tek bir kalıp varsa al
+    #         filtered_list.append(kaliplar[0])
+    # return filtered_list
+
+def check_order_for_new_dies(profiles):
+    print(len(profiles))
+    # print(profil_nos)
+    siparis = SiparisList.objects.using('dies').filter(ProfilNo__in=profiles)
+    print(siparis)
+
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
+    # profiles = get_new_unique_dies()
+    # check_order_for_new_dies(profiles)
+
+
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
@@ -4431,7 +4534,7 @@ def get_kart_info(request):
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
             alternative_dies = get_alternative_profiles(profil_no)
 
-            siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+            siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) ) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
             siparisler = siparis_query.filter(ProfilNo__in=alternative_dies).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin', '-PlanlananMm')
             # siparisler = SiparisList.objects.using('dies').filter(KartNo__in = ['312578', '312579', '312580', '312581', '312582', '312583', '312584']).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
             for s in siparisler:

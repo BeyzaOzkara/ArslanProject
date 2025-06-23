@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kalıp Sipariş Takip Raporu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+        h2 {
+            color: #005aa7;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3f3f3;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <h2>Kalıp Sipariş Takip Raporu</h2>
+
+    {% if result_list %}
+    <table>
+        <thead>
+            <tr>
+                <th>Kalıp No</th>
+                <th>Profil No</th>
+                <th>Müşteri Temsilcisi</th>
+                <th>Eklenme Tarihi</th>
+                <th>Bekleme Süresi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in result_list %}
+            <tr {% if item.wait_time > 15 %}style="color: red;"{% endif %}>
+                <td>{{ item.die }}</td>
+                <td>{{ item.profile }}</td>
+                <td>{{ item.representative }}</td>
+                <td>{{ item.add_date }}</td>
+                <td>{{ item.wait_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Bugün için raporlanacak veri bulunmamaktadır.</p>
+    {% endif %}
+</body>
+</html>

@@ -106,6 +106,8 @@ class KalipMs(models.Model):
     PresKodu = models.CharField(null=True)
     ResimDizini = models.CharField(null=True)
     PaketBoyu = models.CharField(null=True)
+    BariyerOkey = models.IntegerField(null=True, blank=True)
+
     class Meta:
         managed = False
         db_table = 'View020_KalipListe'

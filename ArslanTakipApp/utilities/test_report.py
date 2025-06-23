@@ -93,7 +93,7 @@ def send_daily_test_report_for_all():
             musteri = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız"
             # musteri = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi')[0]['MusteriTemsilcisi']
             siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
-
+ 
             if siparis_qs.exists():
                 # 'ACIK' durumu var mı diye kontrol ediyoruz
                 has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
