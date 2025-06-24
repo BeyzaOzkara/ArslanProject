@@ -172,9 +172,6 @@ def get_new_unique_dies():
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
-    profiles = get_new_unique_dies()
-
-
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
