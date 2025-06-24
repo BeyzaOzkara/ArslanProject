@@ -107,6 +107,7 @@ class KalipMs(models.Model):
     ResimDizini = models.CharField(null=True)
     PaketBoyu = models.CharField(null=True)
     BariyerOkey = models.IntegerField(null=True, blank=True)
+    Create_Time = models.DateTimeField(null=True)
 
     class Meta:
         managed = False

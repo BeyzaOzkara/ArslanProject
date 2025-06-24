@@ -1,7 +1,7 @@
 from ..models import Location, DiesLocation, KalipMs, SiparisList, MusteriFirma, Hareket
 from django.contrib.auth.models import User
-from django.db.models import Func, F, Q
-from datetime import datetime, date
+from django.db.models import Func, F, Q, Count, Sum, Max
+from datetime import datetime, date, timedelta
 from django.template.loader import render_to_string
 from ..email_utils import send_email
 
@@ -234,3 +234,50 @@ def send_single_die_report(die, press, user_info):
 
     send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
 
+
+
+def send_new_dies_without_orders_report():
+    # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
+    date_filter = datetime.now() - timedelta(days=183)
+    queryset = (
+        KalipMs.objects.using('dies')
+        .values('ProfilNo')
+        .annotate(
+            CountKalip=Count('KalipNo'),
+            SumUretim=Sum('UretimToplamKg'),
+            CreateTime=Max('Create_Time')
+        )
+        .filter(SumUretim=0, CreateTime__gt=date_filter)
+    )
+    
+    profilno_list = list(queryset.values_list('ProfilNo', flat=True))
+    profilno_no_open_order = []
+
+    for profilno in profilno_list:
+        open_order_exists = SiparisList.objects.using('dies').filter(
+            ProfilNo=profilno
+        ).exists()  # Açılmış herhangi bir sipariş var mı kontrol et
+
+        if not open_order_exists:
+            # Yoksa listeye ekle
+            profilno_no_open_order.append(profilno)
+
+    print(profilno_no_open_order)
+
+    if len(profilno_no_open_order) >= 1:
+        result_list = sorted(profilno_no_open_order, key=lambda x: x['press'])
+        # to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
+        #                  'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
+        #                  'enesozturk@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com']
+
+        # cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
+
+        cc_addresses = ['yazilim@arslanaluminyum.com']
+        to_addresses = ['ai@arslanaluminyum.com']
+
+        subject = f"Profil Sipariş Takip Raporu - {datetime.now().strftime('%d.%m.%Y')}"
+        html_message = render_to_string('mail/profile_without_orders_report.html', {
+            'result_list': result_list,
+        })
+
+        send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)

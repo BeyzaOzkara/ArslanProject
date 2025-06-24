@@ -142,7 +142,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 
 def get_new_unique_dies():
     # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
-    date_filter = datetime(2025, 1, 1)
+    date_filter = datetime.datetime.now() - datetime.timedelta(days=183)
     queryset = (
         KalipMs.objects.using('dies')
         .values('ProfilNo')
@@ -153,96 +153,26 @@ def get_new_unique_dies():
         )
         .filter(SumUretim=0, CreateTime__gt=date_filter)
     )
-
-    # kaliplar = list(DiesLocation.objects.filter(kalipVaris_id=48).values_list('kalipNo', flat=True))
-    # print(f"kaliplar: {len(kaliplar)}")
-    # if len(kaliplar)<=0:
-    #     return   
-    # def extract_profil_no(kalip_no):
-    #     if not kalip_no:
-    #         return None
-    #     kalip_no = kalip_no.strip()
-    #     return kalip_no.split("-")[0] if "-" in kalip_no else kalip_no
-
-    # # Only process non-empty strings
-    # profil_nolari = [extract_profil_no(k) for k in kaliplar if k and isinstance(k, str) and k.strip()]
-
-    # profil_sayaci = Counter(profil_nolari)
-    # unique_profiller = [profil for profil, adet in profil_sayaci.items() if adet == 1]
     
-    # # Clean again, make sure there are no None values
-    # clean_unique_profiller = [
-    #     str(p).strip()
-    #     for p in unique_profiller
-    #     if isinstance(p, str)
-    #     and p.strip().lower() != 'none'
-    #     and p.strip() != ''
-    #     and p is not None
-    # ]
-    # print("---- ProfilNos to be queried ----")
-    # for i, p in enumerate(clean_unique_profiller):
-    #     if type(p) == NoneType:
-    #         print("burda")
-    #     print(f"{i}: {repr(p)}  (type={type(p)})")
+    profilno_list = list(queryset.values_list('ProfilNo', flat=True))
+    profilno_no_open_order = []
 
-    # # If the list is empty, avoid querying with an empty IN clause
-    # if not clean_unique_profiller:
-    #     print("No valid unique profiles found.")
-    #     return
+    for profilno in profilno_list:
+        open_order_exists = SiparisList.objects.using('dies').filter(
+            ProfilNo=profilno
+        ).exists()  # Açılmış herhangi bir sipariş var mı kontrol et
 
-    # siparisli_profiller = SiparisList.objects.using('dies').filter(
-    #     ProfilNo__in=clean_unique_profiller).values_list('ProfilNo', flat=True)
-    # print(siparisli_profiller)
-    # siparisli_profiller_set = set(siparisli_profiller)
+        if not open_order_exists:
+            # Yoksa listeye ekle
+            profilno_no_open_order.append(profilno)
 
-    # 6. Siparişi olmayanları filtrele
-    # siparissiz_profiller = [p for p in unique_profiller if p not in siparisli_profiller_set]
+    print(profilno_no_open_order)
 
-    # 7. Sonuç
-    print("Siparişi olmayan (ve benzersiz) profil numaraları:")
-    # print(siparissiz_profiller)
-
-
-    # all_dies = DiesLocation.objects.filter(kalipVaris_id=48)
-    # profil_dict = defaultdict(list)
-
-    # def get_profil_no(kalip_no):
-    #     return kalip_no.split('-')[0].strip()
-    
-    # # Count how many times each profilNo appears
-    # profilnos = [get_profil_no(kalip.kalipNo) for kalip in all_dies]
-    # profilno_counts = Counter(profilnos)
-
-    # # Only keep profilNos that appear once
-    # unique_profilnos = [profil_no for profil_no, count in profilno_counts.items() if count == 1]
-    # print(unique_profilnos) 
-    # return unique_profilnos
-
-    # eski
-
-    # for kalip in all_dies:
-    #     profil_no = get_profil_no(kalip.kalipNo)
-    #     profil_dict[profil_no].append(kalip)
-    # print(profil_dict)
-    # filtered_list = []
-    # # Birden fazla kalıba sahip profil numaralarını dışla
-    # for profil_no, kaliplar in profil_dict.items():
-    #     if len(kaliplar) == 1:
-    #         # Sadece bu profil numarasına ait tek bir kalıp varsa al
-    #         filtered_list.append(kaliplar[0])
-    # return filtered_list
-
-def check_order_for_new_dies(profiles):
-    print(len(profiles))
-    # print(profil_nos)
-    siparis = SiparisList.objects.using('dies').filter(ProfilNo__in=profiles)
-    print(siparis)
 
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
-    # profiles = get_new_unique_dies()
-    # check_order_for_new_dies(profiles)
+    profiles = get_new_unique_dies()
 
 
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
@@ -4341,8 +4271,93 @@ class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
         context['profils'] = profil_nos
 
         return context
-        
+    
 def get_ext_info(request): 
+    if request.method == "GET":
+        profil_no = request.GET.get('profil_no')  # pres kodunu da gönderelim
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=50)
+
+        try:
+            alternative_dies = get_alternative_profiles(profil_no)
+            events = EventData.objects.using('dms') \
+                .filter(start_time__gte=start_time, end_time__lte=end_time) \
+                .order_by('start_time')
+
+            grouped_data = []
+            current_group = []
+            last_event = None
+
+            for event in events:
+                die = event.static_data.get("DieNumber")
+                lot = event.static_data.get("BilletLot")
+                kart = event.static_data.get("kartNo")
+
+                key = (die, lot, kart)
+
+                if not current_group:
+                    current_group.append(event)
+                else:
+                    last = current_group[-1]
+                    last_key = (
+                        last.static_data.get("DieNumber"),
+                        last.static_data.get("BilletLot"),
+                        last.static_data.get("kartNo")
+                    )
+
+                    time_gap = (event.start_time - last.end_time).total_seconds() / 60.0  # in minutes
+
+                    if key == last_key and time_gap <= 15:
+                        current_group.append(event)
+                    else:
+                        grouped_data.append(current_group)
+                        current_group = [event]
+
+            if current_group:
+                grouped_data.append(current_group)
+
+            results = []
+
+            for group in grouped_data:
+                die = group[0].static_data.get("DieNumber")
+                lot = group[0].static_data.get("BilletLot")
+                kart = group[0].static_data.get("kartNo")
+
+                if not die or not any(die.startswith(alt) for alt in alternative_dies):
+                    continue
+
+                brüt_imalat = sum(
+                    (e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
+                )
+                billet_count = len(group)
+                imalat_baslangici = min(e.start_time for e in group)
+                imalat_sonu = max(e.end_time for e in group)
+
+                if billet_count > 0:
+                    average_billet_length = brüt_imalat / (billet_count * 1.367)
+                else:
+                    average_billet_length = 0
+
+                ortalama_billet_boyu = round(average_billet_length, 2)
+                
+                results.append({
+                    "kalip_no": die,
+                    "billet_lot": lot,
+                    "kart_no": kart,
+                    "brüt_imalat": round(brüt_imalat, 2),
+                    "billet_count": billet_count,
+                    "imalat_baslangici": imalat_baslangici,
+                    "imalat_sonu": imalat_sonu,
+                    "imalat_baslangici_2": format_date_time_without_year(imalat_baslangici),
+                    "imalat_sonu_2": format_date_time_without_year(imalat_sonu),
+                    "ortalama_billet_boyu": ortalama_billet_boyu
+                })
+
+            return JsonResponse({'success': True, 'ext_data': results})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+def get_ext_info____old(request): 
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
