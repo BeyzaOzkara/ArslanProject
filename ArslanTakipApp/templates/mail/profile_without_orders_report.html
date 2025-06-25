@@ -32,13 +32,12 @@
     </style>
 </head>
 <body>
-    <h2>Kalıp Sipariş Takip Raporu</h2>
+    <h2>Profil - Sipariş Takip Raporu</h2>
 
     {% if result_list %}
     <table>
         <thead>
             <tr>
-                <th>Kalıp No</th>
                 <th>Profil No</th>
                 <th>Müşteri Temsilcisi</th>
                 <th>Eklenme Tarihi</th>
@@ -47,8 +46,7 @@
         </thead>
         <tbody>
             {% for item in result_list %}
-            <tr {% if item.wait_time > 15 %}style="color: red;"{% endif %}>
-                <td>{{ item.die }}</td>
+            <tr {% if item.wait_time > 30 %}style="color: red;"{% endif %}>
                 <td>{{ item.profile }}</td>
                 <td>{{ item.representative }}</td>
                 <td>{{ item.add_date }}</td>
@@ -57,6 +55,11 @@
             {% endfor %}
         </tbody>
     </table>
+    <br>
+    <p>
+        Yukarıda yer alan tabloda, son 6 ay içerisinde kalıp sistemine eklenmiş ancak bu süreçte hiçbir brüt üretimi yapılmamış ve henüz siparişi açılmamış profiller listelenmiştir.<br>
+        Her bir satırda ilgili profil numarası, müşteri temsilcisi, kalıbın sisteme eklendiği tarih ve bu tarihten itibaren geçen süre (gün olarak) belirtilmiştir.<br>
+    </p>
     {% else %}
     <p>Bugün için raporlanacak veri bulunmamaktadır.</p>
     {% endif %}

@@ -1,3 +1,4 @@
+import re
 from ..models import Location, DiesLocation, KalipMs, SiparisList, MusteriFirma, Hareket
 from django.contrib.auth.models import User
 from django.db.models import Func, F, Q, Count, Sum, Max
@@ -83,9 +84,7 @@ def send_daily_test_report_for_all():
             kalip_no = die.KalipNo
             last_move_date = Hareket.objects.filter(kalipNo=kalip_no).latest('hareketTarihi').hareketTarihi
             move_date = last_move_date.strftime("%d-%m-%Y %H:%M")
-            print(move_date)
             wait_time = (today - last_move_date.date()).days
-            print(wait_time)
             if (wait_time) > 3:
                 print("burda")
             profil_no = die.ProfilNo
@@ -234,14 +233,12 @@ def send_single_die_report(die, press, user_info):
 
     send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
 
-
-
 def send_new_dies_without_orders_report():
     # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
     date_filter = datetime.now() - timedelta(days=183)
     queryset = (
         KalipMs.objects.using('dies')
-        .values('ProfilNo')
+        .values('ProfilNo', 'FirmaKodu')
         .annotate(
             CountKalip=Count('KalipNo'),
             SumUretim=Sum('UretimToplamKg'),
@@ -250,34 +247,48 @@ def send_new_dies_without_orders_report():
         .filter(SumUretim=0, CreateTime__gt=date_filter)
     )
     
-    profilno_list = list(queryset.values_list('ProfilNo', flat=True))
+    # profilno_list = list(queryset.values_list('ProfilNo', flat=True))
+    # profilno_no_open_order = []
+
+    # for profilno in profilno_list:
+    #     open_order_exists = SiparisList.objects.using('dies').filter(
+    #         ProfilNo=profilno
+    #     ).exists()  # Açılmış herhangi bir sipariş var mı kontrol et
+
+    #     if not open_order_exists:
+    #         # Yoksa listeye ekle
+    #         profilno_no_open_order.append(profilno)
+
     profilno_no_open_order = []
 
-    for profilno in profilno_list:
-        open_order_exists = SiparisList.objects.using('dies').filter(
-            ProfilNo=profilno
-        ).exists()  # Açılmış herhangi bir sipariş var mı kontrol et
+    for kalip_data in queryset:
+        profilno = kalip_data['ProfilNo']
+        firmakodu = kalip_data['FirmaKodu']
+        open_order_exists = SiparisList.objects.using('dies').filter(ProfilNo=profilno).exists()
 
         if not open_order_exists:
-            # Yoksa listeye ekle
-            profilno_no_open_order.append(profilno)
+            wait_time = (datetime.now().date() - kalip_data['CreateTime'].date()).days
+            musteri_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=firmakodu).values('MusteriTemsilcisi').first()
+            temsilci = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız"
 
+            profilno_no_open_order.append({
+                'profile': profilno,
+                'representative': temsilci,
+                'add_date': kalip_data['CreateTime'].strftime('%d.%m.%Y'),
+                'wait_time': wait_time
+            })
     print(profilno_no_open_order)
 
     if len(profilno_no_open_order) >= 1:
-        result_list = sorted(profilno_no_open_order, key=lambda x: x['press'])
-        # to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
-        #                  'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
-        #                  'enesozturk@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com']
-
-        # cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
-
-        cc_addresses = ['yazilim@arslanaluminyum.com']
-        to_addresses = ['ai@arslanaluminyum.com']
+        profilno_no_open_order.sort(key=lambda x: (not x['profile'][0].isdigit(), re.sub(r'\D', '', x['profile'])))
+        to_addresses = ['hasanpasa@arslanaluminyum.com']
+        cc_addresses = ['ufukizgi@arslanaluminyum.com', 'yazilim@arslanaluminyum.com']
+        # cc_addresses = ['yazilim@arslanaluminyum.com']
+        # to_addresses = ['ai@arslanaluminyum.com']
 
         subject = f"Profil Sipariş Takip Raporu - {datetime.now().strftime('%d.%m.%Y')}"
         html_message = render_to_string('mail/profile_without_orders_report.html', {
-            'result_list': result_list,
+            'result_list': profilno_no_open_order,
         })
 
         send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)

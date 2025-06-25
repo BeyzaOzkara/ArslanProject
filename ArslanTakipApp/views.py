@@ -61,8 +61,9 @@ from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
 from .reports import send_report_email_for_all
 from DMS.models import EventData, TemporalData
-from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report
+from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report, send_new_dies_without_orders_report
 from django.db.models import Func
+from .die_update import check_new_dies
 # Create your views here.
 
 
@@ -140,35 +141,6 @@ def hareketSave(dieList, lRec, dieTo, request):
                 print("Hareket not saved")
 
 
-def get_new_unique_dies():
-    # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
-    date_filter = datetime.datetime.now() - datetime.timedelta(days=183)
-    queryset = (
-        KalipMs.objects.using('dies')
-        .values('ProfilNo')
-        .annotate(
-            CountKalip=Count('KalipNo'),
-            SumUretim=Sum('UretimToplamKg'),
-            CreateTime=Max('Create_Time')
-        )
-        .filter(SumUretim=0, CreateTime__gt=date_filter)
-    )
-    
-    profilno_list = list(queryset.values_list('ProfilNo', flat=True))
-    profilno_no_open_order = []
-
-    for profilno in profilno_list:
-        open_order_exists = SiparisList.objects.using('dies').filter(
-            ProfilNo=profilno
-        ).exists()  # Açılmış herhangi bir sipariş var mı kontrol et
-
-        if not open_order_exists:
-            # Yoksa listeye ekle
-            profilno_no_open_order.append(profilno)
-
-    print(profilno_no_open_order)
-
-
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
@@ -177,7 +149,7 @@ def location(request):
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
     root_nodes = []
-
+ 
     for item in loc_list:
         parent_id = item['locationRelationID_id']
         if parent_id:
