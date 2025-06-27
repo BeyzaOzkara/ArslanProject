@@ -468,8 +468,33 @@ body{
         ['para', ['ul', 'ol', 'paragraph']],
         ['height', ['height']],
         ['table'],
-        ['custom', ['specialchars']],
-      ]
+        ['custom', ['specialchars', 'spoilerBtn']],
+      ],
+      buttons: {
+        spoilerBtn: function(context) {
+          var ui = $.summernote.ui;
+
+          // create a button
+          var button = ui.button({
+            contents: '<i class="fas fa-eye-slash"></i>',
+            tooltip: 'Spoiler',
+            click: function() {
+              // Insert spoiler HTML
+              var range = context.invoke('editor.getLastRange');
+              if (range.isCollapsed()) {
+                // No selection, insert template
+                var spoilerHtml = '<span class="spoiler-text" onclick="toggleSpoiler(this)" data-spoiler="true" title="Görmek için tıklayın" style="background: #333; color: #333; cursor: pointer; padding: 2px 4px; border-radius: 3px;">Gizli metin</span>';
+                context.invoke('editor.pasteHTML', spoilerHtml);
+              } else {
+                // Wrap selection
+                var selectedText = context.invoke('editor.getSelectedText');
+                var spoilerHtml = '<span class="spoiler-text" onclick="toggleSpoiler(this)" data-spoiler="true" title="Görmek için tıklayın" style="background: #333; color: #333; cursor: pointer; padding: 2px 4px; border-radius: 3px;">' + selectedText + '</span>';
+                context.invoke('editor.pasteHTML', spoilerHtml);
+              }
+            }
+          })
+        }
+      }
     });
     
   });

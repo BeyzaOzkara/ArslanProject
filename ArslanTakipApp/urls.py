@@ -164,4 +164,5 @@ urlpatterns = [
     path('kaliphane/is_emri', views.KaliphaneIsEmriView.as_view(), name='kaliphane_is_emri'),
     path('kaliphane/is_emri/tab_info', views.kaliphane_get_tab_info, name='kaliphane_get_is_emri'),
     
+    path('4500/stretcher', views.Stretcher4500View.as_view(), name='stretcher_4500'),
 ]

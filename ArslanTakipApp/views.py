@@ -151,7 +151,7 @@ def location(request):
     root_nodes = []
  
     for item in loc_list:
-        parent_id = item['locationRelationID_id']
+        parent_id = item['locationRelationID_id'] 
         if parent_id:
             parent = loc_dict.get(parent_id)
             if parent:
@@ -5008,3 +5008,8 @@ def kaliphane_get_tab_info(request):
         for emir in is_emris:
                 emir['KesimBoyu'] = stok_kodu_map(emir['StokKodu'])
                 emir['GercekOlcu'] = emir['KesimBoyu'] - 5
+
+
+
+class Stretcher4500View(generic.TemplateView):
+    template_name = '4500/stretcher.html'
