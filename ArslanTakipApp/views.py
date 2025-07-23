@@ -4204,14 +4204,251 @@ def get_the_latest_data(queryset, datetime_field='start'):
     # time_24_hours_before = latest_time - timedelta(hours=24) #datetime
 
 
+class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
+    template_name = '4500/hesaplama.html'
+    permission_required ="ArslanTakipApp.view_4500_uretim"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+    
+def hesap_get_profils(request):
+    timespan = request.GET.get('timespan')
+    pres = request.GET.get('pres')
+    
+    try:
+        timespan = int(timespan)
+        end_time = timezone.now()
+        start_time = end_time - datetime.timedelta(hours=timespan)
+
+        ext_list = list(EventData.objects.using('dms').filter(machine_name=pres, start_time__gte=start_time, end_time__lte=end_time).values_list("static_data__DieNumber", flat=True).distinct())
+        profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
+        siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+        gonderilecek_profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
+        fark_listesi = list(set(profil_list) - set(gonderilecek_profiller))
+        if fark_listesi:
+            for profil in fark_listesi:
+                muadiller = KalipMuadil.objects.filter(profiller__contains=[profil]).first()
+                if muadiller:
+                    # Her muadil profilin siparişi olup olmadığını kontrol ediyoruz
+                    for muadil in muadiller.profiller:
+                        siparisler = siparis_query.filter(ProfilNo=muadil)
+                        if siparisler.exists():
+                            gonderilecek_profiller.append(profil)
+                            break
+        data = {'profiller': gonderilecek_profiller}
+        return JsonResponse(data)
+    except:
+        return JsonResponse({'profiller': []})
+
+def get_ext_info(request): 
+    if request.method == "GET":
+        profil_no = request.GET.get('profil_no')  # pres kodunu da gönderelim
+        timespan = request.GET.get('timespan') 
+
+        try:
+            end_time = timezone.now()
+            start_time = end_time - datetime.timedelta(hours=int(timespan))
+            alternative_dies = get_alternative_profiles(profil_no)
+            events = EventData.objects.using('dms') \
+                .filter(start_time__gte=start_time, end_time__lte=end_time) \
+                .order_by('start_time')
+
+            grouped_data = []
+            current_group = []
+            last_event = None
+
+            for event in events:
+                die = event.static_data.get("DieNumber")
+                lot = event.static_data.get("BilletLot")
+                kart = event.static_data.get("kartNo")
+
+                key = (die, lot, kart)
+
+                if not current_group:
+                    current_group.append(event)
+                else:
+                    last = current_group[-1]
+                    last_key = (
+                        last.static_data.get("DieNumber"),
+                        last.static_data.get("BilletLot"),
+                        last.static_data.get("kartNo")
+                    )
+
+                    time_gap = (event.start_time - last.end_time).total_seconds() / 60.0  # in minutes
+
+                    if key == last_key and time_gap <= 15:
+                        current_group.append(event)
+                    else:
+                        grouped_data.append(current_group)
+                        current_group = [event]
+
+            if current_group:
+                grouped_data.append(current_group)
+
+            results = []
+
+            for group in grouped_data:
+                die = group[0].static_data.get("DieNumber")
+                lot = group[0].static_data.get("BilletLot")
+                kart = group[0].static_data.get("kartNo")
+
+                if not die or not any(die.startswith(alt) for alt in alternative_dies):
+                    continue
+
+                brüt_imalat = sum(
+                    (e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
+                )
+                billet_count = len(group)
+                imalat_baslangici = min(e.start_time for e in group)
+                imalat_sonu = max(e.end_time for e in group)
+
+                if billet_count > 0:
+                    average_billet_length = brüt_imalat / (billet_count * 1.367)
+                else:
+                    average_billet_length = 0
+
+                ortalama_billet_boyu = round(average_billet_length, 2)
+                
+                results.append({
+                    "kalip_no": die,
+                    "billet_lot": lot,
+                    "kart_no": kart,
+                    "brüt_imalat": round(brüt_imalat, 2),
+                    "billet_count": billet_count,
+                    "imalat_baslangici": imalat_baslangici,
+                    "imalat_sonu": imalat_sonu,
+                    "imalat_baslangici_2": format_date_time_without_year(imalat_baslangici),
+                    "imalat_sonu_2": format_date_time_without_year(imalat_sonu),
+                    "ortalama_billet_boyu": ortalama_billet_boyu
+                })
+
+            return JsonResponse({'success': True, 'ext_data': results})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+def get_sepet_info(request):
+    if request.method == "GET":
+        profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+        timespan = request.GET.get('timespan') 
+        end_time = timezone.now()
+        end_48_time = end_time - datetime.timedelta(hours=int(timespan))
+        
+        alternative_dies = get_alternative_profiles(profil_no)
+        q = Q()
+        w = Q()
+        for die in alternative_dies:
+            q |= Q(static_data__DieNumber__startswith=die)
+            w |= Q(yuklenen__contains=[{'ProfilNo': die, 'Atandi': False}]) 
+        
+        start = EventData.objects.using('dms').filter(start_time__gte=end_48_time, end_time__lte=end_time).filter(q).values('start_time', 'end_time').order_by('start_time')[0]['start_time']
+        # start = PlcData.objects.using('plc4').filter(start__gte=end_48_time, stop__lte=end_time).filter(q).values('start', 'stop').order_by('start')[0]['start']
+        sepet = Sepet.objects.filter(baslangic_saati__gte=start).filter(w).values().order_by('baslangic_saati') # profil no ile filtrele
+        try:
+            sepet_data = []
+
+            for s in sepet:
+                for item in s['yuklenen']:
+                    if item.get("ProfilNo") in alternative_dies:
+                        elem = {
+                            "id": s['id'],
+                            "SepetNo": s["sepet_no"],
+                            "Adet": item["Adet"],
+                            "KartNo": item["KartNo"],
+                            "Boy": item["Boy"]
+                        }
+                        if item.get("KalipNo"):
+                            elem = {
+                                "id": s['id'],
+                                "SepetNo": s["sepet_no"],
+                                "Adet": item["Adet"],
+                                "KartNo": item["KartNo"],
+                                "KalipNo": item["KalipNo"],
+                                "BilletLot": item["BilletLot"],
+                                "Boy": item["Boy"]
+                            }
+                        sepet_data.append(elem)
+            return JsonResponse({'success': True, 'sepet_data': sepet_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+def get_kart_info(request):
+    if request.method == "GET":
+        try:
+            profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
+            alternative_dies = get_alternative_profiles(profil_no)
+
+            siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+            siparisler = siparis_query.filter(ProfilNo__in=alternative_dies).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin', '-PlanlananMm')
+            # siparisler = SiparisList.objects.using('dies').filter(KartNo__in = ['312578', '312579', '312580', '312581', '312582', '312583', '312584']).values('Kimlik', 'KartNo', 'Kg', 'Adet', 'PlanlananMm', 'SonTermin', 'FirmaAdi', 'KondusyonTuru', 'YuzeyOzelligi', 'Profil_Gramaj').order_by('SonTermin')
+            for s in siparisler:
+                s["FirmaAdi"] = s['FirmaAdi'].split(' ')[0]
+                s['SonTermin'] = format_date(s['SonTermin'])
+            list_siparisler = list(siparisler)
+
+            return JsonResponse({'success': True, 'siparis_data': list_siparisler}, safe=False)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+def sepete_dagit(request):
+    if request.method == 'POST':
+        try:
+            profil_no = request.POST.get('profil')
+            profil_gr = request.POST.get('profil_gr')
+            secilen_ext = json.loads(request.POST.get('secilen_ext'))
+            secilen_sepet = json.loads(request.POST.get('secilen_sepet'))
+            secilen_siparis = json.loads(request.POST.get('secilen_siparis'))
+            kart_dagilimi = json.loads(request.POST.get('sonuc_kartlar')) # kartları neyle birlikte kaydetmeliyim
+            gelen_sepetler = json.loads(request.POST.get('sonuc_sepetler'))
+            sepetler_grouped = {}
+            alternative_dies = get_alternative_profiles(profil_no)
+
+            kart_nos = [sepet["KartNo"] for sepet in gelen_sepetler]
+            siparis_list = {siparis.KartNo: siparis for siparis in SiparisList.objects.using('dies').filter(KartNo__in=kart_nos)}
+
+            for sepet in gelen_sepetler:
+                sepet_id = sepet["id"]
+                kart_no = sepet["KartNo"]
+
+                if sepet_id not in sepetler_grouped:
+                    sepetler_grouped[sepet_id] = []
+                siparis = siparis_list.get(kart_no) # SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
+                if siparis:
+                    sepetler_grouped[sepet_id].append({"KartNo": kart_no, "Adet":sepet["Adet"], "Boy": sepet["Boy"], "ProfilNo":profil_no, "Yuzey": siparis.YuzeyOzelligi, 
+                                                   "BilletLot": sepet["BilletLot"], "KalipNo":sepet["KalipNo"], "Kondusyon": siparis.KondusyonTuru, "Atandi": True})
+
+            grouped_sepetler = [{"id": sepet_id, "items": items} for sepet_id, items in sepetler_grouped.items()]
+            print(grouped_sepetler)
+            with transaction.atomic():
+                for sepetler in grouped_sepetler:
+                    sepet = Sepet.objects.get(id=sepetler['id']) 
+                    yuklenen_veri = sepet.yuklenen
+                    # ProfilNo ile eşleşen eski verileri sil
+                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
+                    for item in sepetler['items']:
+                        yuklenen_veri.append(item)
+                    sepet.yuklenen = yuklenen_veri
+                    sepet.save()
+                KartDagilim.objects.create(
+                    profil_no = profil_no,
+                    profil_gr = profil_gr,
+                    secilen_ext = secilen_ext,
+                    secilen_sepet = secilen_sepet,
+                    secilen_siparis = secilen_siparis,
+                    dagitilan_kartlar = kart_dagilimi
+                )
+
+            return JsonResponse({'success': True}, safe=False)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+
+ 
 def get_profil_nos(pres):
     end_time = timezone.now()
     start_time = end_time - datetime.timedelta(hours=48)
     # get_the_latest_data(EventData.objects.using('dms').values(), 'start_time')
-
     ext_list = list(EventData.objects.using('dms').filter(machine_name=pres, start_time__gte=start_time, end_time__lte=end_time).values_list("static_data__DieNumber", flat=True).distinct())
     # ext_list = list(PlcData.objects.using('plc4').filter(plc = pres, start__gte = start_time, stop__lte=end_time).values_list("singular_params__DieNumber", flat=True).distinct())
- 
     profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
     siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
     gonderilecek_profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
@@ -4228,8 +4465,8 @@ def get_profil_nos(pres):
                         break
     return gonderilecek_profiller
 
-class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
-    template_name = '4500/hesaplama.html'
+class DenemeHesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
+    template_name = '4500/deneme_hesaplama.html'
     permission_required ="ArslanTakipApp.view_4500_uretim"
 
     def get_context_data(self, **kwargs):
@@ -4240,8 +4477,8 @@ class Hesaplama4500View(PermissionRequiredMixin, generic.TemplateView):
         context['profils'] = profil_nos
 
         return context
-    
-def get_ext_info(request): 
+
+def get_ext_info2(request): 
     if request.method == "GET":
         profil_no = request.GET.get('profil_no')  # pres kodunu da gönderelim
         end_time = timezone.now()
@@ -4468,7 +4705,7 @@ def get_ext_info_old(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-def get_sepet_info(request):
+def get_sepet_info2(request):
     if request.method == "GET":
         profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
         end_time = timezone.now()
@@ -4512,7 +4749,7 @@ def get_sepet_info(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-def get_kart_info(request):
+def get_kart_info2(request):
     if request.method == "GET":
         try:
             profil_no = request.GET.get('profil_no') # pres kodunu da gönderelim
@@ -4530,7 +4767,7 @@ def get_kart_info(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
         
-def sepete_dagit(request):
+def sepete_dagit2(request):
     if request.method == 'POST':
         try:
             profil_no = request.POST.get('profil')
@@ -4581,6 +4818,8 @@ def sepete_dagit(request):
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
+
 
 def get_sepetler(pres):
     # içinde Atandi = False olan sepet listesini getirs

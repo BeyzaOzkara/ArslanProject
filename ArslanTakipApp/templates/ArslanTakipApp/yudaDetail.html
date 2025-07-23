@@ -251,6 +251,113 @@ body{
     }
 }
 
+
+.spoiler-content {
+    display: none; /* Completely hidden by default */
+}
+
+.spoiler-content.revealed {
+    display: inline; /* Show when revealed */
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+
+.spoiler-content.author-spoiler {
+    display: inline; /* Authors can always see their spoilers */
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+
+.spoiler-toggle {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 2px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.spoiler-toggle:hover {
+    background-color: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.spoiler-toggle.revealed {
+    background-color: #007bff;
+}
+
+.spoiler-toggle.revealed:hover {
+    background-color: #0056b3;
+}
+
+.spoiler-notice {
+    font-size: 11px;
+    color: #6c757d;
+    font-style: italic;
+    margin-left: 5px;
+}
+
+.note-btn-spoiler {
+    color: #333;
+}
+
+.note-btn-spoiler.active {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.spoiler-mode-indicator {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin: 5px 0;
+    display: none;
+}
+
+.spoiler-typing-indicator {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    display: inline-block;
+    margin: 0 2px;
+    animation: pulse 1.5s infinite;
+}
+
+.note-editable .spoiler-content {
+    display: inline !important; /* Always visible in editor */
+    background-color: #fff3cd;
+    border: 1px dashed #ffc107;
+    border-radius: 4px;
+    padding: 2px 4px;
+    position: relative;
+}
+
+.note-editable .spoiler-content::before {
+    content: "🔒";
+    font-size: 10px;
+    color: #856404;
+    margin-right: 2px;
+}
+ 
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
   </style>
 {% endblock %}
 
@@ -454,50 +561,222 @@ body{
   });
 
   
-  $(function () {
-    // Summernote
-    $('.textarea').summernote({
-      disableResizeEditor: true,
-      height:200,
-      toolbar: [
-        //['misc', ['undo', 'redo']],
-        ['style', ['bold', 'italic', 'underline']],
-        ['font', ['superscript', 'subscript']],
-        ['fontsize', ['fontsize']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['height', ['height']],
-        ['table'],
-        ['custom', ['specialchars', 'spoilerBtn']],
-      ],
-      buttons: {
-        spoilerBtn: function(context) {
-          var ui = $.summernote.ui;
+let spoilerMode = false;
+let spoilerCounter = 0;
+let spoilerStartMarker = null;
 
-          // create a button
-          var button = ui.button({
-            contents: '<i class="fas fa-eye-slash"></i>',
-            tooltip: 'Spoiler',
-            click: function() {
-              // Insert spoiler HTML
-              var range = context.invoke('editor.getLastRange');
-              if (range.isCollapsed()) {
-                // No selection, insert template
-                var spoilerHtml = '<span class="spoiler-text" onclick="toggleSpoiler(this)" data-spoiler="true" title="Görmek için tıklayın" style="background: #333; color: #333; cursor: pointer; padding: 2px 4px; border-radius: 3px;">Gizli metin</span>';
-                context.invoke('editor.pasteHTML', spoilerHtml);
-              } else {
-                // Wrap selection
-                var selectedText = context.invoke('editor.getSelectedText');
-                var spoilerHtml = '<span class="spoiler-text" onclick="toggleSpoiler(this)" data-spoiler="true" title="Görmek için tıklayın" style="background: #333; color: #333; cursor: pointer; padding: 2px 4px; border-radius: 3px;">' + selectedText + '</span>';
-                context.invoke('editor.pasteHTML', spoilerHtml);
-              }
-            }
-          })
+// Custom Summernote spoiler button
+const SpoilerButton = function (context) {
+    const ui = $.summernote.ui;
+    const button = ui.button({
+        contents: '<i class="fas fa-eye-slash"></i>',
+        tooltip: 'Start/End Spoiler',
+        click: function () {
+            toggleSpoilerMode();
         }
-      }
     });
+    return button.render();
+};
+
+function toggleSpoilerMode() {
+    if (!spoilerMode) {
+        startSpoilerMode();
+    } else {
+        endSpoilerMode();
+    }
+}
+
+function startSpoilerMode() {
+    spoilerMode = true;
+    const $button = $('.note-btn-spoiler');
+    const $indicator = $('#spoilerModeIndicator');
     
-  });
+    // Update button appearance
+    $button.addClass('active');
+    $button.find('i').removeClass('fa-eye-slash').addClass('fa-eye');
+    $button.attr('title', 'End Spoiler');
+    
+    // Show indicator
+    $indicator.text('🔒 Spoiler mode: Type hidden content, then click spoiler button again to end').show();
+    
+    // Insert spoiler start marker in the editor
+    const editable = $('.note-editable');
+    const range = window.getSelection().getRangeAt(0);
+    
+    // Create start marker
+    const startMarker = document.createElement('span');
+    startMarker.className = 'spoiler-typing-indicator';
+    startMarker.setAttribute('data-spoiler-start', ++spoilerCounter);
+    startMarker.textContent = 'spoiler start';
+    startMarker.contentEditable = false;
+    
+    range.insertNode(startMarker);
+    spoilerStartMarker = startMarker;
+    
+    // Place cursor after marker
+    range.setStartAfter(startMarker);
+    range.collapse(true);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    // Focus the editor
+    editable.focus();
+}
+
+function endSpoilerMode() {
+    if (!spoilerStartMarker) return;
+    
+    spoilerMode = false;
+    const $button = $('.note-btn-spoiler');
+    const $indicator = $('#spoilerModeIndicator');
+    
+    // Update button appearance
+    $button.removeClass('active');
+    $button.find('i').removeClass('fa-eye').addClass('fa-eye-slash');
+    $button.attr('title', 'Start/End Spoiler');
+    
+    // Hide indicator
+    $indicator.hide();
+    
+    // Get current selection/cursor position
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    
+    // Create end marker at cursor position
+    const endMarker = document.createElement('span');
+    endMarker.className = 'spoiler-typing-indicator';
+    endMarker.setAttribute('data-spoiler-end', spoilerStartMarker.getAttribute('data-spoiler-start'));
+    endMarker.textContent = 'spoiler end';
+    endMarker.contentEditable = false;
+    
+    range.insertNode(endMarker);
+    
+    // Process the content between markers
+    processSpoilerMarkers(spoilerStartMarker, endMarker);
+    
+    // Reset
+    spoilerStartMarker = null;
+}
+
+function processSpoilerMarkers(startMarker, endMarker) {
+    const spoilerId = startMarker.getAttribute('data-spoiler-start');
+    
+    // Create a range from start to end marker
+    const range = document.createRange();
+    range.setStartAfter(startMarker);
+    range.setEndBefore(endMarker);
+    
+    // Extract the content between markers
+    const spoilerContent = range.extractContents();
+    
+    // Create spoiler wrapper
+    const spoilerSpan = document.createElement('span');
+    spoilerSpan.className = 'spoiler-content';   // spoiler-content yerine comment-spoiler gibi bir class koyup çoktan paylaşılmış olan yorumların spoileriyle arasında fark oluşturulabilir 
+    spoilerSpan.setAttribute('data-spoiler-id', spoilerId);
+    spoilerSpan.appendChild(spoilerContent);
+    
+    // Replace start marker with spoiler content
+    startMarker.parentNode.replaceChild(spoilerSpan, startMarker);
+    
+    // Remove end marker
+    endMarker.remove();
+}
+
+function processSpoilerContent(content, currentUserId, authorId) {
+    const isAuthor = currentUserId === authorId;
+    let hasAuthorSpoilers = false;
+    
+    // Find all spoiler content
+    const spoilerRegex = /<span[^>]*class="[^"]*spoiler-content[^"]*"[^>]*data-spoiler-id="(\d+)"[^>]*>(.*?)<\/span>/g;
+    
+    let processedContent = content.replace(spoilerRegex, (match, spoilerId, spoilerContent) => {
+        if (isAuthor) {
+            hasAuthorSpoilers = true;
+            return `<span class="spoiler-content author-spoiler" data-spoiler-id="${spoilerId}">${spoilerContent}</span>`;
+        } else {
+            return `<button class="spoiler-toggle" onclick="toggleSpoiler(${spoilerId})" data-spoiler-id="${spoilerId}">Show Hidden Text</button><span class="spoiler-content" data-spoiler-id="${spoilerId}">${spoilerContent}</span>`;
+        }
+    });
+   
+    return {
+        html: processedContent,
+        toggleButtons: '',
+        hasAuthorSpoilers: hasAuthorSpoilers
+    };
+}
+ 
+function toggleSpoiler(spoilerId) {
+    const $spoiler = $(`.spoiler-content[data-spoiler-id="${spoilerId}"]`);
+    const $toggle = $(`.spoiler-toggle[data-spoiler-id="${spoilerId}"]`);
+    
+    if ($spoiler.hasClass('revealed')) {
+        $spoiler.removeClass('revealed').hide();
+        $toggle.removeClass('revealed').text('Show Hidden Text').show();
+    } else {
+        $spoiler.addClass('revealed').show();
+        $toggle.addClass('revealed').text('Hide Text');
+    }
+}
+
+// Modify your existing Summernote initialization in $(function () {
+$(function () {
+    // Add spoiler mode indicator before summernote
+    $('#yorumCard .card-body').prepend(`
+        <div class="spoiler-mode-indicator" id="spoilerModeIndicator">
+            🔒 Spoiler mode: Type hidden content, then click spoiler button again to end
+        </div>
+    `);
+
+    // Modify your exi ting Summernote initialization
+    $('.textarea').summernote({
+        disableResizeEditor: true,
+        height: 200,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['font', ['superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table'],
+            ['custom', ['specialchars', 'spoiler']], // Add spoiler to custom group
+        ],
+        buttons: {
+            spoiler: SpoilerButton // Add the spoiler button
+        },
+        callbacks: {
+            onKeydown: function(e) {
+                // Handle Enter key in spoiler mode
+                if (spoilerMode && e.keyCode === 13) {
+                    // Allow Enter but don't exit spoiler mode automatically
+                    return true;
+                }
+            },
+            onKeyup: function(e) {
+                // Clean up any orphaned markers if needed
+                $('.note-editable .spoiler-typing-indicator').each(function() {
+                    const $this = $(this);
+                    // Keep markers for now - they'll be processed when spoiler mode ends
+                });
+            }
+        }
+    });
+});
+
+// Modify your existing createReplyElement and createCommentElement functions
+// Add this helper function to process spoiler content when displaying comments
+
+function processCommentSpoilers(commentContent, commentAuthorId) {
+    const processedContent = processSpoilerContent(commentContent, userID, commentAuthorId);
+    return {
+        content: processedContent.html,
+        hasAuthorSpoilers: processedContent.hasAuthorSpoilers
+    };
+}
+
+  window.toggleSpoiler = toggleSpoiler;
+
 
   function printYuda() {
     window.print();
@@ -766,14 +1045,19 @@ body{
           }
       });
   }
+  
 
   function createReplyElement(reply) {
     const userBlock = `<div class="user-block">
                           <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
                           <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
                           <span class="description">${reply.Tarih}</span>
+                          ${reply.Kullanici_id == userID ? '<span class="spoiler-notice">This spoiler is only visible to you</span>' : ''}
                       </div>`;
-    const replyContent = `<p>${reply.Aciklama}</p>`;
+    // Process spoilers in reply content
+    const processedReply = processCommentSpoilers(reply.Aciklama, reply.Kullanici_id);
+    const replyContent = `<p>${processedReply.content}</p>`;
+    // const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
     reply.cfiles.forEach(cf => {
@@ -795,7 +1079,7 @@ body{
               <div class="form-group">
                 <div class="row" style="height: 265px;">
                   <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${reply.id}">
-                    <textarea class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
+                    <  class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
                                     style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                   </div>
                   <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${reply.id}" style="height: 265px;display: none;">
@@ -845,8 +1129,12 @@ body{
                           <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
                           <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
                           <span class="description">${comment.Tarih}</span>
+                          ${comment.Kullanici_id == userID ? '<span class="spoiler-notice">This spoiler is only visible to you</span>' : ''}
                       </div>`;
-    const commentContent = `<p>${comment.Aciklama}</p>`;
+    // Process spoilers in comment content
+    const processedComment = processCommentSpoilers(comment.Aciklama, comment.Kullanici_id);
+    const commentContent = `<p>${processedComment.content}</p>`;
+    // const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 
     comment.cfiles.forEach(cf => {

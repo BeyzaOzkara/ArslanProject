@@ -10,22 +10,6 @@
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
 <style>
-
-.timeDiv {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.timeDiv label {
-    margin-right: 5px;
-}
-
-.timeDiv input {
-    width: auto;
-}
-
 .profilDiv {
     display: flex;
     align-items: center;
@@ -60,14 +44,13 @@
 
 {% block content %}
 <div class="container-fluid secimDiv">
-    <div class="timeDiv">
-        <label for="timeInput">Son Kaç Saat İçinde</label>
-        <input type="number" class="form-control" name="timeInput" id="timeInput" min="1" max="336">
-    </div>
-    <div class="profilDiv" style="display: none;">
+    <div class="profilDiv">
         <label for="profilSelect">Profil Numarası Seçiniz: </label>
         <select name="profil" id="profilSelect" class="form-control">
             <option value="" disabled selected>Profil No</option>
+            {% for p in profils %}
+            <option value={{p}}>{{p}}</option>
+            {% endfor %}
         </select>
         <label for="gramaj" class="ml-2">Profil Gramajı Giriniz:</label>
         <input type="number" class="form-control" name="gramaj" id="gramaj">
@@ -117,7 +100,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    var timeInput = document.getElementById('timeInput');
     var profilSelect = document.getElementById('profilSelect');
     var hideDiv = document.querySelector('.hideDiv');
     var secimDiv = document.querySelector('.secimDiv');
@@ -132,34 +114,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var genelImalatHiziInp = document.getElementById('genelImalatHizi');
     var data = [];
     var profil = "";
-
-    $('#timeInput').on('change', function() {
-        let timespan = $(this).val();
-        $.ajax({
-            url: '/4500/hesaplama/get_profils/',
-            type: 'GET',
-            data: {
-                timespan: timespan,
-                pres: '4500'
-            },
-            success: function (response) {
-                let select = $('#profilSelect');
-                select.empty();
-                select.append('<option disabled selected>Profil No</option>');
-
-                $.each(response.profiller, function (index, profil) {
-                    select.append(
-                        $('<option></option>').val(profil).text(profil)
-                    );
-                });
-
-                $('.profilDiv').show();
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching Ext info:", error);
-            }
-        });
-    })
 
     
     function initializeExtTable(data) { 
@@ -245,13 +199,11 @@ document.addEventListener("DOMContentLoaded", function () {
     profilSelect.addEventListener("change",function () {
         gramajInp.value = "";
         profil = this.value;
-        timespan = timeInput.value;
         $.ajax({
             url: '/4500/hesaplama/get_ext_info/',
             type: 'GET',
             data: {
-                profil_no: profil,
-                timespan: timespan
+                profil_no: profil
             },
             success: function (response) {
                 console.log(response.ext_data);
@@ -267,8 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/4500/hesaplama/get_sepet_info/',
             type: 'GET',
             data: {
-                profil_no: profil,
-                timespan: timespan
+                profil_no: profil
             },
             success: function (response) {
                 console.log(response.sepet_data);
@@ -284,8 +235,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/4500/hesaplama/get_kart_info/',
             type: 'GET',
             data: {
-                profil_no: profil,
-                timespan: timespan
+                profil_no: profil
             },
             success: function (response) {
                 console.log(response.siparis_data);

@@ -139,10 +139,18 @@ urlpatterns = [
     path('kalip/hareket', views.kalip_hareket),
     path('kalip/yorum', views.kalip_yorum),
     path('4500/hesaplama', views.Hesaplama4500View.as_view(), name='hesaplama_4500'),
+    path('4500/hesaplama/get_profils/', views.hesap_get_profils, name='hesap_get_profils'),
     path('4500/hesaplama/get_ext_info/', views.get_ext_info, name='get_ext_info'),
     path('4500/hesaplama/get_sepet_info/', views.get_sepet_info, name='get_sepet_info'),
     path('4500/hesaplama/get_kart_info/', views.get_kart_info, name='get_kart_info'),
     path('4500/hesaplama/sepete_dagit/', views.sepete_dagit, name='sepete_dagit'),
+
+    
+    path('4500/denemehesaplama', views.DenemeHesaplama4500View.as_view(), name='deneme_hesaplama_4500'),
+    path('4500/denemehesaplama/get_ext_info2/', views.get_ext_info2, name='get_ext_info2'),
+    path('4500/denemehesaplama/get_sepet_info2/', views.get_sepet_info2, name='get_sepet_info2'),
+    path('4500/denemehesaplama/get_kart_info2/', views.get_kart_info2, name='get_kart_info2'),
+    path('4500/denemehesaplama/sepete_dagit2/', views.sepete_dagit2, name='sepete_dagit2'),
 
     path('4500/sepetler', views.Sepetler4500View.as_view(), name='sepetler_4500'),
     path('4500/sepetler/get_sepetler/', views.get_sepetler, name='get_sepetler'),
