@@ -387,6 +387,17 @@ document.addEventListener("DOMContentLoaded", function () {
         // 3 tabulatorden de seçim yapılmış mı kontrol et.
         // yapılmayan varsa alert ile uyar işlem yapma.
         var ext = JSON.parse(JSON.stringify(extTable.getSelectedData()));
+        console.log(ext)
+        // Check if all BilletLot values are the same
+        var firstBilletLot = ext[0]?.billet_lot;
+        console.log(firstBilletLot);
+        var sameBilletLot = ext.every(item => item.billet_lot === firstBilletLot);
+
+        if (!sameBilletLot) {
+            alert("Lütfen aynı Şarj'a sahip kayıtları seçin.");
+            return;
+        }
+
         var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
         console.log(sepet)
         var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
