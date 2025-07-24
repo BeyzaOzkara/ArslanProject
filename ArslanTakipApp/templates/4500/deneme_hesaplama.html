@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
         gramajInp.value = "";
         profil = this.value;
         $.ajax({
-            url: '/4500/hesaplama/get_ext_info/',
+            url: '/4500/denemehesaplama/get_ext_info2/',
             type: 'GET',
             data: {
                 profil_no: profil
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         
         $.ajax({
-            url: '/4500/hesaplama/get_sepet_info/',
+            url: '/4500/denemehesaplama/get_sepet_info2/',
             type: 'GET',
             data: {
                 profil_no: profil
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         $.ajax({
-            url: '/4500/hesaplama/get_kart_info/',
+            url: '/4500/denemehesaplama/get_kart_info2/',
             type: 'GET',
             data: {
                 profil_no: profil
@@ -588,7 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var profil_gr = gramajInp.value;
         console.log("gonder kart:", gonderKart);
         $.ajax({
-            url: "/4500/hesaplama/sepete_dagit/", 
+            url: "/4500/denemehesaplama/sepete_dagit2/", 
             type: "POST",
             data: {
                 secilen_ext: secilenExt,
