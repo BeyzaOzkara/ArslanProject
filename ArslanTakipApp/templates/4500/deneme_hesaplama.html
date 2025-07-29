@@ -390,7 +390,6 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(ext)
         // Check if all BilletLot values are the same
         var firstBilletLot = ext[0]?.billet_lot;
-        console.log(firstBilletLot);
         var sameBilletLot = ext.every(item => item.billet_lot === firstBilletLot);
 
         if (!sameBilletLot) {

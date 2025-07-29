@@ -241,7 +241,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'check-die': {
         'task': 'ArslanTakipApp.tasks.start_die_listener',
-        'schedule': crontab(minute='*/30'),
+        'schedule': crontab(minute='*/15'),
     },
     'send-test-email': {
         'task': 'ArslanTakipApp.tasks.start_test_report_listener',
