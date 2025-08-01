@@ -2785,9 +2785,12 @@ def yudas_list(request):
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
         if o['GüncelTarih'] != None:
-            o_comment = Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id']).exclude(Silindi=True).order_by('-Tarih').values()[0]
-            o_comment_user = get_user_full_name(o_comment['Kullanici_id'])
-            o['GüncelTarih'] = o_comment_user + "<br>" + format_date_time_without_year(o['GüncelTarih'])
+            if Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id']).exclude(Silindi=True).exists():
+                o_comment = Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id']).exclude(Silindi=True).order_by('-Tarih').values()[0]
+                o_comment_user = get_user_full_name(o_comment['Kullanici_id'])
+                o['GüncelTarih'] = o_comment_user + "<br>" + format_date_time_without_year(o['GüncelTarih'])
+            else:
+                o['GüncelTarih'] = ""
         else: o['GüncelTarih'] = ""
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
