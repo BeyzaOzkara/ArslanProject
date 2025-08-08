@@ -219,7 +219,7 @@ def send_email_notification(request, dieList, dieTo_press):
             'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com',
             'nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
             'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
-            'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com'] 
+            'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com'] 
         
         email_mapping = {
             '1100-1': 'eski1100pres@arslanaluminyum.com',
