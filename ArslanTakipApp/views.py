@@ -4831,6 +4831,13 @@ def get_sepetler(pres):
     data = json.dumps(list(sepetler), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
 
+def get_atanan_sepetler(pres):
+    # içinde Atandi = False olan sepet listesini getirs
+    sepetler = Sepet.objects.exclude(yuklenen__contains=[{'Atandi':False}]).order_by('-baslangic_saati').values()
+
+    data = json.dumps(list(sepetler), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+    return HttpResponse(data)
+
 class Sepetler4500View(generic.TemplateView):
     template_name = '4500/sepetler.html'
 

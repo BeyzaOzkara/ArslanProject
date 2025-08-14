@@ -32,7 +32,26 @@
 <div class="container-fluid">
     <h3>SEPETLER</h3>
     <hr>
-<div id="sepetlerTable"></div>
+    <div class="card" >
+        <div class="card-header">
+            <div class="card-title">
+                <h5>Sepetler</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="sepetlerTable"></div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <h5>Atanan Sepetler</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="atananSepetTable"></div>
+        </div>
+    </div>
 </div>
 <div class="modal fade" id="sepetModal" tabindex="-1" aria-labelledby="sepetModalLabel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -100,6 +119,24 @@
       </div>
     </div>
   </div>
+<div  class="modal fade" id="atananSepetModal" tabindex="-1" aria-labelledby="atananSepetModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sepet Görüntüle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="atananSepetNo">Sepet No:</label>
+                <input type="text" class="form-control" name="atananSepetNo" id="atananSepetNo" disabled>
+                <div class="mt-3" id="atanan-sepet-tabulator"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -153,6 +190,7 @@
     var sepet_id = 0;
     document.addEventListener("DOMContentLoaded", function () { 
         var sepetNoInput = document.getElementById('sepetNo');
+        var atananSepetNoInput = document.getElementById('atananSepetNo');
         var kalipNoSelect = document.getElementById('kalipNoSelect');
         var kartNoSelect = document.getElementById('kartNoSelect');
         var billetLotSelect = document.getElementById('billetLotSelect');
@@ -168,6 +206,11 @@
             initializeTabulator(data.yuklenen);
             getKalipNoList();
         }
+        function fillAtananModal(data) {
+            atananSepetNoInput.value = data.sepet_no;
+            sepet_id = data.id;
+            initializeAtananTabulator(data.yuklenen);
+        }
         var editIcon = function(cell, formatterParams, onRendered){ 
             return "<i class='fa fa-edit'></i>";
         };
@@ -181,6 +224,30 @@
                     var data = cell.getData();
                     fillModal(data);
                     $('#sepetModal').modal('show');
+                }},
+                { title: "Sepet No", field: "sepet_no" },
+                { title: "Başlangıç", field: "baslangic_saati", formatter:function(cell, formatterParams, onRendered){
+                    var value = cell.getValue();
+                    value = moment(value).format("DD/MM HH:mm");
+                    return value;
+                }},
+                { title: "Bitiş", field: "bitis_saati", formatter:function(cell, formatterParams, onRendered){
+                    var value = cell.getValue();
+                    value = moment(value).format("DD/MM HH:mm");
+                    return value;
+                }},
+            ]
+        });
+        var atananSepetTable = new Tabulator("#atananSepetTable", {
+            height: "500px",
+            layout:"fitColumns",
+            placeholder: "Atanan Sepetler",
+            ajaxURL:"/4500/sepetler/get_atanan_sepetler",
+            columns: [
+                {formatter:editIcon, width:80, hozAlign:"center", headerSort:false ,cellClick: function (e, cell) {
+                    var data = cell.getData();
+                    fillAtananModal(data);
+                    $('#atananSepetModal').modal('show');
                 }},
                 { title: "Sepet No", field: "sepet_no" },
                 { title: "Başlangıç", field: "baslangic_saati", formatter:function(cell, formatterParams, onRendered){
@@ -317,6 +384,23 @@
             });
         }
 
+        function initializeAtananTabulator(data) { 
+            var deleteIcon = function(cell, formatterParams, onRendered){ 
+                return "<i class='fa fa-trash'></i>";
+            };
+            sepetTable = new Tabulator("#atanan-sepet-tabulator", {
+                height: "300px",
+                layout:"fitColumns",
+                placeholder: "Atanan Sepet",
+                data: data || '[]',
+                columns: [
+                    { title: "Kalıp No", field: "KalipNo" },
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Şarj No", field: "BilletLot" },
+                    { title: "Adet", field: "Adet" },
+                ]
+            });
+        }
         ekleButton.addEventListener('click', function() {
             // Kart No ve Adet var mı kontrol et
             if (kalipNoSelect.value == "" || kartNoSelect.value == "" || billetLotSelect.value == "" || adet.value == "") {

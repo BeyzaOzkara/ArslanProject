@@ -160,6 +160,8 @@ urlpatterns = [
     path('4500/sepetler/get_siparis_nos/', views.sepet_get_siparis_no_list, name='sepet_get_siparis_no_list'),
     path('4500/sepetler/get_siparis_kart_info/', views.get_siparis_kart_info, name='get_siparis_kart_info'),
     
+    path('4500/sepetler/get_atanan_sepetler/', views.get_atanan_sepetler, name='get_atanan_sepetler'),
+
     path('4500/saw', views.saw4500View.as_view(), name='saw_4500'), # node red 7
     path('4500/finishsaw', views.FinishSaw4500View.as_view(), name='finishsaw_4500'),
     path('4500/finishsaw/get_saw_table', views.get_saw_table, name='get_saw_table'),
