@@ -125,7 +125,23 @@ def format_date_time(date):
 def format_date(date):
     return date.strftime("%d-%m-%Y")
 
+def can_user_send_to_pres(request, lRec):
+    allowed_users = [45, 47, 52] # Adem Kuru, Şerafettin Şahin, İlker Çiçek
+    user = request.user
+
+    # if user is superuser or in allowed list → always allow
+    if user.is_superuser or user.id in allowed_users:
+        return True
+    
+    # if destination location is PRES and user not allowed → block
+    if lRec.name.upper() == "PRES":
+        return False
+
+    return True
+
 def hareketSave(dieList, lRec, dieTo, request):
+    if not can_user_send_to_pres(request, lRec):
+        return  # blocked, do nothing
     for i in dieList:
         k = DiesLocation.objects.get(kalipNo = i)
         if k.kalipVaris.id != 1134: #HURDA
