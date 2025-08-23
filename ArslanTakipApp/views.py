@@ -133,15 +133,22 @@ def can_user_send_to_pres(request, lRec):
     if user.is_superuser or user.id in allowed_users:
         return True
     
-    # if destination location is PRES and user not allowed → block
     if lRec.name.upper() == "PRES":
-        return False
-
+        if user.is_superuser or user.id in allowed_users:
+            return True # if user is superuser or in allowed list → continue the rest of the function
+        else:
+            return # if not then break from the code
     return True
 
 def hareketSave(dieList, lRec, dieTo, request):
-    if not can_user_send_to_pres(request, lRec):
-        return  # blocked, do nothing
+    allowed_users = [45, 47, 52] # Adem Kuru, Şerafettin Şahin, İlker Çiçek
+    user = request.user
+
+    is_pres = (getattr(lRec, "name", None) or "").upper() == "PRES" # is the sending location = PRES
+    if is_pres and not (getattr(user, "is_superuser", False) or user.id in allowed_users): # check if the user is in allowed list or superuser
+        # Not authorized to move to PRES
+        return False
+
     for i in dieList:
         k = DiesLocation.objects.get(kalipNo = i)
         if k.kalipVaris.id != 1134: #HURDA
