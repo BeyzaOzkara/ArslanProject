@@ -147,12 +147,14 @@ def hareketSave(dieList, lRec, dieTo, request):
     is_pres = (getattr(lRec, "locationName", None) or "").upper() == "PRES" # is the sending location = PRES
     if is_pres:
         if not (getattr(user, "is_superuser", False) or user.id in allowed_users):
-            return JsonResponse({'success': False,'error': 'Bu lokasyona gönderme yetkiniz yok.'})
+            return JsonResponse({'success': False,'message': 'Bu lokasyona gönderme yetkiniz yok.'})
             # return False
         # If PRES already has a die inside -> block
         existing_dies = DiesLocation.objects.filter(kalipVaris_id=dieTo).count()
+        print(f"Existing dies in PRES: {existing_dies}")
         if existing_dies > 0:
-            return JsonResponse({'success': False,'error': 'PRES lokasyonunda zaten kalıp var. Gönderim yapılamaz.'})
+            print("PRES already has a die, blocking the send.")
+            return JsonResponse({'success': False,'message': 'PRES lokasyonunda zaten kalıp var. Gönderim yapılamaz.'})
 
     for i in dieList:
         k = DiesLocation.objects.get(kalipNo = i)
@@ -206,6 +208,7 @@ def location(request):
                     check_last_location_press(request, dieList, dieTo)
                 # hareketSave(dieList, lRec, dieTo, request)
                 result = hareketSave(dieList, lRec, dieTo, request)
+                print(result)
                 if isinstance(result, JsonResponse):  # hareketSave returned an error
                     return result
                 # 1.fabrikaya kalıp gönderiliyorsa
