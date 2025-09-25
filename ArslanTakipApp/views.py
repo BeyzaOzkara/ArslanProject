@@ -143,11 +143,21 @@ def can_user_send_to_pres(request, lRec):
 def hareketSave(dieList, lRec, dieTo, request):
     allowed_users = [45, 47, 52] # Adem Kuru, Şerafettin Şahin, İlker Çiçek
     user = request.user
-
-    is_pres = (getattr(lRec, "name", None) or "").upper() == "PRES" # is the sending location = PRES
-    if is_pres and not (getattr(user, "is_superuser", False) or user.id in allowed_users): # check if the user is in allowed list or superuser
-        # Not authorized to move to PRES
-        return False
+    # check if the pres has any die in it, if yes, check if the user is not allowed to send to pres and gave an alert
+    is_pres = (getattr(lRec, "locationName", None) or "").upper() == "PRES" # is the sending location = PRES
+    print(f"Is sending to PRES location: {is_pres}")
+    if is_pres:
+        print("Sending to PRES location")
+        if not (getattr(user, "is_superuser", False) or user.id in allowed_users):
+            print("User not allowed to send to PRES")
+            return JsonResponse({'success': False,'error': 'Bu lokasyona gönderme yetkiniz yok.'})
+            # return False
+        # If PRES already has a die inside -> block
+        existing_dies = DiesLocation.objects.filter(kalipVaris_id=dieTo).count()
+        print(f"Existing dies in PRES location: {existing_dies}")
+        if existing_dies > 0:
+            print("PRES location already has dies, blocking send")
+            return JsonResponse({'success': False,'error': 'PRES lokasyonunda zaten kalıp var. Gönderim yapılamaz.'})
 
     for i in dieList:
         k = DiesLocation.objects.get(kalipNo = i)
@@ -199,13 +209,19 @@ def location(request):
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
                 if int(dieTo) in checkList and request.user.id != 1 and lRec.locationName != "TEST":
                     check_last_location_press(request, dieList, dieTo)
-                hareketSave(dieList, lRec, dieTo, request)
+                # hareketSave(dieList, lRec, dieTo, request)
+                result = hareketSave(dieList, lRec, dieTo, request)
+                if isinstance(result, JsonResponse):  # hareketSave returned an error
+                    return result
                 # 1.fabrikaya kalıp gönderiliyorsa
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
                 if firinKalipSayisi < gozCapacity:
                     if not (firinKalipSayisi + len(dieList)) > gozCapacity:
-                        hareketSave(dieList, lRec, dieTo, request)
+                        # hareketSave(dieList, lRec, dieTo, request)
+                        result = hareketSave(dieList, lRec, dieTo, request)
+                        if isinstance(result, JsonResponse):
+                            return result
             if lRec.locationName == "TEST":
                 user_info = get_user_full_name(request.user.id)
                 kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))

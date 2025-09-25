@@ -273,7 +273,7 @@ function kalipGonder() {
         success: function(response) {
             let check = window.mobileCheck();
             if (check) {
-                alert(response.message);
+                alert(response.error || response.message);
                 window.location.reload();
             }
             else {
