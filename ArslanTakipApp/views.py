@@ -145,18 +145,13 @@ def hareketSave(dieList, lRec, dieTo, request):
     user = request.user
     # check if the pres has any die in it, if yes, check if the user is not allowed to send to pres and gave an alert
     is_pres = (getattr(lRec, "locationName", None) or "").upper() == "PRES" # is the sending location = PRES
-    print(f"Is sending to PRES location: {is_pres}")
     if is_pres:
-        print("Sending to PRES location")
         if not (getattr(user, "is_superuser", False) or user.id in allowed_users):
-            print("User not allowed to send to PRES")
             return JsonResponse({'success': False,'error': 'Bu lokasyona gönderme yetkiniz yok.'})
             # return False
         # If PRES already has a die inside -> block
         existing_dies = DiesLocation.objects.filter(kalipVaris_id=dieTo).count()
-        print(f"Existing dies in PRES location: {existing_dies}")
         if existing_dies > 0:
-            print("PRES location already has dies, blocking send")
             return JsonResponse({'success': False,'error': 'PRES lokasyonunda zaten kalıp var. Gönderim yapılamaz.'})
 
     for i in dieList:
