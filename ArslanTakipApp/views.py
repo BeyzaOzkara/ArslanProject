@@ -204,13 +204,16 @@ def location(request):
                 
             if gozCapacity == None:
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
+                dies_to_notify = []
                 if int(dieTo) in checkList and request.user.id != 1 and lRec.locationName != "TEST":
-                    check_last_location_press(request, dieList, dieTo)
+                    dies_to_notify = check_last_location_press(request, dieList, dieTo)
                 # hareketSave(dieList, lRec, dieTo, request)
                 result = hareketSave(dieList, lRec, dieTo, request)
                 if isinstance(result, JsonResponse):  # hareketSave returned an error
                     return result
-                # 1.fabrikaya kalıp gönderiliyorsa
+                # hareket başarılıysa mail gönder
+                if dies_to_notify:
+                    send_email_notification(request, dies_to_notify, Location.objects.get(id=dieTo).presKodu)
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
                 if firinKalipSayisi < gozCapacity:
@@ -233,7 +236,19 @@ def location(request):
         return response
     return render(request, 'ArslanTakipApp/location.html', {'location_json':data, 'gonder_json':gonderData})
 
-def check_last_location_press(request, dieList, dieTo):
+def check_last_location_press(dieList, dieTo):
+    dieTo_press = Location.objects.get(id=dieTo).presKodu
+    dies = DiesLocation.objects.filter(kalipNo__in=dieList).select_related('kalipVaris')
+    dies_to_notify = []
+
+    for die in dies:
+        die_press = die.kalipVaris.presKodu
+        if die_press != dieTo_press and die_press != None and dieTo_press!= None:
+            dies_to_notify.append(die.kalipNo)
+    
+    return dies_to_notify
+
+def check_last_location_press1(request, dieList, dieTo):
     dieTo_press = Location.objects.get(id=dieTo).presKodu
     dies = DiesLocation.objects.filter(kalipNo__in=dieList).select_related('kalipVaris')
     dies_to_notify = []
