@@ -2363,15 +2363,19 @@ def kalipfirini_meydan(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location)
     
     if not request.user.is_superuser:
-        loc_obj = loc.filter(
+        loc_objs = loc.filter(
             Q(locationName__icontains="MEYDAN") | Q(locationName__icontains="TEST")
-        ).first()
-        if loc_obj:
-            loc_id = loc_obj.id
+        )
+        loc_ids = [l.id for l in loc_objs]
+
+        if loc_ids:
+            meydanKalip = DiesLocation.objects.filter(
+                kalipVaris_id__in=loc_ids
+            ).order_by('kalipNo')
         else:
-            loc_id = None
+            meydanKalip = DiesLocation.objects.none()
         # loc.get(locationName__contains = "MEYDAN").id
-        meydanKalip = DiesLocation.objects.filter(kalipVaris_id = loc_id).order_by('kalipNo')
+        # meydanKalip = DiesLocation.objects.filter(kalipVaris_id = loc_id).order_by('kalipNo')
     else:
         loc_list = list(loc.values())
         locs = [l['id'] for l in loc_list]
