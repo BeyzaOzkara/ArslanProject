@@ -206,13 +206,13 @@ def location(request):
                 checkList = list(Location.objects.exclude(presKodu=None).values_list('id', flat=True))
                 dies_to_notify = []
                 if int(dieTo) in checkList and request.user.id != 1 and lRec.locationName != "TEST":
-                    dies_to_notify = check_last_location_press(request, dieList, dieTo)
+                    dies_to_notify = check_last_location_press(dieList, dieTo)
                 # hareketSave(dieList, lRec, dieTo, request)
                 result = hareketSave(dieList, lRec, dieTo, request)
                 if isinstance(result, JsonResponse):  # hareketSave returned an error
                     return result
                 # hareket başarılıysa mail gönder
-                if dies_to_notify:
+                if len(dies_to_notify) > 0:
                     send_email_notification(request, dies_to_notify, Location.objects.get(id=dieTo).presKodu)
             else:
                 firinKalipSayisi = DiesLocation.objects.filter(kalipVaris_id = lRec.id).count()
@@ -2363,7 +2363,14 @@ def kalipfirini_meydan(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location)
     
     if not request.user.is_superuser:
-        loc_id = loc.get(locationName__contains = "MEYDAN").id
+        loc_obj = loc.filter(
+            Q(locationName__icontains="MEYDAN") | Q(locationName__icontains="TEST")
+        ).first()
+        if loc_obj:
+            loc_id = loc_obj.id
+        else:
+            loc_id = None
+        # loc.get(locationName__contains = "MEYDAN").id
         meydanKalip = DiesLocation.objects.filter(kalipVaris_id = loc_id).order_by('kalipNo')
     else:
         loc_list = list(loc.values())
