@@ -174,6 +174,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
+    send_daily_test_report_for_all()
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
@@ -2363,15 +2364,11 @@ def kalipfirini_meydan(request):
     loc = get_objects_for_user(request.user, "ArslanTakipApp.meydan_view_location", klass=Location)
     
     if not request.user.is_superuser:
-        loc_objs = loc.filter(
-            Q(locationName__icontains="MEYDAN") | Q(locationName__icontains="TEST")
-        )
+        loc_objs = loc.filter(Q(locationName__icontains="MEYDAN") | Q(locationName__icontains="TEST"))
         loc_ids = [l.id for l in loc_objs]
 
         if loc_ids:
-            meydanKalip = DiesLocation.objects.filter(
-                kalipVaris_id__in=loc_ids
-            ).order_by('kalipNo')
+            meydanKalip = DiesLocation.objects.filter(kalipVaris_id__in=loc_ids).order_by('kalipNo')
         else:
             meydanKalip = DiesLocation.objects.none()
         # loc.get(locationName__contains = "MEYDAN").id

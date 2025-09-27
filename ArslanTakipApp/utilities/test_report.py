@@ -88,8 +88,9 @@ def send_daily_test_report_for_all():
             if (wait_time) > 3:
                 print("burda")
             profil_no = die.ProfilNo
-            musteri_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi').first()
-            musteri = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız"
+            musteri_firma = " ".join(die.FirmaAdi.split()[:2]) if die.FirmaAdi else "Tanımsız"
+            musteri_tem_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi').first()
+            musteri_tem = musteri_tem_obj['MusteriTemsilcisi'] if musteri_tem_obj else "Tanımsız"
             # musteri = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi')[0]['MusteriTemsilcisi']
             siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
  
@@ -98,23 +99,25 @@ def send_daily_test_report_for_all():
                 has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
                 
                 if has_open_order:
-                    result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
+                    result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık', 'representative':musteri_tem, 'client':musteri_firma, 'move_date': move_date, 'wait_time': wait_time})
                 else: 
                     # Eğer 'ACIK' durumu yoksa, 'BLOKE' durumuna bakıyoruz
                     has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
                     if has_blocked_order:
-                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Bloke', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
+                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Bloke', 'representative':musteri_tem, 'client':musteri_firma, 'move_date': move_date, 'wait_time': wait_time})
                     else:
-                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
+                        result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri_tem, 'client':musteri_firma, 'move_date': move_date, 'wait_time': wait_time})
             else:
                 # Eğer profil ile ilgili hiç sipariş yoksa
-                result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri, 'move_date': move_date, 'wait_time': wait_time})
+                result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri_tem, 'client':musteri_firma, 'move_date': move_date, 'wait_time': wait_time})
 
     if len(result_list) >= 1:
         result_list = sorted(result_list, key=lambda x: x['press'])
         to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
                          'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
-                         'enesozturk@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com']
+                         'enesozturk@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 
+                         'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com'
+        ]
 
         cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
 
