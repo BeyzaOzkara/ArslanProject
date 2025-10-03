@@ -446,6 +446,12 @@ def kalip_liste(request):
             b = DiesLocation.objects.get(kalipNo = c['KalipNo']).kalipVaris_id
         except:
             b = 48
+            Hareket.objects.create(
+                    kalipVaris_id=48, # Yeri Bilinmeyenler
+                    kalipNo=c['KalipNo'],
+                    kimTarafindan_id=57, # Yapay Zeka user
+                    aciklama="Yeni Kalıp"
+                ) 
 
         try:
             c['kalipLocation'] = list(location_list.filter(id=list(location_list.filter(id=b))[0]["locationRelationID_id"]))[0]["locationName"] + " <BR>└ " + list(location_list.filter(id=b))[0]["locationName"]
