@@ -1,0 +1,242 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+
+{% block title %}Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<style>
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      max-width: 95vw; /* responsive width */
+      width: fit-content; /* auto-expand to table width */
+      margin: 0 auto;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+      overflow-x: auto;     /* ✅ allows scrolling if table wider than card */
+    }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+    p { color: #6b7280; margin-bottom: 30px; }
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 50px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .drop-zone.dragover {
+      border-color: #2563eb;
+      background-color: #eff6ff;
+    }
+    .btn {
+      margin: 15px 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary { background-color: #2563eb; color: white; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-secondary { background-color: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background-color: #d1d5db; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      min-width: 1000px; /* ✅ keeps layout balanced */
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+    }
+    input {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 6px 8px;
+      width: 95%;
+    }
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card" id="uploadCard">
+  <h1>PDF to Excel Converter</h1>
+  <p>Transform your PDF documents into editable Excel spreadsheets instantly</p>
+
+  <input type="file" id="pdfFile" accept="application/pdf" hidden>
+  <div class="drop-zone" id="dropZone">
+    <p>Drop your PDF file here<br><small>or click to browse</small></p>
+  </div>
+  <button class="btn btn-primary" id="uploadBtn">Upload PDF</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const card = document.getElementById("uploadCard");
+  const dropZone = document.getElementById("dropZone");
+  const fileInput = document.getElementById("pdfFile");
+  const uploadBtn = document.getElementById("uploadBtn");
+
+  dropZone.addEventListener("click", () => fileInput.click());
+  dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("dragover"); });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    fileInput.files = e.dataTransfer.files;
+  });
+
+  uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    if (!file) return alert("Please select a PDF first!");
+
+    const formData = new FormData();
+    formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    formData.append("pdf_file", file);
+
+    uploadBtn.textContent = "Extracting...";
+    uploadBtn.disabled = true;
+
+    const res = await fetch("", { method: "POST", body: formData });
+    uploadBtn.textContent = "Upload PDF";
+    uploadBtn.disabled = false;
+
+    if (!res.ok) return alert("Error extracting data!");
+    const { data } = await res.json();
+
+    renderEditableTable(data, file.name);
+  });
+
+  function renderEditableTable(data, filename) {
+    card.innerHTML = `
+      <h2 style="text-align:left;">Extracted Data</h2>
+      <p style="text-align:left;">Review and edit the data from: <strong>${filename}</strong></p>
+      <button class="btn btn-secondary" id="newFileBtn" style="float:right;margin-top:10px;">Upload New File</button>
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th style="width:70px">No</th>
+            <th>Müşteri</th>
+            <th>Profil No</th>
+            <th style="width:100px">Boy (mm)</th>
+            <th>Kesim (ad/saat)</th>
+            <th style="width:100px">Çalışacak Personel</th>
+            <th>Pres Planlama Boyu</th>
+            <th>Bir Boydan Çıkacak Adet</th>
+            <th>CNC (ad/saat)</th>
+            <th style="width:100px">CNC Çalışacak Personel</th>
+            <th>Yüzey</th>
+            <th>Askı İzi</th>
+            <th>Açıklama</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map((row, i) => `
+            <tr>
+              <td><input value="${i + 1}"></td>
+              <td><input value="${row["Musteri"] || ""}"></td>
+              <td><input value="${row["Profil No"] || ""}"></td>
+              <td><input value="${row["Boy\n(mm)"] || ""}"></td>
+              <td><input value="${row["Kesim(ad/saat)"] || ""}"></td>
+              <td><input value="${row["ÇalışacakPersonel"] || ""}"></td>
+              <td><input value="${row["PresPlanlamaBoyu"] || ""}"></td>
+              <td><input value="${row["BirBoydanÇıkacakAdet"] || ""}"></td>
+              <td><input value="${row["CNC(ad/saat)"] || ""}"></td>
+              <td><input value="${row["CNCÇalışacakPersonel"] || ""}"></td>
+              <td><input value="${row["Yüzey"] || ""}"></td>
+              <td><input value="${row["AskiIzi"] || ""}"></td>
+              <td><input value="${row["Paketleme Şekli"] || ""}"></td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+      <div class="actions">
+        <button class="btn btn-secondary" id="addRowBtn">Add Row</button>
+        <button class="btn btn-primary" id="saveDataBtn">Save Data</button>
+      </div>
+    `;
+
+    document.getElementById("newFileBtn").addEventListener("click", () => location.reload());
+    document.getElementById("addRowBtn").addEventListener("click", addNewRow);
+    document.getElementById("saveDataBtn").addEventListener("click", saveData);
+  }
+
+  function addNewRow() {
+    const tbody = document.querySelector("#dataTable tbody");
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td></td> <!-- No will be auto-filled -->
+      ${Array.from({ length: 12 }, () => "<td><input></td>").join("")}
+    `;
+    tbody.appendChild(row);
+    updateRowNumbers(); // ✅ renumber after adding
+  }
+
+  function updateRowNumbers() {
+    document.querySelectorAll("#dataTable tbody tr").forEach((tr, index) => {
+      tr.querySelector("td:first-child").textContent = index + 1;
+    });
+  }
+
+  async function saveData() {
+    updateRowNumbers(); // ✅ ensure numbers are updated before saving
+    const rows = Array.from(document.querySelectorAll("#dataTable tbody tr")).map(tr => {
+      const inputs = tr.querySelectorAll("input");
+      return {
+        "No": values[0],
+        "Müşteri": values[1],
+        "Profil No": values[2],
+        "Boy (mm)": values[3],
+        "Kesim (ad/saat)": values[4],
+        "Çalışacak Personel": values[5],
+        "Pres Planlama Boyu": values[6],
+        "Bir Boydan Çıkacak Adet": values[7],
+        "CNC (ad/saat)": values[8],
+        "CNC Çalışacak Personel": values[9],
+        "Yüzey": values[10],
+        "Askı İzi": values[11],
+        "Açıklama": values[12]
+      };
+    });
+
+    const res = await fetch("/api/download-excel/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rows })
+    });
+
+    if (!res.ok) return alert("Error creating Excel file");
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "edited_data.xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+
+{% endblock %}

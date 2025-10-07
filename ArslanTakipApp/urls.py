@@ -175,4 +175,6 @@ urlpatterns = [
     path('kaliphane/is_emri/tab_info', views.kaliphane_get_tab_info, name='kaliphane_get_is_emri'),
     
     path('4500/stretcher', views.Stretcher4500View.as_view(), name='stretcher_4500'),
+
+    path("pdf_teklif/", views.pdf_to_excel_page, name="pdf_to_excel_page"),
 ]

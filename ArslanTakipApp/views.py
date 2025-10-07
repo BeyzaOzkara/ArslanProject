@@ -64,6 +64,9 @@ from DMS.models import EventData, TemporalData
 from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report, send_new_dies_without_orders_report
 from django.db.models import Func
 from .die_update import check_new_dies
+import pdfplumber
+import pandas as pd
+from django.core.files.storage import FileSystemStorage
 # Create your views here.
 
 
@@ -5326,3 +5329,47 @@ def kaliphane_get_tab_info(request):
 
 class Stretcher4500View(generic.TemplateView):
     template_name = '4500/stretcher.html'
+
+
+def extract_pdf_data(pdf_path):
+    """PDF'in ilk sayfasından müşteri adı ve tablo sütunlarını çıkarır."""
+    with pdfplumber.open(pdf_path) as pdf:
+        page = pdf.pages[0]
+        text = page.extract_text()
+
+        # Müşteri adını yakala
+        customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
+        print(f"firma: {customer_line[0].strip()}")
+        customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
+
+        print(f"firma: {customer_name}")
+        # Tabloyu dataframe olarak çıkar
+        table = page.extract_table()
+        df = pd.DataFrame(table[1:], columns=table[0])
+        print(df.columns) # ['No', 'Profil No', 'Birim', 'Profil Adı', 'Boy\n(mm)', 'Yüzey', 'Renk', 'Kaplama\nKalınlığı', 'Sertlik', 'Miktar', 'Toplam Mt', 'Ağırlık\n(Kg)', 'Mekanik\nİşlem No', 'Paketleme Şekli', 'Birim\nFiyat\n(TL)', 'Toplam Tutar\n(TL)']
+        # İstenen sütunları seç
+        subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Paketleme Şekli"]]
+        subset["Musteri"] = customer_name
+        subset["Kesim(ad/saat)"] = ""
+        subset["ÇalışacakPersonel"] = ""
+        subset["PresPlanlamaBoyu"] = ""
+        subset["BirBoydanÇıkacakAdet"] = ""
+        subset["CNC(ad/saat)"] = ""
+        subset["CNCÇalışacakPersonel"] = ""
+        subset["AskiIzi"] = ""
+        return subset
+
+def pdf_to_excel_page(request):
+    """PDF yükleme ve Excel oluşturma sayfası."""
+    if request.method == "POST" and request.FILES.get("pdf_file"):
+        pdf_file = request.FILES["pdf_file"]
+        path = "temp.pdf"
+        with open(path, "wb") as f:
+            for chunk in pdf_file.chunks():
+                f.write(chunk)
+
+        df = extract_pdf_data(path)
+        data = df.to_dict(orient="records")
+        return JsonResponse({"data": data}, status=200)
+
+    return render(request, "teklif/pdf_to_excel.html")
