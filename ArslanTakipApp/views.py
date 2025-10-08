@@ -666,7 +666,7 @@ def kalip_tum(request):
 
 def kalip_getcomments(request, kId):
     if request.method == "GET":
-        yudaComments = getParentComments("KalipMs", kId).order_by("Tarih")
+        yudaComments = getParentComments("KalipMs", kId).order_by('-IsPinned', "Tarih")
         yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
         comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -898,7 +898,7 @@ def kalip_hareket(request):
 def kalip_yorum(request):
     kalip_no = request.GET.get('kalipNo')
     if request.method == "GET":
-        comments = getParentComments("KalipMs", kalip_no).order_by("-Tarih")
+        comments = getParentComments("KalipMs", kalip_no).order_by("-IsPinned", "-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
