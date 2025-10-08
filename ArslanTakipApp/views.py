@@ -1,14 +1,12 @@
 from collections import Counter, OrderedDict, defaultdict
 import csv
 import logging
-import os, tempfile, io
-from django.views.decorators.csrf import csrf_exempt
+import os, #  tempfile, io
+# from django.views.decorators.csrf import csrf_exempt
 # from openpyxl import load_workbook
-from django.contrib.staticfiles import finders
+# from django.contrib.staticfiles import finders
 # from openpyxl.styles import Alignment
 import re
-import ssl
-import base64, binascii, zlib
 import datetime
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
@@ -17,7 +15,7 @@ from types import NoneType
 from itertools import groupby
 import time
 import math
-import unicodedata
+# import unicodedata
 from urllib.parse import unquote
 from django.apps import apps
 from django.conf import settings
@@ -68,7 +66,7 @@ from DMS.models import EventData, TemporalData
 from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report, send_new_dies_without_orders_report
 from django.db.models import Func
 from .die_update import check_new_dies
-import pdfplumber
+# import pdfplumber
 import pandas as pd
 from django.core.files.storage import FileSystemStorage
 # Create your views here.
