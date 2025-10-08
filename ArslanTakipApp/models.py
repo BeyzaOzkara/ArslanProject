@@ -474,6 +474,7 @@ class Comment(models.Model):
     ReplyTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     Silindi = models.BooleanField(default=False ,null=True, blank=True)
     ViewedUsers = models.ManyToManyField(User, related_name='viewed_comments', blank=True)  # Field to track viewed users
+    IsPinned = models.BooleanField(default=False, null=True, blank=True)
 
     def mark_viewed(self, user):
         """

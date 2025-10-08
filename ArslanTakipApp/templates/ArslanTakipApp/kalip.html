@@ -504,12 +504,16 @@ function createEditButton(id) {
 function createDeleteButton(id) {
     return `<span><a role="button" class="ml-2" style="color:red; cursor:pointer;" onclick="deleteComment(${id})">sil</a></span>`;
 }
+function createPinItButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" onclick="pinComment(${id})"><i class="fa fa-thumb-tack" aria-hidden="true"></i>Pinle</a></span>`;
+}
 
 function createButtons(comment) {
     let buttonHtml = $('<div>', { id: `buttons${comment.id}` });
     const isViewed = comment.Is_Viewed;
     buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
     buttonHtml.append(createReplyButton(comment.id));
+    buttonHtml.append(createPinItButton(comment.id));
     if (String(comment.Kullanici_id) === userID || userIsSuper) {
         buttonHtml.append(createEditButton(comment.id), createDeleteButton(comment.id));
     }
@@ -614,6 +618,19 @@ function deleteComment(cId) {
       });
     }
 };
+
+function pinComment(cId) {
+    $.ajax({
+        url: 'pincomment/'+cId,
+        type: 'GET',
+        success: function (response) {
+            alert(response.message);
+        },
+        error: function (error) {
+          alert('Yorum pinlenemedi. '+error);
+        }
+      });
+}
 
 function handleFileSelection(files, type) {
     for (let i = 0; i < files.length; i++) {

@@ -46,6 +46,7 @@ urlpatterns = [
     path('kalip/postcomment', views.kalip_comments_post, name='kalipCommentPost'),
     path('kalip/editcomment', views.kalip_comments_edit, name='kalipCommentEdit'),
     path('kalip/deletecomment/<str:cId>', views.kalip_comments_delete, name='kalipCommentDelete'),
+    path('kalip/pincomment/<str:cId>', views.kalip_comments_pin, name='kalipCommentPin'),
     path('qr/<int:id>', views.qrcodeRedirect, name='qr'),
     # path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
     path('siparis2/', views.siparis2_list),
@@ -177,4 +178,5 @@ urlpatterns = [
     path('4500/stretcher', views.Stretcher4500View.as_view(), name='stretcher_4500'),
 
     path("pdf_teklif/", views.pdf_to_excel_page, name="pdf_to_excel_page"),
+    path("pdf_teklif/download_excel", views.download_excel, name="download_excel"),
 ]

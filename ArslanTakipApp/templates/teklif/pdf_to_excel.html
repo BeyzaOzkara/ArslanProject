@@ -81,9 +81,9 @@
   <h1>PDF to Excel Converter</h1>
   <p>Transform your PDF documents into editable Excel spreadsheets instantly</p>
 
-  <input type="file" id="pdfFile" accept="application/pdf" hidden>
+  <input type="file" id="pdfFiles" accept="application/pdf" hidden multiple>
   <div class="drop-zone" id="dropZone">
-    <p>Drop your PDF file here<br><small>or click to browse</small></p>
+    <p>Drop your PDF files here<br><small>or click to browse</small></p>
   </div>
   <button class="btn btn-primary" id="uploadBtn">Upload PDF</button>
 </div>
@@ -93,7 +93,7 @@
 <script>
   const card = document.getElementById("uploadCard");
   const dropZone = document.getElementById("dropZone");
-  const fileInput = document.getElementById("pdfFile");
+  const fileInput = document.getElementById("pdfFiles");
   const uploadBtn = document.getElementById("uploadBtn");
 
   dropZone.addEventListener("click", () => fileInput.click());
@@ -102,57 +102,60 @@
   dropZone.addEventListener("drop", e => {
     e.preventDefault();
     dropZone.classList.remove("dragover");
-    fileInput.files = e.dataTransfer.files;
+    if (e.dataTransfer.files.length) fileInput.files = e.dataTransfer.files; // can be many
   });
 
   uploadBtn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
-    if (!file) return alert("Please select a PDF first!");
+    const files = Array.from(fileInput.files || []);
+    if (!files.length) return alert("Please select at least one PDF!");
 
     const formData = new FormData();
-    formData.append("csrfmiddlewaretoken", "{{csrf_token}}");
-    formData.append("pdf_file", file);
+    formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+    // backend will read 'pdf_files' as a list
+    files.forEach(f => formData.append("pdf_files", f));
 
     uploadBtn.textContent = "Extracting...";
     uploadBtn.disabled = true;
 
+    // post to the same URL that returned the page (your view should JsonResponse on POST)
     const res = await fetch("", { method: "POST", body: formData });
     uploadBtn.textContent = "Upload PDF";
     uploadBtn.disabled = false;
 
     if (!res.ok) return alert("Error extracting data!");
-    const { data } = await res.json();
+    const { data, filenames } = await res.json();  // data = merged rows from all PDFs
 
-    renderEditableTable(data, file.name);
+    renderEditableTable(data, filenames);
   });
 
-  function renderEditableTable(data, filename) {
+  function renderEditableTable(data, filenames=[]) {
     card.innerHTML = `
       <h2 style="text-align:left;">Extracted Data</h2>
-      <p style="text-align:left;">Review and edit the data from: <strong>${filename}</strong></p>
+      <p style="text-align:left;">Files: <strong>${filenames.join(", ")}</strong></p>
       <button class="btn btn-secondary" id="newFileBtn" style="float:right;margin-top:10px;">Upload New File</button>
       <table id="dataTable">
         <thead>
           <tr>
             <th style="width:70px">No</th>
-            <th>Müşteri</th>
-            <th>Profil No</th>
+            <th style="width:130px">Müşteri</th>
+            <th style="width:120px">Profil No</th>
             <th style="width:100px">Boy (mm)</th>
-            <th>Kesim (ad/saat)</th>
+            <th style="width:100px">Kesim (ad/saat)</th>
             <th style="width:100px">Çalışacak Personel</th>
-            <th>Pres Planlama Boyu</th>
-            <th>Bir Boydan Çıkacak Adet</th>
-            <th>CNC (ad/saat)</th>
+            <th style="width:100px">Pres Planlama Boyu</th>
+            <th style="width:100px">Bir Boydan Çıkacak Adet</th>
+            <th style="width:100px">CNC (ad/saat)</th>
             <th style="width:100px">CNC Çalışacak Personel</th>
-            <th>Yüzey</th>
-            <th>Askı İzi</th>
+            <th style="width:100px">Yüzey</th>
+            <th>Mekanik İşlem No</th>
+            <th style="width:150px">Askı İzi</th>
             <th>Açıklama</th>
           </tr>
         </thead>
         <tbody>
           ${data.map((row, i) => `
             <tr>
-              <td><input value="${i + 1}"></td>
+              <td><input value="${i+1}"></td>
               <td><input value="${row["Musteri"] || ""}"></td>
               <td><input value="${row["Profil No"] || ""}"></td>
               <td><input value="${row["Boy\n(mm)"] || ""}"></td>
@@ -163,6 +166,7 @@
               <td><input value="${row["CNC(ad/saat)"] || ""}"></td>
               <td><input value="${row["CNCÇalışacakPersonel"] || ""}"></td>
               <td><input value="${row["Yüzey"] || ""}"></td>
+              <td><input value="${row["Mekanik\nİşlem No"] || ""}"></td>
               <td><input value="${row["AskiIzi"] || ""}"></td>
               <td><input value="${row["Paketleme Şekli"] || ""}"></td>
             </tr>`).join("")}
@@ -181,43 +185,41 @@
 
   function addNewRow() {
     const tbody = document.querySelector("#dataTable tbody");
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td></td> <!-- No will be auto-filled -->
-      ${Array.from({ length: 12 }, () => "<td><input></td>").join("")}
-    `;
-    tbody.appendChild(row);
-    updateRowNumbers(); // ✅ renumber after adding
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td></td>${Array.from({ length: 13 }, () => "<td><input></td>").join("")}`;
+    tbody.appendChild(tr);
+    updateRowNumbers();
   }
 
   function updateRowNumbers() {
-    document.querySelectorAll("#dataTable tbody tr").forEach((tr, index) => {
-      tr.querySelector("td:first-child").textContent = index + 1;
+    document.querySelectorAll("#dataTable tbody tr").forEach((tr, idx) => {
+      tr.querySelector("td:first-child").textContent = idx + 1;
     });
   }
 
   async function saveData() {
-    updateRowNumbers(); // ✅ ensure numbers are updated before saving
+    // updateRowNumbers(); // ✅ ensure numbers are updated before saving
     const rows = Array.from(document.querySelectorAll("#dataTable tbody tr")).map(tr => {
-      const inputs = tr.querySelectorAll("input");
+      const cells = Array.from(tr.querySelectorAll("td"));
+      const values = cells.map(td => td.querySelector("input")?.value || "");
+      console.log(values)
       return {
-        "No": values[0],
+        "NO": values[0],
         "Müşteri": values[1],
         "Profil No": values[2],
-        "Boy (mm)": values[3],
-        "Kesim (ad/saat)": values[4],
+        "Profil boyu (mm.)": values[3],
+        "Kesim\n (ad/saat)": values[4],
         "Çalışacak Personel": values[5],
-        "Pres Planlama Boyu": values[6],
+        "PRES PLANLAMA BOYU": values[6],
         "Bir Boydan Çıkacak Adet": values[7],
-        "CNC (ad/saat)": values[8],
-        "CNC Çalışacak Personel": values[9],
-        "Yüzey": values[10],
-        "Askı İzi": values[11],
-        "Açıklama": values[12]
+        "CNC (AD/SAAT)": values[8],
+        "çalışacak personel": values[9],
+        "yüzey": values[10],
+        "AÇIKLAMA": values[13]
       };
     });
-
-    const res = await fetch("/api/download-excel/", {
+    console.log(rows)
+    const res = await fetch("/pdf_teklif/download_excel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rows })
