@@ -177,6 +177,6 @@ urlpatterns = [
     
     path('4500/stretcher', views.Stretcher4500View.as_view(), name='stretcher_4500'),
 
-    path("pdf_teklif/", views.pdf_to_excel_page, name="pdf_to_excel_page"),
-    path("pdf_teklif/download_excel", views.download_excel, name="download_excel"),
+    # path("pdf_teklif/", views.pdf_to_excel_page, name="pdf_to_excel_page"),
+    # path("pdf_teklif/download_excel", views.download_excel, name="download_excel"),
 ]

@@ -5565,25 +5565,25 @@ class Stretcher4500View(generic.TemplateView):
 #     return resp
 
 # def pdf_to_excel_page(request): 
-    """PDF yükleme ve Excel oluşturma sayfası.""" 
-    if request.method == "POST": 
-        files = request.FILES.getlist("pdf_files") or request.FILES.getlist("pdf_file") 
-        if not files: 
-            return JsonResponse({"error": "No PDFs uploaded"}, status=400) 
-        all_rows = [] 
-        filenames = [] 
-        for f in files: 
-            filenames.append(f.name)
-            # save to temp & extract 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp: 
-                for chunk in f.chunks(): 
-                    tmp.write(chunk) 
-                    tmp_path = tmp.name 
-            try: 
-                # df = extract_pdf_data(tmp_path) # your existing function 
-                df = extract_pdf_data_all_pages(tmp_path) # Extract all pages 
-                all_rows.extend(df.to_dict(orient="records")) 
-            finally: 
-                os.unlink(tmp_path) 
-        return JsonResponse({"data": all_rows, "filenames": filenames}, status=200) 
-    return render(request, "teklif/pdf_to_excel.html")
+    # """PDF yükleme ve Excel oluşturma sayfası.""" 
+    # if request.method == "POST": 
+    #     files = request.FILES.getlist("pdf_files") or request.FILES.getlist("pdf_file") 
+    #     if not files: 
+    #         return JsonResponse({"error": "No PDFs uploaded"}, status=400) 
+    #     all_rows = [] 
+    #     filenames = [] 
+    #     for f in files: 
+    #         filenames.append(f.name)
+    #         # save to temp & extract 
+    #         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp: 
+    #             for chunk in f.chunks(): 
+    #                 tmp.write(chunk) 
+    #                 tmp_path = tmp.name 
+    #         try: 
+    #             # df = extract_pdf_data(tmp_path) # your existing function 
+    #             df = extract_pdf_data_all_pages(tmp_path) # Extract all pages 
+    #             all_rows.extend(df.to_dict(orient="records")) 
+    #         finally: 
+    #             os.unlink(tmp_path) 
+    #     return JsonResponse({"data": all_rows, "filenames": filenames}, status=200) 
+    # return render(request, "teklif/pdf_to_excel.html")
