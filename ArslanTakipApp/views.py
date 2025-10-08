@@ -68,8 +68,8 @@ from .utilities.test_report import send_daily_test_report_for_all, send_single_d
 from django.db.models import Func
 from .die_update import check_new_dies
 # import pdfplumber
-import pandas as pd
-from django.core.files.storage import FileSystemStorage
+# import pandas as pd
+# from django.core.files.storage import FileSystemStorage
 # Create your views here.
 
 
