@@ -3,9 +3,9 @@ import csv
 import logging
 import os, tempfile, io
 from django.views.decorators.csrf import csrf_exempt
-from openpyxl import load_workbook
+# from openpyxl import load_workbook
 from django.contrib.staticfiles import finders
-from openpyxl.styles import Alignment
+# from openpyxl.styles import Alignment
 import re
 import ssl
 import base64, binascii, zlib
@@ -5351,220 +5351,220 @@ class Stretcher4500View(generic.TemplateView):
     template_name = '4500/stretcher.html'
 
 
-def extract_pdf_data(pdf_path):
-    """PDF'in ilk sayfasından müşteri adı ve tablo sütunlarını çıkarır."""
-    with pdfplumber.open(pdf_path) as pdf:
-        page = pdf.pages[0]
-        text = page.extract_text()
+# def extract_pdf_data(pdf_path):
+#     """PDF'in ilk sayfasından müşteri adı ve tablo sütunlarını çıkarır."""
+#     with pdfplumber.open(pdf_path) as pdf:
+#         page = pdf.pages[0]
+#         text = page.extract_text()
 
-        # Müşteri adını yakala
-        customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
-        print(f"firma: {customer_line[0].strip()}")
-        customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
-        print(f"firma: {customer_name}")
+#         # Müşteri adını yakala
+#         customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
+#         print(f"firma: {customer_line[0].strip()}")
+#         customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
+#         print(f"firma: {customer_name}")
 
-        # Tabloyu dataframe olarak çıkar
-        table = page.extract_table()
-        df = pd.DataFrame(table[1:], columns=table[0])
-        print(df.columns) # ['No', 'Profil No', 'Birim', 'Profil Adı', 'Boy\n(mm)', 'Yüzey', 'Renk', 'Kaplama\nKalınlığı', 'Sertlik', 'Miktar', 'Toplam Mt', 'Ağırlık\n(Kg)', 'Mekanik\nİşlem No', 'Paketleme Şekli', 'Birim\nFiyat\n(TL)', 'Toplam Tutar\n(TL)']
-        # İstenen sütunları seç
-        subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Paketleme Şekli"]]
-        subset["Musteri"] = customer_name
-        subset["Kesim(ad/saat)"] = ""
-        subset["ÇalışacakPersonel"] = ""
-        subset["PresPlanlamaBoyu"] = ""
-        subset["BirBoydanÇıkacakAdet"] = ""
-        subset["CNC(ad/saat)"] = ""
-        subset["CNCÇalışacakPersonel"] = ""
-        subset["AskiIzi"] = ""
-        return subset
+#         # Tabloyu dataframe olarak çıkar
+#         table = page.extract_table()
+#         df = pd.DataFrame(table[1:], columns=table[0])
+#         print(df.columns) # ['No', 'Profil No', 'Birim', 'Profil Adı', 'Boy\n(mm)', 'Yüzey', 'Renk', 'Kaplama\nKalınlığı', 'Sertlik', 'Miktar', 'Toplam Mt', 'Ağırlık\n(Kg)', 'Mekanik\nİşlem No', 'Paketleme Şekli', 'Birim\nFiyat\n(TL)', 'Toplam Tutar\n(TL)']
+#         # İstenen sütunları seç
+#         subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Paketleme Şekli"]]
+#         subset["Musteri"] = customer_name
+#         subset["Kesim(ad/saat)"] = ""
+#         subset["ÇalışacakPersonel"] = ""
+#         subset["PresPlanlamaBoyu"] = ""
+#         subset["BirBoydanÇıkacakAdet"] = ""
+#         subset["CNC(ad/saat)"] = ""
+#         subset["CNCÇalışacakPersonel"] = ""
+#         subset["AskiIzi"] = ""
+#         return subset
     
-def norm_key(s: str) -> str:
-    if s is None: return ""
-    s = str(s).strip()
-    s = unicodedata.normalize("NFKD", s)
-    s = "".join(ch for ch in s if not unicodedata.combining(ch))
-    s = s.upper().translate(str.maketrans({"İ":"I","Ş":"S","Ğ":"G","Ü":"U","Ö":"O","Ç":"C"}))
-    s = s.replace(" ", "")
-    # drop non-alnum for robust match (e.g., 'AB-123/4' -> 'AB1234')
-    return re.sub(r"[^A-Z0-9]", "", s)
+# def norm_key(s: str) -> str:
+#     if s is None: return ""
+#     s = str(s).strip()
+#     s = unicodedata.normalize("NFKD", s)
+#     s = "".join(ch for ch in s if not unicodedata.combining(ch))
+#     s = s.upper().translate(str.maketrans({"İ":"I","Ş":"S","Ğ":"G","Ü":"U","Ö":"O","Ç":"C"}))
+#     s = s.replace(" ", "")
+#     # drop non-alnum for robust match (e.g., 'AB-123/4' -> 'AB1234')
+#     return re.sub(r"[^A-Z0-9]", "", s)
 
-# exact capture rules you requested
-ASKI_LINE = re.compile(
-    r'^Ask[ıi]\s*[İI]zi\s*:\s*(.*?)\s*(?:Mek\.?\s*İ?şlem\s*No\s*:|$)',
-    re.IGNORECASE | re.UNICODE
-)
-TEDARIKCI_LINE = re.compile(
-    r'^Tedarik[cç]i\s*[ÜU]rün\s*No\s*:\s*(.*?)\s*(?:Mekanik\s*İ?şlem\s*:|$)',
-    re.IGNORECASE | re.UNICODE
-)
+# # exact capture rules you requested
+# ASKI_LINE = re.compile(
+#     r'^Ask[ıi]\s*[İI]zi\s*:\s*(.*?)\s*(?:Mek\.?\s*İ?şlem\s*No\s*:|$)',
+#     re.IGNORECASE | re.UNICODE
+# )
+# TEDARIKCI_LINE = re.compile(
+#     r'^Tedarik[cç]i\s*[ÜU]rün\s*No\s*:\s*(.*?)\s*(?:Mekanik\s*İ?şlem\s*:|$)',
+#     re.IGNORECASE | re.UNICODE
+# )
 
-def build_aski_map_sequential(pdf_path: str) -> dict[str, str]:
-    """
-    Scan each page in order. When we see:
-      - 'Askı İzi : <X> [Mek.İşlem No : ...]'  -> capture <X>
-      - 'Tedarikçi Ürün No : <Y> [Mekanik İşlem : ...]' -> capture <Y>
-    Pair norm_key(Y) -> X (most recent Askı İzi seen above it).
-    """
-    aski_map: dict[str, str] = {}
+# def build_aski_map_sequential(pdf_path: str) -> dict[str, str]:
+#     """
+#     Scan each page in order. When we see:
+#       - 'Askı İzi : <X> [Mek.İşlem No : ...]'  -> capture <X>
+#       - 'Tedarikçi Ürün No : <Y> [Mekanik İşlem : ...]' -> capture <Y>
+#     Pair norm_key(Y) -> X (most recent Askı İzi seen above it).
+#     """
+#     aski_map: dict[str, str] = {}
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            if not text.strip():
-                continue
+#     with pdfplumber.open(pdf_path) as pdf:
+#         for page in pdf.pages:
+#             text = page.extract_text() or ""
+#             if not text.strip():
+#                 continue
 
-            lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-            current_aski = None
+#             lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+#             current_aski = None
 
-            for ln in lines:
-                m_aski = ASKI_LINE.match(ln)
-                if m_aski:
-                    current_aski = m_aski.group(1).strip()  # e.g. 'Askı İzli' / 'Askı İzsiz'
-                    continue
+#             for ln in lines:
+#                 m_aski = ASKI_LINE.match(ln)
+#                 if m_aski:
+#                     current_aski = m_aski.group(1).strip()  # e.g. 'Askı İzli' / 'Askı İzsiz'
+#                     continue
 
-                m_ted = TEDARIKCI_LINE.match(ln)
-                if m_ted:
-                    raw_no = m_ted.group(1).strip()         # e.g. '17227'
-                    key = norm_key(raw_no)
-                    if key not in aski_map or (not aski_map[key] and current_aski is not None):
-                        aski_map[key] = current_aski or ""
-                    current_aski = None  # reset after pairing
+#                 m_ted = TEDARIKCI_LINE.match(ln)
+#                 if m_ted:
+#                     raw_no = m_ted.group(1).strip()         # e.g. '17227'
+#                     key = norm_key(raw_no)
+#                     if key not in aski_map or (not aski_map[key] and current_aski is not None):
+#                         aski_map[key] = current_aski or ""
+#                     current_aski = None  # reset after pairing
 
-    return aski_map
+#     return aski_map
 
-def extract_pdf_data_all_pages(pdf_path: str) -> pd.DataFrame:
-    """
-    Extracts all tables (same header structure) from every page of a PDF.
-    Merges them into a single DataFrame.
-    """
-    aski_map: dict[str, str] = {}
-    customer_name = None
-    with pdfplumber.open(pdf_path) as pdf:
-        page = pdf.pages[0]
-        text = page.extract_text()
-        # Müşteri adını yakala
-        customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
-        customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
-        print(f"firma: {customer_name}")
+# def extract_pdf_data_all_pages(pdf_path: str) -> pd.DataFrame:
+#     """
+#     Extracts all tables (same header structure) from every page of a PDF.
+#     Merges them into a single DataFrame.
+#     """
+#     aski_map: dict[str, str] = {}
+#     customer_name = None
+#     with pdfplumber.open(pdf_path) as pdf:
+#         page = pdf.pages[0]
+#         text = page.extract_text()
+#         # Müşteri adını yakala
+#         customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
+#         customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
+#         print(f"firma: {customer_name}")
 
-    tables = []
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            table = page.extract_table()
-            df = pd.DataFrame(table[1:], columns=table[0])
-            # İstenen sütunları seç
-            if df.empty or "Profil No" not in df.columns:
-                continue
-            subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli"]]
-            tables.append(subset)
-    if not tables:
-        return pd.DataFrame(columns=["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli", "Musteri", "Kesim(ad/saat)", \
-             "ÇalışacakPersonel", "PresPlanlamaBoyu", "BirBoydanÇıkacakAdet", "CNC(ad/saat)", "CNCÇalışacakPersonel", "AskiIzi"])
+#     tables = []
+#     with pdfplumber.open(pdf_path) as pdf:
+#         for page in pdf.pages:
+#             table = page.extract_table()
+#             df = pd.DataFrame(table[1:], columns=table[0])
+#             # İstenen sütunları seç
+#             if df.empty or "Profil No" not in df.columns:
+#                 continue
+#             subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli"]]
+#             tables.append(subset)
+#     if not tables:
+#         return pd.DataFrame(columns=["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli", "Musteri", "Kesim(ad/saat)", \
+#              "ÇalışacakPersonel", "PresPlanlamaBoyu", "BirBoydanÇıkacakAdet", "CNC(ad/saat)", "CNCÇalışacakPersonel", "AskiIzi"])
 
-    combined = pd.concat(tables, ignore_index=True)
+#     combined = pd.concat(tables, ignore_index=True)
     
-    aski_map = build_aski_map_sequential(pdf_path)
-    # Fill AskiIzi by matching Profil No <-> Tedarikçi Ürün No (normalized)
-    combined["AskiIzi"] = combined["Profil No"].map(lambda x: aski_map.get(norm_key(x), ""))
+#     aski_map = build_aski_map_sequential(pdf_path)
+#     # Fill AskiIzi by matching Profil No <-> Tedarikçi Ürün No (normalized)
+#     combined["AskiIzi"] = combined["Profil No"].map(lambda x: aski_map.get(norm_key(x), ""))
 
-    # Add your fixed customer info once
-    combined["Musteri"] = customer_name
-    combined["Kesim(ad/saat)"] = ""
-    combined["ÇalışacakPersonel"] = ""
-    combined["PresPlanlamaBoyu"] = ""
-    combined["BirBoydanÇıkacakAdet"] = ""
-    combined["CNC(ad/saat)"] = ""
-    combined["CNCÇalışacakPersonel"] = ""
+#     # Add your fixed customer info once
+#     combined["Musteri"] = customer_name
+#     combined["Kesim(ad/saat)"] = ""
+#     combined["ÇalışacakPersonel"] = ""
+#     combined["PresPlanlamaBoyu"] = ""
+#     combined["BirBoydanÇıkacakAdet"] = ""
+#     combined["CNC(ad/saat)"] = ""
+#     combined["CNCÇalışacakPersonel"] = ""
 
-    return combined[["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli", "Musteri", "Kesim(ad/saat)", \
-             "ÇalışacakPersonel", "PresPlanlamaBoyu", "BirBoydanÇıkacakAdet", "CNC(ad/saat)", "CNCÇalışacakPersonel", "AskiIzi"]]
+#     return combined[["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli", "Musteri", "Kesim(ad/saat)", \
+#              "ÇalışacakPersonel", "PresPlanlamaBoyu", "BirBoydanÇıkacakAdet", "CNC(ad/saat)", "CNCÇalışacakPersonel", "AskiIzi"]]
 
-def _find_template_path() -> str:
-    # looks under static/ and STATICFILES_DIRS / STATIC_ROOT
-    path = finders.find("excel/taslak.xlsx")
-    if not path:
-        raise FileNotFoundError("excel/taslak.xlsx not found in staticfiles.")
-    return path
+# def _find_template_path() -> str:
+#     # looks under static/ and STATICFILES_DIRS / STATIC_ROOT
+#     path = finders.find("excel/taslak.xlsx")
+#     if not path:
+#         raise FileNotFoundError("excel/taslak.xlsx not found in staticfiles.")
+#     return path
 
-REQUIRED_HEADERS = [
-    "NO", "Müşteri", "Profil No", "Profil boyu (mm.)",
-    "Kesim\n (ad/saat)", "Çalışacak Personel", "PRES PLANLAMA BOYU",
-    "Bir Boydan Çıkacak Adet", "CNC (AD/SAAT)", "çalışacak personel",
-    "yüzey", "AÇIKLAMA"
-]
+# REQUIRED_HEADERS = [
+#     "NO", "Müşteri", "Profil No", "Profil boyu (mm.)",
+#     "Kesim\n (ad/saat)", "Çalışacak Personel", "PRES PLANLAMA BOYU",
+#     "Bir Boydan Çıkacak Adet", "CNC (AD/SAAT)", "çalışacak personel",
+#     "yüzey", "AÇIKLAMA"
+# ]
 
-def _find_header_row(ws, required_headers, search_rows=10):
-    for r in range(1, min(search_rows, ws.max_row) + 1):
-        values = [str(ws.cell(r, c).value).strip() if ws.cell(r, c).value is not None else ""
-                  for c in range(1, ws.max_column + 1)]
-        lower = [v.lower() for v in values]
-        hits = {}
-        for h in required_headers:
-            try:
-                idx = lower.index(h.lower())
-                hits[h] = idx + 1
-            except ValueError:
-                pass
-        if len(hits) >= max(3, len(required_headers)//2):
-            return r, hits
-    # fallback: assume exact order on first row
-    return 1, {h: i+1 for i, h in enumerate(required_headers)}
+# def _find_header_row(ws, required_headers, search_rows=10):
+#     for r in range(1, min(search_rows, ws.max_row) + 1):
+#         values = [str(ws.cell(r, c).value).strip() if ws.cell(r, c).value is not None else ""
+#                   for c in range(1, ws.max_column + 1)]
+#         lower = [v.lower() for v in values]
+#         hits = {}
+#         for h in required_headers:
+#             try:
+#                 idx = lower.index(h.lower())
+#                 hits[h] = idx + 1
+#             except ValueError:
+#                 pass
+#         if len(hits) >= max(3, len(required_headers)//2):
+#             return r, hits
+#     # fallback: assume exact order on first row
+#     return 1, {h: i+1 for i, h in enumerate(required_headers)}
 
-def _wrap_text(ws, cols, start_row, end_row):
-    for r in range(start_row, end_row + 1):
-        for c in cols:
-            ws.cell(r, c).alignment = Alignment(wrap_text=True, vertical="center")
+# def _wrap_text(ws, cols, start_row, end_row):
+#     for r in range(start_row, end_row + 1):
+#         for c in cols:
+#             ws.cell(r, c).alignment = Alignment(wrap_text=True, vertical="center")
 
-@csrf_exempt
-def download_excel(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "POST required"}, status=405)
+# @csrf_exempt
+# def download_excel(request):
+#     if request.method != "POST":
+#         return JsonResponse({"error": "POST required"}, status=405)
 
-    try:
-        payload = json.loads(request.body.decode("utf-8"))
-        rows = payload.get("rows", [])
-        if not rows:
-            return JsonResponse({"error": "No rows provided"}, status=400)
-    except Exception as e:
-        return JsonResponse({"error": f"Invalid JSON: {e}"}, status=400)
+#     try:
+#         payload = json.loads(request.body.decode("utf-8"))
+#         rows = payload.get("rows", [])
+#         if not rows:
+#             return JsonResponse({"error": "No rows provided"}, status=400)
+#     except Exception as e:
+#         return JsonResponse({"error": f"Invalid JSON: {e}"}, status=400)
 
-    try:
-        template_path = _find_template_path()  # ✅ locate static/excel/taslak.xlsx
-        wb = load_workbook(template_path)
-    except Exception as e:
-        return JsonResponse({"error": f"Template error: {e}"}, status=500)
+#     try:
+#         template_path = _find_template_path()  # ✅ locate static/excel/taslak.xlsx
+#         wb = load_workbook(template_path)
+#     except Exception as e:
+#         return JsonResponse({"error": f"Template error: {e}"}, status=500)
 
-    ws = wb.active  # or wb["Teklif"] if you have a named sheet
+#     ws = wb.active  # or wb["Teklif"] if you have a named sheet
 
-    header_row, header_map = _find_header_row(ws, REQUIRED_HEADERS)
+#     header_row, header_map = _find_header_row(ws, REQUIRED_HEADERS)
 
-    write_row = header_row + 1
-    for i, row in enumerate(rows, start=1):
-        for key, val in row.items():
-            col = header_map.get(key)
-            if col:
-                ws.cell(write_row, col, val)
-        write_row += 1
+#     write_row = header_row + 1
+#     for i, row in enumerate(rows, start=1):
+#         for key, val in row.items():
+#             col = header_map.get(key)
+#             if col:
+#                 ws.cell(write_row, col, val)
+#         write_row += 1
 
-    # Nice wrapping for long text columns (optional)
-    wrap_cols = [header_map.get(h) for h in ["Müşteri", "yüzey", "AÇIKLAMA"] if h in header_map]
-    _wrap_text(ws, wrap_cols, header_row + 1, write_row - 1)
+#     # Nice wrapping for long text columns (optional)
+#     wrap_cols = [header_map.get(h) for h in ["Müşteri", "yüzey", "AÇIKLAMA"] if h in header_map]
+#     _wrap_text(ws, wrap_cols, header_row + 1, write_row - 1)
 
-    out = io.BytesIO()
-    wb.save(out)
-    out.seek(0)
+#     out = io.BytesIO()
+#     wb.save(out)
+#     out.seek(0)
 
-    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M")
-    filename = f"data_{ts}.xlsx"
-    resp = HttpResponse(
-        out.getvalue(),
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return resp
+#     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+#     filename = f"data_{ts}.xlsx"
+#     resp = HttpResponse(
+#         out.getvalue(),
+#         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+#     )
+#     resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+#     return resp
 
-def pdf_to_excel_page(request): 
+# def pdf_to_excel_page(request): 
     """PDF yükleme ve Excel oluşturma sayfası.""" 
     if request.method == "POST": 
         files = request.FILES.getlist("pdf_files") or request.FILES.getlist("pdf_file") 
