@@ -499,8 +499,18 @@ function createFileLink(cf) {
             </a></p>`;
 }
 
-function createPinnedIcon() {
-    return `<i class="fas fa-thumbtack pinned-pin" title="Sabitlenmiş yorum"></i>`;
+// function createPinnedIcon() { // sabitlenmiş yorum için pin ikonu
+//     return `<i class="fas fa-thumbtack pinned-pin" title="Sabitlenmiş yorum"></i>`;
+// }
+function createPinnedIcon(comment) {
+    const color = comment.IsPinned ? "#f7d308" : "#ccc";  // sarı = sabitli, gri = sabit değil
+    const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
+
+    return `<i class="fas fa-thumbtack pinned-pin" 
+                style="cursor:pointer; color:${color}"
+                title="${title}"
+                onclick="pinComment(${comment.id})">
+            </i>`;
 }
 
 function createViewedIcon(comment) {
@@ -523,16 +533,16 @@ function createEditButton(id) {
 function createDeleteButton(id) {
     return `<span><a role="button" class="ml-2" style="color:red; cursor:pointer;" onclick="deleteComment(${id})">sil</a></span>`;
 }
-function createPinItButton(id) {
-    return $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Sabitle" onclick="pinComment(${id})"><i class="fa fa-thumb-tack" style="color:blue" name="pinIconElement" aria-hidden="true"></i>Sabitle</a></span>`);
-}
+// function createPinItButton(id) {
+//     return $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Sabitle" onclick="pinComment(${id})"><i class="fas fa-thumbtack" style="color:blue" name="pinIconElement" aria-hidden="true"></i>Sabitle</a></span>`);
+// }
 
 function createButtons(comment) {
     let buttonHtml = $('<div>', { id: `buttons${comment.id}` });
     const isViewed = comment.Is_Viewed;
     buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
     buttonHtml.append(createReplyButton(comment.id));
-    buttonHtml.append(createPinItButton(comment.id));
+    // buttonHtml.append(createPinItButton(comment.id));
     if (String(comment.Kullanici_id) === userID || userIsSuper) {
         buttonHtml.append(createEditButton(comment.id), createDeleteButton(comment.id));
     }
@@ -548,9 +558,12 @@ function createCommentBlock(comment) {
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
     // 🔽 sabitlenmişse sağ üstte pin göster
-    if (comment.IsPinned === true) {
-        commentElement.append(createPinnedIcon());
-    }
+    // if (comment.IsPinned === true) {
+    //     commentElement.append(createPinnedIcon());
+    // }
+    
+    commentElement.append(createPinnedIcon(comment));
+
     commentElement.append(createButtons(comment));
     commentElement.append(`<div id="divTextArea${comment.id}" style="margin-top:10px;"></div>`);
     if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
@@ -647,6 +660,7 @@ function pinComment(cId) {
         type: 'GET',
         success: function (response) {
             alert(response.message);
+            initializeComments();
         },
         error: function (error) {
           alert('Yorum pinlenemedi. '+error);
