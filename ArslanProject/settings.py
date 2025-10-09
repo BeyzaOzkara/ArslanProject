@@ -244,8 +244,8 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='*/15'),
     },
     'send-test-email': {
-        'task': 'ArslanTakipApp.tasks.start_test_report_listener',
-        'schedule': crontab(minute=0, hour='7'),
+        'task': 'ArslanTakipApp.tasks.start_test_report_listener', # test_report send_daily_test_report_for_all ve send_new_dies_without_orders_report
+        'schedule': crontab(minute=0, hour='16'),
     }
 }
 

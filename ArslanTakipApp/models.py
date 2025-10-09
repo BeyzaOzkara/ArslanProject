@@ -475,6 +475,7 @@ class Comment(models.Model):
     Silindi = models.BooleanField(default=False ,null=True, blank=True)
     ViewedUsers = models.ManyToManyField(User, related_name='viewed_comments', blank=True)  # Field to track viewed users
     IsPinned = models.BooleanField(default=False, null=True, blank=True)
+    OriginId = models.IntegerField(null=True, blank=True)  # ProfilNoya Sabitle denildiğinde orijinal yorumun ID'si
 
     def mark_viewed(self, user):
         """

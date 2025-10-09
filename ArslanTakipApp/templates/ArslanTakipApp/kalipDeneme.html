@@ -1,0 +1,1007 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse {% endblock %}{% endblock %}
+
+{% load static %}
+{% load comment_tags %}
+
+{% block title %}Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'node_modules/file-icon-vectors/dist/file-icon-vectors.min.css' %}">
+
+
+<style>
+    .tabulator-menu{
+        width: 200px;
+        height: 150px;
+        overflow-y: auto;
+    }
+    .tabulator { 
+        background-color: #ccc;
+        font-weight: bold;
+        /* width: 535px; */
+    }
+    .imgComment {
+        max-width: 100%; /* Restrict width to fit the parent container */
+        height: auto; /* Maintain aspect ratio */
+        display: block;
+        margin: auto; /* Center the image */
+    }
+    .gallery {
+        display: flex;
+        flex-wrap: wrap; /* Wrap images if there's not enough space */
+        gap: 10px; /* Add spacing between images */
+    }
+    .gallery__item {
+        max-width: 1000px; /* Set maximum width for individual gallery items */
+    }
+    /* yorum kutusunu konumlandırma için */
+    .post { 
+        position: relative; 
+    }
+
+    /* sabitlenmiş yorum pini */
+    .post .pinned-pin {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        font-size: 16px;
+        color: #f7d308;            /* sarı pin */
+        transform: rotate(20deg);  /* isterseniz kaldırın */
+        opacity: 0.95;
+    }
+</style>
+  
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid col-lg-11">
+    <h1 class="col-lg-11">Arslan Alüminyum Kalıp Listesi</h1>
+    <div class="row">
+        <div class="container-fluid col-lg-12">
+            <div class="row col-lg-12">
+                <div class="col-lg-6">
+                    <span id="deneme"></span>
+                </div>
+                <div class="col-lg-6">
+                    <a class="btn btn-app bg-success" style="float: right;" id="download-xlsx" >
+                        <i class="fas fa-file-excel"></i>
+                        excell
+                    </a>
+                </div>
+            </div>
+            <div class="card" id="kalipListe-table"></div>
+        </div>
+        <div class="container-fluid col-lg-12">
+            <div class="card card-primary card-tabs" id="kalipInfoCard" style="display: none;">
+                <div class="card-header p-0 pt-1">
+                  <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+                    <li class="pt-2 px-3"><h3 class="card-title" id="kalipNoInfoCard">Kalıp No</h3></li>
+                    <li class="nav-item">
+                      <a class="nav-link tab-item active" id="custom-tabs-two-bilgi-tab" data-tab="custom-tabs-two-bilgi" data-toggle="pill" href="#custom-tabs-two-bilgi" role="tab" aria-controls="custom-tabs-two-bilgi" aria-selected="true">Kalıp Kartı</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link tab-item" id="custom-tabs-two-uretimraporu-tab" data-tab="custom-tabs-two-uretimraporu" data-toggle="pill" href="#custom-tabs-two-uretimraporu" role="tab" aria-controls="custom-tabs-two-uretimraporu" aria-selected="false">Üretim Raporu</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link tab-item" id="custom-tabs-two-hareketler-tab" data-tab="custom-tabs-two-hareketler" data-toggle="pill" href="#custom-tabs-two-hareketler" role="tab" aria-controls="custom-tabs-two-hareketler" aria-selected="false">Hareketler</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link tab-item" id="custom-tabs-two-yorumlar-tab" data-tab="custom-tabs-two-yorumlar" data-toggle="pill" href="#custom-tabs-two-yorumlar" role="tab" aria-controls="custom-tabs-two-yorumlar" aria-selected="false">Yorumlar</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link tab-item" id="custom-tabs-two-grafikler-tab" data-tab="custom-tabs-two-grafikler" data-toggle="pill" href="#custom-tabs-two-grafikler" role="tab" aria-controls="custom-tabs-two-grafikler" aria-selected="false">Grafikler</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="card-body">
+                  <div class="tab-content" id="custom-tabs-two-tabContent">
+                    <div class="tab-pane fade show active" id="custom-tabs-two-bilgi" role="tabpanel" aria-labelledby="custom-tabs-two-bilgi-tab">
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-uretimraporu" role="tabpanel" aria-labelledby="custom-tabs-two-uretimraporu-tab">
+                       Mauris tincidunt mi at erat gravida, eget tristique urna bibendum. Mauris pharetra purus ut ligula tempor, et vulputate metus facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas sollicitudin, nisi a luctus interdum, nisl ligula placerat mi, quis posuere purus ligula eu lectus. Donec nunc tellus, elementum sit amet ultricies at, posuere nec nunc. Nunc euismod pellentesque diam. 
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-hareketler" role="tabpanel" aria-labelledby="custom-tabs-two-hareketler-tab">
+                       Morbi turpis dolor, vulputate vitae felis non, tincidunt congue mauris. Phasellus volutpat augue id mi placerat mollis. Vivamus faucibus eu massa eget condimentum. Fusce nec hendrerit sem, ac tristique nulla. Integer vestibulum orci odio. Cras nec augue ipsum. Suspendisse ut velit condimentum, mattis urna a, malesuada nunc. Curabitur eleifend facilisis velit finibus tristique. Nam vulputate, eros non luctus efficitur, ipsum odio volutpat massa, sit amet sollicitudin est libero sed ipsum. Nulla lacinia, ex vitae gravida fermentum, lectus ipsum gravida arcu, id fermentum metus arcu vel metus. Curabitur eget sem eu risus tincidunt eleifend ac ornare magna. 
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-yorumlar" role="tabpanel" aria-labelledby="custom-tabs-two-yorumlar-tab">
+
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-grafikler" role="tabpanel" aria-labelledby="custom-tabs-two-grafikler-tab">
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card -->
+              </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(){
+    const currentHash = window.location.hash;
+    console.log("currentHash: " + currentHash);
+    const kalipPattern = /^#.+$/; // Matches "#<any characters>"
+    // # karakterini çıkart
+
+    if (kalipPattern.test(currentHash)) {
+        let dieNumber = currentHash.slice(1);
+        handleDieChange(dieNumber);
+    }
+});
+
+let loadedData = {
+    currentDie: null,
+    data: {}  // Store data for each die by tab
+};
+    
+let userID = "{{user.id}}";
+let userIsSuper = "{{ user.is_superuser }}";
+
+var selectedFiles = [];
+
+//define column header menu as column visibility toggle
+var headerMenu = function(){
+    var menu = [];
+    var columns = this.getColumns();
+
+    for(let column of columns){
+        if (column.getDefinition().title != ""){
+        //create checkbox element using font awesome icons
+            let icon = document.createElement("i");
+            icon.classList.add("fas");
+            
+            icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
+            
+            //build label
+            let label = document.createElement("span");
+            let title = document.createElement("span");
+
+            title.textContent = " " + column.getDefinition().title;
+            label.appendChild(icon);
+            label.appendChild(title);
+
+            //create menu item
+            menu.push({
+                label:label,
+                action:function(e){
+                    //prevent menu closing
+                    e.stopPropagation();
+                    //toggle current column visibility
+                    column.toggle();
+
+                    //change menu item icon
+                    if(column.isVisible()){
+                        icon.classList.remove("fa-square");
+                        icon.classList.add("fa-check-square");
+                    }else{
+                        icon.classList.remove("fa-check-square");
+                        icon.classList.add("fa-square");
+                    }
+                }
+            });
+    }};
+
+   return menu;
+};
+
+var listIcon = function(cell, formatterParams, onRendered){ 
+    return "<a><i class='fa fa-list-ul'></i></a> ";
+};
+var msgIcon = function(cell, formatterParams, onRendered) {
+    return `<a href='#dieComment'><i class='fa fa-comments'></i></a>`;
+}
+var aktifIcon = function(cell, formatterParams, onRendered){
+    return "<i class='fa fa-list-ul'></i> ";
+};
+var printIcon = function(cell, formatterParams, onRendered) {
+    return "<i class='fa fa-print'></i> ";
+}
+
+var hatAccessor = function(value, data, type, params, column){
+    if (value == params.Hatasiz){
+        value = 'Hatasız';
+    }
+    else if (value == params.Hatali){
+        value = 'Hatalı';
+    };
+    return value;
+};
+var aktAccessor = function(value, data, type, params, column) {
+    if (value == params.Akt){
+        value = 'Aktif';
+    }
+    else if (value == params.Pas){
+        value = 'Pasif';
+    };
+    return value;
+};
+
+var kSayisi = 0;
+var toplamKalip = function(values, data, calcParams) {
+    $.ajax({
+      url: `tum`,
+      method: 'GET', 
+      dataType: 'json',
+      success: function (sayi) {
+        kSayisi = parseInt(sayi); 
+      },
+      error: function (error) {
+          console.error('Error loading kalip sayisi:', error);
+      }
+    });
+    return kSayisi;
+}
+
+function initializeGraphics() {
+    let kalipNo = loadedData.currentDie;
+    var toTime = Date.now();
+    var fromTime = toTime - (48 * 60 * 60 * 1000);;
+    var grapDiv = document.getElementById('custom-tabs-two-grafikler');
+    grapDiv.innerHTML = '';
+    var graphics = `
+        <div class="col-12">
+            <iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&var-KalipNo=${kalipNo}&theme=light&panelId=1" width=100% height="300" frameborder="0"></iframe>
+            <iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&var-KalipNo=${kalipNo}&var-ProfilNo=All&from=${fromTime}&to=${toTime}&theme=light&panelId=4" width="100%" height="300" frameborder="0"></iframe>
+            <iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&var-KalipNo=${kalipNo}&var-ProfilNo=All&from=${fromTime}&to=${toTime}&theme=light&panelId=3" width="100%" height="300" frameborder="0"></iframe>
+            </div>`;
+    grapDiv.innerHTML += graphics;
+    loadedData.data.graphics = graphics;
+}
+
+function initializeProductionReports() {
+    let kalipNo = loadedData.currentDie;
+    var toTime = Date.now();
+    var fromTime = toTime - (48 * 60 * 60 * 1000);
+    var reportDiv = document.getElementById('custom-tabs-two-uretimraporu');
+    reportDiv.innerHTML = '';
+    var grafana = `<div class="col-12"><iframe src="http://192.168.150.230:3000/d-solo/eecmtmw9oeby8f/embeded-visuals?orgId=1&from=${fromTime}&to=${toTime}&var-database=ARSLAN_2025&var-KalipNo=${kalipNo}&theme=light&panelId=2" width=100% height="400" frameborder="0"></iframe></div>`;
+    reportDiv.innerHTML += grafana; 
+    loadedData.data.uretimraporu = grafana; 
+}
+
+function initializeDieMovements(){
+    var dieMovements = new Tabulator("#custom-tabs-two-hareketler", {
+        height: "500px",
+        layout: "fitDataFill",
+        placeholder: "Kalıp Hareketleri",
+        progressiveLoad: "scroll",
+        paginationMode: "remote",
+        filterMode: "remote",
+        paginationSize: 30,
+        ajaxURL: "hareket",  // The URL to fetch data from
+        ajaxURLGenerator: function(url, config, params) {
+            const kalipNo = loadedData.currentDie;
+            return `${url}?KalipNo=${kalipNo}&params=${encodeURI(JSON.stringify(params))}`;
+        },
+        columns: [
+            {title:"KALIP NO", field:"kalipNo", headerSort:false},
+            {title:"NEREDEN", field:"kalipKonum", formatter:"html", headerSort:false},
+            {title:"NEREYE", field:"kalipVaris", formatter:"html", headerSort:false},
+            {title:"GÖNDEREN", field:"kimTarafindan", headerSort:false},
+            {title:"HAREKET TARİHİ", field:"hareketTarihi"},
+        ]
+    });
+    loadedData.data.hareketler = dieMovements;
+}
+
+function initializeDieComments() {
+    let kalip_no = loadedData.currentDie;
+    $.ajax({
+        url: `/kalip/yorum`,
+        method: 'GET',
+        data: {'kalipNo': kalip_no},
+        success: function(data) {
+            // ARTIK: die-comments-content içine render ediyoruz
+            const commentsContainer = document.getElementById('die-comments-content');
+            commentsContainer.innerHTML = '';  // temizle
+            commentsContainer.innerHTML = createPostComment(); // editor + liste çerçevesi
+
+            let comment_data = JSON.parse(data);
+            if (comment_data.length > 0) {
+                const commentsHTML = renderCommentsTemplate(comment_data);
+                commentsContainer.innerHTML += commentsHTML;
+            } else {
+                commentsContainer.innerHTML += '<p>Paylaşım Yok.</p>';
+            }
+
+            $('#commentTextarea').summernote({
+                disableResizeEditor: true,
+                height: 200,
+                lang: 'tr-TR',
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline']],
+                    ['font', ['superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']],
+                    ['table'],
+                    ['custom', ['specialchars']],
+                    ['insert', ['picture', 'file']],
+                ],
+                callbacks: {
+                    onInit: function () {
+                        const fileInput = $('.note-group-select-from-files input[type="file"]');
+                        if (fileInput.length) fileInput.attr('multiple', 'multiple');
+                    },
+                    onImageUpload: function (files) { handleFileSelection(files, 'images'); },
+                    onFileUpload: function (files) { handleFileSelection(files, 'files'); },
+                },
+            });
+        },
+        error: function(error) {
+            console.error('Error loading comments:', error);
+        }
+    });
+}
+
+function initializeProfileComments() {
+    // Şimdilik sadece temiz bir zemin
+    const el = document.getElementById('profile-comments-content');
+    if (!el) return;
+    el.innerHTML = ''; 
+    // ileride profil bazlı yorumları buraya getireceğiz
+}
+
+function initializeCommentsContainer() {
+    const host = document.getElementById('custom-tabs-two-yorumlar');
+    if (!host) return;
+
+    // İç-sekme iskeleti
+    host.innerHTML = `
+      <div class="card card-light card-outline">
+        <div class="card-header p-2">
+          <ul class="nav nav-pills" id="inner-comments-tabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="die-comments-tab" data-toggle="pill"
+                 href="#die-comments-content" role="tab" aria-controls="die-comments-content"
+                 aria-selected="true">Kalıp Yorumları</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="profile-comments-tab" data-toggle="pill"
+                 href="#profile-comments-content" role="tab" aria-controls="profile-comments-content"
+                 aria-selected="false">Profil Yorumları</a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content" id="inner-comments-content">
+            <div class="tab-pane fade show active" id="die-comments-content" role="tabpanel" aria-labelledby="die-comments-tab"></div>
+            <div class="tab-pane fade" id="profile-comments-content" role="tabpanel" aria-labelledby="profile-comments-tab"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Varsayılan: Kalıp Yorumları yükle
+    initializeDieComments();
+
+    // Tıklamalara göre lazy-load
+    $('#die-comments-tab').off('shown.bs.tab').on('shown.bs.tab', function(){ 
+        initializeDieComments();
+    });
+    $('#profile-comments-tab').off('shown.bs.tab').on('shown.bs.tab', function(){
+        initializeProfileComments();
+    });
+}
+
+function createPostComment() {
+    const newCommentHTML = `
+        <div id="newCommentContainer" style="margin-top: 20px; margin-bottom:20px">
+            <textarea id="commentTextarea" class="textarea"></textarea>
+            <button id="submitCommentButton" onclick="sendComment(this)" data-action="Paylas" class="btn btn-primary mt-2">Paylaş</button>
+        </div>
+        <hr style="margin: 20px 0; border: 1px solid #ccc;">
+        <div class="col-lg-12" id="commentsDiv">
+        </div>
+    `;
+    return newCommentHTML;
+}
+
+function sendComment(element) {
+    var action = $(element).attr('data-action');
+    console.log(action)
+    if (action == "Paylas") {
+        postComment();
+    }
+    else if (action == "Gönder") {
+        let cId = $(element).attr('data-comment');
+        console.log(cId)
+        postComment(cId);
+    }
+    else if (action == "Düzenle") {
+        let cId = $(element).attr('data-comment');
+        editComment(cId);
+    }
+}
+
+function postComment(commentId="") {
+    var yorumData = new FormData();
+    var textareaValue = $(`#commentTextarea${commentId}`).summernote('code');
+    var kNo = loadedData.currentDie;
+    console.log(kNo);
+    yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    yorumData.append("formID", kNo);
+    yorumData.append("yorum", textareaValue); // file nameler textareada olmasın
+    selectedFiles.forEach(function(file) {
+        yorumData.append('yfiles', file);
+    });
+    if (commentId != "") { yorumData.append("replyID", commentId); }
+    $.ajax({
+            url: `postcomment`,
+            type: 'POST',
+            data: yorumData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                alert("Paylaşım başarılı.");
+                $(`.textarea`).summernote('code', '');
+                selectedFiles = [];
+                initializeDieComments(JSON.parse(response.data));
+            },
+            error: function(response) {
+                alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
+            }
+    });
+}
+
+function editComment(commentId="") {
+    const editData = new FormData();
+    var textareaValue = $(`#commentTextarea${commentId}`).summernote('code');
+    editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
+    editData.append("commentId", commentId);
+    editData.append("commentText", textareaValue);
+
+    $.ajax({
+        url: 'editcomment',
+        type: 'POST',
+        data: editData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            alert(response.message);
+            let p = document.getElementById(`div${commentId}`);
+            p.innerHTML = textareaValue;
+            
+            $(`.textarea`).summernote('code', '');
+            selectedFiles = [];
+            initializeDieComments(JSON.parse(response.data));
+        },
+        error: function(response) {
+            alert('Yorum düzenlenemedi.');
+        }
+    });
+}
+
+function renderCommentsTemplate(commentTree) {
+    let commentsHTML = '';
+    commentTree.forEach(comment => {
+        commentsHTML += createCommentBlock(comment).prop('outerHTML');
+    });
+    return commentsHTML;
+}
+
+function renderReplies(replies, indentLevel=1) {
+    let repliesHTML = `<div class="replies-container" style="margin-left: 10px; border-left: 3px solid #4FB6EC; /* Add a left border */
+            padding-left: 10px; margin-bottom: 10px; margin-top: 10px;">`;
+    replies.forEach(reply => {
+        repliesHTML += createCommentBlock(reply).prop('outerHTML');
+    });
+    repliesHTML += '</div>';
+    return repliesHTML;
+}
+
+function createUserBlock(comment) {
+    return `<div class="user-block">
+                <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
+                <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
+                <span class="description">${comment.Tarih}</span>
+            </div>`;
+};
+
+function createCommentContent(comment) {
+    let commentContent = $(`<div id="div${comment.id}"></div>`).append(comment.Aciklama);
+    return commentContent;
+}
+
+function createImagePreview(cf) { // comment.files foreach cf
+    var format_array = ["img", "jpg", "PNG", "png"];
+    var video_format_array = ["mp4"];
+    var file_format = /[^.]*$/.exec(cf.File)[0];
+    var fileHtml ="";
+    if (format_array.indexOf(file_format) > -1) {
+        fileHtml = `<div class="gallery__item"><img class="imgComment" onclick="imgClick(this)" src="/media/${cf.File}" alt="${cf.File.substring(6)}"></div>`;
+    }
+    if (video_format_array.indexOf(file_format) > -1) {
+        fileHtml = `<div class="gallery__item"><video width="320" height="240" controls>
+            <source src="/media/${cf.File}" type="video/${file_format}"></video></div>`;
+    }
+    return fileHtml;
+}
+ 
+function commentImagePreviews(cfiles) {
+    var imagePreviews = ``;
+    cfiles.forEach(cf => { imagePreviews += createImagePreview(cf); });
+    var galleryDiv = `<div class="gallery">${imagePreviews}</div>`;
+    return galleryDiv;
+}
+
+function createFileLink(cf) {
+    return `<p><a href="/media/${cf.File}" target="_blank" class="link-black text-sm">
+                <i class="fas fa-link mr-1"></i>${cf.File.substring(6)}
+            </a></p>`;
+}
+
+// function createPinnedIcon() { // sabitlenmiş yorum için pin ikonu
+//     return `<i class="fas fa-thumbtack pinned-pin" title="Sabitlenmiş yorum"></i>`;
+// }
+function createPinnedIcon(comment) {
+    const color = comment.IsPinned ? "#f7d308" : "#ccc";  // sarı = sabitli, gri = sabit değil
+    const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
+
+    return `<i class="fas fa-thumbtack pinned-pin" 
+                style="cursor:pointer; color:${color}"
+                title="${title}"
+                onclick="pinComment(${comment.id})">
+            </i>`;
+}
+
+function createViewedIcon(comment) {
+    const iconColor = comment.All_Viewed ? "#4FB6EC" : "black";
+    return $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Görüntüleyenler"  onclick="iconClick(${comment.id})"><i class="fa fa-check iconelement" style="color:${iconColor}" name="iconElement" aria-hidden="true"></i></a></span>`);
+}
+
+function createReadButton(id) {
+    return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
+}
+
+function createReplyButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:green; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+}
+
+function createEditButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+}
+
+function createDeleteButton(id) {
+    return `<span><a role="button" class="ml-2" style="color:red; cursor:pointer;" onclick="deleteComment(${id})">sil</a></span>`;
+}
+// function createPinItButton(id) {
+//     return $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Sabitle" onclick="pinComment(${id})"><i class="fas fa-thumbtack" style="color:blue" name="pinIconElement" aria-hidden="true"></i>Sabitle</a></span>`);
+// }
+
+function createButtons(comment) {
+    let buttonHtml = $('<div>', { id: `buttons${comment.id}` });
+    const isViewed = comment.Is_Viewed;
+    buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
+    buttonHtml.append(createReplyButton(comment.id));
+    // buttonHtml.append(createPinItButton(comment.id));
+    if (String(comment.Kullanici_id) === userID || userIsSuper) {
+        buttonHtml.append(createEditButton(comment.id), createDeleteButton(comment.id));
+    }
+    return buttonHtml;
+}
+
+function createCommentBlock(comment) {
+    const commentElement = $('<div>', { class: `post ${comment.id}` });
+    commentElement.append(createUserBlock(comment), createCommentContent(comment));
+
+    if (comment.cfiles.length > 0) {
+        commentElement.append(commentImagePreviews(comment.cfiles));
+    }
+    comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
+    // 🔽 sabitlenmişse sağ üstte pin göster
+    // if (comment.IsPinned === true) {
+    //     commentElement.append(createPinnedIcon());
+    // }
+    
+    commentElement.append(createPinnedIcon(comment));
+
+    commentElement.append(createButtons(comment));
+    commentElement.append(`<div id="divTextArea${comment.id}" style="margin-top:10px;"></div>`);
+    if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
+        commentElement.append(renderReplies(comment.replies));
+    }
+
+    return commentElement;
+}
+
+function replyEditBtnClick(commentId, action) {
+    // const buttonsDiv = $(`#buttons${commentId}`);
+    const textareaContainer = $(`#divTextArea${commentId}`);
+    const existingTextarea = $(`#commentTextarea${commentId}`);
+    const existingSendButton = $(`#send${commentId}`);
+    const otherTextareas = $(`.btnText[id^="commentTextarea"]:not(#commentTextarea${commentId})`);
+    const otherSendButtons = $(`button[id^="send"]:not(#send${commentId})`);
+    selectedFiles = [];
+    // Remove all other textareas (if reply or edit is already open elsewhere)
+    otherTextareas.each(function () {
+        $(this).summernote('destroy');
+        $(this).remove();
+    });
+    otherSendButtons.each(function () {
+        $(this).remove();
+    });
+
+    // Remove existing textarea for this comment
+    if (existingTextarea.length > 0) {
+        existingTextarea.summernote('destroy'); // Destroy the Summernote instance
+        existingTextarea.remove(); // Remove the textarea element
+        existingSendButton.remove();
+        if (existingTextarea.hasClass(action)) {return;} // Exit if the textarea was removed
+    }
+
+    // Create a new textarea for reply or edit
+    const textarea = $(`<textarea id="commentTextarea${commentId}" class="textarea btnText ${action}"></textarea>`);
+    const sendButton =  $(`<button id="send${commentId}" onclick="sendComment(this)" class="btn btn-primary mb-2" data-comment=${commentId} data-action=${action}>${action}</button>`);
+    textareaContainer.append(textarea, sendButton);
+
+    // Initialize Summernote
+    textarea.summernote({
+        disableResizeEditor: true,
+        height: 200,
+        lang: 'tr-TR',
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['font', ['superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table'],
+            ['custom', ['specialchars']],
+            ['insert', ['picture', 'file']],
+        ],
+        callbacks: {
+            onImageUpload: function(files) {
+                handleFileSelection(files, 'images');
+            },
+            onFileUpload: function(files) {
+                handleFileSelection(files, 'files');
+            }
+        }
+
+    });
+    if (action == 'Düzenle') {
+        //textarea içine comment.Aciklama ekle
+        const existingComment = document.getElementById(`div${commentId}`).innerHTML;
+        $(`#commentTextarea${commentId}`).summernote("code", existingComment);
+    }
+
+}
+
+function deleteComment(cId) {
+    let con = confirm("Silmek istediğinize emin misiniz?");
+    if (con == true) {
+      $.ajax({
+        url: 'deletecomment/'+cId,
+        type: 'GET',
+        success: function (response) {
+            $(`.${cId}`).remove();
+            alert(response.message);
+        },
+        error: function (error) {
+          alert('Yorum silinemedi. '+error);
+        }
+      });
+    }
+};
+
+function askPinComment(cId) {
+    let con = confirm("Bu yorumu Kalıp için mi Profil için mi pinlemek istiyorsunuz?\nEvet: Kalıp\nHayır: Profil");
+    if (con == true) {
+        pinComment(cId);
+    }
+}
+
+function pinComment(cId) { // kalıp tabindeyken kalıba, profildeyken profile pinlenenler için
+    $.ajax({
+        url: 'pincomment/'+cId,
+        type: 'GET',
+        success: function (response) {
+            alert(response.message);
+            initializeDieComments();
+        },
+        error: function (error) {
+          alert('Yorum pinlenemedi. '+error);
+        }
+      });
+}
+
+function handleFileSelection(files, type) {
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (isDuplicate) {
+            console.warn(`File "${file.name}" has already been added.`);
+            continue; // Skip this file
+        }
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            // Preview the file in the editor without uploading
+            if (type === 'images') {
+                $('.btnText').summernote('insertImage', e.target.result);
+            } else if (type === 'files') {
+                const fileLink = `<a href="${e.target.result}" target="_blank">${file.name}</a> | `;
+                $('.btnText').summernote('code', $('.btnText').summernote('code') + fileLink);
+            }
+        };
+
+        reader.readAsDataURL(file);
+        selectedFiles.push(file); // Store the file for later upload
+        console.log(selectedFiles)
+    }
+}
+
+function handleDieChange(kalipNo) {
+    loadedData.data = {};
+    loadedData.currentDie = kalipNo;
+
+    showKalipInfoCard(kalipNo);
+    document.getElementById("kalipNoInfoCard").innerHTML = kalipNo;
+    resetTabs();
+}
+
+function resetTabs() {
+    // Clear tab content for all tabs
+    const tabContent = document.querySelectorAll(".tab-pane");
+    tabContent.forEach(tab => {
+        tab.innerHTML = ""; // Clear existing content
+        tab.dataset.loaded = "false"; // Reset the loaded flag for lazy loading
+    });
+}
+
+function showKalipInfoCard(kalipNo) {
+    const kalipInfoCard = document.getElementById("kalipInfoCard");
+    if (kalipInfoCard) {
+        // ajax ile kalip bilgilerini getir 
+        $.ajax({
+            url: `getinfo/${kalipNo}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                const rdizin = data.ResimDizini.replace(/\s+/g, '') + "Teknik1.jpg";
+                const rdizin2 = data.ResimDizini.replace(/\s+/g, '') + "Teknik2.jpg";
+                const teknikUrl1 = "http://arslan/static" + rdizin.slice(13);
+                const teknikUrl2 = "http://arslan/static" + rdizin2.slice(13);
+
+                let durum = data.Silindi == 1 ? "Silindi, Sebebi: " + data.SilinmeSebebi : (data.AktifPasif ? (data.Hatali ? "Aktif" : "Hatalı ve Aktif") : (data.Hatali ? "Pasif" : "Hatalı ve Pasif"));
+                let bilgiTabContent = `
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Müşteri (Firma) Adı</th>
+                        <td id="firma-adi">${data.FirmaAdi}</td>
+                        <th>Üretici Firma</th>
+                        <td id="uretici-firma">${data.UreticiFirma}</td>
+                    </tr>
+                    <tr>
+                        <th>Resim Gramaj</th>
+                        <td id="resim-gramaj">${data.ProfilGramaj}</td>
+                        <th>Son Üretim Gr</th>
+                        <td id="son-uretim-gramaj">${data.SonUretimGr}</td>
+                    </tr>
+                    <tr>
+                        <th>Cinsi</th>
+                        <td id="cinsi">${data.Cinsi}</td>
+                        <th>Figür</th>
+                        <td id="figur">${data.GozAdedi}</td>
+                    </tr>
+                    <tr>
+                        <th>Ø ÇAPI</th>
+                        <td id="cinsi">${data.Capi}</td>
+                        <th>Paket Boyu</th>
+                        <td id="figur">${data.PaketBoyu}</td>
+                    </tr>
+                    <tr>
+                        <th>Son Üretim Tarihi</th>
+                        <td id="cinsi">${data.SonUretimTarih}</td>
+                        <th>Son Tenifer Tarihi</th>
+                        <td id="figur">${data.SonTeniferTarih}</td>
+                    </tr>
+                    <tr>
+                        <th>Üretim Toplam (Kg)</th>
+                        <td id="cinsi">${data.UretimToplamKg} kg</td>
+                        <th>TEN KALAN OMUR (KG)</th>
+                        <td id="figur">${data.TeniferKalanOmurKg} kg</td>
+                    </tr>
+                    <tr>
+                        <th>Sıradaki Tenifer</th>
+                        <td id="cinsi">${data.TeniferNo}</td>
+                        <th>Durumu</th>
+                        <td id="figur">${durum}</td>
+                    </tr>
+                    <tr>
+                        <th>Kalıp Açıklama</th>
+                        <td id="cinsi">${data.KalipAciklama}</td>
+                        <th>Kalite Açıklama</th>
+                        <td id="figur">${data.KaliteAciklama}</td>
+                    </tr>
+                </table>
+                <div class="container-fluid col-lg-12">
+                    <div class="card col-lg-12">
+                        <div class="card-body" id="photos">  <!-- Fotoğraflar  -->
+                            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <a href="${teknikUrl1}" data-toggle="lightbox" id="TeknikA">
+                                            <img id="TeknikResim" class="d-block w-100" alt="First slide" src="${teknikUrl1}" > </a>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <a href="${teknikUrl2}" data-toggle="lightbox" id="TeknikB">
+                                            <img id="TeknikResim2" class="d-block w-100" alt="Second slide" src="${teknikUrl2}" > </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card col-lg-12">
+                        <div class="card-body">
+                            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-left"></i> </span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                                <span class="carousel-control-custom-icon" aria-hidden="true"  style="color: rgb(158, 27, 22);"><i class="fas fa-chevron-right"></i> </span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                            <ol class="carousel-indicators">
+                                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="" style="background-color: rgb(226, 141, 43);"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""  style="background-color: rgb(226, 141, 43);"></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                `;
+                const bilgiTab = document.getElementById("custom-tabs-two-bilgi");
+                if (bilgiTab) {
+                    bilgiTab.innerHTML = bilgiTabContent;
+                }
+            },
+            error: function (error) {
+                console.error('Error loading comments data:', error);
+            }
+        });
+
+        kalipInfoCard.style.display = "block";
+    }
+}
+
+const tabInitializers = {
+    'custom-tabs-two-uretimraporu': initializeProductionReports,
+    'custom-tabs-two-hareketler': initializeDieMovements,
+    'custom-tabs-two-yorumlar': initializeCommentsContainer,
+    'custom-tabs-two-grafikler': initializeGraphics
+};
+
+// Lazy load content for the other tabs
+function loadTabContent(tabId) {
+    const tabContent = document.getElementById(tabId);
+
+    if (tabContent && tabContent.dataset.loaded !== "true") {
+        tabContent.dataset.loaded = "true"; // Mark as loaded to avoid multiple requests
+
+        // Call the corresponding initializer function for the tab
+        const initializer = tabInitializers[tabId];
+        if (initializer) {
+            initializer();
+        }
+    }
+}
+
+// Attach click handlers to all tabs with the .tab-item class
+$('.tab-item').on('click', function() {
+    const tabId = $(this).attr('id'); //.replace('-tab', '');
+    const contentTabId = $(this).data('tab');
+    loadTabContent(contentTabId);
+});
+
+var tableKalip = new Tabulator("#kalipListe-table", {
+    height:"700px",
+    layout:"fitDataFill",
+    placeholder:"Kalıp Liste",
+    ajaxURL:"/kalip/liste",
+    progressiveLoad:"scroll",
+    paginationMode:"remote",
+    filterMode:"remote",
+    paginationSize:30,
+    popupContainer:true,
+    rowFormatter: row => {
+        let data = row.getData();
+        if (data.Hatali === 0) {
+            row.getElement().style.color = "#6e2bcc" //renkleri sor ne olsun
+        }
+        if (data.AktifPasif === false) {
+            row.getElement().style.color = "#a3050a"
+        }
+    },
+    ajaxURLGenerator:function(url, config, params){
+        return url + "?params=" + encodeURI(JSON.stringify(params)); //encode parameters as a json object
+    },
+    columns:[
+        {
+            title:"Gösterilen Sütunlar",
+            headerMenu:headerMenu, //add a menu to this column header
+            columns:[
+            {formatter:listIcon, title: "", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                kalData = cell.getData();
+                kalipNo = kalData.KalipNo;
+                window.location.hash = kalipNo;
+                handleDieChange(kalipNo);
+            },
+            },
+            {title:"AKTİF", field:"AktifPasif", headerVertical:true, formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null},
+            accessorDownload:aktAccessor, accessorDownloadParams:{Akt:true, Pas:false}},
+            {title:"HATA", field:"Hatali", headerVertical:true, headerFilter:"input", formatter:"tickCross", headerFilter:"tickCross", headerFilterParams:{"tristate":true}, headerFilterEmptyCheck:function(value){return value === null}, visible:false,
+            accessorDownload:hatAccessor, accessorDownloadParams:{Hatali:0, Hatasiz:1}},
+            {title:"KALIP NO", field:"KalipNo", headerFilter:"input", topCalc: toplamKalip},//"count"},
+            {title:"PROFİL NO", field:"ProfilNo", headerFilter:"input"},
+            {title:"FİRMA KODU", field:"FirmaKodu", headerFilter:"input", visible:false},
+            {title:"FİRMA ADI", field:"FirmaAdi", headerFilter:"input", visible:false},
+            {title:"CİNSİ", field:"Cinsi", headerFilter:"input", visible:false},
+            {title:"GRAMAJ", field:"Miktar", headerFilter:"input", visible:false},
+            {title:"CAPİ", field:"Capi", headerFilter:"input", visible:false},
+            {title:"PAKET BOYU", field:"PaketBoyu", headerFilter:"input", visible:false},
+            {title:"URETİM TARİHİ", field:"UretimTarihi", headerFilter:"input", visible:false},
+            {title:"FİGÜR", field:"GozAdedi", headerFilter:"input", visible:false},
+            {title:"BOLSTER", field:"Bolster", headerFilter:"input", visible:false},
+            {title:"KALIP ÇEVRESİ", field:"KalipCevresi", headerFilter:"input", visible:false},
+            {title:"KALİTE OKEY", field:"KaliteOkey", headerFilter:"input", visible:false},
+            {title:"ÜRETİCİ FİRMA", field:"UreticiFirma", headerFilter:"input", visible:false},
+            {title:"KALAN TENİFER", field:"TeniferKalanOmurKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruMt", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " m.",symbolAfter:" m.",negativeSign:false,}},
+            {title:"TENİFER ÖMRÜ", field:"TeniferOmruKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"SON TENİFER TARİHİ", field:"SonTeniferTarih", headerFilter:"input", visible:false},
+            {title:"SON TENİFER", field:"SonTeniferKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"SON TENİFER SEBEBİ", field:"SonTeniferSebebi", headerFilter:"input", visible:false},
+            {title:"SIRADAKİ TENİFER NO", field:"TeniferNo", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM TARİHİ", field:"SonUretimTarih", headerFilter:"input", visible:false},
+            {title:"SON ÜRETİM GR", field:"SonUretimGr", headerFilter:"input", visible:false},
+            {title:"ÜRETİM TEN SONRASI", field:"UretimTenSonrasiKg", headerFilter:"input", visible:false, formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"ÜRETİM TOPLAM", field:"UretimToplamKg", headerFilter:"input", formatter:"money", formatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,},
+             topCalc:"sum", topCalcFormatter: "money", topCalcFormatterParams:{decimal:",",thousand:".",symbol: " kg",symbolAfter:" kg",negativeSign:false,}},
+            {title:"PROFİL GRAMAJ", field:"ProfilGramaj", headerFilter:"input", visible:false},
+            {title:"KALIP AÇIKLAMA", field:"KalipAciklama", headerFilter:"input", visible:false},
+            {title:"ŞİKAYET VAR", field:"SikayetVar", headerFilter:"input", visible:false},
+            {title:"KALİTE AÇIKLAMA", field:"KaliteAciklama", headerFilter:"input", visible:false},
+            {title:"SİLİNDİ", field:"Silindi", headerFilter:"input", visible:false},
+            {title:"SİLİNME SEBEBİ", field:"SilinmeSebebi", headerFilter:"input", visible:false},
+            {title:"PRES KODU", field:"PresKodu", headerFilter:"input"},
+            {title:"KONUM", field:"kalipLocation", formatter:"html"},
+            {title:"RESİM DİZİNİ", field:"ResimDizini", headerFilter:"input", visible:false},
+            ],
+
+        },
+    ],
+}); 
+
+</script>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<script src="{% static 'tabulator/dist/js/tabulator.js' %} "></script>
+<script src="{% static 'ArslanTakipApp/xlsx.full.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
+
+<script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/plugin/specialchars/summernote-ext-specialchars.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/summernote/lang/summernote-tr-TR.js' %}"></script>
+<script src="{% static 'node_modules/summernote-file/summernote-file.js' %}"></script>
+<!-- indirmek zorunda kalmayacağımız bir yolunu bul -->
+{% endblock %}

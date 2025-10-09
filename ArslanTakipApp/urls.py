@@ -35,7 +35,6 @@ urlpatterns = [
     path('location/hareket', views.location_hareket),
     path('hareket', login_required(views.HareketView.as_view())),
     path('kalip/', login_required(views.KalipView.as_view())),
-    path('deneme/', views.DenemeView.as_view()),
     path('kalip/liste', views.kalip_liste),
     path('kalip/tum', views.kalip_tum),
     path('kalip/rapor', views.kalip_rapor),
@@ -47,6 +46,23 @@ urlpatterns = [
     path('kalip/editcomment', views.kalip_comments_edit, name='kalipCommentEdit'),
     path('kalip/deletecomment/<str:cId>', views.kalip_comments_delete, name='kalipCommentDelete'),
     path('kalip/pincomment/<str:cId>', views.kalip_comments_pin, name='kalipCommentPin'),
+
+    path('kalipdeneme/', login_required(views.KalipDenemeView.as_view())),
+    path('kalipdeneme/liste', views.kalip_liste),
+    path('kalipdeneme/tum', views.kalip_tum),
+    path('kalipdeneme/rapor', views.kalip_rapor),
+    path('diesChat/<str:kNo>', views.comment_kalip, name="dieChat"),
+    path('kalipdeneme/getcomments/<str:kId>', views.kalip_getcomments, name='dieComment'),
+    path('view/comment/<str:cId>', views.view_comment, name='viewComment'),
+    path('getviews/<str:cId>', views.get_viewed_users, name='getviewedusers'),
+    path('kalipdeneme/postcomment', views.kalip_comments_post, name='dieCommentPost'),
+    path('kalipdeneme/editcomment', views.kalip_comments_edit, name='dieCommentEdit'),
+    path('kalipdeneme/deletecomment/<str:cId>', views.kalip_comments_delete, name='dieCommentDelete'),
+    path('kalipdeneme/pincomment/<str:cId>', views.kalip_comments_pin, name='dieCommentPin'),
+
+
+
+
     path('qr/<int:id>', views.qrcodeRedirect, name='qr'),
     # path('qr/deneme', views.qrKalite_deneme, name='qrdeneme'),
     path('siparis2/', views.siparis2_list),

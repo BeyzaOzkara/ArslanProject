@@ -110,13 +110,13 @@ def send_daily_test_report_for_all():
             else:
                 # Eğer profil ile ilgili hiç sipariş yoksa
                 result_list.append({'die': die.KalipNo, 'profile': profil_no, 'press': location.presKodu, 'order_status': 'Sipariş Açık Değil', 'representative':musteri_tem, 'client':musteri_firma, 'move_date': move_date, 'wait_time': wait_time})
-
+    
     if len(result_list) >= 1:
         result_list = sorted(result_list, key=lambda x: x['press'])
         to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
                          'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
                          'enesozturk@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 
-                         'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com'
+                         'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com',
         ]
 
         cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']

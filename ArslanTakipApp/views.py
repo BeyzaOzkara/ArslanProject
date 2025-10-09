@@ -180,6 +180,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
+    send_daily_test_report_for_all()
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
@@ -637,11 +638,12 @@ def location_hareket(request):
 def kalip(request):
     return render(request, 'ArslanTakipApp/kalip.html')
 
+class KalipDenemeView(generic.TemplateView):
+    template_name = 'ArslanTakipApp/kalipDeneme.html'
+    
+
 class KalipView(generic.TemplateView):
     template_name = 'ArslanTakipApp/kalip.html'
-
-class DenemeView(generic.TemplateView):
-    template_name = 'ArslanTakipApp/deneme.html'
 
 def comment_kalip(request, kNo):
     kalipList = list(KalipMs.objects.using('dies').filter(KalipNo = kNo).values())

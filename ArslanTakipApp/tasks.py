@@ -25,7 +25,7 @@ def start_report__for_everyone_listener():
 
 @shared_task
 def start_report_listener_for_():
-    send_report_email_for_all
+    send_report_email_for_all()
 
 @shared_task
 def start_test_report_listener():
