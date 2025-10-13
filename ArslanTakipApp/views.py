@@ -677,9 +677,10 @@ def kalip_comments_post(request):
     if request.method == "POST":
         try:
             req = request.POST
+            print(req)
             c = Comment()
             c.Kullanici = request.user
-            c.FormModel = "KalipMs"
+            c.FormModel = req['modelName']
             c.FormModelId = req['formID']
             c.Tarih = datetime.datetime.now()
             if 'replyID' in req:
@@ -699,7 +700,7 @@ def kalip_comments_post(request):
                     Note = "",
                 )
             
-            yudaComments = getParentComments("KalipMs", c.FormModelId).order_by("Tarih")
+            yudaComments = getParentComments(req['modelName'], c.FormModelId).order_by("Tarih")
             yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
             comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
@@ -900,6 +901,14 @@ def kalip_yorum(request):
     kalip_no = request.GET.get('kalipNo')
     if request.method == "GET":
         comments = getParentComments("KalipMs", kalip_no).order_by("-IsPinned", "-Tarih")
+        comment_list = [process_comment(request.user, comment) for comment in comments]
+        data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+        return HttpResponse(data)
+
+def kalip_profile_yorum(request):
+    profil_no = request.GET.get('profilNo')
+    if request.method == "GET":
+        comments = getParentComments("ProfilMs", profil_no).order_by("-IsPinned", "-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)

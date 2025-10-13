@@ -47,7 +47,17 @@ urlpatterns = [
     path('kalip/deletecomment/<str:cId>', views.kalip_comments_delete, name='kalipCommentDelete'),
     path('kalip/pincomment/<str:cId>', views.kalip_comments_pin, name='kalipCommentPin'),
 
+
+    path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
+    path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
+    path('kalip/rapor2', views.kalip_rapor2),
+    path('kalip/hareket', views.kalip_hareket),
+    path('kalip/yorum', views.kalip_yorum),
+    path('kalip/profile_yorum', views.kalip_profile_yorum),
+
+
     path('kalipdeneme/', login_required(views.KalipDenemeView.as_view())),
+    path('kalipdeneme/profile_yorum', views.kalip_profile_yorum),
     path('kalipdeneme/liste', views.kalip_liste),
     path('kalipdeneme/tum', views.kalip_tum),
     path('kalipdeneme/rapor', views.kalip_rapor),
@@ -150,11 +160,7 @@ urlpatterns = [
     path('4500/stacker/get_siparis_nos/', views.get_siparis_no_list, name='get_siparis_no_list'),
     path('4500/stacker/get_siparis_info/', views.get_siparis_kart_info, name='get_siparis_info'),
 
-    path('kalip/getinfo/<str:kalip_no>/', views.kalip_get_info, name='get_kalip_info'),
-    path('kalip/getTabData/<str:kalip_no>/<str:tab>', views.kalip_get_tab, name='get_tab_data'),
-    path('kalip/rapor2', views.kalip_rapor2),
-    path('kalip/hareket', views.kalip_hareket),
-    path('kalip/yorum', views.kalip_yorum),
+
     path('4500/hesaplama', views.Hesaplama4500View.as_view(), name='hesaplama_4500'),
     path('4500/hesaplama/get_profils/', views.hesap_get_profils, name='hesap_get_profils'),
     path('4500/hesaplama/get_ext_info/', views.get_ext_info, name='get_ext_info'),

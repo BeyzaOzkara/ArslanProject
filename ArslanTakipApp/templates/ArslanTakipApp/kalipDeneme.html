@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 let loadedData = {
     currentDie: null,
+    currentProfile: null,
     data: {}  // Store data for each die by tab
 };
     
@@ -302,7 +303,7 @@ function initializeDieComments() {
             // ARTIK: die-comments-content içine render ediyoruz
             const commentsContainer = document.getElementById('die-comments-content');
             commentsContainer.innerHTML = '';  // temizle
-            commentsContainer.innerHTML = createPostComment(); // editor + liste çerçevesi
+            commentsContainer.innerHTML = createPostComment('die'); // editor + liste çerçevesi
 
             let comment_data = JSON.parse(data);
             if (comment_data.length > 0) {
@@ -312,7 +313,7 @@ function initializeDieComments() {
                 commentsContainer.innerHTML += '<p>Paylaşım Yok.</p>';
             }
 
-            $('#commentTextarea').summernote({
+            $('#dieCommentTextarea').summernote({
                 disableResizeEditor: true,
                 height: 200,
                 lang: 'tr-TR',
@@ -344,11 +345,54 @@ function initializeDieComments() {
 }
 
 function initializeProfileComments() {
-    // Şimdilik sadece temiz bir zemin
-    const el = document.getElementById('profile-comments-content');
-    if (!el) return;
-    el.innerHTML = ''; 
-    // ileride profil bazlı yorumları buraya getireceğiz
+    let profile_no = loadedData.currentProfile;
+
+    $.ajax({
+        url: `/kalipdeneme/profile_yorum`,
+        method: 'GET',
+        data: {'profilNo': profile_no},
+        success: function(data) {
+            const commentsContainer = document.getElementById('profile-comments-content');
+            commentsContainer.innerHTML = '';  // temizle
+            commentsContainer.innerHTML = createPostComment('profile'); // editor + liste çerçevesi
+
+            let comment_data = JSON.parse(data);
+            if (comment_data.length > 0) {
+                const commentsHTML = renderCommentsTemplate(comment_data);
+                commentsContainer.innerHTML += commentsHTML;
+            } else {
+                commentsContainer.innerHTML += '<p>Paylaşım Yok.</p>';
+            }
+
+            $('#profileCommentTextarea').summernote({
+                disableResizeEditor: true,
+                height: 200,
+                lang: 'tr-TR',
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline']],
+                    ['font', ['superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']],
+                    ['table'],
+                    ['custom', ['specialchars']],
+                    ['insert', ['picture', 'file']],
+                ],
+                callbacks: {
+                    onInit: function () {
+                        const fileInput = $('.note-group-select-from-files input[type="file"]');
+                        if (fileInput.length) fileInput.attr('multiple', 'multiple');
+                    },
+                    onImageUpload: function (files) { handleFileSelection(files, 'images'); },
+                    onFileUpload: function (files) { handleFileSelection(files, 'files'); },
+                },
+            });
+        },
+        error: function(error) {
+            console.error('Error loading profile comments:', error);
+        }
+    });
 }
 
 function initializeCommentsContainer() {
@@ -393,11 +437,17 @@ function initializeCommentsContainer() {
     });
 }
 
-function createPostComment() {
+function createPostComment(type="die") {
+    text_id = 'dieCommentTextarea'; // commentTextarea
+    div_id = 'newDieCommentContainer'; // newCommentContainer
+    if (type=='profile'){
+        div_id = 'newProfileCommentContainer';
+        text_id = 'profileCommentTextarea';
+    } 
     const newCommentHTML = `
-        <div id="newCommentContainer" style="margin-top: 20px; margin-bottom:20px">
-            <textarea id="commentTextarea" class="textarea"></textarea>
-            <button id="submitCommentButton" onclick="sendComment(this)" data-action="Paylas" class="btn btn-primary mt-2">Paylaş</button>
+        <div id="${div_id}" style="margin-top: 20px; margin-bottom:20px">
+            <textarea id="${text_id}" class="textarea"></textarea>
+            <button id="submit${type}CommentButton" onclick="sendComment(this)" data-action="Paylas" data-type="${type}" class="btn btn-primary mt-2">Paylaş</button>
         </div>
         <hr style="margin: 20px 0; border: 1px solid #ccc;">
         <div class="col-lg-12" id="commentsDiv">
@@ -408,29 +458,41 @@ function createPostComment() {
 
 function sendComment(element) {
     var action = $(element).attr('data-action');
+    let type = $(element).attr('data-type');
+    console.log(type);
     console.log(action)
     if (action == "Paylas") {
-        postComment();
+        postComment(type=type);
     }
     else if (action == "Gönder") {
         let cId = $(element).attr('data-comment');
         console.log(cId)
-        postComment(cId);
+        postComment(type=type, commentId=cId);
     }
     else if (action == "Düzenle") {
         let cId = $(element).attr('data-comment');
-        editComment(cId);
+        editComment(type, commentId=cId);
     }
 }
 
-function postComment(commentId="") {
+function postComment(type="die", commentId="") {
     var yorumData = new FormData();
-    var textareaValue = $(`#commentTextarea${commentId}`).summernote('code');
     var kNo = loadedData.currentDie;
+    var model = "KalipMs";
+    var textid = "dieCommentTextarea";
+    if (type=='profile'){
+        kNo = loadedData.currentProfile;
+        model = "ProfilMs";
+    var textid = "profileCommentTextarea";
+    }
+    var textareaValue = $(`#${textid}${commentId}`).summernote('code');
     console.log(kNo);
+    console.log(model);
+    console.log(commentId);
     yorumData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     yorumData.append("formID", kNo);
-    yorumData.append("yorum", textareaValue); // file nameler textareada olmasın
+    yorumData.append("modelName", model);
+    yorumData.append("yorum", textareaValue); // file nameler textareada olmasın, isimler değişecek
     selectedFiles.forEach(function(file) {
         yorumData.append('yfiles', file);
     });
@@ -445,7 +507,11 @@ function postComment(commentId="") {
                 alert("Paylaşım başarılı.");
                 $(`.textarea`).summernote('code', '');
                 selectedFiles = [];
-                initializeDieComments(JSON.parse(response.data));
+                if (type=="die"){
+                    initializeDieComments();
+                }else if (type=="profile") {
+                    initializeProfileComments();
+                }
             },
             error: function(response) {
                 alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
@@ -453,9 +519,9 @@ function postComment(commentId="") {
     });
 }
 
-function editComment(commentId="") {
+function editComment(type="die", commentId="") {
     const editData = new FormData();
-    var textareaValue = $(`#commentTextarea${commentId}`).summernote('code');
+    var textareaValue = $(`#${type}CommentTextarea${commentId}`).summernote('code');
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     editData.append("commentId", commentId);
     editData.append("commentText", textareaValue);
@@ -473,7 +539,11 @@ function editComment(commentId="") {
             
             $(`.textarea`).summernote('code', '');
             selectedFiles = [];
-            initializeDieComments(JSON.parse(response.data));
+            if (type=="die"){
+                initializeDieComments();
+            }else if (type=="profile") {
+                initializeProfileComments();
+            }
         },
         error: function(response) {
             alert('Yorum düzenlenemedi.');
@@ -550,7 +620,7 @@ function createPinnedIcon(comment) {
     return `<i class="fas fa-thumbtack pinned-pin" 
                 style="cursor:pointer; color:${color}"
                 title="${title}"
-                onclick="pinComment(${comment.id})">
+                onclick="askPinComment(${comment.id})">
             </i>`;
 }
 
@@ -563,12 +633,12 @@ function createReadButton(id) {
     return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
 }
 
-function createReplyButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:green; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Gönder')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
+function createReplyButton(id, type="die") {
+    return `<span><a role="button" class="ml-2" style="color:green; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Gönder', '${type}')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
-function createEditButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Düzenle')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
+function createEditButton(id, type="die") {
+    return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Düzenle', '${type}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
 function createDeleteButton(id) {
@@ -579,13 +649,15 @@ function createDeleteButton(id) {
 // }
 
 function createButtons(comment) {
+    let type = "die";
+    if (comment.FormModel == "ProfilMs") { type = "profile"; };
     let buttonHtml = $('<div>', { id: `buttons${comment.id}` });
     const isViewed = comment.Is_Viewed;
     buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
-    buttonHtml.append(createReplyButton(comment.id));
+    buttonHtml.append(createReplyButton(comment.id, type));
     // buttonHtml.append(createPinItButton(comment.id));
     if (String(comment.Kullanici_id) === userID || userIsSuper) {
-        buttonHtml.append(createEditButton(comment.id), createDeleteButton(comment.id));
+        buttonHtml.append(createEditButton(comment.id, type), createDeleteButton(comment.id));
     }
     return buttonHtml;
 }
@@ -598,11 +670,7 @@ function createCommentBlock(comment) {
         commentElement.append(commentImagePreviews(comment.cfiles));
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
-    // 🔽 sabitlenmişse sağ üstte pin göster
-    // if (comment.IsPinned === true) {
-    //     commentElement.append(createPinnedIcon());
-    // }
-    
+
     commentElement.append(createPinnedIcon(comment));
 
     commentElement.append(createButtons(comment));
@@ -614,12 +682,12 @@ function createCommentBlock(comment) {
     return commentElement;
 }
 
-function replyEditBtnClick(commentId, action) {
+function replyEditBtnClick(commentId, action, type) {
     // const buttonsDiv = $(`#buttons${commentId}`);
     const textareaContainer = $(`#divTextArea${commentId}`);
-    const existingTextarea = $(`#commentTextarea${commentId}`);
+    const existingTextarea = $(`#${type}CommentTextarea${commentId}`);
     const existingSendButton = $(`#send${commentId}`);
-    const otherTextareas = $(`.btnText[id^="commentTextarea"]:not(#commentTextarea${commentId})`);
+    const otherTextareas = $(`.btnText[id^="${type}CommentTextarea"]:not(#${type}CommentTextarea${commentId})`);
     const otherSendButtons = $(`button[id^="send"]:not(#send${commentId})`);
     selectedFiles = [];
     // Remove all other textareas (if reply or edit is already open elsewhere)
@@ -640,8 +708,8 @@ function replyEditBtnClick(commentId, action) {
     }
 
     // Create a new textarea for reply or edit
-    const textarea = $(`<textarea id="commentTextarea${commentId}" class="textarea btnText ${action}"></textarea>`);
-    const sendButton =  $(`<button id="send${commentId}" onclick="sendComment(this)" class="btn btn-primary mb-2" data-comment=${commentId} data-action=${action}>${action}</button>`);
+    const textarea = $(`<textarea id="${type}CommentTextarea${commentId}" class="textarea btnText ${action}"></textarea>`);
+    const sendButton =  $(`<button id="send${commentId}" onclick="sendComment(this)" data-type="${type}" class="btn btn-primary mb-2" data-comment=${commentId} data-action=${action}>${action}</button>`);
     textareaContainer.append(textarea, sendButton);
 
     // Initialize Summernote
@@ -673,7 +741,7 @@ function replyEditBtnClick(commentId, action) {
     if (action == 'Düzenle') {
         //textarea içine comment.Aciklama ekle
         const existingComment = document.getElementById(`div${commentId}`).innerHTML;
-        $(`#commentTextarea${commentId}`).summernote("code", existingComment);
+        $(`#${type}CommentTextarea${commentId}`).summernote("code", existingComment);
     }
 
 }
@@ -698,17 +766,24 @@ function deleteComment(cId) {
 function askPinComment(cId) {
     let con = confirm("Bu yorumu Kalıp için mi Profil için mi pinlemek istiyorsunuz?\nEvet: Kalıp\nHayır: Profil");
     if (con == true) {
-        pinComment(cId);
+        pinComment(cId, type="die");
+    }
+    else {
+        pinComment(cId, type="profile");
     }
 }
 
-function pinComment(cId) { // kalıp tabindeyken kalıba, profildeyken profile pinlenenler için
+function pinComment(cId, type="die") { // kalıp tabindeyken kalıba, profildeyken profile pinlenenler için
     $.ajax({
         url: 'pincomment/'+cId,
         type: 'GET',
         success: function (response) {
             alert(response.message);
-            initializeDieComments();
+            if (type=="profile"){
+                initializeProfileComments();
+            } else if (type=="die") {
+                initializeDieComments();
+            }
         },
         error: function (error) {
           alert('Yorum pinlenemedi. '+error);
@@ -745,6 +820,7 @@ function handleFileSelection(files, type) {
 function handleDieChange(kalipNo) {
     loadedData.data = {};
     loadedData.currentDie = kalipNo;
+    loadedData.currentProfile = kalipNo.match(/^([^\s-]+)/)?.[1] ?? null;
 
     showKalipInfoCard(kalipNo);
     document.getElementById("kalipNoInfoCard").innerHTML = kalipNo;
