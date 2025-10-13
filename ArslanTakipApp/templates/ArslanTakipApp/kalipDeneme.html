@@ -121,6 +121,31 @@
     </div>
 </div>
 
+<!-- Pin Seçimi Modal -->
+<div class="modal fade" id="pinChoiceModal" tabindex="-1" role="dialog" aria-labelledby="pinChoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h5 class="modal-title" id="pinChoiceModalLabel">Sabitleme</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Kapat"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body pt-3 pb-2">
+        <p class="mb-2" id="pinChoiceText"></p>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">İptal</button>
+        <div>
+          <button type="button" class="btn btn-info mr-2 d-none"    id="btnPinDie">Kalıp’a sabitle</button>
+          <button type="button" class="btn btn-primary mr-2 d-none" id="btnPinProfile">Profil’e sabitle</button>
+          <button type="button" class="btn btn-danger d-none"       id="btnUnpin">Sabitlemeyi kaldır</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 {% endblock %}
 
 {% block extra_js %}
@@ -610,19 +635,59 @@ function createFileLink(cf) {
             </a></p>`;
 }
 
-// function createPinnedIcon() { // sabitlenmiş yorum için pin ikonu
-//     return `<i class="fas fa-thumbtack pinned-pin" title="Sabitlenmiş yorum"></i>`;
-// }
-function createPinnedIcon(comment) {
-    const color = comment.IsPinned ? "#f7d308" : "#ccc";  // sarı = sabitli, gri = sabit değil
-    const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
+// function createPinnedIcon(comment) {
+//     const color = comment.IsPinned ? "#f7d308" : "#ccc";  // sarı = sabitli, gri = sabit değil
+//     const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
 
-    return `<i class="fas fa-thumbtack pinned-pin" 
-                style="cursor:pointer; color:${color}"
-                title="${title}"
-                onclick="askPinComment(${comment.id})">
-            </i>`;
+//     return `<i class="fas fa-thumbtack pinned-pin" 
+//                 style="cursor:pointer; color:${color}"
+//                 title="${title}"
+//                 onclick="askPinComment(${comment.id})">
+//             </i>`;
+// }
+function createPinnedIcon(comment, type) {
+  const color = comment.IsPinned ? "#f7d308" : "#ccc";
+  const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
+  return `<i class="fas fa-thumbtack pinned-pin" style="cursor:pointer; color:${color}" title="${title}"
+              onclick="askPinComment(${comment.id}, ${comment.IsPinned ? 'true':'false'}, '${type}')">
+          </i>`;
 }
+
+function askPinComment(cId, isPinned, type) {
+    $('#pinChoiceModal').modal('show');
+    console.log(cId, isPinned, type);
+    if (isPinned) {
+        // Sabitlenmişse, sadece kaldırma butonunu göster
+        $('#pinChoiceText').text("Bu yorumun sabitlemesini kaldırmak istediğinize emin misiniz?");
+        $('#btnUnpin').removeClass('d-none').off('click').on('click', function() {
+            pinComment(cId, type=type);
+            $('#pinChoiceModal').modal('hide');
+        });
+        $('#btnPinDie, #btnPinProfile').addClass('d-none');
+    } else {
+        // Sabitlenmemişse, kalıp ve profil için sabitleme butonlarını göster
+        $('#pinChoiceText').text("Bu yorumu hangi alanda sabitlemek istiyorsunuz?");
+        $('#btnPinDie').removeClass('d-none').off('click').on('click', function() {
+            pinComment(cId, type="die");
+            $('#pinChoiceModal').modal('hide');
+        });
+        $('#btnPinProfile').removeClass('d-none').off('click').on('click', function() {
+            pinComment(cId, type="profile");
+            $('#pinChoiceModal').modal('hide');
+        });
+        $('#btnUnpin').addClass('d-none');
+    }
+}
+
+// function askPinComment(cId) {
+//     let con = confirm("Bu yorumu Kalıp için mi Profil için mi pinlemek istiyorsunuz?\nEvet: Kalıp\nHayır: Profil");
+//     if (con == true) {
+//         pinComment(cId, type="die");
+//     }
+//     else {
+//         pinComment(cId, type="profile");
+//     }
+// }
 
 function createViewedIcon(comment) {
     const iconColor = comment.All_Viewed ? "#4FB6EC" : "black";
@@ -633,11 +698,11 @@ function createReadButton(id) {
     return `<span><a role="button" class="btn btn-warning btn-sm blinking-text" name="blinkread" href="#replyComment${id}" id="readCheckbox${id}" data-id="${id}">Okundu İşaretle</a></span>`;
 }
 
-function createReplyButton(id, type="die") {
+function createReplyButton(id, type) {
     return `<span><a role="button" class="ml-2" style="color:green; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Gönder', '${type}')" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>`;
 }
 
-function createEditButton(id, type="die") {
+function createEditButton(id, type) {
     return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Düzenle', '${type}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
@@ -648,9 +713,7 @@ function createDeleteButton(id) {
 //     return $(`<span><a role="button" class="btn btn-light btn-sm" style="font-weight:bold;" data-toggle="tooltip" title="Sabitle" onclick="pinComment(${id})"><i class="fas fa-thumbtack" style="color:blue" name="pinIconElement" aria-hidden="true"></i>Sabitle</a></span>`);
 // }
 
-function createButtons(comment) {
-    let type = "die";
-    if (comment.FormModel == "ProfilMs") { type = "profile"; };
+function createButtons(comment, type) {
     let buttonHtml = $('<div>', { id: `buttons${comment.id}` });
     const isViewed = comment.Is_Viewed;
     buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
@@ -665,15 +728,17 @@ function createButtons(comment) {
 function createCommentBlock(comment) {
     const commentElement = $('<div>', { class: `post ${comment.id}` });
     commentElement.append(createUserBlock(comment), createCommentContent(comment));
-
+    let type = "die";
+    console.log(comment.id, comment.FormModel);
+    if (comment.FormModel == "ProfilMs") { type = "profile"; };
     if (comment.cfiles.length > 0) {
         commentElement.append(commentImagePreviews(comment.cfiles));
     }
     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
 
-    commentElement.append(createPinnedIcon(comment));
+    commentElement.append(createPinnedIcon(comment, type));
 
-    commentElement.append(createButtons(comment));
+    commentElement.append(createButtons(comment, type));
     commentElement.append(`<div id="divTextArea${comment.id}" style="margin-top:10px;"></div>`);
     if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
         commentElement.append(renderReplies(comment.replies));
@@ -763,25 +828,30 @@ function deleteComment(cId) {
     }
 };
 
-function askPinComment(cId) {
-    let con = confirm("Bu yorumu Kalıp için mi Profil için mi pinlemek istiyorsunuz?\nEvet: Kalıp\nHayır: Profil");
-    if (con == true) {
-        pinComment(cId, type="die");
-    }
-    else {
-        pinComment(cId, type="profile");
-    }
-}
+// function askPinComment(cId) {
+//     let con = confirm("Bu yorumu Kalıp için mi Profil için mi pinlemek istiyorsunuz?\nEvet: Kalıp\nHayır: Profil");
+//     if (con == true) {
+//         pinComment(cId, type="die");
+//     }
+//     else {
+//         pinComment(cId, type="profile");
+//     }
+// }
 
-function pinComment(cId, type="die") { // kalıp tabindeyken kalıba, profildeyken profile pinlenenler için
+function pinComment(cId, pin_type) { // kalıp tabindeyken kalıba, profildeyken profile pinlenenler için
     $.ajax({
         url: 'pincomment/'+cId,
         type: 'GET',
+        data: {
+            'pin_type': pin_type,
+            'kalip_no': loadedData.currentDie,
+            'profil_no': loadedData.currentProfile
+        },
         success: function (response) {
             alert(response.message);
-            if (type=="profile"){
+            if (response.comment_type=="ProfilMs"){
                 initializeProfileComments();
-            } else if (type=="die") {
+            } else if (response.comment_type=="KalipMs") {
                 initializeDieComments();
             }
         },

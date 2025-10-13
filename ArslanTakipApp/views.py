@@ -741,15 +741,47 @@ def kalip_comments_delete(request, cId):
 
 def kalip_comments_pin(request, cId):
     try:
+        pin_type = request.GET.get('pin_type')
         comment = Comment.objects.get(id = cId)
-        if comment.IsPinned == True:
-            comment.IsPinned = False
-            message = 'Yorum sabitlemesi başarıyla kaldırıldı.'
+        comment_type = comment.FormModel
+
+        if pin_type == 'die':
+            pin_type = 'KalipMs'
+        elif pin_type == 'profile':
+            pin_type = 'ProfilMs'
+
+            
+        print(f"comment type: {comment_type}, pin type: {pin_type}")
+        if comment_type != pin_type: # pintype yorumlarına bak OriginId = cId olan yoksa o tipte (formmodel) yeni bir comment ekle pinle 
+            print("aynı değil")
+            target_comment = Comment.objects.filter(FormModel=pin_type, OriginId=cId)
+            if len(target_comment) != 0:
+                print("var")
+            else:
+                print("yok")
+                if pin_type == 'ProfilMs':
+                    model_id = request.GET.get('profil_no')
+                else:
+                    model_id = request.GET.get('kalip_no')
+                new_comment = Comment.objects.create(
+                    Kullanici = comment.Kullanici,
+                    FormModel = pin_type,
+                    FormModelId = model_id,
+                    OriginId = cId,
+                    Tarih = comment.Tarih,
+                    IsPinned = True
+                )
+                new_comment.save()
+                message = 'Yorum başarıyla sabitlendi.'
         else:
-            comment.IsPinned = True
-            message = 'Yorum başarıyla sabitlendi.'
-        comment.save()
-        response = JsonResponse({'message': message})
+            if comment.IsPinned == True:
+                comment.IsPinned = False
+                message = 'Yorum sabitlemesi başarıyla kaldırıldı.'
+            else:
+                comment.IsPinned = True
+                message = 'Yorum başarıyla sabitlendi.'
+            comment.save()
+        response = JsonResponse({'message': message, 'comment_type': comment_type})
     except Exception as e:
         response = JsonResponse({'error': str(e)})
         response.status_code = 500 #server error
@@ -2920,7 +2952,10 @@ def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum
             comment['All_Viewed'] = False
             break
         else: comment['All_Viewed'] = True
-
+    if comment['OriginId'] is not None:
+        origin_instance = Comment.objects.get(id=comment['OriginId'])
+        comment['Aciklama'] = origin_instance.Aciklama
+        
     comment['KullaniciAdi'] = get_user_full_name(int(comment['Kullanici_id']))
     comment['Tarih'] = format_date_time(comment['Tarih'])
     comment['Is_Viewed'] = user in views
