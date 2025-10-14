@@ -164,16 +164,116 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-document.addEventListener("DOMContentLoaded", function(){
-    const currentHash = window.location.hash;
-    console.log("currentHash: " + currentHash);
-    const kalipPattern = /^#.+$/; // Matches "#<any characters>"
-    // # karakterini çıkart
+    // ====== Deep-link helpers ======
+function buildCommentHash(kalipNo, type, commentId){
+  // type: "die" | "profile"
+  return `#${encodeURIComponent(kalipNo)}|c:${type}|id:${commentId}`;
+}
 
-    if (kalipPattern.test(currentHash)) {
-        let dieNumber = currentHash.slice(1);
-        handleDieChange(dieNumber);
+function parseCommentHash(){
+  // Returns { kalipNo, type, id } or null
+  const h = window.location.hash || "";
+  // examples: #123|c:die|id:45  OR just #123
+  const m = /^#([^|]+)(?:\|c:(die|profile)\|id:(\d+))?$/.exec(h);
+  if (!m) return null;
+  const kalipNo = decodeURIComponent(m[1]);
+  const type   = m[2] || null;
+  const id     = m[3] || null;
+  return { kalipNo, type, id };
+}
+
+// Ensure the outer "YORUMLAR" tab is shown AND its content is initialized
+function ensureYorumlarTabReady(done){
+  // 1) show the outer tab
+  $('#custom-tabs-two-yorumlar-tab').tab('show');
+
+  // 2) manually trigger lazy initializer (your code binds loading to .tab-item click,
+  //    so programmatic show won't call it)
+  loadTabContent('custom-tabs-two-yorumlar');
+
+  // 3) wait until the container exists and is filled at least once
+  let tries = 40; // ~8s max
+  (function waitLoaded(){
+    const host = document.getElementById('custom-tabs-two-yorumlar');
+    const dieHost = document.getElementById('die-comments-content');
+    const profileHost = document.getElementById('profile-comments-content');
+    const loaded = host && host.dataset.loaded === 'true' && (dieHost || profileHost);
+    if (loaded){
+      done();
+    } else if (tries-- > 0){
+      setTimeout(waitLoaded, 200);
     }
+  })();
+}
+
+// Call after selecting the die/profile from hash
+function tryDeepLinkToComment(){
+  const parsed = parseCommentHash();
+  if (!parsed || !parsed.id || !parsed.type) return;
+
+  // we'll set the pending target so fulfillers can pick it up too
+  pendingOrigin = { id: String(parsed.id), target: parsed.type };
+
+  ensureYorumlarTabReady(() => {
+    // show the right inner tab
+    const targetTabSel = (parsed.type === 'die') ? '#die-comments-tab' : '#profile-comments-tab';
+    $(targetTabSel).tab('show');
+
+    // try to scroll now (in case already rendered)
+    fulfillPendingOriginIn(
+      document.getElementById(parsed.type === 'die' ? 'die-comments-content' : 'profile-comments-content')
+    );
+
+    // and also set a short watcher in case render happens a moment later
+    watchForPendingIn(
+      document.getElementById(parsed.type === 'die' ? 'die-comments-content' : 'profile-comments-content')
+    );
+  });
+}
+
+
+// Call this after initializers render, to go to comment if hash requests it
+// function tryDeepLinkToComment(){
+//   const parsed = parseCommentHash();
+//   if (!parsed || !parsed.id || !parsed.type) return;
+//   // Reuse your pendingOrigin flow:
+//   pendingOrigin = { id: String(parsed.id), target: parsed.type }; // target is the tab to show
+//   const targetTabSel = (parsed.type === 'die') ? '#die-comments-tab' : '#profile-comments-tab';
+//   $(targetTabSel).tab('show');
+// }
+
+document.addEventListener("DOMContentLoaded", function(){
+    // const currentHash = window.location.hash;
+    // console.log("currentHash: " + currentHash);
+    // const kalipPattern = /^#.+$/; // Matches "#<any characters>"
+    // // # karakterini çıkart
+
+    // if (kalipPattern.test(currentHash)) {
+    //     let dieNumber = currentHash.slice(1);
+    //     handleDieChange(dieNumber);
+    // }
+    const parsed = parseCommentHash();
+    if (parsed && parsed.kalipNo){
+        // Ensure the right die is selected
+        handleDieChange(parsed.kalipNo);
+    }
+    // If there is a specific comment, we'll jump after tabs render
+    // Initial render usually triggers initializeDieComments; we’ll also call:
+    setTimeout(tryDeepLinkToComment, 0);
+});
+
+// Optional: allow navigating by changing the hash later, too
+window.addEventListener('hashchange', function(){
+  const parsed = parseCommentHash();
+  if (!parsed) return;
+  // Make sure die matches
+  if (parsed.kalipNo && parsed.kalipNo !== loadedData.currentDie){
+    handleDieChange(parsed.kalipNo);
+    // give it a moment to load card & tabs
+    setTimeout(tryDeepLinkToComment, 50);
+  } else {
+    tryDeepLinkToComment();
+  }
 });
 
 let loadedData = {
@@ -331,6 +431,33 @@ function initializeDieMovements(){
     });
     loadedData.data.hareketler = dieMovements;
 }
+
+async function copyText(text){
+  try {
+    await navigator.clipboard.writeText(text);
+    // optional toast
+    console.log('Copied!');
+  } catch(e){
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+}
+
+// Build absolute URL for a comment
+function buildCommentURL(kalipNo, type, commentId){
+  const hash = buildCommentHash(kalipNo, type, commentId);
+  return `${location.origin}${location.pathname}${hash}`;
+}
+
+function shareCommentLink(commentId, type){
+  // type is where the comment currently lives: "die" or "profile"
+  const url = buildCommentURL(loadedData.currentDie, type, commentId);
+  copyText(url);
+  alert('Bağlantı kopyalandı:\n' + url);
+}
+
 
 let pendingOrigin = null; // { id: "1234", target: "die"|"profile" }
 
@@ -771,7 +898,13 @@ function createButtons(comment, type) {
     const isViewed = comment.Is_Viewed;
     buttonHtml.append(isViewed ? createViewedIcon(comment) : createReadButton(comment.id));
     buttonHtml.append(createReplyButton(comment.id, type));
-    // buttonHtml.append(createPinItButton(comment.id));
+
+    // NEW: Share link
+    buttonHtml.append(
+        `<span><a role="button" class="ml-2" style="color:#555; cursor:pointer;" 
+            onclick="shareCommentLink(${comment.id}, '${type}')">linki kopyala</a></span>`
+    );
+
     if (String(comment.Kullanici_id) === userID || userIsSuper) {
         buttonHtml.append(createEditButton(comment.id, type), createDeleteButton(comment.id));
     }
