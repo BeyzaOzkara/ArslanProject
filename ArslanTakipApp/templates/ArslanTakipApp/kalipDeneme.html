@@ -54,6 +54,20 @@
         transform: rotate(20deg);  /* isterseniz kaldırın */
         opacity: 0.95;
     }
+    .origin-badge {
+        cursor:pointer; 
+        margin-left: .5rem;
+    }
+    /* hedef yoruma atlayınca kısa süre vurgula */
+    .origin-highlight {
+        outline: 3px solid rgba(255, 193, 7, .8);
+        transition: outline 0.2s ease-in-out;
+    }
+
+    /* pin ikonunun yanına mini “bağlantı” ikonu yerleştirmek istersen */
+    .cross-pin {
+        position:absolute; top:6px; right:28px; font-size:14px; opacity:.9; cursor:pointer;
+    }
 </style>
   
 {% endblock %}
@@ -318,6 +332,41 @@ function initializeDieMovements(){
     loadedData.data.hareketler = dieMovements;
 }
 
+let pendingOrigin = null; // { id: "1234", target: "die"|"profile" }
+
+function highlightAndScroll(el) {
+  // remove old highlights
+  document.querySelectorAll('.origin-highlight').forEach(n => n.classList.remove('origin-highlight'));
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('origin-highlight');
+  // re-center once more after images finish layout
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 250);
+  setTimeout(() => el.classList.remove('origin-highlight'), 2000);
+}
+
+function fulfillPendingOriginIn(scopeEl) {
+  if (!pendingOrigin) return false;
+  // find by data-id or id fallback
+  const sel = `.post[data-id="${pendingOrigin.id}"], #comment-${pendingOrigin.id}`;
+  const target = scopeEl.querySelector(sel);
+  if (!target) return false;
+  highlightAndScroll(target);
+  pendingOrigin = null;
+  return true;
+}
+
+/** fromType is where you clicked: "die" or "profile" */
+function goToOrigin(originId, fromType) {
+  const targetTabSel = (fromType === 'die') ? '#profile-comments-tab' : '#die-comments-tab';
+  const targetPaneId = (fromType === 'die') ? 'profile' : 'die'; // just informational
+
+  // set global pending request; renderer will consume it
+  pendingOrigin = { id: String(originId), target: targetPaneId };
+
+  // switch tab (your existing lazy-loader will render that tab)
+  $(targetTabSel).tab('show');
+}
+
 function initializeDieComments() {
     let kalip_no = loadedData.currentDie;
     $.ajax({
@@ -362,6 +411,8 @@ function initializeDieComments() {
                     onFileUpload: function (files) { handleFileSelection(files, 'files'); },
                 },
             });
+            
+            fulfillPendingOriginIn(document.getElementById('die-comments-content'));
         },
         error: function(error) {
             console.error('Error loading comments:', error);
@@ -413,6 +464,8 @@ function initializeProfileComments() {
                     onFileUpload: function (files) { handleFileSelection(files, 'files'); },
                 },
             });
+
+            fulfillPendingOriginIn(document.getElementById('profile-comments-content'));
         },
         error: function(error) {
             console.error('Error loading profile comments:', error);
@@ -462,7 +515,7 @@ function initializeCommentsContainer() {
     });
 }
 
-function createPostComment(type="die") {
+function createPostComment(type) {
     text_id = 'dieCommentTextarea'; // commentTextarea
     div_id = 'newDieCommentContainer'; // newCommentContainer
     if (type=='profile'){
@@ -635,16 +688,16 @@ function createFileLink(cf) {
             </a></p>`;
 }
 
-// function createPinnedIcon(comment) {
-//     const color = comment.IsPinned ? "#f7d308" : "#ccc";  // sarı = sabitli, gri = sabit değil
-//     const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
+// Pin ikonunun yanına mini link ikonu (opsiyonel, istersen rozet yerine/yanına)
+function createCrossPinIcon(comment, type){
+  if (!comment.OriginId) return '';
+  const srcNice = (type === 'die') ? 'Profil' : 'Kalıp';
+  const srcNo = (type === 'die') ? loadedData.currentDie : loadedData.currentProfile;
+  return `<i class="fas fa-external-link-alt cross-pin"
+             title="Kaynak: ${srcNice} ${srcNo} (yorum id #${comment.OriginId})"
+             onclick="goToOrigin(${comment.OriginId}, '${type}')"></i>`;
+}
 
-//     return `<i class="fas fa-thumbtack pinned-pin" 
-//                 style="cursor:pointer; color:${color}"
-//                 title="${title}"
-//                 onclick="askPinComment(${comment.id})">
-//             </i>`;
-// }
 function createPinnedIcon(comment, type) {
   const color = comment.IsPinned ? "#f7d308" : "#ccc";
   const title = comment.IsPinned ? "Sabitlemeyi kaldır" : "Yorumu sabitle";
@@ -725,27 +778,74 @@ function createButtons(comment, type) {
     return buttonHtml;
 }
 
+// function createCommentBlock(comment) {
+//     const commentElement = $('<div>', { class: `post ${comment.id}` });
+//     commentElement.append(createUserBlock(comment), createCommentContent(comment));
+//     let type = (comment.FormModel == "ProfilMs") ? "profile" : "die";
+//     console.log(comment.id, comment.FormModel);
+
+//     if (comment.cfiles.length > 0) {
+//         commentElement.append(commentImagePreviews(comment.cfiles));
+//     }
+//     comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
+
+//     commentElement.append(createPinnedIcon(comment, type));
+
+//     commentElement.append(createButtons(comment, type));
+//     commentElement.append(`<div id="divTextArea${comment.id}" style="margin-top:10px;"></div>`);
+//     if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
+//         commentElement.append(renderReplies(comment.replies));
+//     }
+
+//     return commentElement;
+// }
 function createCommentBlock(comment) {
-    const commentElement = $('<div>', { class: `post ${comment.id}` });
-    commentElement.append(createUserBlock(comment), createCommentContent(comment));
-    let type = "die";
-    console.log(comment.id, comment.FormModel);
-    if (comment.FormModel == "ProfilMs") { type = "profile"; };
-    if (comment.cfiles.length > 0) {
-        commentElement.append(commentImagePreviews(comment.cfiles));
-    }
-    comment.cfiles.forEach(cf => { commentElement.append(createFileLink(cf)); });
+  // Infer comment type from model
+  const type = (comment.FormModel === "ProfilMs") ? "profile" : "die";
 
-    commentElement.append(createPinnedIcon(comment, type));
+  // Root container for a single comment
+  //const commentElement = $('<div>', { class: `post ${comment.id}` });
+  const commentElement = $('<div>', { class: 'post', 'data-id': comment.id, id: `comment-${comment.id}`,});
 
-    commentElement.append(createButtons(comment, type));
-    commentElement.append(`<div id="divTextArea${comment.id}" style="margin-top:10px;"></div>`);
-    if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
-        commentElement.append(renderReplies(comment.replies));
-    }
+  // Header: user block + (optional) origin badge
+  const header = $('<div class="d-flex align-items-center justify-content-between"></div>');
+  header.append($(createUserBlock(comment)));
 
-    return commentElement;
+  // Append header and the content/body
+  commentElement.append(
+    header,
+    createCommentContent(comment)
+  );
+
+  // Attached images (gallery) and files
+  if (Array.isArray(comment.cfiles) && comment.cfiles.length > 0) {
+    commentElement.append(commentImagePreviews(comment.cfiles));
+    comment.cfiles.forEach(cf => {
+      commentElement.append(createFileLink(cf));
+    });
+  }
+
+  // Pin icon + (optional) mini cross-pin link icon near the top-right
+  commentElement.append(
+    createPinnedIcon(comment, type),
+    $(createCrossPinIcon(comment, type)) // safe to append empty string -> ignored
+  );
+
+  // Action buttons (reply/edit/delete/seen)
+  commentElement.append(createButtons(comment, type));
+
+  // Placeholder for reply/edit textarea
+  commentElement.append(`<div id="divTextArea${comment.id}" style="margin-top:10px;"></div>`);
+
+  // Render nested replies (if any)
+  if (comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0) {
+    commentElement.append(renderReplies(comment.replies));
+  }
+
+  return commentElement;
 }
+
+
 
 function replyEditBtnClick(commentId, action, type) {
     // const buttonsDiv = $(`#buttons${commentId}`);

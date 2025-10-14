@@ -753,12 +753,10 @@ def kalip_comments_pin(request, cId):
             
         print(f"comment type: {comment_type}, pin type: {pin_type}")
         if comment_type != pin_type: # pintype yorumlarına bak OriginId = cId olan yoksa o tipte (formmodel) yeni bir comment ekle pinle 
-            print("aynı değil")
             target_comment = Comment.objects.filter(FormModel=pin_type, OriginId=cId)
             if len(target_comment) != 0:
-                print("var")
+                message = 'Bu yorum daha önce profil için sabitlenmiş.'
             else:
-                print("yok")
                 if pin_type == 'ProfilMs':
                     model_id = request.GET.get('profil_no')
                 else:
