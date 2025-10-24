@@ -217,7 +217,7 @@ function tryDeepLinkToComment(){
     const targetTabSel = (parsed.type === 'die') ? '#die-comments-tab' : '#profile-comments-tab';
     $(targetTabSel).tab('show');
 
-    // try to scroll now (in case already rendered)
+    // try to scroll now (in case already render ed)
     fulfillPendingOriginIn(
       document.getElementById(parsed.type === 'die' ? 'die-comments-content' : 'profile-comments-content')
     );
@@ -228,7 +228,7 @@ function tryDeepLinkToComment(){
     );
   });
 }
-
+ 
 document.addEventListener("DOMContentLoaded", function(){
     // const currentHash = window.location.hash;
     // console.log("currentHash: " + currentHash);
