@@ -5630,3 +5630,6 @@ class Stretcher4500View(generic.TemplateView):
     #             os.unlink(tmp_path) 
     #     return JsonResponse({"data": all_rows, "filenames": filenames}, status=200) 
     # return render(request, "teklif/pdf_to_excel.html")
+
+def viewer_page(request):
+    return render(request, 'viewer/viewer3d.html')

@@ -807,6 +807,12 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     });
     }
 
+
+  $(document).on('click', '.view3d', function () {
+    const url = $(this).data('url');
+    // open /viewer3d?url=<encoded> in a new tab
+    window.open(`/viewer3d?url=${encodeURIComponent(url)}`, '_blank');
+  });
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
 
@@ -968,7 +974,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
         </div>
         
       </div>
-      <div class="col-12 col-md-12 col-lg-2 order-1 order-md-2" id="yudaDosya" style="position: relative;">
+      <div class="col-12 col-md-12 col-lg-3 order-1 order-md-2" id="yudaDosya" style="position: relative;">
         <h3 class="text-primary"><i class="fa fa-file"></i> DOSYALAR</h3>
         <p class="text-muted">${i.YudaNo} ile ilişkili dosyalar</p>
         <br>
@@ -1004,24 +1010,59 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     const paketList = $('#paket');
     const digerDosList = $('#digerDos');
 
-    files.forEach(f => {
-        const listItem = $('<li style="font-size:1.2em"></li>').html(`
-            <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1">
-                <i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)}
-            </a>
-            <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-        `);
+    function isO3dvSupported(pathOrName) {
+      const ext = (pathOrName.split('.').pop() || '').toLowerCase();
+      // Core formats supported by Online3DViewer single-file bundle
+      const supported = ['step','stp','iges','igs','brep','stl','obj','gltf','glb'];
+      return supported.includes(ext);
+    }
 
-        if (f.FileTitle === "Teknik Resim") {
-            teknikList.append(listItem);
-        } else if (f.FileTitle === "Şartname") {
-            sartList.append(listItem);
-        } else if (f.FileTitle === "Paketleme Talimatı") {
-            paketList.append(listItem);
-        } else {
-            digerDosList.append(listItem);
-        }
+    files.forEach(f => {
+      const fileUrl = `/media/${f.File}`;
+      const fname   = f.File.substring(6);
+      const viewIcon = isO3dvSupported(f.File)
+        ? `<i class="fas fa-cube text-primary ml-2 view3d"
+              title="3D Görüntüle"
+              style="cursor:pointer"
+              data-url="${fileUrl}"></i>`
+        : '';
+
+      const listItem = $('<li style="font-size:1.2em"></li>').html(`
+          <a href="${fileUrl}" target="_blank" class="btn-link text-secondary mr-1">
+              <i class="far fa-fw fa-file-word"></i> ${fname}
+          </a>
+          ${viewIcon}
+      `);
+
+      if (f.FileTitle === "Teknik Resim") {
+          teknikList.append(listItem);
+      } else if (f.FileTitle === "Şartname") {
+          sartList.append(listItem);
+      } else if (f.FileTitle === "Paketleme Talimatı") {
+          paketList.append(listItem);
+      } else {
+          digerDosList.append(listItem);
+      }
     });
+
+    // files.forEach(f => {
+    //     const listItem = $('<li style="font-size:1.2em"></li>').html(`
+    //         <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1">
+    //             <i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)}
+    //         </a>
+    //         <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
+    //     `);
+
+    //     if (f.FileTitle === "Teknik Resim") {
+    //         teknikList.append(listItem);
+    //     } else if (f.FileTitle === "Şartname") {
+    //         sartList.append(listItem);
+    //     } else if (f.FileTitle === "Paketleme Talimatı") {
+    //         paketList.append(listItem);
+    //     } else {
+    //         digerDosList.append(listItem);
+    //     }
+    // });
 
   };
 

@@ -459,6 +459,7 @@ class UploadFile(models.Model):
     UploadedBy = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="file_uploaded_by", blank=True, null =True)
     OriginFile = models.ForeignKey("self", on_delete=models.DO_NOTHING, blank =True, null=True)
     Note = models.CharField(null=True, blank=True)
+    meta_data = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.File
