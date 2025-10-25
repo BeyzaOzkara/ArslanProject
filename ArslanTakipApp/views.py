@@ -5632,4 +5632,5 @@ class Stretcher4500View(generic.TemplateView):
     # return render(request, "teklif/pdf_to_excel.html")
 
 def viewer_page(request):
-    return render(request, 'viewer/viewer3d.html')
+    file_url = request.GET.get('url', '')  # read ?url=<...>
+    return render(request, 'viewer/viewer3d.html', {'file_url': file_url})
