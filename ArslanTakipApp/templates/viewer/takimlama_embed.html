@@ -1,0 +1,257 @@
+{% load static %}
+<style>
+  /* Kök kutu: sayfana göre yüksekliği ayarla */
+  .takimlama-root { display:flex; gap:0; height:70vh; background:#f0f0f0; color:#111; }
+  .takimlama-left { width:400px; background:#ddd; display:flex; flex-direction:column; padding:10px; box-sizing:border-box; }
+  .takimlama-viewer { flex:1; position:relative; }
+  /* ... diğer küçük stiller, istersen kısalt ... */
+</style>
+
+<div class="takimlama-root" id="takimlamaRoot">
+  <div class="takimlama-left">
+    <div style="display:flex; gap:8px; margin-bottom:8px">
+      <button id="tkm-open">📂</button>
+      <button id="tkm-save">💾</button>
+      <button id="tkm-save-server">🗄️</button>
+      <button id="tkm-reset">🧹</button>
+      <button id="tkm-theme">🌗</button>
+    </div>
+
+    <div>
+      <h3>Eklenen Parçalar</h3>
+      <table style="width:100%" id="tkm-table">
+        <thead><tr><th>Dosya</th><th>Öteleme</th><th>Döndürme</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div style="flex:1; overflow:auto; margin-top:8px; border-top:1px solid #8884; padding-top:6px">
+      <h3>Tüm Parçalar</h3>
+      <div id="tkm-tree"></div>
+    </div>
+  </div>
+
+  <div class="takimlama-viewer" id="tkm-viewer"></div>
+</div>
+
+<script type="module">
+  import * as THREE from "{% static 'node_modules/three/build/three.module.js' %}";
+  import { OrbitControls } from "{% static 'node_modules/three/examples/jsm/controls/OrbitControls.js' %}";
+  import { GLTFLoader } from "{% static 'node_modules/three/examples/jsm/loaders/GLTFLoader.js' %}";
+  import { OutlineEffect } from "{% static 'node_modules/three/examples/jsm/effects/OutlineEffect.js' %}";
+
+  const FILETREE_URL = "{{ filetree_url|escapejs }}";
+  const DIE_NO = "{{ die_no|escapejs }}";
+  const PROFILE_NO = "{{ profile_no|escapejs }}";
+
+  // CSRF
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  // DOM
+  const viewer = document.getElementById('tkm-viewer');
+  const tbody = document.querySelector('#tkm-table tbody');
+
+  // Three scene
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, viewer.clientWidth / viewer.clientHeight, 0.1, 10000);
+  camera.position.set(500,500,500);
+
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.setClearColor(0xf0f0f0);
+  renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+  viewer.appendChild(renderer.domElement);
+
+  const effect = new OutlineEffect(renderer, {
+    defaultThickness: 0.0018, defaultColor: [0,0,0], defaultAlpha: 0.8, defaultKeepAlive: true
+  });
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(400,500,300); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.5); fill.position.set(-300,-200,-400); scene.add(fill);
+
+  const loader = new GLTFLoader();
+  let zOffset = 0;
+  const addedParts = [];
+  let selectedRow = null, selectedObj = null;
+
+  async function loadGLB(path){
+    return new Promise((res, rej)=>{
+      loader.load(path, glb=>{
+        glb.scene.traverse(o=>{
+          if(o.isMesh){
+            o.material = new THREE.MeshStandardMaterial({ color:0xeeeeee, metalness:0.05, roughness:0.3, flatShading:true });
+            o.geometry.computeVertexNormals();
+          }
+        });
+        res(glb.scene);
+      }, undefined, rej);
+    });
+  }
+
+  function selectRow(row,obj){
+    if(selectedRow) selectedRow.classList.remove('active');
+    if(selectedObj) selectedObj.traverse(o=>{ if(o.isMesh) o.material.color.set(0xeeeeee); });
+    selectedRow=row; selectedObj=obj;
+    row.classList.add('active');
+    obj.traverse(o=>{ if(o.isMesh) o.material.color.set(0x2b80ff); });
+  }
+
+  async function addPart(path){
+    try{
+      const obj = await loadGLB(path);
+      obj.position.z = zOffset; zOffset -= 300;
+      scene.add(obj);
+
+      const tr = document.createElement('tr');
+      const name = path.split('/').pop().replace(/\.glb$/i,'');
+      tr.innerHTML = `
+        <td>${name}</td>
+        <td><input type="number" value="${obj.position.z.toFixed(0)}" step="10"></td>
+        <td><input type="number" value="0" step="5"></td>
+        <td><button>🗑️</button></td>`;
+      const offsetInput = tr.children[1].querySelector('input');
+      const rotInput    = tr.children[2].querySelector('input');
+      const delBtn      = tr.children[3].querySelector('button');
+
+      offsetInput.onchange = ()=>{ obj.position.z = parseFloat(offsetInput.value); };
+      rotInput.onchange    = ()=>{ obj.rotation.z = THREE.MathUtils.degToRad(parseFloat(rotInput.value)); };
+      delBtn.onclick = (e)=>{ e.stopPropagation(); scene.remove(obj); tr.remove(); };
+
+      tr.onclick = ()=>selectRow(tr,obj);
+      tbody.appendChild(tr);
+      addedParts.push({ path, obj });
+    }catch(e){
+      alert('Yükleme hatası: '+path);
+    }
+  }
+
+  // Ağaç
+  async function buildTree(){
+    const data = await (await fetch(FILETREE_URL)).json();
+    const container = document.getElementById('tkm-tree');
+    container.innerHTML = '';
+    function render(obj, el){
+      for(const [key,val] of Object.entries(obj)){
+        if(val===null){
+          const div=document.createElement('div');
+          const btn=document.createElement('button'); btn.textContent='+';
+          btn.onclick=()=>addPart(key);
+          const clean=key.split('/').pop().replace(/\.glb$/i,'');
+          div.innerHTML='📄 '+clean; div.appendChild(btn); el.appendChild(div);
+        }else{
+          const folder=document.createElement('div'); folder.className='folder'; folder.textContent=key;
+          const kids=document.createElement('div'); kids.className='children';
+          folder.onclick=()=>folder.classList.toggle('open');
+          el.appendChild(folder); el.appendChild(kids);
+          render(val, kids);
+        }
+      }
+    }
+    render(data, container);
+  }
+
+  // Sunucudan mevcut montajı yükle
+  async function loadFromServer(){
+    const url = "{% url 'ArslanTakipApp:takimlama_load' %}" + `?die_no=${encodeURIComponent(DIE_NO)}&profile_no=${encodeURIComponent(PROFILE_NO)}`;
+    const js = await (await fetch(url)).json();
+    const arr = js.data || [];
+
+    // temizle
+    addedParts.forEach(p=>scene.remove(p.obj));
+    addedParts.length=0; tbody.innerHTML=''; zOffset=0; selectedRow=null; selectedObj=null;
+
+    for(const p of arr){
+      try{
+        const obj = await loadGLB(p.path);
+        obj.position.z = p.offset ?? 0;
+        obj.rotation.z = THREE.MathUtils.degToRad(p.rotate ?? 0);
+        scene.add(obj);
+
+        const tr=document.createElement('tr');
+        const name=p.path.split('/').pop().replace(/\.glb$/i,'');
+        tr.innerHTML=`
+          <td>${name}</td>
+          <td><input type="number" value="${obj.position.z.toFixed(0)}" step="10"></td>
+          <td><input type="number" value="${p.rotate ?? 0}" step="5"></td>
+          <td><button>🗑️</button></td>`;
+        const offsetInput=tr.children[1].querySelector('input');
+        const rotInput=tr.children[2].querySelector('input');
+        const delBtn=tr.children[3].querySelector('button');
+        offsetInput.onchange=()=>{ obj.position.z=parseFloat(offsetInput.value); };
+        rotInput.onchange=()=>{ obj.rotation.z=THREE.MathUtils.degToRad(parseFloat(rotInput.value)); };
+        delBtn.onclick=(e)=>{ e.stopPropagation(); scene.remove(obj); tr.remove(); };
+        tr.onclick=()=>selectRow(tr,obj);
+        tbody.appendChild(tr);
+        addedParts.push({ path:p.path, obj });
+      }catch(e){ console.warn('Yüklenemedi:', p.path, e); }
+    }
+  }
+
+  // Kaydet (DB)
+  async function saveToServer(){
+    const data = addedParts.map(p=>({
+      path:p.path,
+      offset:p.obj.position.z,
+      rotate:THREE.MathUtils.radToDeg(p.obj.rotation.z)
+    }));
+    const resp = await fetch("{% url 'ArslanTakipApp:takimlama_save' %}", {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'X-CSRFToken': csrftoken },
+      body: JSON.stringify({ die_no: DIE_NO, profile_no: PROFILE_NO, data })
+    });
+    const js = await resp.json();
+    if(js.ok) alert('Takımlama kaydedildi.'); else alert('Kaydetme hatası!');
+  }
+
+  // Butonlar
+  document.getElementById('tkm-reset').onclick=()=>{
+    addedParts.forEach(p=>scene.remove(p.obj));
+    addedParts.length=0; tbody.innerHTML=''; zOffset=0; selectedRow=null; selectedObj=null;
+  };
+  document.getElementById('tkm-save-server').onclick=saveToServer;
+  document.getElementById('tkm-save').onclick=()=>{
+    const data = addedParts.map(p=>({ path:p.path, offset:p.obj.position.z, rotate:THREE.MathUtils.radToDeg(p.obj.rotation.z) }));
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='montaj.json'; a.click();
+  };
+  document.getElementById('tkm-open').onclick=()=>{
+    const input=document.createElement('input'); input.type='file'; input.accept='.json';
+    input.onchange=async (e)=>{
+      const file=e.target.files[0]; if(!file) return;
+      const arr=JSON.parse(await file.text());
+      // temizle
+      addedParts.forEach(p=>scene.remove(p.obj)); addedParts.length=0; tbody.innerHTML=''; zOffset=0;
+
+      for(const p of arr){ await addPart(p.path); addedParts[addedParts.length-1].obj.rotation.z = THREE.MathUtils.degToRad(p.rotate??0); addedParts[addedParts.length-1].obj.position.z = p.offset??0; }
+      // tabloyu güncellemek için hızlı yol: mevcut addPart zaten satır ekliyor, üstte değerleri yazdık.
+    };
+    input.click();
+  };
+  document.getElementById('tkm-theme').onclick=()=>{
+    const bg = renderer.getClearColor().getHex() === 0xf0f0f0 ? 0x111111 : 0xf0f0f0;
+    renderer.setClearColor(bg); scene.background = new THREE.Color(bg);
+  };
+
+  // init
+  await buildTree();
+  await loadFromServer();
+
+  // resize
+  const root = document.getElementById('takimlamaRoot');
+  new ResizeObserver(()=>{
+    camera.aspect = viewer.clientWidth / viewer.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+  }).observe(root);
+
+  (function animate(){ requestAnimationFrame(animate); controls.update(); effect.render(scene,camera); })();
+</script>

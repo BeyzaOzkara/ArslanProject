@@ -34,7 +34,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri
+    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -69,7 +69,7 @@ from django.db.models import Func
 from .die_update import check_new_dies
 from pathlib import Path
 from functools import lru_cache
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 # import pdfplumber
 # import pandas as pd
 # from django.core.files.storage import FileSystemStorage
@@ -5638,6 +5638,30 @@ def viewer_page(request):
     file_url = request.GET.get('url', '')  # read ?url=<...>
     return render(request, 'viewer/viewer3d.html', {'file_url': file_url})
 
+
+
+@require_GET
+@login_required
+def takimlama_has(request):
+    die_no = request.GET.get('die_no')
+    profile_no = request.GET.get('profile_no')
+    if not die_no or not profile_no:
+        return HttpResponseBadRequest("die_no ve profile_no zorunlu")
+    print(f"takimlama_has: die_no={die_no}, profile_no={profile_no}")
+    has = False
+    try:
+        di = DieInfo.objects.get(die_no=die_no)
+        md = di.meta_data or {}
+        tj = md.get('takim_json', {})
+        if isinstance(tj, dict):
+            has = bool(tj.get(profile_no))  # ilgili profil için veri var mı
+        else:
+            has = bool(tj)  # eski tek katmanlı format
+    except DieInfo.DoesNotExist:
+        has = False
+    print(f"takimlama_has: has={has}")
+    return JsonResponse({'has': has})
+
 def _build_tree_dict(base_path: Path) -> dict:
     """
     base_path altındaki dizinleri iç içe dict yapısına çevirir.
@@ -5688,14 +5712,89 @@ def takimlama_filetree(request):
     return JsonResponse(data, json_dumps_params={'ensure_ascii': False, 'indent': 2})
 
 @login_required
-def takimlama_view(request):
-    """
-    Three.js görüntüleyicisini açan sayfa.
-    Template içinde filetree endpoint URL’sini kullanacağız.
-    """
+def takimlama_view(request, die_no: str, profile_no: str):
+    # Tam sayfa (yeni sekme) sürümü
     return render(request, 'viewer/takimlamadeneme.html', {
-        'filetree_url':  # template içinde fetch edecek
-            request.build_absolute_uri(
-                request.path.replace('takimlama/', 'takimlama/filetree')
-            )
+        'die_no': die_no,
+        'profile_no': profile_no,
+        'filetree_url': request.build_absolute_uri(
+            request.path.replace(f'{die_no}/{profile_no}/', 'filetree')
+        )
     })
+
+@login_required
+def takimlama_embed(request, die_no: str, profile_no: str):
+    # Aynı sayfaya gömülecek parça (partial). <div> içine yüklenir.
+    # Head/body yok—sadece içerik (JS, HTML, CSS birlikte).
+    return render(request, 'viewer/takimlama_embed.html', {
+        'die_no': die_no,
+        'profile_no': profile_no,
+        'filetree_url': request.build_absolute_uri(
+            request.path.replace(f'embed/{die_no}/{profile_no}/', 'filetree')
+        )
+    })
+
+@require_GET
+@login_required
+def takimlama_load(request):
+    die_no = request.GET.get('die_no')
+    profile_no = request.GET.get('profile_no')
+    if not die_no or not profile_no:
+        return HttpResponseBadRequest("die_no ve profile_no zorunlu")
+
+    try:
+        di = DieInfo.objects.get(die_no=die_no)
+    except DieInfo.DoesNotExist:
+        return JsonResponse({'data': []})  # hiç kayıt yok
+
+    md = di.meta_data or {}
+    # Yapı: meta_data['takim_json'] tek bir liste olabilir
+    # veya çoklu profil için meta_data['takim_json'][profile_no] olabilir.
+    takim_json = md.get('takim_json', {})
+
+    if isinstance(takim_json, dict):
+        data = takim_json.get(profile_no, [])
+    else:
+        # eski tek-katmanlı format
+        data = takim_json or []
+
+    return JsonResponse({'data': data})
+
+@require_POST
+@login_required
+@transaction.atomic
+def takimlama_save(request):
+    """
+    Body (JSON):
+    {
+      "die_no": "KALIP123",
+      "profile_no": "PRF456",
+      "data": [ { "path": "/media/takimlama/..../x.glb", "offset": 0, "rotate": 0 }, ... ]
+    }
+    Kaydetme stratejisi:
+      meta_data['takim_json'][profile_no] = data
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return HttpResponseBadRequest("Geçersiz JSON")
+
+    die_no = payload.get('die_no')
+    profile_no = payload.get('profile_no')
+    data = payload.get('data')
+
+    if not die_no or not profile_no or data is None:
+        return HttpResponseBadRequest("die_no, profile_no ve data zorunlu")
+
+    di, _created = DieInfo.objects.get_or_create(die_no=die_no, defaults={'profil_no': profile_no})
+    md = di.meta_data or {}
+
+    # çoklu profil desteği:
+    if 'takim_json' not in md or not isinstance(md['takim_json'], dict):
+        md['takim_json'] = {}
+
+    md['takim_json'][profile_no] = data
+    di.meta_data = md
+    di.save(update_fields=['meta_data'])
+
+    return JsonResponse({'ok': True})

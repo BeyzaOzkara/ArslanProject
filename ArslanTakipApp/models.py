@@ -606,6 +606,7 @@ class KaliphaneIsEmri(models.Model):
         managed = False
         db_table = 'View_URT_IsEmri'  # KALIPHANE 'kh' db
 
-class Takımlama(models.Model):
-    KalipNo = models.CharField(primary_key=True, blank=True)
-    Takimlama = models.JSONField(null=True, blank=True)
+class DieInfo(models.Model):
+    die_no = models.CharField(primary_key=True, max_length=64)
+    profil_no = models.CharField(max_length=64, null=True, blank=True)
+    meta_data = models.JSONField(null=True, blank=True, default=dict)

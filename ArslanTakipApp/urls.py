@@ -203,6 +203,12 @@ urlpatterns = [
     # path("pdf_teklif/download_excel", views.download_excel, name="download_excel"),
     path('viewer3d/', views.viewer_page, name='viewer'),
 
-    path('takimlama/', views.takimlama_view, name='takimlama_view'),
+    # path('takimlama/', views.takimlama_view, name='takimlama_view'),
+    # path('takimlama/filetree', views.takimlama_filetree, name='takimlama_filetree'),
+    path('takimlama/<str:die_no>/<str:profile_no>/', views.takimlama_view, name='takimlama_view'),             # tam sayfa
+    path('takimlama/embed/<str:die_no>/<str:profile_no>/', views.takimlama_embed, name='takimlama_embed'),     # sayfa içi parça (partial)
     path('takimlama/filetree', views.takimlama_filetree, name='takimlama_filetree'),
+    path('takimlama/load', views.takimlama_load, name='takimlama_load'),
+    path('takimlama/save', views.takimlama_save, name='takimlama_save'),
+    path('takimlama/has', views.takimlama_has, name='takimlama_has'),  # sadece var/yok kontrolü
 ]

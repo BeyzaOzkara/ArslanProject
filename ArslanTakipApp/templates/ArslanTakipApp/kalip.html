@@ -235,16 +235,6 @@ function tryDeepLinkToComment(){
 }
  
 document.addEventListener("DOMContentLoaded", function(){
-    // const currentHash = window.location.hash;
-    // console.log("currentHash: " + currentHash);
-    // const kalipPattern = /^#.+$/; // Matches "#<any characters>"
-    // // # karakterini çıkart
-
-    // if (kalipPattern.test(currentHash)) {
-    //     let dieNumber = currentHash.slice(1);
-    //     handleDieChange(dieNumber);
-    // }
-
     const parsed = parseCommentHash();
     if (parsed && parsed.kalipNo){
         // Ensure the right die is selected
@@ -373,10 +363,36 @@ var toplamKalip = function(values, data, calcParams) {
     return kSayisi;
 }
 
-function initializeTakimlama() {
-    let kalipNo = loadedData.currentDie;
+async function initializeTakimlama() {
+    let die_no = loadedData.currentDie;
+    let profile_no = loadedData.currentProfile;
     // check if the die has any meta_data takimlama json.
-    window.open("{% url 'ArslanTakipApp:takimlama_view' %}", "_blank", "noopener");
+    const hasUrl = "{% url 'ArslanTakipApp:takimlama_has' %}" + `?die_no=${encodeURIComponent(die_no)}&profile_no=${encodeURIComponent(profile_no)}`;
+    const resp = await fetch(hasUrl);
+    const js = await resp.json();
+    console.log("takimlama has response:", js);
+
+    if (js.has) {
+      // Sayfa içinde göster (embed)
+      const embedUrl = "{% url 'ArslanTakipApp:takimlama_embed' die_no='__D__' profile_no='__P__' %}"
+        .replace('__D__', encodeURIComponent(dieNo))
+        .replace('__P__', encodeURIComponent(profileNo));
+
+      const host = document.getElementById('takimlamaHost');
+      // Parçayı yükle ve yerleştir
+      const html = await (await fetch(embedUrl, {headers: {'X-Requested-With': 'XMLHttpRequest'}})).text();
+      host.innerHTML = html;
+
+      // İsteğe bağlı: host’a scroll yap
+      host.scrollIntoView({behavior: 'smooth', block: 'start'});
+    } else {
+      // Yeni sekme aç
+      const fullUrl = "{% url 'ArslanTakipApp:takimlama_view' die_no='__D__' profile_no='__P__' %}"
+        .replace('__D__', encodeURIComponent(dieNo))
+        .replace('__P__', encodeURIComponent(profileNo));
+
+      window.open(fullUrl, "_blank", "noopener");
+    }
 }
 
 function initializeGraphics() {
