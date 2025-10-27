@@ -67,6 +67,9 @@ from DMS.models import EventData, TemporalData
 from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report, send_new_dies_without_orders_report
 from django.db.models import Func
 from .die_update import check_new_dies
+from pathlib import Path
+from functools import lru_cache
+from django.views.decorators.http import require_GET
 # import pdfplumber
 # import pandas as pd
 # from django.core.files.storage import FileSystemStorage
@@ -5634,3 +5637,65 @@ class Stretcher4500View(generic.TemplateView):
 def viewer_page(request):
     file_url = request.GET.get('url', '')  # read ?url=<...>
     return render(request, 'viewer/viewer3d.html', {'file_url': file_url})
+
+def _build_tree_dict(base_path: Path) -> dict:
+    """
+    base_path altındaki dizinleri iç içe dict yapısına çevirir.
+    .glb dosyaları yaprak olarak None değer alır.
+    Dönen sözlükteki dosya yolları, istemcinin indirebilmesi için MEDIA_URL bazlıdır.
+    """
+    tree: dict = {}
+    base_str = str(base_path.resolve())
+    media_url = settings.MEDIA_URL.rstrip('/')
+
+    for root, dirs, files in os.walk(base_path):
+        # gereksiz klasörleri ayıkla
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        rel_root = os.path.relpath(root, base_str)
+        sub = tree
+        if rel_root != '.':
+            for part in rel_root.split(os.sep):
+                sub = sub.setdefault(part, {})
+
+        for d in dirs:
+            sub[d] = {}
+
+        for f in files:
+            if f.lower().endswith('.glb'):
+                rel_path = os.path.normpath(os.path.join(rel_root, f)) if rel_root != '.' else f
+                # web yolu (MEDIA_URL + 'takimlama/' + rel_path)
+                web_path = f"{media_url}/takimlama/{rel_path.replace(os.sep, '/')}"
+                # istemcide butona bastığımızda bu web_path kullanılacak
+                sub[web_path] = None
+
+    return tree
+
+@lru_cache(maxsize=1)
+def build_tree_cached() -> dict:
+    base = Path(settings.MEDIA_ROOT) / 'takimlama'
+    if not base.exists():
+        return {}
+    data = _build_tree_dict(base)
+    return data
+
+@require_GET
+@login_required
+def takimlama_filetree(request):
+    # ?refresh varsa cache'i temizle
+    if 'refresh' in request.GET:
+        build_tree_cached.cache_clear()
+    data = build_tree_cached()
+    return JsonResponse(data, json_dumps_params={'ensure_ascii': False, 'indent': 2})
+
+@login_required
+def takimlama_view(request):
+    """
+    Three.js görüntüleyicisini açan sayfa.
+    Template içinde filetree endpoint URL’sini kullanacağız.
+    """
+    return render(request, 'viewer/takimlamadeneme.html', {
+        'filetree_url':  # template içinde fetch edecek
+            request.build_absolute_uri(
+                request.path.replace('takimlama/', 'takimlama/filetree')
+            )
+    })

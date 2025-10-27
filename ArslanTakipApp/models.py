@@ -606,3 +606,6 @@ class KaliphaneIsEmri(models.Model):
         managed = False
         db_table = 'View_URT_IsEmri'  # KALIPHANE 'kh' db
 
+class Takımlama(models.Model):
+    KalipNo = models.CharField(primary_key=True, blank=True)
+    Takimlama = models.JSONField(null=True, blank=True)

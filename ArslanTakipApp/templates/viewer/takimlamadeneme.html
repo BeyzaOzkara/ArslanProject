@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kalıp Takımlama Detayı</title>
+  <style>
+    :root { --bg:#f0f0f0; --fg:#111; --panel:#ddd; --button-bg:#ccc; --button-fg:#000; --highlight:#2b80ff; }
+    [data-theme="dark"] { --bg:#111; --fg:#eee; --panel:#222; --button-bg:#444; --button-fg:#eee; --highlight:#66aaff; }
+    body { margin:0; overflow:hidden; font-family:sans-serif; display:flex; height:100vh; background:var(--bg); color:var(--fg); }
+    #left { width:400px; background:var(--panel); display:flex; flex-direction:column; padding:10px; box-sizing:border-box; }
+    #viewer { flex:1; position:relative; background:var(--bg); }
+    #topBar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    #topBar button { width:64px; height:64px; font-size:32px; line-height:1; display:flex; justify-content:center; align-items:center; padding:0; border-radius:8px; background:var(--button-bg); color:var(--button-fg); transition:all .15s ease; }
+    #topBar button:hover { background:var(--highlight); color:#fff; transform:scale(1.08); }
+    button { background:var(--button-bg); color:var(--button-fg); border:none; padding:5px 8px; cursor:pointer; border-radius:5px; font-size:13px; }
+    button:hover { background:var(--highlight); color:#fff; }
+    h3 { margin:8px 0 6px; font-size:14px; border-bottom:1px solid #8884; padding-bottom:3px; }
+    input[type="number"] { width:55px; background:var(--button-bg); color:var(--button-fg); border:none; border-radius:4px; padding:2px; text-align:right; }
+    table { border-collapse:collapse; width:100%; font-size:13px; }
+    th,td { padding:3px 5px; border-bottom:1px solid #8884; text-align:left; }
+    th { background:var(--button-bg); font-weight:bold; }
+    tr.active { background:var(--highlight); color:#fff; }
+    #addedPanel { flex:none; overflow:visible; }
+    #allParts { flex:1; overflow-y:auto; min-height:100px; border-top:1px solid #8884; margin-top:8px; padding-top:6px; }
+    .folder { cursor:pointer; user-select:none; display:flex; align-items:center; font-weight:bold; margin-top:4px; }
+    .folder::before { content:"▶"; display:inline-block; margin-right:5px; font-size:10px; transition:transform .2s ease; }
+    .folder.open::before { transform:rotate(90deg); }
+    .children { margin-left:15px; display:none; }
+    .folder.open + .children { display:block; }
+    #fileTree button { margin-left:6px; font-size:12px; padding:1px 5px; }
+  </style>
+</head>
+<body data-theme="light">
+  <div id="left">
+    <div id="topBar">
+      <button id="openBtn">📂</button>
+      <button id="saveBtn">💾</button>
+      <button id="resetBtn">🧹</button>
+      <button id="themeToggle">🌗</button>
+    </div>
+
+    <div id="addedPanel">
+      <h3>Eklenen Parçalar</h3>
+      <table id="addedTable">
+        <thead>
+          <tr><th>Dosya</th><th>Öteleme mm</th><th>Döndürme °</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="allParts">
+      <h3>Tüm Parçalar</h3>
+      <div id="fileTree"></div>
+    </div>
+  </div>
+
+  <div id="viewer"></div>
+
+  <script type="module">
+    import * as THREE from "https://esm.run/three@0.158.0";
+    import { OrbitControls } from "https://esm.run/three@0.158.0/examples/jsm/controls/OrbitControls.js";
+    import { GLTFLoader } from "https://esm.run/three@0.158.0/examples/jsm/loaders/GLTFLoader.js";
+    import { OutlineEffect } from "https://esm.run/three@0.158.0/examples/jsm/effects/OutlineEffect.js";
+
+    const FILETREE_URL = "{{ filetree_url|escapejs }}";
+
+    const viewer = document.getElementById('viewer');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, viewer.clientWidth / viewer.clientHeight, 0.1, 10000);
+    camera.position.set(500, 500, 500);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.setClearColor(0xf0f0f0);
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+    viewer.appendChild(renderer.domElement);
+
+    const effect = new OutlineEffect(renderer, {
+      defaultThickness: 0.0018,
+      defaultColor: [0, 0, 0],
+      defaultAlpha: 0.8,
+      defaultKeepAlive: true
+    });
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+    sun.position.set(400, 500, 300);
+    scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.5);
+    fill.position.set(-300, -200, -400);
+    scene.add(fill);
+
+    const loader = new GLTFLoader();
+    let zOffset = 0;
+    const addedTable = document.querySelector('#addedTable tbody');
+    const addedParts = [];
+    let selectedRow = null;
+    let selectedObj = null;
+
+    async function loadGLB(path) {
+      return new Promise((resolve, reject) => {
+        loader.load(path, glb => {
+          glb.scene.traverse(o => {
+            if (o.isMesh) {
+              o.material = new THREE.MeshStandardMaterial({
+                color: 0xeeeeee, metalness: 0.05, roughness: 0.3, flatShading: true
+              });
+              o.geometry.computeVertexNormals();
+            }
+          });
+          resolve(glb.scene);
+        }, undefined, reject);
+      });
+    }
+
+    async function addPart(path) {
+      try {
+        const obj = await loadGLB(path); // path: /media/takimlama/....glb
+        obj.position.z = zOffset;
+        zOffset -= 300;
+        scene.add(obj);
+
+        const tr = document.createElement('tr');
+        const name = path.split('/').pop().replace(/\.glb$/i, '');
+        tr.innerHTML = `
+          <td>${name}</td>
+          <td><input type="number" value="${obj.position.z.toFixed(0)}" step="10"></td>
+          <td><input type="number" value="0" step="5"></td>
+          <td><button>🗑️</button></td>
+        `;
+
+        const offsetInput = tr.children[1].querySelector('input');
+        const rotInput = tr.children[2].querySelector('input');
+        const delBtn = tr.children[3].querySelector('button');
+
+        offsetInput.onchange = () => { obj.position.z = parseFloat(offsetInput.value); };
+        rotInput.onchange = () => { obj.rotation.z = THREE.MathUtils.degToRad(parseFloat(rotInput.value)); };
+        delBtn.onclick = (e) => { e.stopPropagation(); scene.remove(obj); tr.remove(); };
+
+        tr.onclick = () => selectRow(tr, obj);
+
+        addedTable.appendChild(tr);
+        addedParts.push({ path, obj });
+      } catch (e) {
+        alert('Yükleme hatası: ' + path);
+      }
+    }
+
+    function selectRow(row, obj) {
+      if (selectedRow) selectedRow.classList.remove('active');
+      if (selectedObj)
+        selectedObj.traverse(o => { if (o.isMesh) o.material.color.set(0xeeeeee); });
+
+      selectedRow = row;
+      selectedObj = obj;
+
+      row.classList.add('active');
+      obj.traverse(o => { if (o.isMesh) o.material.color.set(0x2b80ff); });
+    }
+
+    document.getElementById('resetBtn').onclick = () => {
+      addedParts.forEach(p => scene.remove(p.obj));
+      addedParts.length = 0;
+      addedTable.innerHTML = "";
+      zOffset = 0;
+      selectedRow = null;
+      selectedObj = null;
+    };
+
+    document.getElementById('saveBtn').onclick = () => {
+      const data = addedParts.map(p => ({
+        path: p.path, // media URL’li tam yol
+        offset: p.obj.position.z,
+        rotate: THREE.MathUtils.radToDeg(p.obj.rotation.z)
+      }));
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "montaj.json";
+      a.click();
+    };
+
+    async function buildTree() {
+      const resp = await fetch(FILETREE_URL);
+      const data = await resp.json();
+
+      function render(obj, container, basePath = '') {
+        for (const [key, value] of Object.entries(obj)) {
+          // key artık dosya ise /media/.../xxx.glb türünde full web path
+          if (value === null) {
+            const div = document.createElement('div');
+            const btn = document.createElement('button');
+            btn.textContent = '+';
+            btn.onclick = () => addPart(key); // key = web path
+            const cleanName = key.split('/').pop().replace(/\.glb$/i, '');
+            div.innerHTML = '📄 ' + cleanName;
+            div.appendChild(btn);
+            container.appendChild(div);
+          } else {
+            const folder = document.createElement('div');
+            folder.textContent = key;
+            folder.className = 'folder';
+            const children = document.createElement('div');
+            children.className = 'children';
+            render(value, children, basePath);
+
+            folder.onclick = () => { folder.classList.toggle('open'); };
+
+            container.appendChild(folder);
+            container.appendChild(children);
+          }
+        }
+      }
+      render(data, document.getElementById('fileTree'));
+    }
+    buildTree();
+
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.onclick = () => {
+      const body = document.body;
+      const dark = body.dataset.theme === "dark";
+      body.dataset.theme = dark ? "light" : "dark";
+      const bg = dark ? 0xf0f0f0 : 0x111111;
+      scene.background = new THREE.Color(bg);
+      renderer.setClearColor(bg);
+    };
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      effect.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = viewer.clientWidth / viewer.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+    });
+
+    // OPEN (JSON içe aktar)
+    document.getElementById('openBtn').onclick = () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        // temizle
+        addedParts.forEach(p => scene.remove(p.obj));
+        addedParts.length = 0;
+        addedTable.innerHTML = "";
+        zOffset = 0;
+
+        for (const p of data) {
+          try {
+            const obj = await loadGLB(p.path); // p.path: media URL’li tam yol
+            obj.position.z = p.offset ?? 0;
+            obj.rotation.z = THREE.MathUtils.degToRad(p.rotate ?? 0);
+            scene.add(obj);
+
+            const tr = document.createElement('tr');
+            const name = p.path.split('/').pop().replace(/\.glb$/i, '');
+            tr.innerHTML = `
+              <td>${name}</td>
+              <td><input type="number" value="${obj.position.z.toFixed(0)}" step="10"></td>
+              <td><input type="number" value="${p.rotate ?? 0}" step="5"></td>
+              <td><button>🗑️</button></td>
+            `;
+
+            const offsetInput = tr.children[1].querySelector('input');
+            const rotInput = tr.children[2].querySelector('input');
+            const delBtn = tr.children[3].querySelector('button');
+
+            offsetInput.onchange = () => { obj.position.z = parseFloat(offsetInput.value); };
+            rotInput.onchange = () => { obj.rotation.z = THREE.MathUtils.degToRad(parseFloat(rotInput.value)); };
+            delBtn.onclick = (e) => { e.stopPropagation(); scene.remove(obj); tr.remove(); };
+
+            tr.onclick = () => selectRow(tr, obj);
+
+            addedTable.appendChild(tr);
+            addedParts.push({ path: p.path, obj });
+          } catch (err) {
+            alert(`Yüklenemedi: ${p.path}`);
+          }
+        }
+      };
+      input.click();
+    };
+  </script>
+</body>
+</html>

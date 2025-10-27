@@ -203,4 +203,6 @@ urlpatterns = [
     # path("pdf_teklif/download_excel", views.download_excel, name="download_excel"),
     path('viewer3d/', views.viewer_page, name='viewer'),
 
+    path('takimlama/', views.takimlama_view, name='takimlama_view'),
+    path('takimlama/filetree', views.takimlama_filetree, name='takimlama_filetree'),
 ]

@@ -110,6 +110,9 @@
                     <li class="nav-item">
                       <a class="nav-link tab-item" id="custom-tabs-two-grafikler-tab" data-tab="custom-tabs-two-grafikler" data-toggle="pill" href="#custom-tabs-two-grafikler" role="tab" aria-controls="custom-tabs-two-grafikler" aria-selected="false">Grafikler</a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link tab-item" id="custom-tabs-two-takimlama-tab" data-tab="custom-tabs-two-takimlama" data-toggle="pill" href="#custom-tabs-two-takimlama" role="tab" aria-controls="custom-tabs-two-takimlama" aria-selected="false">Takımlama</a>
+                    </li>
                   </ul>
                 </div>
                 <div class="card-body">
@@ -126,6 +129,8 @@
 
                     </div>
                     <div class="tab-pane fade" id="custom-tabs-two-grafikler" role="tabpanel" aria-labelledby="custom-tabs-two-grafikler-tab">
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-two-takimlama" role="tabpanel" aria-labelledby="custom-tabs-two-takimlama-tab">
                     </div>
                   </div>
                 </div>
@@ -368,6 +373,12 @@ var toplamKalip = function(values, data, calcParams) {
     return kSayisi;
 }
 
+function initializeTakimlama() {
+    let kalipNo = loadedData.currentDie;
+    // check if the die has any meta_data takimlama json.
+    window.open("{% url 'ArslanTakipApp:takimlama_view' %}", "_blank", "noopener");
+}
+
 function initializeGraphics() {
     let kalipNo = loadedData.currentDie;
     var toTime = Date.now();
@@ -433,7 +444,7 @@ async function copyText(text){
   }
 }
 
-// Build absolute URL for a comment
+// Build absolute URL for a comments
 function buildCommentURL(kalipNo, type, commentId){
   const hash = buildCommentHash(kalipNo, type, commentId);
   return `${location.origin}${location.pathname}${hash}`;
@@ -442,7 +453,7 @@ function buildCommentURL(kalipNo, type, commentId){
 function shareCommentLink(commentId, type){
   // type is where the comment currently lives: "die" or "profile"
   const url = buildCommentURL(loadedData.currentDie, type, commentId);
-  copyText(url);
+  copyText(url); 
   alert('Bağlantı kopyalandı:\n' + url);
 }
 
@@ -1201,7 +1212,8 @@ const tabInitializers = {
     'custom-tabs-two-uretimraporu': initializeProductionReports,
     'custom-tabs-two-hareketler': initializeDieMovements,
     'custom-tabs-two-yorumlar': initializeCommentsContainer,
-    'custom-tabs-two-grafikler': initializeGraphics
+    'custom-tabs-two-grafikler': initializeGraphics,
+    'custom-tabs-two-takimlama': initializeTakimlama, 
 };
 
 // Lazy load content for the other tabs

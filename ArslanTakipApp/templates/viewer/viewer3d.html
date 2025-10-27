@@ -13,6 +13,7 @@
   <script src="{% static 'ArslanTakipApp/o3dv.min.js' %}"></script>
 <script>
   (async function () {
+
     // 1) get URL from server or query
     var ctxUrl = "{{ file_url|escapejs }}";
     var qsUrl  = new URLSearchParams(window.location.search).get('url');
