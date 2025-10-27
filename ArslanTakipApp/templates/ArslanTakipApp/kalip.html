@@ -385,12 +385,14 @@ async function initializeTakimlama() {
 
       // İsteğe bağlı: host’a scroll yap
       host.scrollIntoView({behavior: 'smooth', block: 'start'});
-    } else {
+    } 
+    else {
       // Yeni sekme aç
+      console.log("takimlama not found, opening new tab");
       const fullUrl = "{% url 'ArslanTakipApp:takimlama_view' die_no='__D__' profile_no='__P__' %}"
-        .replace('__D__', encodeURIComponent(dieNo))
-        .replace('__P__', encodeURIComponent(profileNo));
-
+        .replace('__D__', encodeURIComponent(die_no))
+        .replace('__P__', encodeURIComponent(profile_no));
+        console.log("Opening URL:", fullUrl);
       window.open(fullUrl, "_blank", "noopener");
     }
 }
