@@ -260,7 +260,8 @@
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
-      effect.render(scene, camera);
+      renderer.render(scene, camera);
+      // effect.render(scene, camera);
     }
     animate();
 
