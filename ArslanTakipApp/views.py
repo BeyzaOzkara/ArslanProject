@@ -5652,7 +5652,7 @@ def takimlama_has(request):
     try:
         di = DieInfo.objects.get(die_no=die_no)
         md = di.meta_data or {}
-        tj = md.get('takim_json', {})
+        tj = md.get('takimlama', {})
         if isinstance(tj, dict):
             has = bool(tj.get(profile_no))  # ilgili profil için veri var mı
         else:
@@ -5750,7 +5750,7 @@ def takimlama_load(request):
     md = di.meta_data or {}
     # Yapı: meta_data['takim_json'] tek bir liste olabilir
     # veya çoklu profil için meta_data['takim_json'][profile_no] olabilir.
-    takim_json = md.get('takim_json', {})
+    takim_json = md.get('takimlama', {})
 
     if isinstance(takim_json, dict):
         data = takim_json.get(profile_no, [])
@@ -5793,12 +5793,12 @@ def takimlama_save(request):
     # Kaydet
     di, _created = DieInfo.objects.get_or_create(
         die_no=die_no,
-        defaults={"profil_no": profile_no}
+        profile_no= profile_no
     )
     md = di.meta_data or {}
-    if "takim_json" not in md or not isinstance(md["takim_json"], dict):
-        md["takim_json"] = {}
-    md["takim_json"][profile_no] = data
+    if "takimlama" not in md or not isinstance(md["takimlama"], dict):
+        md["takimlama"] = {}
+    md["takimlama"] = data
 
     di.meta_data = md
     di.save(update_fields=["meta_data"])
