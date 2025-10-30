@@ -380,7 +380,8 @@ async function initializeTakimlama() {
 
       const host = document.getElementById('custom-tabs-two-takimlama');
       // Parçayı yükle ve yerleştir
-      const html = await (await fetch(embedUrl, {headers: {'X-Requested-With': 'XMLHttpRequest'}})).text();
+      const html = await (await fetch(embedUrl, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}})).text();
       host.innerHTML = html;
 
       // İsteğe bağlı: host’a scroll yap

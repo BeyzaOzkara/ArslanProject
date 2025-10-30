@@ -4,6 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Kalıp Takımlama Detayı</title>
+  {% if embed_mode %}
+  <style>
+    body {
+      margin: 0;
+      background: var(--bg);
+      height: 600px; /* veya auto */
+      overflow: hidden;
+    }
+    #viewer {
+      height: 600px;
+    }
+  </style>
+  {% endif %}
   <style>
     :root { --bg:#f0f0f0; --fg:#111; --panel:#ddd; --button-bg:#ccc; --button-fg:#000; --highlight:#2b80ff; }
     [data-theme="dark"] { --bg:#111; --fg:#eee; --panel:#222; --button-bg:#444; --button-fg:#eee; --highlight:#66aaff; }

@@ -5714,25 +5714,48 @@ def takimlama_filetree(request):
 @login_required
 def takimlama_view(request, die_no: str, profile_no: str):
     # Tam sayfa (yeni sekme) sürümü
+    filetree_url = reverse('ArslanTakipApp:takimlama_filetree')
     return render(request, 'viewer/takimlamadeneme.html', {
         'die_no': die_no,
         'profile_no': profile_no,
-        'filetree_url': request.build_absolute_uri(
-            request.path.replace(f'{die_no}/{profile_no}/', 'filetree')
-        )
+        'filetree_url': filetree_url,
+        'embed_mode': False
+        # 'filetree_url': request.build_absolute_uri(
+        #     request.path.replace(f'{die_no}/{profile_no}/', 'filetree')
+        # )
     })
 
 @login_required
 def takimlama_embed(request, die_no: str, profile_no: str):
     # Aynı sayfaya gömülecek parça (partial). <div> içine yüklenir.
     # Head/body yok—sadece içerik (JS, HTML, CSS birlikte).
-    return render(request, 'viewer/takimlama_embed.html', {
+    # return render(request, 'viewer/takimlama_embed.html', {
+    #     'die_no': die_no,
+    #     'profile_no': profile_no,
+    #     'filetree_url': request.build_absolute_uri(
+    #         request.path.replace(f'embed/{die_no}/{profile_no}/', 'filetree')
+    #     )
+    # })
+    """
+    Eğer istek AJAX (embed) geldiyse, sadece gövde kısmını render eder.
+    """
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Güvenlik: doğrudan erişirse tam sayfaya yönlendir
+        return takimlama_view(request, die_no, profile_no)
+
+    try:
+        di = DieInfo.objects.get(die_no=die_no, profil_no=profile_no)
+    except DieInfo.DoesNotExist:
+        return HttpResponseBadRequest("Kalıp bulunamadı")
+
+    filetree_url = reverse('ArslanTakipApp:takimlama_filetree')
+    return render(request, 'ArslanTakipApp/takimlama_view.html', {
         'die_no': die_no,
         'profile_no': profile_no,
-        'filetree_url': request.build_absolute_uri(
-            request.path.replace(f'embed/{die_no}/{profile_no}/', 'filetree')
-        )
+        'filetree_url': filetree_url,
+        'embed_mode': True
     })
+
 
 @require_GET
 @login_required
