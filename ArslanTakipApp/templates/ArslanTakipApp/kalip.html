@@ -375,8 +375,8 @@ async function initializeTakimlama() {
     if (js.has) {
       // Sayfa içinde göster (embed)
       const embedUrl = "{% url 'ArslanTakipApp:takimlama_embed' die_no='__D__' profile_no='__P__' %}"
-        .replace('__D__', encodeURIComponent(dieNo))
-        .replace('__P__', encodeURIComponent(profileNo));
+        .replace('__D__', encodeURIComponent(die_no))
+        .replace('__P__', encodeURIComponent(profile_no));
 
       const host = document.getElementById('takimlamaHost');
       // Parçayı yükle ve yerleştir
