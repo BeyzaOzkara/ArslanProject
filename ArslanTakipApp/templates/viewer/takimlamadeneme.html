@@ -36,6 +36,7 @@
     <div id="topBar">
       <button id="openBtn">📂</button>
       <button id="saveBtn">💾</button>
+      <button id="serverSaveBtn">🗄️</button> 
       <button id="resetBtn">🧹</button>
       <button id="themeToggle">🌗</button>
     </div>
@@ -69,12 +70,17 @@
     import * as THREE from "three";
     import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
     import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-    // import { OutlineEffect } from "three/examples/jsm/effects/OutlineEffect.js";
-    // import { EdgesGeometry } from "https://esm.run/three@0.158.0/src/geometries/EdgesGeometry.js";
-    // import { LineSegments } from "https://esm.run/three@0.158.0/src/objects/LineSegments.js";
-    // import { LineBasicMaterial } from "https://esm.run/three@0.158.0/src/materials/LineBasicMaterial.js";
 
     const FILETREE_URL = "{{ filetree_url|escapejs }}";
+    const DIE_NO = "{{ die_no|escapejs }}";
+    const PROFILE_NO = "{{ profile_no|escapejs }}";
+
+    function getCookie(name) { // NEW
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    const csrftoken = getCookie('csrftoken');
 
     const viewer = document.getElementById('viewer');
     const scene = new THREE.Scene();
@@ -86,13 +92,6 @@
     renderer.setClearColor(0xf0f0f0);
     renderer.setSize(viewer.clientWidth, viewer.clientHeight);
     viewer.appendChild(renderer.domElement);
-
-    // const effect = new OutlineEffect(renderer, {
-    //   defaultThickness: 0.0018,
-    //   defaultColor: [0, 0, 0],
-    //   defaultAlpha: 0.8,
-    //   defaultKeepAlive: true
-    // });
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -323,6 +322,34 @@
       };
       input.click();
     };
+
+    async function saveToServer() {
+      const data = addedParts.map(p => ({
+        path: p.path,
+        offset: p.obj.position.z,
+        rotate: THREE.MathUtils.radToDeg(p.obj.rotation.z)
+      }));
+
+      const resp = await fetch("{% url 'ArslanTakipApp:takimlama_save' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ die_no: DIE_NO, profile_no: PROFILE_NO, data })
+      });
+
+      const js = await resp.json();
+      if (js.ok) {
+        alert('Takımlama kaydedildi.');
+      } else {
+        alert('Kaydetme hatası!');
+      }
+    }
+
+    // Buton bağlama
+    document.getElementById('serverSaveBtn').onclick = saveToServer;
   </script>
  
 </body>
