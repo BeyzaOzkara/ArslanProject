@@ -5743,21 +5743,12 @@ def takimlama_load(request):
         return HttpResponseBadRequest("die_no ve profile_no zorunlu")
 
     try:
-        di = DieInfo.objects.get(die_no=die_no)
+        di = DieInfo.objects.get(die_no=die_no, profil_no=profile_no)
     except DieInfo.DoesNotExist:
         return JsonResponse({'data': []})  # hiç kayıt yok
 
     md = di.meta_data or {}
-    # Yapı: meta_data['takim_json'] tek bir liste olabilir
-    # veya çoklu profil için meta_data['takim_json'][profile_no] olabilir.
-    takim_json = md.get('takimlama', {})
-
-    if isinstance(takim_json, dict):
-        data = takim_json.get(profile_no, [])
-    else:
-        # eski tek-katmanlı format
-        data = takim_json or []
-
+    data = md.get('takimlama', [])
     return JsonResponse({'data': data})
 
 @require_POST
@@ -5793,7 +5784,7 @@ def takimlama_save(request):
     # Kaydet
     di, _created = DieInfo.objects.get_or_create(
         die_no=die_no,
-        profile_no= profile_no
+        profil_no= profile_no
     )
     md = di.meta_data or {}
     if "takimlama" not in md or not isinstance(md["takimlama"], dict):
