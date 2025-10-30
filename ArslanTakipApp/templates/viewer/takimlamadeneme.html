@@ -69,7 +69,7 @@
     import * as THREE from "three";
     import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
     import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-    import { OutlineEffect } from "three/examples/jsm/effects/OutlineEffect.js";
+    // import { OutlineEffect } from "three/examples/jsm/effects/OutlineEffect.js";
     // import { EdgesGeometry } from "https://esm.run/three@0.158.0/src/geometries/EdgesGeometry.js";
     // import { LineSegments } from "https://esm.run/three@0.158.0/src/objects/LineSegments.js";
     // import { LineBasicMaterial } from "https://esm.run/three@0.158.0/src/materials/LineBasicMaterial.js";
@@ -87,12 +87,12 @@
     renderer.setSize(viewer.clientWidth, viewer.clientHeight);
     viewer.appendChild(renderer.domElement);
 
-    const effect = new OutlineEffect(renderer, {
-      defaultThickness: 0.0018,
-      defaultColor: [0, 0, 0],
-      defaultAlpha: 0.8,
-      defaultKeepAlive: true
-    });
+    // const effect = new OutlineEffect(renderer, {
+    //   defaultThickness: 0.0018,
+    //   defaultColor: [0, 0, 0],
+    //   defaultAlpha: 0.8,
+    //   defaultKeepAlive: true
+    // });
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -105,6 +105,21 @@
     const fill = new THREE.DirectionalLight(0xffffff, 0.5);
     fill.position.set(-300, -200, -400);
     scene.add(fill);
+
+    function addEdges(mesh) { // NEW
+      try {
+        const edges = new THREE.EdgesGeometry(mesh.geometry, 12);
+        const mat = new THREE.LineBasicMaterial({
+          color: 0x000000,
+          // polygonOffset line materyallerde etkisiz olabilir; renderOrder ile öne alıyoruz
+        });
+        const line = new THREE.LineSegments(edges, mat);
+        line.renderOrder = 9999;
+        mesh.add(line);
+      } catch (e) {
+        console.warn("Edge çizimi atlandı:", e);
+      }
+    }
 
     const loader = new GLTFLoader();
     let zOffset = 0;
@@ -122,6 +137,7 @@
                 color: 0xeeeeee, metalness: 0.05, roughness: 0.3, flatShading: true
               });
               o.geometry.computeVertexNormals();
+              addEdges(o); // NEW
             }
           });
           resolve(glb.scene);
