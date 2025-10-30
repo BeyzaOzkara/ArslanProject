@@ -59,15 +59,15 @@
   <div id="viewer"></div>
 
   <script type="module">
-    // import * as THREE from "{% static 'node_modules/three/build/three.module.js' %}";
-    // import { OrbitControls } from "{% static 'node_modules/three/examples/jsm/controls/OrbitControls.js' %}";
-    // import { GLTFLoader } from "{% static 'node_modules/three/examples/jsm/loaders/GLTFLoader.js' %}";
-    // import { OutlineEffect } from "{% static 'node_modules/three/examples/jsm/effects/OutlineEffect.js' %}";
+    import * as THREE from "{% static 'node_modules/three/build/three.module.js' %}";
+    import { OrbitControls } from "{% static 'node_modules/three/examples/jsm/controls/OrbitControls.js' %}";
+    import { GLTFLoader } from "{% static 'node_modules/three/examples/jsm/loaders/GLTFLoader.js' %}";
+    import { OutlineEffect } from "{% static 'node_modules/three/examples/jsm/effects/OutlineEffect.js' %}";
 
-    import * as THREE from "https://esm.run/three@0.158.0";
-    import { OrbitControls } from "https://esm.run/three@0.158.0/examples/jsm/controls/OrbitControls.js";
-    import { GLTFLoader } from "https://esm.run/three@0.158.0/examples/jsm/loaders/GLTFLoader.js";
-    import { OutlineEffect } from "https://esm.run/three@0.158.0/examples/jsm/effects/OutlineEffect.js";
+    // import * as THREE from "https://esm.run/three@0.158.0";
+    // import { OrbitControls } from "https://esm.run/three@0.158.0/examples/jsm/controls/OrbitControls.js";
+    // import { GLTFLoader } from "https://esm.run/three@0.158.0/examples/jsm/loaders/GLTFLoader.js";
+    // import { OutlineEffect } from "https://esm.run/three@0.158.0/examples/jsm/effects/OutlineEffect.js";
 
     const FILETREE_URL = "{{ filetree_url|escapejs }}";
 
