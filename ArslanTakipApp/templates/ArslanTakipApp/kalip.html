@@ -378,7 +378,7 @@ async function initializeTakimlama() {
         .replace('__D__', encodeURIComponent(die_no))
         .replace('__P__', encodeURIComponent(profile_no));
 
-      const host = document.getElementById('takimlamaHost');
+      const host = document.getElementById('custom-tabs-two-takimlama');
       // Parçayı yükle ve yerleştir
       const html = await (await fetch(embedUrl, {headers: {'X-Requested-With': 'XMLHttpRequest'}})).text();
       host.innerHTML = html;
