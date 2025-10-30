@@ -5772,7 +5772,7 @@ def takimlama_save(request):
       "data": [ { "path": "/media/takimlama/..../x.glb", "offset": 0, "rotate": 0 }, ... ]
     }
     Kaydetme stratejisi:
-      meta_data['takim_json'][profile_no] = data
+      DieInfo.meta_data['takim_json'][profile_no] = data
     """
     try:
         payload = json.loads(request.body.decode('utf-8'))
@@ -5785,16 +5785,35 @@ def takimlama_save(request):
 
     if not die_no or not profile_no or data is None:
         return HttpResponseBadRequest("die_no, profile_no ve data zorunlu")
+    
+    # Liste bekliyoruz; yine de gevşek doğrulama yapalım
+    if not isinstance(data, list):
+        return HttpResponseBadRequest("data bir liste olmalı")
 
-    di, _created = DieInfo.objects.get_or_create(die_no=die_no, defaults={'profil_no': profile_no})
+    # Kaydet
+    di, _created = DieInfo.objects.get_or_create(
+        die_no=die_no,
+        defaults={"profil_no": profile_no}
+    )
     md = di.meta_data or {}
+    if "takim_json" not in md or not isinstance(md["takim_json"], dict):
+        md["takim_json"] = {}
+    md["takim_json"][profile_no] = data
 
-    # çoklu profil desteği:
-    if 'takim_json' not in md or not isinstance(md['takim_json'], dict):
-        md['takim_json'] = {}
-
-    md['takim_json'][profile_no] = data
     di.meta_data = md
-    di.save(update_fields=['meta_data'])
+    di.save(update_fields=["meta_data"])
 
-    return JsonResponse({'ok': True})
+    return JsonResponse({"ok": True})
+
+    # di, _created = DieInfo.objects.get_or_create(die_no=die_no, defaults={'profil_no': profile_no})
+    # md = di.meta_data or {}
+
+    # # çoklu profil desteği:
+    # if 'takim_json' not in md or not isinstance(md['takim_json'], dict):
+    #     md['takim_json'] = {}
+
+    # md['takim_json'][profile_no] = data
+    # di.meta_data = md
+    # di.save(update_fields=['meta_data'])
+
+    # return JsonResponse({'ok': True})
