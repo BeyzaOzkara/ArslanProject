@@ -5727,15 +5727,6 @@ def takimlama_view(request, die_no: str, profile_no: str):
 
 @login_required
 def takimlama_embed(request, die_no: str, profile_no: str):
-    # Aynı sayfaya gömülecek parça (partial). <div> içine yüklenir.
-    # Head/body yok—sadece içerik (JS, HTML, CSS birlikte).
-    # return render(request, 'viewer/takimlama_embed.html', {
-    #     'die_no': die_no,
-    #     'profile_no': profile_no,
-    #     'filetree_url': request.build_absolute_uri(
-    #         request.path.replace(f'embed/{die_no}/{profile_no}/', 'filetree')
-    #     )
-    # })
     """
     Eğer istek AJAX (embed) geldiyse, sadece gövde kısmını render eder.
     """
@@ -5749,7 +5740,7 @@ def takimlama_embed(request, die_no: str, profile_no: str):
         return HttpResponseBadRequest("Kalıp bulunamadı")
 
     filetree_url = reverse('ArslanTakipApp:takimlama_filetree')
-    return render(request, 'ArslanTakipApp/takimlama_view.html', {
+    return render(request, 'ArslanTakipApp/takimlamadeneme.html', {
         'die_no': die_no,
         'profile_no': profile_no,
         'filetree_url': filetree_url,
