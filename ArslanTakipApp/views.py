@@ -5740,7 +5740,7 @@ def takimlama_embed(request, die_no: str, profile_no: str):
         return HttpResponseBadRequest("Kalıp bulunamadı")
 
     filetree_url = reverse('ArslanTakipApp:takimlama_filetree')
-    return render(request, 'ArslanTakipApp/takimlamadeneme.html', {
+    return render(request, 'viewer/takimlamadeneme.html', {
         'die_no': die_no,
         'profile_no': profile_no,
         'filetree_url': filetree_url,
