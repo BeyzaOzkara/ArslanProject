@@ -405,19 +405,32 @@ async function initializeTakimlama() {
         .replace('__P__', encodeURIComponent(profile_no));
 
         const htmlText = await (await fetch(embedUrl, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin'
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
         })).text();
 
-        // innerHTML ile eklenen <script> tag’leri otomatik çalışmaz;
-        // bu helper ile script’leri yeniden enjekte edip çalıştırıyoruz.
-        // injectHTMLWithScripts(host, htmlText);
+        injectHTMLWithScripts(host, htmlText);
 
-        // istersen otomatik scroll
+        // otomatik scroll
         host.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (err) {
+    } 
+    catch (err) {
         console.error(err);
         host.innerHTML = `<div style="padding:12px; color:#b00020">Takımlama yüklenirken bir hata oluştu.</div>`;
+    }
+
+    function injectHTMLWithScripts(targetEl, html) {
+        targetEl.innerHTML = html;
+
+        const scripts = Array.from(targetEl.querySelectorAll('script'));
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            Array.from(oldScript.attributes).forEach(attr =>
+                newScript.setAttribute(attr.name, attr.value)
+            );
+            newScript.text = oldScript.text;
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
     }
 
 
