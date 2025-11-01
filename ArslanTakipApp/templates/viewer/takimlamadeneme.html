@@ -6,15 +6,16 @@
   <title>Kalıp Takımlama Detayı</title>
   {% if embed_mode %}
   <style>
-    body {
-      margin: 0;
+    html, body {
+      height: auto !important;
+      overflow: auto !important;    /* ← sayfa scroll’u geri gelsin */
+    }
+    body {                           /* embed’te flex yapmayalım */
+      display: block !important;
       background: var(--bg);
-      height: auto; /* veya 600px */
-      overflow: hidden;
+      margin: 0;
     }
-    #viewer {
-      height: 600px;
-    }
+    #viewer { height: 600px; }
   </style>
   {% endif %}
   <style>
