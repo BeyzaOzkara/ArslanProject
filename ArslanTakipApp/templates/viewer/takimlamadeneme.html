@@ -135,6 +135,41 @@
       }
     }
 
+    async function getJson() {
+      const embedUrl = "{% url 'ArslanTakipApp:takimlama_load' die_no='__D__' profile_no='__P__' %}"
+        .replace('__D__', encodeURIComponent(die_no))
+        .replace('__P__', encodeURIComponent(profile_no));
+      console.log("Embed URL:", embedUrl);
+        const htmlText = await (await fetch(embedUrl, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        })).text();
+
+    }
+
+    async function loadMontage() {
+      // get the ssaved json
+      var data = getJson();
+      for (const p of data) {
+        try {
+          const obj = await loadGLB(p.path);
+          obj.position.z = p.offset ?? 0;
+          obj.rotation.z = THREE.MathUtils.degToRad(p.rotate ?? 0);
+          scene.add(obj);
+
+          const tr = document.createElement('tr');
+          const name = p.path.split('/').pop().replace(/\.glb$/i, '');
+          tr.innerHTML = `<td>${name}</td>`;
+          tr.onclick = () => selectRow(tr, obj);
+
+          addedTable.appendChild(tr);
+          addedParts.push({ path: p.path, obj, row: tr });
+        } catch (e) {
+          console.warn('Yüklenemedi:', p.path);
+        }
+      }
+    }
+
     const loader = new GLTFLoader();
     let zOffset = 0;
     const addedTable = document.querySelector('#addedTable tbody');

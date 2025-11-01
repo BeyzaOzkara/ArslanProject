@@ -5750,7 +5750,7 @@ def takimlama_embed(request, die_no: str, profile_no: str):
 
 @require_GET
 @login_required
-def takimlama_load(request):
+def takimlama_load(request, die_no: str, profile_no: str):
     die_no = request.GET.get('die_no')
     profile_no = request.GET.get('profile_no')
     if not die_no or not profile_no:

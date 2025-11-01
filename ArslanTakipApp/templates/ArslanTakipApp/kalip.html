@@ -411,7 +411,7 @@ async function initializeTakimlama() {
 
         // innerHTML ile eklenen <script> tag’leri otomatik çalışmaz;
         // bu helper ile script’leri yeniden enjekte edip çalıştırıyoruz.
-        injectHTMLWithScripts(host, htmlText);
+        // injectHTMLWithScripts(host, htmlText);
 
         // istersen otomatik scroll
         host.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -452,6 +452,8 @@ async function initializeTakimlama() {
     //   window.open(fullUrl, "_blank", "noopener");
     // }
 }
+
+
 
 function initializeGraphics() {
     let kalipNo = loadedData.currentDie;
