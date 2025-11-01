@@ -364,38 +364,93 @@ var toplamKalip = function(values, data, calcParams) {
 }
 
 async function initializeTakimlama() {
+    // kalıbın takımlaması olsun olmasın ilk önce bu tab içinde belirtelim otomatik bir ey açılmasın. 
     let die_no = loadedData.currentDie;
     let profile_no = loadedData.currentProfile;
-    // check if the die has any meta_data takimlama json.
-    const hasUrl = "{% url 'ArslanTakipApp:takimlama_has' %}" + `?die_no=${encodeURIComponent(die_no)}&profile_no=${encodeURIComponent(profile_no)}`;
-    const resp = await fetch(hasUrl);
-    const js = await resp.json();
-    console.log("takimlama has response:", js);
+    
+    const host = document.getElementById('custom-tabs-two-takimlama');
+    if (!host) return;
+    host.innerHTML = `<div style="padding:12px">Kontrol ediliyor …</div>`;
 
-    if (js.has) {
-      // Sayfa içinde göster (embed)
-      const embedUrl = "{% url 'ArslanTakipApp:takimlama_embed' die_no='__D__' profile_no='__P__' %}"
+    try {
+        // 1) var mı yok mu bak   
+        const hasUrl = "{% url 'ArslanTakipApp:takimlama_has' %}"
+        + `?die_no=${encodeURIComponent(die_no)}&profile_no=${encodeURIComponent(profile_no)}`;
+        const hasResp = await fetch(hasUrl, { credentials: 'same-origin' });
+        if (!hasResp.ok) throw new Error('Durum sorgulanamadı');
+        const { has } = await hasResp.json();
+
+        if (!has) {
+        // 2) yoksa CTA koy
+        const fullUrl = "{% url 'ArslanTakipApp:takimlama_view' die_no='__D__' profile_no='__P__' %}"
+            .replace('__D__', encodeURIComponent(die_no))
+            .replace('__P__', encodeURIComponent(profile_no));
+
+        host.innerHTML = `
+            <div style="padding:16px; background:#f8f9fa; border:1px solid #e3e6ea; border-radius:8px">
+            <div style="font-weight:600; margin-bottom:8px;">Kaydedilen bir takımlama yok.</div>
+            <div style="margin-bottom:12px; color:#555">Yenisini oluşturmak için tıklayınız.</div>
+            <button id="tkm-create-btn" style="padding:8px 12px; border:none; border-radius:6px; background:#2b80ff; color:white; cursor:pointer">Yeni Takımlama Oluştur</button>
+            </div>
+        `;
+        document.getElementById('tkm-create-btn').onclick = () => {
+            window.open(fullUrl, "_blank", "noopener");
+        };
+        return;
+        }
+
+        // 3) varsa embed et: AJAX ile partial’ı çekip HTML’i yerleştir
+        const embedUrl = "{% url 'ArslanTakipApp:takimlama_embed' die_no='__D__' profile_no='__P__' %}"
         .replace('__D__', encodeURIComponent(die_no))
         .replace('__P__', encodeURIComponent(profile_no));
 
-      const host = document.getElementById('custom-tabs-two-takimlama');
-      // Parçayı yükle ve yerleştir
-      const html = await (await fetch(embedUrl, {
-        headers: {'X-Requested-With': 'XMLHttpRequest'}})).text();
-      host.innerHTML = html;
+        const htmlText = await (await fetch(embedUrl, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+        })).text();
 
-      // İsteğe bağlı: host’a scroll yap
-      host.scrollIntoView({behavior: 'smooth', block: 'start'});
-    } 
-    else {
-      // Yeni sekme aç
-      console.log("takimlama not found, opening new tab");
-      const fullUrl = "{% url 'ArslanTakipApp:takimlama_view' die_no='__D__' profile_no='__P__' %}"
-        .replace('__D__', encodeURIComponent(die_no))
-        .replace('__P__', encodeURIComponent(profile_no));
-        console.log("Opening URL:", fullUrl);
-      window.open(fullUrl, "_blank", "noopener");
+        // innerHTML ile eklenen <script> tag’leri otomatik çalışmaz;
+        // bu helper ile script’leri yeniden enjekte edip çalıştırıyoruz.
+        injectHTMLWithScripts(host, htmlText);
+
+        // istersen otomatik scroll
+        host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+        console.error(err);
+        host.innerHTML = `<div style="padding:12px; color:#b00020">Takımlama yüklenirken bir hata oluştu.</div>`;
     }
+
+
+    // check if the die has any meta_data takimlama json.
+    // const hasUrl = "{% url 'ArslanTakipApp:takimlama_has' %}" + `?die_no=${encodeURIComponent(die_no)}&profile_no=${encodeURIComponent(profile_no)}`;
+    // const resp = await fetch(hasUrl);
+    // const js = await resp.json();
+    // console.log("takimlama has response:", js);
+
+    // if (js.has) {
+    //   // Sayfa içinde göster (embed)
+    //   const embedUrl = "{% url 'ArslanTakipApp:takimlama_embed' die_no='__D__' profile_no='__P__' %}"
+    //     .replace('__D__', encodeURIComponent(die_no))
+    //     .replace('__P__', encodeURIComponent(profile_no));
+
+    //   const host = document.getElementById('custom-tabs-two-takimlama');
+    //   // Parçayı yükle ve yerleştir
+    //   const html = await (await fetch(embedUrl, {
+    //     headers: {'X-Requested-With': 'XMLHttpRequest'}})).text();
+    //   host.innerHTML = html;
+
+    //   // İsteğe bağlı: host’a scroll yap
+    //   host.scrollIntoView({behavior: 'smooth', block: 'start'});
+    // } 
+    // else {
+    //   // Yeni sekme aç
+    //   console.log("takimlama not found, opening new tab");
+    //   const fullUrl = "{% url 'ArslanTakipApp:takimlama_view' die_no='__D__' profile_no='__P__' %}"
+    //     .replace('__D__', encodeURIComponent(die_no))
+    //     .replace('__P__', encodeURIComponent(profile_no));
+    //     console.log("Opening URL:", fullUrl);
+    //   window.open(fullUrl, "_blank", "noopener");
+    // }
 }
 
 function initializeGraphics() {

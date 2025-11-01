@@ -9,7 +9,7 @@
     body {
       margin: 0;
       background: var(--bg);
-      height: 600px; /* veya auto */
+      height: auto; /* veya 600px */
       overflow: hidden;
     }
     #viewer {
@@ -87,6 +87,8 @@
     const FILETREE_URL = "{{ filetree_url|escapejs }}";
     const DIE_NO = "{{ die_no|escapejs }}";
     const PROFILE_NO = "{{ profile_no|escapejs }}";
+    const embed_mode = "{{ embed_mode|escapejs }}";
+    console.log("Embed mode:", embed_mode);
 
     function getCookie(name) { // NEW
       const value = `; ${document.cookie}`;
