@@ -135,38 +135,52 @@
       }
     }
 
-    async function getJson() {
-      const embedUrl = "{% url 'ArslanTakipApp:takimlama_load' die_no='__D__' profile_no='__P__' %}"
-        .replace('__D__', encodeURIComponent(die_no))
-        .replace('__P__', encodeURIComponent(profile_no));
-      console.log("Embed URL:", embedUrl);
-        const htmlText = await (await fetch(embedUrl, {
-          headers: { 'X-Requested-With': 'XMLHttpRequest' },
-          credentials: 'same-origin'
-        })).text();
-
+    if (embed_mode === "True") {
+      loadMontage();
     }
 
     async function loadMontage() {
-      // get the ssaved json
-      var data = getJson();
-      for (const p of data) {
-        try {
-          const obj = await loadGLB(p.path);
-          obj.position.z = p.offset ?? 0;
-          obj.rotation.z = THREE.MathUtils.degToRad(p.rotate ?? 0);
-          scene.add(obj);
+      try {
+        // ✅ load endpoint’i query string ile çağır
+        const url = "{% url 'ArslanTakipApp:takimlama_load' %}"
+          + `?die_no=${encodeURIComponent(DIE_NO)}&profile_no=${encodeURIComponent(PROFILE_NO)}`;
 
-          const tr = document.createElement('tr');
-          const name = p.path.split('/').pop().replace(/\.glb$/i, '');
-          tr.innerHTML = `<td>${name}</td>`;
-          tr.onclick = () => selectRow(tr, obj);
+        const resp = await fetch(url, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        });
+        if (!resp.ok) throw new Error('takimlama_load yanıtı başarısız');
 
-          addedTable.appendChild(tr);
-          addedParts.push({ path: p.path, obj, row: tr });
-        } catch (e) {
-          console.warn('Yüklenemedi:', p.path);
+        // ✅ JSON içinden data’yı al
+        const js = await resp.json();
+        const arr = Array.isArray(js.data) ? js.data : [];
+
+        console.log("Montage data:", arr);
+
+        // Mevcut sahneyi ve tabloyu temizlemek istersen:
+        // addedParts.forEach(p => scene.remove(p.obj));
+        // addedParts.length = 0; addedTable.innerHTML = ""; zOffset = 0; selectedRow = null; selectedObj = null;
+
+        for (const p of arr) {
+          try {
+            const obj = await loadGLB(p.path);
+            obj.position.z = p.offset ?? 0;
+            obj.rotation.z = THREE.MathUtils.degToRad(p.rotate ?? 0);
+            scene.add(obj);
+
+            const tr = document.createElement('tr');
+            const name = p.path.split('/').pop().replace(/\.glb$/i, '');
+            tr.innerHTML = `<td>${name}</td>`;  // embed modda sade satır
+            tr.onclick = () => selectRow(tr, obj);
+
+            addedTable.appendChild(tr);
+            addedParts.push({ path: p.path, obj, row: tr });
+          } catch (e) {
+            console.warn('Yüklenemedi:', p.path, e);
+          }
         }
+      } catch (e) {
+        console.error('loadMontage hata:', e);
       }
     }
 

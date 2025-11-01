@@ -5750,9 +5750,10 @@ def takimlama_embed(request, die_no: str, profile_no: str):
 
 @require_GET
 @login_required
-def takimlama_load(request, die_no: str, profile_no: str):
+def takimlama_load(request): #, die_no: str, profile_no: str
     die_no = request.GET.get('die_no')
     profile_no = request.GET.get('profile_no')
+    print(f"takimlama_load: die_no={die_no}, profile_no={profile_no}")
     if not die_no or not profile_no:
         return HttpResponseBadRequest("die_no ve profile_no zorunlu")
 
