@@ -6,20 +6,125 @@
   <title>Kalıp Takımlama Detayı</title>
   {% if embed_mode %}
   <style>
-    html, body {
-      height: auto !important;
-      overflow: auto !important;    /* ← sayfa scroll’u geri gelsin */
-    }
-    body {                           /* embed’te flex yapmayalım */
-      display: block !important;
-      background: var(--bg);
-      margin: 0;
-    }
-    #viewer { height: 600px; }
+    #tkm-root { height: auto; }
+    #tkm-root #viewer { height: 600px; } /* embed içinde viewer yüksekliği */
   </style>
   {% endif %}
   <style>
-    :root { --bg:#f0f0f0; --fg:#111; --panel:#ddd; --button-bg:#ccc; --button-fg:#000; --highlight:#2b80ff; }
+    :root{
+      --bg:#f0f0f0; --fg:#111; --panel:#ddd; --button-bg:#ccc; --button-fg:#000; --highlight:#2b80ff;
+    }
+    [data-theme="dark"]{
+      --bg:#111; --fg:#eee; --panel:#222; --button-bg:#444; --button-fg:#eee; --highlight:#66aaff;
+    }
+
+    /* !!! ÖNEMLİ: Global body’ye overflow/height verme. Her şeyi #tkm-root içine scope et. */
+    html, body { margin:0; padding:0; }
+
+    /* Kök kapsayıcı: tüm layout bunun içinde */
+    #tkm-root{
+      display:flex;
+      height:100vh;            /* Tam sayfada “tam ekran” davranışı */
+      background:var(--bg);
+      color:var(--fg);
+      font-family:sans-serif;
+      box-sizing:border-box;
+      overflow:hidden;         /* Kendi içinde scroll yöneteceğiz */
+    }
+
+    /* Sol panel */
+    #tkm-root #left{
+      width:400px;
+      background:var(--panel);
+      display:flex;
+      flex-direction:column;
+      padding:10px;
+      box-sizing:border-box;
+      overflow:auto;           /* Sol panel kendi içinde scroll alabilsin */
+      border-right:1px solid #0001;
+    }
+
+    /* Viewer sahası */
+    #tkm-root #viewer{
+      flex:1;
+      position:relative;
+      background:var(--bg);
+      min-width:0;             /* flex overflow taşmasını engeller */
+    }
+
+    /* Üst buton barı */
+    #tkm-root #topBar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:8px;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    #tkm-root #topBar button{
+      width:64px; height:64px; font-size:32px; line-height:1;
+      display:flex; justify-content:center; align-items:center;
+      padding:0; border-radius:8px;
+      background:var(--button-bg); color:var(--button-fg);
+      transition:all .15s ease; border:none; cursor:pointer;
+    }
+    #tkm-root #topBar button:hover{
+      background:var(--highlight); color:#fff; transform:scale(1.08);
+    }
+
+    /* Genel buton */
+    #tkm-root button{
+      background:var(--button-bg); color:var(--button-fg);
+      border:none; padding:5px 8px; cursor:pointer; border-radius:5px; font-size:13px;
+    }
+    #tkm-root button:hover{ background:var(--highlight); color:#fff; }
+
+    /* Başlıklar */
+    #tkm-root h3{
+      margin:8px 0 6px; font-size:14px;
+      border-bottom:1px solid #8884; padding-bottom:3px;
+    }
+
+    /* Inputlar */
+    #tkm-root input[type="number"]{
+      width:55px; background:var(--button-bg); color:var(--button-fg);
+      border:none; border-radius:4px; padding:2px; text-align:right;
+    }
+
+    /* Tablo */
+    #tkm-root table{ border-collapse:collapse; width:100%; font-size:13px; }
+    #tkm-root th, #tkm-root td{
+      padding:3px 5px; border-bottom:1px solid #8884; text-align:left;
+    }
+    #tkm-root th{ background:var(--button-bg); font-weight:bold; }
+    #tkm-root tr.active{ background:var(--highlight); color:#fff; }
+
+    /* Bölümler */
+    #tkm-root #addedPanel{ flex:none; overflow:visible; }
+    #tkm-root #allParts{
+      flex:1; overflow:auto; min-height:100px;
+      border-top:1px solid #8884; margin-top:8px; padding-top:6px;
+    }
+
+    /* Dosya ağacı */
+    #tkm-root .folder{
+      cursor:pointer; user-select:none; display:flex; align-items:center; font-weight:bold; margin-top:4px;
+    }
+    #tkm-root .folder::before{
+      content:"▶"; display:inline-block; margin-right:5px; font-size:10px; transition:transform .2s ease;
+    }
+    #tkm-root .folder.open::before{ transform:rotate(90deg); }
+    #tkm-root .children{ margin-left:15px; display:none; }
+    #tkm-root .folder.open + .children{ display:block; }
+    #tkm-root #fileTree button{ margin-left:6px; font-size:12px; padding:1px 5px; }
+
+    /* Küçük ekranlarda sol panel daraltılabilir */
+    @media (max-width: 900px){
+      #tkm-root{ flex-direction:column; height:auto; }
+      #tkm-root #left{ width:auto; max-height:45vh; }
+      #tkm-root #viewer{ height:55vh; }
+    }
+    /* :root { --bg:#f0f0f0; --fg:#111; --panel:#ddd; --button-bg:#ccc; --button-fg:#000; --highlight:#2b80ff; }
     [data-theme="dark"] { --bg:#111; --fg:#eee; --panel:#222; --button-bg:#444; --button-fg:#eee; --highlight:#66aaff; }
     body { margin:0; overflow:hidden; font-family:sans-serif; display:flex; height:100vh; background:var(--bg); color:var(--fg); }
     #left { width:400px; background:var(--panel); display:flex; flex-direction:column; padding:10px; box-sizing:border-box; }
@@ -39,39 +144,41 @@
     #allParts { flex:1; overflow-y:auto; min-height:100px; border-top:1px solid #8884; margin-top:8px; padding-top:6px; }
     .folder { cursor:pointer; user-select:none; display:flex; align-items:center; font-weight:bold; margin-top:4px; }
     .folder::before { content:"▶"; display:inline-block; margin-right:5px; font-size:10px; transition:transform .2s ease; }
-    .folder.open::before { transform:rotate(90deg); }
+    .folder.open::before { transform:rotate(90deg); } 
     .children { margin-left:15px; display:none; }
     .folder.open + .children { display:block; }
-    #fileTree button { margin-left:6px; font-size:12px; padding:1px 5px; }
+    #fileTree button { margin-left:6px; font-size:12px; padding:1px 5px; } */
   </style>
 </head>
 <body data-theme="light">
-  <div id="left">
-    <div id="topBar">
-      <button id="openBtn">📂</button>
-      <button id="saveBtn">💾</button>
-      <button id="serverSaveBtn">🗄️</button> 
-      <button id="resetBtn">🧹</button>
-      <button id="themeToggle">🌗</button>
+  <div id="tkm-root">
+    <div id="left">
+      <div id="topBar">
+        <button id="openBtn">📂</button>
+        <!-- <button id="saveBtn">🗄️</button> -->
+        <button id="serverSaveBtn">💾</button> 
+        <button id="resetBtn">🧹</button>
+        <button id="themeToggle">🌗</button>
+      </div>
+
+      <div id="addedPanel">
+        <h3>Eklenen Parçalar</h3>
+        <table id="addedTable">
+          <thead>
+            <tr><th>Dosya</th><th>Öteleme mm</th><th>Döndürme °</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="allParts">
+        <h3>Tüm Parçalar</h3>
+        <div id="fileTree"></div>
+      </div>
     </div>
 
-    <div id="addedPanel">
-      <h3>Eklenen Parçalar</h3>
-      <table id="addedTable">
-        <thead>
-          <tr><th>Dosya</th><th>Öteleme mm</th><th>Döndürme °</th><th></th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div id="allParts">
-      <h3>Tüm Parçalar</h3>
-      <div id="fileTree"></div>
-    </div>
+    <div id="viewer"></div>
   </div>
-
-  <div id="viewer"></div>
   <script type="importmap">
   {
     "imports": {
@@ -263,7 +370,7 @@
       selectedObj = null;
     };
 
-    document.getElementById('saveBtn').onclick = () => {
+    /* document.getElementById('saveBtn').onclick = () => {
       const data = addedParts.map(p => ({
         path: p.path, // media URL’li tam yol
         offset: p.obj.position.z,
@@ -274,7 +381,7 @@
       a.href = URL.createObjectURL(blob);
       a.download = "montaj.json";
       a.click();
-    };
+    }; */
 
     async function buildTree() {
       const resp = await fetch(FILETREE_URL);
