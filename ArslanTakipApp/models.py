@@ -610,3 +610,7 @@ class DieInfo(models.Model):
     die_no = models.CharField(primary_key=True, max_length=64)
     profil_no = models.CharField(max_length=64, null=True, blank=True)
     meta_data = models.JSONField(null=True, blank=True, default=dict)
+
+    class Meta:
+        # DieInfo edit yetkisi
+        permissions = [("edit_dieinfo", "DieInfo Düzenleme Yetkisi")]

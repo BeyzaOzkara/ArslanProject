@@ -5721,7 +5721,7 @@ def takimlama_view(request, die_no: str, profile_no: str):
         'filetree_url': filetree_url,
         'embed_mode': False
         # 'filetree_url': request.build_absolute_uri(
-        #     request.path.replace(f'{die_no}/{profile_no}/', 'filetree')
+        #     request.path.replace(f'{die_no}/{profile_no}/', 'filetree') 
         # )
     })
 
@@ -5769,7 +5769,7 @@ def takimlama_load(request): #, die_no: str, profile_no: str
 @require_POST
 @login_required
 @transaction.atomic
-def takimlama_save(request):
+def takimlama_save(request): # kaydetme yetkisi varsa kaydetsin yoksa 403 
     """
     Body (JSON):
     {
@@ -5810,16 +5810,3 @@ def takimlama_save(request):
     di.save(update_fields=["meta_data"])
 
     return JsonResponse({"ok": True})
-
-    # di, _created = DieInfo.objects.get_or_create(die_no=die_no, defaults={'profil_no': profile_no})
-    # md = di.meta_data or {}
-
-    # # çoklu profil desteği:
-    # if 'takim_json' not in md or not isinstance(md['takim_json'], dict):
-    #     md['takim_json'] = {}
-
-    # md['takim_json'][profile_no] = data
-    # di.meta_data = md
-    # di.save(update_fields=['meta_data'])
-
-    # return JsonResponse({'ok': True})
