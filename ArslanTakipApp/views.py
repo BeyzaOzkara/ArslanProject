@@ -4175,48 +4175,114 @@ def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
         start_time = end_time - datetime.timedelta(hours=72)
-        plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time, event_type='Extrusion').values_list('static_data', flat=True)
-        # plc_data = PlcData.objects.using('plc4').filter(start__gte=start_time).values_list('singular_params', flat=True)
+
+        plc_data = EventData.objects.using('dms') \
+            .filter(start_time__gte=start_time, event_type='Extrusion') \
+            .values_list('static_data', flat=True)
+
         profil_listesi = set()
-        cleaned_to_original = {} 
+        cleaned_to_original = {}
+
         for singular_params in plc_data:
             if not singular_params:
                 continue
+
             die_number = singular_params.get("DieNumber", "")
             if not die_number:
                 continue
+
             cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-            if cleaned_die_number not in profil_listesi:
-                alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
-                if alt_group:
-                    alternative_dies = set(alt_group.profiller)
-                    # alternative_dies.discard(cleaned_die_number)
-                    # print(f"second alternative dies: {alternative_dies}")
-                    # if alternative_dies:
-                    #     cleaned_die_number = next(iter(alternative_dies))
-                    # alternative_dies = alt_group.profiller
-                    for alternative_die in alternative_dies:
-                        if alternative_die not in profil_listesi:
-                            cleaned_die_number = alternative_die
-                            print(f"cleaned_die_number: {cleaned_die_number}")
+
+            # Önce muadil grup bul
+            alt_group = KalipMuadil.objects.filter(
+                profiller__contains=[cleaned_die_number]
+            ).first()
+
+            if alt_group:
+                # *** set() KULLANMA, sırasını bozmasın ***
+                for alternative_die in alt_group.profiller:
+                    alt_cleaned = alternative_die.replace(" ", "")
+
+                    profil_listesi.add(alt_cleaned)
+
+                    if alt_cleaned not in cleaned_to_original:
+                        cleaned_to_original[alt_cleaned] = set()
+                    cleaned_to_original[alt_cleaned].add(die_number)
+            else:
+                # Muadil yoksa sadece kendi kalıbını ekle
                 profil_listesi.add(cleaned_die_number)
-                # if cleaned_die_number not in cleaned_to_original:
-                #     cleaned_to_original[cleaned_die_number] = []
-                # cleaned_to_original[cleaned_die_number].append(die_number)
-            if cleaned_die_number not in cleaned_to_original:
-                cleaned_to_original[cleaned_die_number] = set()  # Use a set to avoid duplicates
-            
-            # Add the original die_number to the set
-            cleaned_to_original[cleaned_die_number].add(die_number)
-        siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('ProfilNo', flat=True ).distinct()
+
+                if cleaned_die_number not in cleaned_to_original:
+                    cleaned_to_original[cleaned_die_number] = set()
+                cleaned_to_original[cleaned_die_number].add(die_number)
+
+        siparis_query = SiparisList.objects.using('dies').filter(
+            Q(Adet__gt=0)
+            & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1))
+            & Q(BulunduguYer='TESTERE')
+        ).exclude(SiparisTamam='BLOKE')
+
+        siparisler = siparis_query.filter(
+            ProfilNo__in=profil_listesi
+        ).values_list('ProfilNo', flat=True).distinct()
+
         final_list = [
-            original_die for cleaned_die_number, original_dies in cleaned_to_original.items()
+            original_die
+            for cleaned_die_number, original_dies in cleaned_to_original.items()
             if cleaned_die_number in siparisler
             for original_die in original_dies
         ]
+
         return JsonResponse(final_list, safe=False)
+
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+# def get_kalip_no_list(request):
+#     if request.method == 'GET':
+#         end_time = timezone.now()
+#         start_time = end_time - datetime.timedelta(hours=72)
+#         plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time, event_type='Extrusion').values_list('static_data', flat=True)
+#         profil_listesi = set()
+#         cleaned_to_original = {} 
+#         for singular_params in plc_data:
+#             if not singular_params:
+#                 continue
+#             die_number = singular_params.get("DieNumber", "")
+#             if not die_number:
+#                 continue
+#             cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
+#             if cleaned_die_number not in profil_listesi:
+#                 alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
+#                 if alt_group:
+#                     alternative_dies = set(alt_group.profiller)
+#                     # alternative_dies.discard(cleaned_die_number)
+#                     # print(f"second alternative dies: {alternative_dies}")
+#                     # if alternative_dies:
+#                     #     cleaned_die_number = next(iter(alternative_dies))
+#                     # alternative_dies = alt_group.profiller
+#                     for alternative_die in alternative_dies:
+#                         if alternative_die not in profil_listesi:
+#                             cleaned_die_number = alternative_die
+#                             print(f"cleaned_die_number: {cleaned_die_number}")
+#                 profil_listesi.add(cleaned_die_number)
+#                 # if cleaned_die_number not in cleaned_to_original:
+#                 #     cleaned_to_original[cleaned_die_number] = []
+#                 # cleaned_to_original[cleaned_die_number].append(die_number)
+#             if cleaned_die_number not in cleaned_to_original:
+#                 cleaned_to_original[cleaned_die_number] = set()  # Use a set to avoid duplicates
+            
+#             # Add the original die_number to the set
+#             cleaned_to_original[cleaned_die_number].add(die_number)
+#         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
+#         siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('ProfilNo', flat=True ).distinct()
+#         final_list = [
+#             original_die for cleaned_die_number, original_dies in cleaned_to_original.items()
+#             if cleaned_die_number in siparisler
+#             for original_die in original_dies
+#         ]
+#         return JsonResponse(final_list, safe=False)
+#     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 def get_billet_lot_list(request):
     if request.method == 'GET':
