@@ -231,13 +231,13 @@ CELERY_RESULT_BACKEND = 'django-db'
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'check-email-every-minute': {
-        'task': 'ArslanTakipApp.tasks.start_email_listener',
-        'schedule': crontab(minute='*/10'),
-    },
+    # 'check-email-every-minute': {
+    #     'task': 'ArslanTakipApp.tasks.start_email_listener',
+    #     'schedule': crontab(minute='*/10'),
+    # },
     'send-test-email': {
         'task': 'ArslanTakipApp.tasks.start_test_report_listener', # test_report send_daily_test_report_for_all ve send_new_dies_without_orders_report
-        'schedule': crontab(minute=10, hour='10'),
+        'schedule': crontab(minute=25, hour='10'),
     },
     'check-rapor': {
         'task': 'ArslanTakipApp.tasks.start_rapor_listener',
