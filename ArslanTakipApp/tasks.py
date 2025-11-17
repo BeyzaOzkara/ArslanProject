@@ -9,24 +9,24 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-@shared_task
-def start_email_listener():
-    check_new_emails()
+# @shared_task # bu yok
+# def start_email_listener():
+#     check_new_emails()
 
-@shared_task
+@shared_task # 
 def start_rapor_listener():
     check_new_rapor()
 
-@shared_task
+@shared_task #
 def start_die_listener():
     check_new_dies()
     check_die_deletes()
 
-@shared_task
+@shared_task # bu yok
 def start_report__for_everyone_listener():
     send_report_email_for_all()
 
-@shared_task
+@shared_task # bu yok
 def start_report_listener_for_():
     send_report_email_for_all()
 
@@ -41,6 +41,9 @@ def start_test_report_listener():
     except Exception as e:
         logger.exception("!!! daily_test hata verdi: %s", e)
         raise
+
+@shared_task
+def start_new_dies_without_orders_report_listener():
     try:
         send_new_dies_without_orders_report()
         logger.info(">>> new_dies başarıyla bitti")
