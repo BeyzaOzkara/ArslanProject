@@ -334,4 +334,4 @@ def send_results(to_email, wrong_numbers, saved_numbers):
     </body>
     </html>"""
 
-    send_email(to_addresses=to_email, subject= subject, body= html)
+    send_email(to_addresses=to_email, cc_recipients="", subject= subject, body= html)
