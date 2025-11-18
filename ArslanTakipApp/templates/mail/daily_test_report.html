@@ -32,9 +32,9 @@
     </style>
 </head>
 <body>
+    {% if result_list %}
     <h2>Test Kalıpları Sipariş Durum Raporu</h2>
 
-    {% if result_list %}
     <table>
         <thead>
             <tr>
@@ -64,7 +64,9 @@
         </tbody>
     </table>
     {% else %}
-    <p>Bugün için raporlanacak test verisi bulunmamaktadır.</p>
+    <p style="margin: 0 0 16px 0;">Merhaba,</p>
+    <p style="margin: 0 0 16px 0;">Bugün TEST konumunda raporlanacak herhangi bir kalıp bulunmamaktadır.</p>
+    <p style="margin: 0;">İyi çalışmalar dilerim.</p>
     {% endif %}
 </body>
 </html>

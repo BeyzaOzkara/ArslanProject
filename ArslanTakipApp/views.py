@@ -183,7 +183,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
-    # send_daily_test_report_for_all()
+    send_daily_test_report_for_all()
     loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
@@ -4192,8 +4192,8 @@ def get_kalip_no_list(request):
                 continue
 
             cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-
-            # Önce muadil grup bul
+  
+            # Önce muadil grup bul 
             alt_group = KalipMuadil.objects.filter(
                 profiller__contains=[cleaned_die_number]
             ).first()
