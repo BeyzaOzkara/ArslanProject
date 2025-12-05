@@ -59,6 +59,126 @@ email_mapping = {
     }
 }
 
+def deneme_test():
+    print("=== DEBUG: Test raporu başlıyor ===")
+
+    result_list = []
+    kalipList = KalipMs.objects.using('dies').annotate(
+        trimmed_kalipno=Func(
+            F('KalipNo'), 
+            function='REPLACE',
+            template="%(function)s(%(expressions)s, ' ', '')"
+        )
+    )
+
+    # TEST lokasyonlarını yaz
+    test_locations = Location.objects.filter(locationName="TEST")
+    print(f"\nBulunan TEST lokasyon sayısı: {test_locations.count()}")
+    for tl in test_locations:
+        print(f"  -> TEST Location ID={tl.id}, presKodu={tl.presKodu}, parent={tl.locationRelationID_id}")
+
+    for location in test_locations:
+        print(f"\n--- TEST Lokasyonu İşleniyor: {location.id} / {location.presKodu} ---")
+
+        dieList = list(
+            DiesLocation.objects
+            .filter(kalipVaris=location)
+            .values_list('kalipNo', flat=True)
+        )
+
+        print(f"  >> DiesLocation'dan gelen kalıp sayısı: {len(dieList)}")
+        print(f"  >> Raw dieList: {dieList}")
+
+        if len(dieList) <= 0:
+            print("  !! Bu lokasyonda kalıp yok, atlanıyor.")
+            continue
+
+        # Kalıp numaralarından boşlukları sil
+        clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
+        print(f"  >> clean_dieList: {clean_dieList}")
+
+        # KalipMs ile eşleşenleri bul
+        dies = kalipList.filter(trimmed_kalipno__in=clean_dieList)
+        print(f"  >> KalipMs eşleşen kalıp sayısı: {dies.count()}")
+        print(f"  >> Eşleşen trimmed_kalipno listesi: {list(dies.values_list('KalipNo', 'trimmed_kalipno'))}")
+
+        if dies.count() == 0:
+            print("  !! UYARI: DiesLocation’daki kalıplar KalipMs ile eşleşmedi!")
+            print("  !! Muhtemel neden: KalipNo format farkı veya boşluk/tire uyuşmazlığı.")
+            # Debug için ham eşleşme dene
+            fallback = KalipMs.objects.using('dies').filter(KalipNo__in=dieList)
+            print(f"  >> Fallback (ham KalipNo) eşleşme sayısı: {fallback.count()}")
+            print(f"  >> Fallback eşleşenler: {list(fallback.values_list('KalipNo', flat=True))}")
+
+        today = datetime.now().date()
+
+        for die in dies:
+            print(f"\n  >> Kalıp işleniyor: {die.KalipNo}")
+
+            # --- HAREKET KAYDI ---
+            try:
+                last_move_record = Hareket.objects.filter(kalipNo=die.KalipNo).latest('hareketTarihi')
+                last_move_date = last_move_record.hareketTarihi
+                print(f"     last_move: {last_move_date}")
+            except Exception as e:
+                print(f"     !! HAREKET bulunamadı: {e}")
+                continue
+
+            move_date = last_move_date.strftime("%d-%m-%Y %H:%M")
+            wait_time = (today - last_move_date.date()).days
+            print(f"     wait_time: {wait_time} gün")
+
+            profil_no = die.ProfilNo
+            print(f"     profilNo: {profil_no}")
+
+            musteri_firma = " ".join(die.FirmaAdi.split()[:2]) if die.FirmaAdi else "Tanımsız"
+            print(f"     müşteri firma: {musteri_firma}")
+
+            # --- MÜŞTERİ TEMSİLCİSİ ---
+            musteri_tem_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi').first()
+            musteri_tem = musteri_tem_obj['MusteriTemsilcisi'] if musteri_tem_obj else "Tanımsız"
+            print(f"     müşteri temsilcisi: {musteri_tem}")
+
+            # --- SİPARİŞLER ---
+            siparis_qs = SiparisList.objects.using('dies').filter(
+                Q(ProfilNo=profil_no) &
+                Q(Adet__gt=0) &
+                ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) &
+                Q(BulunduguYer='TESTERE')
+            )
+            print(f"     siparis sayısı: {siparis_qs.count()}")
+
+            if siparis_qs.exists():
+                has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
+                has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
+
+                if has_open_order:
+                    order_status = 'Sipariş Açık'
+                elif has_blocked_order:
+                    order_status = 'Sipariş Bloke'
+                else:
+                    order_status = 'Sipariş Açık Değil'
+            else:
+                order_status = 'Sipariş Açık Değil'
+
+            print(f"     -> Sonuç order_status: {order_status}")
+
+            # Rapor listesine ekle
+            result_list.append({
+                'die': die.KalipNo,
+                'profile': profil_no,
+                'press': location.presKodu,
+                'order_status': order_status,
+                'representative': musteri_tem,
+                'client': musteri_firma,
+                'move_date': move_date,
+                'wait_time': wait_time
+            })
+
+    print("\n=== DEBUG: Rapor tamamlandı ===")
+    print(f"Toplam rapor satırı: {len(result_list)}")
+
+
 def send_daily_test_report_for_all():
     # her presin TEST konumunu al (locationNme'i TEST olan konumlar, hangi pres oldukları presKodu'unda yazıyor)
     # her bir konumda kalıp var mı bak varsa kalıpları getir

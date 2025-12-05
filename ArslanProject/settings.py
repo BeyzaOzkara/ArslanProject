@@ -244,7 +244,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour='7'),
     },
     'check-rapor': {
-        'task': 'ArslanTakipApp.tasks.start_rapor_listener',
+        'task': 'ArslanTakipApp.tasks.start_rapor_listener', 
         'schedule': crontab(minute=0, hour='2,5,8,11,14,17,20,23')
     },
     'check-die': {

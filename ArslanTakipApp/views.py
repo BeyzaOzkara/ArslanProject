@@ -64,7 +64,7 @@ from django.utils.encoding import force_bytes
 from django.forms.models import model_to_dict
 from .reports import send_report_email_for_all
 from DMS.models import EventData, TemporalData
-from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report, send_new_dies_without_orders_report
+from .utilities.test_report import send_daily_test_report_for_all, send_single_die_report, deneme_test
 from django.db.models import Func
 from .die_update import check_new_dies
 from pathlib import Path
