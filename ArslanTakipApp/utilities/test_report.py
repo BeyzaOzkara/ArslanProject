@@ -252,6 +252,7 @@ def send_daily_test_report_for_all():
     })
     send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject=subject, body=html_message)
 
+
 # her hareketten sonra gönderilen
 def send_test_report(dieList, press, user_info):
     print(f"dieList: {dieList}")
