@@ -233,7 +233,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'send-test-email': {
         'task': 'ArslanTakipApp.tasks.start_test_report_listener', # test_report send_daily_test_report_for_all ve send_new_dies_without_orders_report
-        'schedule': crontab(minute=52, hour='13'),
+        'schedule': crontab(minute=0, hour='7'),
     },
     'send-dies-without-orders-email': {
         'task': 'ArslanTakipApp.tasks.start_new_dies_without_orders_report_listener', # test_report send_daily_test_report_for_all ve send_new_dies_without_orders_report
