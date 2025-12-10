@@ -235,7 +235,7 @@ def location(request):
                 user_info = get_user_full_name(request.user.id)
                 kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
                 clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
-                dies = kalipList.filter(trimmed_kalipno__in=clean_dieList)
+                dies = kalipList.filter(trimmed_kalipno__in=clean_dieList).exclude(Silindi=1).exclude(AktifPasif='Pasif')
                 for die in dies:
                     send_single_die_report(die, lRec.presKodu, user_info)
             response = JsonResponse({'message': "Kalıplar Başarıyla Gönderildi."})

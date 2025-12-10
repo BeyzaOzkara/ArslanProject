@@ -37,13 +37,13 @@ def start_die_listener():
     finally:
         cache.delete(lock_id)
 
-@shared_task # bu yok
-def start_report__for_everyone_listener():
-    send_report_email_for_all()
+# @shared_task # bu yok
+# def start_report__for_everyone_listener():
+#     send_report_email_for_all()
 
-@shared_task # bu yok
-def start_report_listener_for_():
-    send_report_email_for_all()
+# @shared_task # bu yok
+# def start_report_listener_for_():
+#     send_report_email_for_all()
 
 @shared_task(ignore_result=True)
 def start_test_report_listener():
