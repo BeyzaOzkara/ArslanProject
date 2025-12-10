@@ -260,7 +260,7 @@ def send_test_report(dieList, press, user_info):
     result_list = []
     kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
     clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
-    dies = kalipList.filter(trimmed_kalipno__in=clean_dieList)
+    dies = kalipList.filter(trimmed_kalipno__in=clean_dieList).exclude(Silindi=1).exclude(AktifPasif='Pasif')
 
     recipients = email_mapping[press]
     to_addresses = recipients['to']
