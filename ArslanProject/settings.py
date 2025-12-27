@@ -246,6 +246,7 @@ CELERY_BEAT_SCHEDULE = {
     'check-die': {
         'task': 'ArslanTakipApp.tasks.start_die_listener',
         'schedule': crontab(minute='*/15'),
+        'options': {'queue': 'celery'},
     }
 }
 
