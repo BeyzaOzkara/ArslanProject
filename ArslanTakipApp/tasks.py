@@ -10,9 +10,6 @@ from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
-# @shared_task # bu yok
-# def start_email_listener():
-#     check_new_emails()
 
 @shared_task # 
 def start_rapor_listener():
@@ -25,25 +22,23 @@ def start_die_listener():
     - Tek seferde yeni kalıpları ve silinenleri kontrol eder.
     - Aynı anda sadece 1 instance çalışsın diye basit bir lock kullanır.
     """
+    logger.info(">>> start_die_listener tetiklendi: %s", timezone.now())
     lock_id = "start_die_listener_lock"
     # 4 dakika süren bir lock (gereğine göre değiştir)
     if not cache.add(lock_id, "true", 60 * 12):
         # Başka bir instance çalışıyor, bu task direkt çıksın
+        logger.warning(">>> start_die_listener LOCK nedeniyle çıkıyor")
         return
 
     try:
         check_new_dies()
         check_die_deletes()
+        logger.info(">>> start_die_listener bitti")
+    except Exception as e:
+        logger.exception("!!! start_die_listener hata: %s", e)
+        raise
     finally:
         cache.delete(lock_id)
-
-# @shared_task # bu yok
-# def start_report__for_everyone_listener():
-#     send_report_email_for_all()
-
-# @shared_task # bu yok
-# def start_report_listener_for_():
-#     send_report_email_for_all()
 
 @shared_task(ignore_result=True)
 def start_test_report_listener():
