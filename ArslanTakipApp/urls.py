@@ -211,4 +211,8 @@ urlpatterns = [
     path('takimlama/load/', views.takimlama_load, name='takimlama_load'),
     path('takimlama/save', views.takimlama_save, name='takimlama_save'),
     path('takimlama/has', views.takimlama_has, name='takimlama_has'),  # sadece var/yok kontrolü
+path("location/kalip-all", views.location_kalip_all, name="location_kalip_all"),
+path("location/kalip-split/", views.location_kalip_split, name="location_kalip_split"),
+
+
 ]

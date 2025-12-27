@@ -149,6 +149,188 @@ def can_user_send_to_pres(request, lRec):
             return # if not then break from the code
     return True
 
+@permission_required("ArslanTakipApp.view_location")
+@login_required
+def location_kalip_split(request):
+    """
+    GET /location/kalip-split?location_id=123
+    Seçilen lokasyon için kalıpları:
+      - aktif
+      - pasif/silinmiş
+      - master'da yok
+    şeklinde ayırıp döndürür.
+    """
+    location_id = request.GET.get("location_id")
+    if not location_id:
+        return JsonResponse({"error": "location_id gerekli"}, status=400)
+
+    try:
+        location_id_int = int(location_id)
+    except ValueError:
+        return JsonResponse({"error": "location_id sayı olmalı"}, status=400)
+
+    # kullanıcının görebildiği lokasyonlar
+    loc_qs = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location)
+    loc_list = list(loc_qs.values())
+    allowed_ids = {l["id"] for l in loc_list}
+
+    if location_id_int not in allowed_ids and not request.user.is_superuser:
+        return JsonResponse({"error": "Bu lokasyona erişim iznin yok"}, status=403)
+
+    # seçili lokasyon bilgisi
+    if request.user.is_superuser:
+        loca = Location.objects.values().get(id=location_id_int)
+    else:
+        loca = next((l for l in loc_list if l["id"] == location_id_int), None)
+        if not loca:
+            return JsonResponse({"error": "Lokasyon bulunamadı"}, status=404)
+
+    # hedef lokasyon id listesi (fiziksel değilse altındaki fiziksel lokasyonlar)
+    if loca["isPhysical"]:
+        target_ids = [location_id_int]
+    else:
+        target_ids = filter_locations(loc_list, target_id=location_id_int, depth=4)
+
+    # DiesLocation: bu lokasyon(lar)daki kalıplar
+    kalipNos = list(
+        DiesLocation.objects
+        .filter(kalipVaris_id__in=target_ids)
+        .values_list("kalipNo", flat=True)
+        .order_by("kalipNo")
+    )
+
+    # dies DB: KalipMs status’larını çek (tek seferde)
+    # NOTE: kalipNo formatı sizde bazen boşluklu olabiliyor.
+    # burada hem raw hem strip normalize ile eşleştirelim.
+    def norm(x: str) -> str:
+        return (x or "").replace(" ", "")
+
+    norm_map = {}  # norm_kalipno -> raw kalipNo (bir örnek)
+    for kn in kalipNos:
+        nk = norm(kn)
+        if nk and nk not in norm_map:
+            norm_map[nk] = kn
+
+    norm_list = list(norm_map.keys())
+
+    ms_rows = (
+        KalipMs.objects.using("dies")
+        .filter(KalipNo__in=kalipNos)  # önce raw dene (en hızlı)
+        .values("KalipNo", "Silindi", "AktifPasif")
+    )
+    ms_by_norm = {}
+    for r in ms_rows:
+        ms_by_norm[norm(r["KalipNo"])] = r
+
+    # raw eşleşmeyenler için ikinci deneme: norm list -> 20 char padding gibi durumlar varsa yakalamak için
+    missing_norms = [nk for nk in norm_list if nk not in ms_by_norm]
+    if missing_norms:
+        # 20 karakter padding’li olabilenler için ljust(20)
+        padded = [nk.ljust(20) for nk in missing_norms]
+        ms_rows2 = (
+            KalipMs.objects.using("dies")
+            .filter(KalipNo__in=padded)
+            .values("KalipNo", "Silindi", "AktifPasif")
+        )
+        for r in ms_rows2:
+            ms_by_norm[norm(r["KalipNo"])] = r
+
+    aktif = []
+    pasif = []
+    master_yok = []
+
+    for kn in kalipNos:
+        nk = norm(kn)
+        row = ms_by_norm.get(nk)
+        if not row:
+            master_yok.append(kn)
+            continue
+
+        if row["Silindi"] == 1 or row["AktifPasif"] == "Pasif":
+            pasif.append(kn)
+        else:
+            aktif.append(kn)
+
+    return JsonResponse({
+        "location_id": location_id_int,
+        "targets": target_ids,
+        "aktif_count": len(aktif),
+        "pasif_count": len(pasif),
+        "master_yok_count": len(master_yok),
+        "aktif": aktif,
+        "pasif": pasif,
+        "master_yok": master_yok,
+    })
+
+
+@permission_required("ArslanTakipApp.view_location")
+@login_required
+def location_kalip_all(request):
+    """
+    GET /location/kalip-all?location_id=123
+    Seçilen lokasyon fiziksel ise sadece o lokasyon,
+    fiziksel değilse altındaki fiziksel lokasyonların kalıplarını getirir.
+    """
+    location_id = request.GET.get("location_id")
+    if not location_id:
+        return JsonResponse({"error": "location_id gerekli"}, status=400)
+
+    # kullanıcının görebildiği lokasyonlar
+    loc_qs = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location)
+    loc_list = list(loc_qs.values())
+    allowed_ids = {l["id"] for l in loc_list}
+
+    try:
+        location_id_int = int(location_id)
+    except ValueError:
+        return JsonResponse({"error": "location_id sayı olmalı"}, status=400)
+
+    if location_id_int not in allowed_ids and not request.user.is_superuser:
+        return JsonResponse({"error": "Bu lokasyona erişim iznin yok"}, status=403)
+
+    # seçili lokasyonun fiziksel mi değil mi kontrolü
+    if request.user.is_superuser:
+        loca = Location.objects.values().get(id=location_id_int)
+    else:
+        loca = next((l for l in loc_list if l["id"] == location_id_int), None)
+        if not loca:
+            return JsonResponse({"error": "Lokasyon bulunamadı"}, status=404)
+
+    # hedef lokasyon id listesi
+    if loca["isPhysical"]:
+        target_ids = [location_id_int]
+    else:
+        # senin mevcut helper’ın: fiziksel alt lokasyonları toplayıp döndürüyor
+        target_ids = filter_locations(loc_list, target_id=location_id_int, depth=4)
+
+    query = DiesLocation.objects.filter(kalipVaris_id__in=target_ids).order_by("kalipNo")
+
+    if request.user.is_superuser:
+        # superuser için zaten tüm lokasyonlar serbest; yine de target_ids filtreliyoruz
+        query = DiesLocation.objects.filter(kalipVaris_id__in=target_ids).order_by("kalipNo")
+
+    # KalipMs üzerinden pasif/silinmiş ele
+    kalip_ms = KalipMs.objects.using("dies").all()
+    kalipNos = list(query.values_list("kalipNo", flat=True))
+
+    cleaned = []
+    for kn in kalipNos:
+        if kalip_ms.filter(KalipNo=kn).exists():
+            s = kalip_ms.get(KalipNo=kn)
+            if s.Silindi == 1 or s.AktifPasif == "Pasif":
+                continue
+        else:
+            continue
+        cleaned.append(kn)
+
+    return JsonResponse({
+        "location_id": location_id_int,
+        "count": len(cleaned),
+        "kalipNoList": cleaned,
+    })
+
+
+
 def hareketSave(dieList, lRec, dieTo, request):
     allowed_users = [45, 47, 52] # Adem Kuru, Şerafettin Şahin, İlker Çiçek
     user = request.user

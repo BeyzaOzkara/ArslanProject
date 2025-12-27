@@ -46,6 +46,39 @@
 {% block extra_js %}
 <script type="text/javascript">
 
+function logKaliplarForLocation(locationId) {
+  $.ajax({
+    url: "/location/kalip-all",
+    type: "GET",
+    data: { location_id: locationId },
+    success: function (res) {
+      console.log("---- Lokasyon:", locationId, "Toplam aktif kalıp:", res.count, "----");
+      console.log(res.kalipNoList);
+    },
+    error: function (xhr) {
+      console.error("Kalıp listesi alınamadı:", xhr.responseText || xhr.statusText);
+    },
+  });
+}
+
+function logKalipSplit(locationId) {
+  $.ajax({
+    url: "/location/kalip-split/",
+    type: "GET",
+    data: { location_id: locationId },
+    success: function (res) {
+      console.group(`Lokasyon ${locationId} | Aktif: ${res.aktif_count} | Pasif: ${res.pasif_count} | MasterYok: ${res.master_yok_count}`);
+      console.log("AKTİF:", res.aktif);
+      console.log("PASİF/SİLİNMİŞ:", res.pasif);
+      if (res.master_yok_count > 0) console.warn("MASTER'DA YOK:", res.master_yok);
+      console.groupEnd();
+    },
+    error: function (xhr) {
+      console.error("kalip-split hata:", xhr.responseText || xhr.statusText);
+    },
+  });
+}
+
 //initialize table
 var data = JSON.parse('{{ location_json|escapejs }}');
 var tableLoc = new Tabulator("#location-tree-table", {
@@ -73,8 +106,11 @@ tableLoc.on("rowClick", (e, rows) =>{
         loc = rda;
         tableKalip.setFilter([{ field: 'kalipVaris_id', type: '=', value: loc }]);
         tableHareket.setFilter([{ field: 'id', type: 'like', value: rda }]);
+        logKaliplarForLocation(rdata);
+        logKalipSplit(rdata);
     } 
 });
+
 
 tableLoc.on("headerClick", function(e, column){
     loc = "";
