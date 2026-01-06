@@ -112,7 +112,7 @@ DATABASES = {
     },
     'dies': {
         'ENGINE': 'mssql',
-        'NAME': 'ARSLAN_2025',
+        'NAME': 'ARSLAN_2026',
         'USER': 'arsbyz',
         'PASSWORD': '123',
         'HOST': '192.168.180.200', 

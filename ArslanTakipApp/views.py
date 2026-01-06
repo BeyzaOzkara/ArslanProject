@@ -593,14 +593,14 @@ def kalip_liste(request):
     params = json.loads(unquote(request.GET.get('params')))
     for i in params:
         value = params[i]
-        #print("Key and Value pair are ({}) = ({})".format(i, value))
+        # print("Key and Value pair are ({}) = ({})".format(i, value))
     size = params["size"]
     page = params["page"]
     offset, limit = calculate_pagination(page, size)
     filter_list = params["filter"]
     query = KalipMs.objects.using('dies').all()
     location_list = Location.objects.values()
-    q = {} 
+    q = {}
     
     if len(filter_list)>0:
         for i in filter_list:
@@ -617,7 +617,7 @@ def kalip_liste(request):
                 q[i['field']] = i['value']
     
     query = query.filter(**q).order_by('-UretimTarihi') 
-
+    
     g = list(query.values()[offset:limit])
     for c in g:
         if c['UretimTarihi'] != None:
