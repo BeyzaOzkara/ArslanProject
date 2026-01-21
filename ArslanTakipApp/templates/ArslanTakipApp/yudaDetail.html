@@ -1037,11 +1037,11 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
               style="cursor:pointer"
               data-url="http://arslan${fileUrl}"></i>`
         : '';
-      if (!viewIcon && is2dCad(f.File)) {
-          viewIcon = `<i class="fas fa-cube text-primary ml-2 view2d"
-              title="2D CAD Görüntüle"
-              style="cursor:pointer"
-              data-url="http://arslan${fileUrl}"></i>`};
+      // if (!viewIcon && is2dCad(f.File)) {
+      //     viewIcon = `<i class="fas fa-cube text-primary ml-2 view2d"
+      //         title="2D CAD Görüntüle"
+      //         style="cursor:pointer"
+      //         data-url="http://arslan${fileUrl}"></i>`};
 
       const listItem = $('<li style="font-size:1.2em"></li>').html(`
           <a href="${fileUrl}" target="_blank" class="btn-link text-secondary mr-1">
