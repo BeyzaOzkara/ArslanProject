@@ -813,11 +813,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     // open /viewer3d?url=<encoded> in a new tab
     window.open(`/viewer3d?url=${encodeURIComponent(url)}`, '_blank');
   });
-  $(document).on('click', '.view2d', function () {
-    const url = $(this).data('url');
-    // open /viewer3d?url=<encoded> in a new tab
-    window.open(`http://arslan:8082/?file=${encodeURIComponent(url)}`, '_blank');
-  });
+
   const cardYuda = $('#yudaCard');
   function LoadDetail() {
 
@@ -1021,12 +1017,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
       const supported = ['step','stp','iges','igs','brep','stl','obj','gltf','glb'];
       return supported.includes(ext);
     }
-    function is2dCad(pathOrName) {
-      const ext = (pathOrName.split('.').pop() || '').toLowerCase();
-      // Core formats supported by Online3DViewer single-file bundle
-      const supported = ['dwg','dxf'];
-      return supported.includes(ext);
-    }
+
 
     files.forEach(f => {
       const fileUrl = `/media/${f.File}`;
@@ -1037,11 +1028,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
               style="cursor:pointer"
               data-url="http://arslan${fileUrl}"></i>`
         : '';
-      // if (!viewIcon && is2dCad(f.File)) {
-      //     viewIcon = `<i class="fas fa-cube text-primary ml-2 view2d"
-      //         title="2D CAD Görüntüle"
-      //         style="cursor:pointer"
-      //         data-url="http://arslan${fileUrl}"></i>`};
+
 
       const listItem = $('<li style="font-size:1.2em"></li>').html(`
           <a href="${fileUrl}" target="_blank" class="btn-link text-secondary mr-1">
