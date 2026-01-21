@@ -1026,7 +1026,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     files.forEach(f => {
       const fileUrl = `/media/${f.File}`;
       const fname   = f.File.substring(6);
-      const viewIcon = isO3dvSupported(f.File)
+      var viewIcon = isO3dvSupported(f.File)
         ? `<i class="fas fa-cube text-primary ml-2 view3d"
               title="3D Görüntüle"
               style="cursor:pointer"
