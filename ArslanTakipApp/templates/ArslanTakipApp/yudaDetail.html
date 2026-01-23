@@ -773,16 +773,9 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
 
   // ✅ One handler for all viewer opens (2D/3D decision is inside fileRouter)
   $(document).on('click', '.open-with-viewer', function () {
-    const payload = $(this).attr('data-file');
-    if (!payload) return;
-
-    const fileObj = JSON.parse(decodeURIComponent(payload));
-    if (fileRouter) {
-      fileRouter.open(fileObj);
-    } else {
-      // fallback if router not loaded for any reason
-      window.open(fileObj.absoluteUrl || fileObj.url, '_blank');
-    }
+    e.preventDefault();
+    const fileObj = JSON.parse($(this).attr("data-file"));
+    fileRouter.open(fileObj);
   });
 
   const cardYuda = $('#yudaCard');
@@ -987,6 +980,12 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
       const fileUrl = `/media/${f.File}`;
       const absUrl  = `http://arslan${fileUrl}`;
       const fname   = f.File.substring(6);
+
+      const fileObj = {
+        name: fname,
+        url: fileUrl,
+        absoluteUrl: absUrl,
+      };
 
       // ✅ Decide type centrally (3d / 2d / pdf / image / default)
       const decision = fileRouter ? fileRouter.pick(fileObj) : { type: "default" };
