@@ -773,9 +773,16 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
 
   // ✅ One handler for all viewer opens (2D/3D decision is inside fileRouter)
   $(document).on('click', '.open-with-viewer', function () {
-    e.preventDefault();
-    const fileObj = JSON.parse($(this).attr("data-file"));
-    fileRouter.open(fileObj);
+    const payload = $(this).attr('data-file');
+    if (!payload) return;
+
+    const fileObj = JSON.parse(decodeURIComponent(payload));
+    if (fileRouter) {
+      fileRouter.open(fileObj);
+    } else {
+      // fallback if router not loaded for any reason
+      window.open(fileObj.absoluteUrl || fileObj.url, '_blank');
+    }
   });
 
   const cardYuda = $('#yudaCard');
