@@ -60,19 +60,6 @@
       fill:black;
       stroke:none
     }
-
-    /* @media print {
-      body {
-        visibility: hidden;
-      }
-      #yudaCard {
-        visibility: visible;
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
-    } */
-
     *,
 *::after,
 *::before{
@@ -514,7 +501,6 @@ body{
 
 </div>
 
-
 {% endblock %}
 
 {% block extra_js %}
@@ -525,6 +511,13 @@ body{
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var selectedFiles = [];
+
+  const fileRouter = (window.FileViewerRouter && window.FileViewerRouter.createRouter)
+  ? FileViewerRouter.createRouter({
+    open3d: (absUrl) => '/viewer3d?url=' + encodeURIComponent(absUrl),
+    open2d: (absUrl) => 'http://arslan:8082/?file=' + encodeURIComponent(absUrl),
+  })
+  : null;
 
   document.addEventListener("DOMContentLoaded", function () {
     $('#kalipNoEkleBtn').click(function() {
@@ -560,7 +553,6 @@ body{
     });
   });
 
-  
 let spoilerMode = false;
 let spoilerCounter = 0;
 let spoilerStartMarker = null;
@@ -777,52 +769,28 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
 
   window.toggleSpoiler = toggleSpoiler;
 
+  function printYuda() { window.print(); }
 
-  function printYuda() {
-    window.print();
-  };
+  // ✅ One handler for all viewer opens (2D/3D decision is inside fileRouter)
+  $(document).on('click', '.open-with-viewer', function () {
+    const payload = $(this).attr('data-file');
+    if (!payload) return;
 
-  function updateYudaTemplate() {
-    // var i = printData[0];
-    document.getElementById('tarih').innerText = i.Tarih;
-    document.getElementById('yudaNo').innerText = i.YudaNo;
-    document.getElementById('musteriFirma').innerText = i.MusteriFirma;
-    document.getElementById('cizimNo').innerText = i.CizimNo;
-    document.getElementById('musteriTemsilcisi').innerText = i.MusteriTemsilcisi;
-    document.getElementById('revizyonTarihi').innerText = i.RevTarih;
-
-    const tbody = document.getElementById('yuda-table-body');
-    tbody.innerHTML = '';
-
-    i.tableRows.forEach(row => {
-        const tr = document.createElement('tr');
-
-        for (const cell of row) {
-            const td = document.createElement('td');
-            td.innerText = cell;
-            tr.appendChild(td);
-        }
-
-        tbody.appendChild(tr);
-    });
+    const fileObj = JSON.parse(decodeURIComponent(payload));
+    if (fileRouter) {
+      fileRouter.open(fileObj);
+    } else {
+      // fallback if router not loaded for any reason
+      window.open(fileObj.absoluteUrl || fileObj.url, '_blank');
     }
-
-
-  $(document).on('click', '.view3d', function () {
-    const url = $(this).data('url');
-    // open /viewer3d?url=<encoded> in a new tab
-    window.open(`/viewer3d?url=${encodeURIComponent(url)}`, '_blank');
   });
-  $(document).on('click', '.view2d', function () {
-    const url = $(this).data('url');
-    // open /viewer3d?url=<encoded> in a new tab
-    window.open(`http://arslan:8082/?file=${encodeURIComponent(url)}`, '_blank');
-  });
+
   const cardYuda = $('#yudaCard');
-  function LoadDetail() {
 
+  function LoadDetail() {
     cardYuda.empty();  // Önceki verileri temizle
     var i = data[0];
+
     const yudaHeader = $('<div class="card-header"></div>').html(`
         <h3 class="card-title mr-2"> ${i.YudaNo}</h3>
         
@@ -1015,33 +983,21 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     const paketList = $('#paket');
     const digerDosList = $('#digerDos');
 
-    function isO3dvSupported(pathOrName) {
-      const ext = (pathOrName.split('.').pop() || '').toLowerCase();
-      // Core formats supported by Online3DViewer single-file bundle
-      const supported = ['step','stp','iges','igs','brep','stl','obj','gltf','glb'];
-      return supported.includes(ext);
-    }
-    function is2dCad(pathOrName) {
-      const ext = (pathOrName.split('.').pop() || '').toLowerCase();
-      // Core formats supported by Online3DViewer single-file bundle
-      const supported = ['dwg','dxf'];
-      return supported.includes(ext);
-    }
-
     files.forEach(f => {
       const fileUrl = `/media/${f.File}`;
+      const absUrl  = `http://arslan${fileUrl}`;
       const fname   = f.File.substring(6);
-      var viewIcon = isO3dvSupported(f.File)
-        ? `<i class="fas fa-cube text-primary ml-2 view3d"
-              title="3D Görüntüle"
+
+      // ✅ Decide type centrally (3d / 2d / pdf / image / default)
+      const decision = fileRouter ? fileRouter.pick(fileObj) : { type: "default" };
+      const canView = decision.type === "3d" || decision.type === "2d";
+
+      const viewIcon = canView
+        ? `<i class="fas fa-cube text-primary ml-2 open-with-viewer"
+              title="${decision.type === "3d" ? "3D Görüntüle" : "2D CAD Görüntüle"}"
               style="cursor:pointer"
-              data-url="http://arslan${fileUrl}"></i>`
+              data-file="${encodeURIComponent(JSON.stringify(fileObj))}"></i>`
         : '';
-      if (!viewIcon && is2dCad(f.File)) {
-          viewIcon = `<i class="fas fa-cube text-primary ml-2 view2d"
-              title="2D CAD Görüntüle"
-              style="cursor:pointer"
-              data-url="http://arslan${fileUrl}"></i>`};
 
       const listItem = $('<li style="font-size:1.2em"></li>').html(`
           <a href="${fileUrl}" target="_blank" class="btn-link text-secondary mr-1">
@@ -1060,50 +1016,26 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
           digerDosList.append(listItem);
       }
     });
-
-    // files.forEach(f => {
-    //     const listItem = $('<li style="font-size:1.2em"></li>').html(`
-    //         <a href="/media/${f.File}" target="_blank" class="btn-link text-secondary mr-1">
-    //             <i class="far fa-fw fa-file-word"></i> ${f.File.substring(6)}
-    //         </a>
-    //         <i class="fa fa-history" title="Revize Geçmişi" style="cursor: pointer;" aria-hidden="true"></i>
-    //     `);
-
-    //     if (f.FileTitle === "Teknik Resim") {
-    //         teknikList.append(listItem);
-    //     } else if (f.FileTitle === "Şartname") {
-    //         sartList.append(listItem);
-    //     } else if (f.FileTitle === "Paketleme Talimatı") {
-    //         paketList.append(listItem);
-    //     } else {
-    //         digerDosList.append(listItem);
-    //     }
-    // });
-
   };
 
   function nestedReplies(replies) {
     const nestedRepliesContainer = $('<div class="replies-container nested-replies"></div>');
-
     replies.forEach(reply => {
         const replyElement = createReplyElement(reply);
         nestedRepliesContainer.append(replyElement);
     });
-
     return nestedRepliesContainer;
   }
 
   function fileInputChange(e, r){
-    console.log("burda")
-      Array.from(e.target.files).forEach(function(newFile) {
-          if (!fileAlreadySelected(newFile)) {
-              selectedFiles.push(newFile);
-              updateFileList(r);
-          }
-      });
+    Array.from(e.target.files).forEach(function(newFile) {
+        if (!fileAlreadySelected(newFile)) {
+            selectedFiles.push(newFile);
+            updateFileList(r);
+        }
+    });
   }
   
-
   function createReplyElement(reply) {
     const userBlock = `<div class="user-block">
                           <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
@@ -1114,7 +1046,6 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     // Process spoilers in reply content
     const processedReply = processCommentSpoilers(reply.Aciklama, reply.Kullanici_id);
     const replyContent = `<p>${processedReply.content}</p>`;
-    // const replyContent = `<p>${reply.Aciklama}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
     reply.cfiles.forEach(cf => {
@@ -1193,7 +1124,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     const commentContent = `<p>${processedComment.content}</p>`;
     // const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
-
+// dosyalar kontrol edilsin 3d ya da 2d ona göre viewver açılsın
     comment.cfiles.forEach(cf => {
         const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
         const fileElement = $('<p></p>').append(fileLink);
