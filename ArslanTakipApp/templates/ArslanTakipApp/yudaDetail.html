@@ -507,17 +507,74 @@ body{
 <script>
   let userID = "{{user.id}}";
   var data = JSON.parse('{{ yuda_json|escapejs }}');
-  // var printData = JSON.parse('{{ printyuda_json|escapejs }}')
   var files = JSON.parse('{{ files_json|escapejs }}');
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var selectedFiles = [];
 
+  // -----------------------------
+  // File viewer router (shared)
+  // -----------------------------
   const fileRouter = (window.FileViewerRouter && window.FileViewerRouter.createRouter)
   ? FileViewerRouter.createRouter({
     open3d: (absUrl) => '/viewer3d?url=' + encodeURIComponent(absUrl),
     open2d: (absUrl) => 'http://arslan:8082/?file=' + encodeURIComponent(absUrl),
   })
   : null;
+
+  function makeMediaFileObj(filePath) {
+    const clean = (filePath || '').replace(/^\/?media\//, '').replace(/^\/+/, '');
+    const fileUrl = `/media/${clean}`;
+    const absUrl  = `http://arslan${fileUrl}`;
+    const fname = clean.includes('/') ? clean.split('/').pop() : clean;
+
+    return {
+      name: fname,
+      url: fileUrl,
+      absoluteUrl: absUrl,
+      path: clean,
+    };
+  }
+
+  function renderFileLinkWithViewer(cfFilePath) {
+    const fileObj = makeMediaFileObj(cfFilePath);
+
+    const decision = fileRouter ? fileRouter.pick(fileObj) : { type: "default" };
+    const canView = decision.type === "3d" || decision.type === "2d";
+
+    const viewIcon = canView
+      ? `<i class="fas fa-cube text-primary ml-2 open-with-viewer"
+            title="${decision.type === "3d" ? "3D Görüntüle" : "2D CAD Görüntüle"}"
+            style="cursor:pointer"
+            data-file="${encodeURIComponent(JSON.stringify(fileObj))}"></i>`
+      : '';
+
+    return `
+      <a href="${fileObj.url}" target="_blank" class="link-black text-sm">
+        <i class="fas fa-link mr-1"></i>${fileObj.name}
+      </a>
+      ${viewIcon}
+    `;
+  }
+
+  // ✅ One handler for all viewer opens (works for main files + comments + replies)
+  $(document).on('click', '.open-with-viewer', function () {
+    const payload = $(this).attr('data-file');
+    if (!payload) return;
+
+    let fileObj = null;
+    try {
+      fileObj = JSON.parse(decodeURIComponent(payload));
+    } catch (e) {
+      console.error("Invalid file payload", e);
+      return;
+    }
+
+    if (fileRouter) {
+      fileRouter.open(fileObj);
+    } else {
+      window.open(fileObj.absoluteUrl || fileObj.url, '_blank');
+    }
+  });
 
   document.addEventListener("DOMContentLoaded", function () {
     $('#kalipNoEkleBtn').click(function() {
@@ -771,20 +828,6 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
 
   function printYuda() { window.print(); }
 
-  // ✅ One handler for all viewer opens (2D/3D decision is inside fileRouter)
-  $(document).on('click', '.open-with-viewer', function () {
-    const payload = $(this).attr('data-file');
-    if (!payload) return;
-
-    const fileObj = JSON.parse(decodeURIComponent(payload));
-    if (fileRouter) {
-      fileRouter.open(fileObj);
-    } else {
-      // fallback if router not loaded for any reason
-      window.open(fileObj.absoluteUrl || fileObj.url, '_blank');
-    }
-  });
-
   const cardYuda = $('#yudaCard');
 
   function LoadDetail() {
@@ -986,15 +1029,11 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     files.forEach(f => {
       const fileUrl = `/media/${f.File}`;
       const absUrl  = `http://arslan${fileUrl}`;
-      const fname   = f.File.substring(6);
+      const clean   = (f.File || '').replace(/^\/?media\//, '');
+      const fname   = clean.includes('/') ? clean.split('/').pop() : clean;
 
-      const fileObj = {
-        name: fname,
-        url: fileUrl,
-        absoluteUrl: absUrl,
-      };
+      const fileObj = { name: fname, url: fileUrl, absoluteUrl: absUrl, path: clean };
 
-      // ✅ Decide type centrally (3d / 2d / pdf / image / default)
       const decision = fileRouter ? fileRouter.pick(fileObj) : { type: "default" };
       const canView = decision.type === "3d" || decision.type === "2d";
 
@@ -1054,10 +1093,15 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     const replyContent = `<p>${processedReply.content}</p>`;
     const replyElement = $('<div class="reply"></div>').append(userBlock, replyContent);
 
+    // reply.cfiles.forEach(cf => {
+    //     const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+    //     const fileElement = $('<p></p>').append(fileLink);
+    //     replyElement.append(fileElement);
+    // });
+    // ✅ files with viewer routing
     reply.cfiles.forEach(cf => {
-        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
-        const fileElement = $('<p></p>').append(fileLink);
-        replyElement.append(fileElement);
+      const fileElement = $('<p></p>').html(renderFileLinkWithViewer(cf.File));
+      replyElement.append(fileElement);
     });
 
     const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', () => {
@@ -1131,10 +1175,15 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     // const commentContent = `<p>${comment.Aciklama}</p>`;
     const commentElement = $('<div class="post"></div>').append(userBlock, commentContent);
 // dosyalar kontrol edilsin 3d ya da 2d ona göre viewver açılsın
+    // comment.cfiles.forEach(cf => {
+    //     const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
+    //     const fileElement = $('<p></p>').append(fileLink);
+    //     commentElement.append(fileElement);
+    // });
+    // ✅ files with viewer routing
     comment.cfiles.forEach(cf => {
-        const fileLink = $('<a href="/media/' + cf.File + '" target="_blank" class="link-black text-sm"></a>').text(cf.File.substring(6)).prepend('<i class="fas fa-link mr-1"></i>');
-        const fileElement = $('<p></p>').append(fileLink);
-        commentElement.append(fileElement);
+      const fileElement = $('<p></p>').html(renderFileLinkWithViewer(cf.File));
+      commentElement.append(fileElement);
     });
 
     const replyButton = $('<span><a class="" role="button" style="color:green" data-toggle="collapse" href="#replyCommentFive" aria-expanded="false" aria-controls="collapseExample">cevapla</a></span>').on('click', (e) => {
@@ -1328,7 +1377,6 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     editData.append("commentId", commentId);
     editData.append("commentText", textareaValue);
-    console.log(editData);
 
     $.ajax({
       url: '/yudaDCEdit',
