@@ -523,7 +523,7 @@ body{
 
   function makeMediaFileObj(filePath) {
     const clean = (filePath || '').replace(/^\/?media\//, '').replace(/^\/+/, '');
-    const fileUrl = `/media/${clean}`;
+    const fileUrl = `/media/media/${clean}`;
     const absUrl  = `http://arslan${fileUrl}`;
     const fname = clean.includes('/') ? clean.split('/').pop() : clean;
 
