@@ -511,15 +511,42 @@ body{
   var comments = JSON.parse('{{ comment_json|escapejs }}');
   var selectedFiles = [];
 
+  // yuda no / id hangisini göndermek istiyorsan burada belirle
+  // (örnek: YudaNo)
+  const yudaNo = (data && data[0] && data[0].YudaNo) ? String(data[0].YudaNo) : "";
+
+  // query param ekleme helper'ı
+  function addQuery(url, key, value) {
+    if (!value) return url;
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+  }
+
   // -----------------------------
   // File viewer router (shared)
   // -----------------------------
   const fileRouter = (window.FileViewerRouter && window.FileViewerRouter.createRouter)
   ? FileViewerRouter.createRouter({
-    open3d: (absUrl) => '/viewer3d?url=' + encodeURIComponent(absUrl),
-    open2d: (absUrl) => 'http://arslan:8082/?file=' + encodeURIComponent(absUrl),
-  })
+      open3d: (absUrl) => {
+        // /viewer3d?url=...&yuda=...
+        let url = '/viewer3d?url=' + encodeURIComponent(absUrl);
+        url = addQuery(url, "yudano", yudaNo); // istersen "yuda_no" yap
+        return url;
+      },
+      open2d: (absUrl) => {
+        // http://arslan:8082/?file=...&yuda=...
+        let url = 'http://arslan:8082/?file=' + encodeURIComponent(absUrl);
+        url = addQuery(url, "yudano", yudaNo);
+        return url;
+      },
+    })
   : null;
+  // const fileRouter = (window.FileViewerRouter && window.FileViewerRouter.createRouter)
+  // ? FileViewerRouter.createRouter({
+  //   open3d: (absUrl) => '/viewer3d?url=' + encodeURIComponent(absUrl),
+  //   open2d: (absUrl) => 'http://arslan:8082/?file=' + encodeURIComponent(absUrl),
+  // })
+  // : null;
 
   function makeMediaFileObj(filePath) {
     const clean = (filePath || '').replace(/^\/?media\//, '').replace(/^\/+/, '');
