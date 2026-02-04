@@ -1183,7 +1183,8 @@ function resetTabs() {
 }
 
 function openDwgViewer(dwgAbsUrl){
-  const url = "http://arslan:8082/?file=" + encodeURIComponent(dwgAbsUrl);
+  const dwgVia8082 = "http://arslan:8082/proxy?url=" + encodeURIComponent(dwgAbsUrl);
+  const url = "http://arslan:8082/?file=" + encodeURIComponent(dwgVia8082);
   window.open(url, "_blank", "noopener");
 }
 
