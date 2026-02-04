@@ -662,16 +662,40 @@ def kalip_liste(request):
 PROFILDESIGN_ROOT = r"\\server\share\ProfilDesign"  # sizde neyse
 
 def profildesign_file(request):
-    rel = request.GET.get("path", "")
+    # preflight için (CORS)
+    if request.method == "OPTIONS":
+        r = HttpResponse()
+        r["Access-Control-Allow-Origin"] = "http://arslan:8082"
+        r["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        r["Access-Control-Allow-Headers"] = "*"
+        return r
+
+    rel = request.GET.get("path", "") or ""
+
+    # normalize: slash/backslash, baştaki / \ temizle
+    rel = rel.replace("\\", "/").lstrip("/")
+
+    # eğer "ProfilDesign/..." geldiyse baştaki klasörü at
+    if rel.lower().startswith("profildesign/"):
+        rel = rel[len("profildesign/"):]
+
     # güvenlik: path traversal engelle
-    rel = rel.replace("..", "").lstrip("/\\")
+    rel = rel.replace("..", "")
+
     abs_path = os.path.join(PROFILDESIGN_ROOT, rel)
+    abs_path = os.path.normpath(abs_path)
+
+    # kök dışına çıkmayı engelle (ek güvenlik)
+    root_norm = os.path.normpath(PROFILDESIGN_ROOT)
+    if not abs_path.startswith(root_norm):
+        raise Http404("Invalid path")
 
     if not os.path.isfile(abs_path):
         raise Http404("File not found")
 
-    # FileResponse streaming yapar
-    return FileResponse(open(abs_path, "rb"), as_attachment=False, filename=os.path.basename(abs_path))
+    resp = FileResponse(open(abs_path, "rb"), as_attachment=False, filename=os.path.basename(abs_path))
+    resp["Access-Control-Allow-Origin"] = "http://arslan:8082"
+    return resp
 
 def kalip_rapor(request):
     params = json.loads(unquote(request.GET.get('params')))
