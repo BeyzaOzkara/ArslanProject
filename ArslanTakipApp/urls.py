@@ -54,6 +54,7 @@ urlpatterns = [
     path('kalip/hareket', views.kalip_hareket),
     path('kalip/yorum', views.kalip_yorum),
     path('kalip/profile_yorum', views.kalip_profile_yorum),
+    path("kalip/profildesign", views.profildesign_file, name="profildesign_file"),
 
 
     path('kalipdeneme/', login_required(views.KalipDenemeView.as_view())),

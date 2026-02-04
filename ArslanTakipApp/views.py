@@ -20,7 +20,7 @@ import math
 from urllib.parse import unquote
 from django.apps import apps
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse, FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
@@ -657,6 +657,21 @@ def kalip_liste(request):
     lastData['data'] = g
     data = json.dumps(lastData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     return HttpResponse(data)
+
+# ProfilDesign kök dizinin (server filesystem path)
+PROFILDESIGN_ROOT = r"\\server\share\ProfilDesign"  # sizde neyse
+
+def profildesign_file(request):
+    rel = request.GET.get("path", "")
+    # güvenlik: path traversal engelle
+    rel = rel.replace("..", "").lstrip("/\\")
+    abs_path = os.path.join(PROFILDESIGN_ROOT, rel)
+
+    if not os.path.isfile(abs_path):
+        raise Http404("File not found")
+
+    # FileResponse streaming yapar
+    return FileResponse(open(abs_path, "rb"), as_attachment=False, filename=os.path.basename(abs_path))
 
 def kalip_rapor(request):
     params = json.loads(unquote(request.GET.get('params')))
