@@ -1187,16 +1187,10 @@ function resetTabs() {
 //   const url = "http://arslan:8082/?file=" + encodeURIComponent(dwgVia8082);
 //   window.open(url, "_blank", "noopener");
 // }
-// function openDwgViewer(dwgServeUrl){
-//   const url = "http://arslan:8082/?file=" + encodeURIComponent(dwgServeUrl);
-//   window.open(url, "_blank", "noopener");
-// }
-function openDwgViewer(dwgAbsUrl){
-  const sameOriginFileUrl = "http://arslan:8082/file?src=" + encodeURIComponent(dwgAbsUrl);
-  const url = "http://arslan:8082/?file=" + encodeURIComponent(sameOriginFileUrl);
+function openDwgViewer(dwgServeUrl){
+  const url = "http://arslan:8082/?file=" + encodeURIComponent(dwgServeUrl);
   window.open(url, "_blank", "noopener");
 }
-
 
 function showKalipInfoCard(kalipNo) {
     const kalipInfoCard = document.getElementById("kalipInfoCard");
@@ -1212,17 +1206,13 @@ function showKalipInfoCard(kalipNo) {
                 const rdwg = data.ResimDizini.replace(/\s+/g, '') + "AutoCad.DWG";
                 const teknikUrl1 = "http://arslan/static" + rdizin.slice(13);
                 const teknikUrl2 = "http://arslan/static" + rdizin2.slice(13);
-                const dwgUrl = "http://arslan/static" + rdwg.slice(13);
+                // const dwgUrl = "http://arslan/static" + rdwg.slice(13);
                 const rdwgRaw = data.ResimDizini.replace(/\s+/g, '') + "AutoCad.DWG";
-// örnek: \ProfilDesign\37501-38000\37701-37800\37766\AutoCad.DWG
-let rel = rdwgRaw.slice(13).replace(/\\/g, '/');  // ProfilDesign/37501-...
-rel = rel.replace(/^\/+/, '');                    // baştaki / varsa sil
+                // rdwgRaw.slice(13) bazen "\ProfilDesign\..." geliyor -> URL için "/" olmalı
+                const rdwgRel = rdwgRaw.slice(13).replace(/\\/g, '/');
 
-// ProfilDesign/ ile başlıyorsa kaldır:
-rel = rel.replace(/^ProfilDesign\//i, '');
-
-const dwgServeUrl = "http://arslan/kalip/profildesign?path=" + encodeURIComponent(rel);
-// viewer (2D) linki
+                const dwgUrl = "http://arslan/static" + rdwgRel;
+                // viewer (2D) linki
                 // const dwgViewerUrl = "http://arslan:8082/?file=" + encodeURIComponent(dwgUrl);
 
                 let durum = data.Silindi == 1 ? "Silindi, Sebebi: " + data.SilinmeSebebi : (data.AktifPasif ? (data.Hatali ? "Aktif" : "Hatalı ve Aktif") : (data.Hatali ? "Pasif" : "Hatalı ve Pasif"));
@@ -1282,7 +1272,7 @@ const dwgServeUrl = "http://arslan/kalip/profildesign?path=" + encodeURIComponen
                         <div class="card-body" id="photos">  <!-- Fotoğraflar  -->
                             <div class="mt-3 d-flex align-items-center" style="gap:10px;">
                                 <button type="button" class="btn btn-outline-primary"
-                                        onclick="openDwgViewer('${dwgServeUrl}')">
+                                        onclick="openDwgViewer('${dwgUrl}')">
                                     <i class="fas fa-drafting-compass mr-1"></i> AutoCad.DWG (Viewer)
                                 </button>
 
