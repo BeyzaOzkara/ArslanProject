@@ -4394,7 +4394,7 @@ class Stacker4500View(generic.TemplateView):
 def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=72)
+        start_time = end_time - datetime.timedelta(hours=168)
 
         plc_data = EventData.objects.using('dms') \
             .filter(start_time__gte=start_time, event_type='Extrusion') \
@@ -4457,58 +4457,11 @@ def get_kalip_no_list(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
-
-# def get_kalip_no_list(request):
-#     if request.method == 'GET':
-#         end_time = timezone.now()
-#         start_time = end_time - datetime.timedelta(hours=72)
-#         plc_data = EventData.objects.using('dms').filter(start_time__gte=start_time, event_type='Extrusion').values_list('static_data', flat=True)
-#         profil_listesi = set()
-#         cleaned_to_original = {} 
-#         for singular_params in plc_data:
-#             if not singular_params:
-#                 continue
-#             die_number = singular_params.get("DieNumber", "")
-#             if not die_number:
-#                 continue
-#             cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-#             if cleaned_die_number not in profil_listesi:
-#                 alt_group = KalipMuadil.objects.filter(profiller__contains=[cleaned_die_number]).first()
-#                 if alt_group:
-#                     alternative_dies = set(alt_group.profiller)
-#                     # alternative_dies.discard(cleaned_die_number)
-#                     # print(f"second alternative dies: {alternative_dies}")
-#                     # if alternative_dies:
-#                     #     cleaned_die_number = next(iter(alternative_dies))
-#                     # alternative_dies = alt_group.profiller
-#                     for alternative_die in alternative_dies:
-#                         if alternative_die not in profil_listesi:
-#                             cleaned_die_number = alternative_die
-#                             print(f"cleaned_die_number: {cleaned_die_number}")
-#                 profil_listesi.add(cleaned_die_number)
-#                 # if cleaned_die_number not in cleaned_to_original:
-#                 #     cleaned_to_original[cleaned_die_number] = []
-#                 # cleaned_to_original[cleaned_die_number].append(die_number)
-#             if cleaned_die_number not in cleaned_to_original:
-#                 cleaned_to_original[cleaned_die_number] = set()  # Use a set to avoid duplicates
-            
-#             # Add the original die_number to the set
-#             cleaned_to_original[cleaned_die_number].add(die_number)
-#         siparis_query = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-#         siparisler = siparis_query.filter(ProfilNo__in=profil_listesi).values_list('ProfilNo', flat=True ).distinct()
-#         final_list = [
-#             original_die for cleaned_die_number, original_dies in cleaned_to_original.items()
-#             if cleaned_die_number in siparisler
-#             for original_die in original_dies
-#         ]
-#         return JsonResponse(final_list, safe=False)
-#     return JsonResponse({"error": "Invalid request method"}, status=400)
-
 def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=72)
+        start_time = end_time - datetime.timedelta(hours=168)
         billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
         # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
@@ -5678,253 +5631,12 @@ def kaliphane_get_tab_info(request):
                 emir['GercekOlcu'] = emir['KesimBoyu'] - 5
 
 
-
 class Stretcher4500View(generic.TemplateView):
     template_name = '4500/stretcher.html'
-
-
-# def extract_pdf_data(pdf_path):
-#     """PDF'in ilk sayfasından müşteri adı ve tablo sütunlarını çıkarır."""
-#     with pdfplumber.open(pdf_path) as pdf:
-#         page = pdf.pages[0]
-#         text = page.extract_text()
-
-#         # Müşteri adını yakala
-#         customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
-#         print(f"firma: {customer_line[0].strip()}")
-#         customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
-#         print(f"firma: {customer_name}")
-
-#         # Tabloyu dataframe olarak çıkar
-#         table = page.extract_table()
-#         df = pd.DataFrame(table[1:], columns=table[0])
-#         print(df.columns) # ['No', 'Profil No', 'Birim', 'Profil Adı', 'Boy\n(mm)', 'Yüzey', 'Renk', 'Kaplama\nKalınlığı', 'Sertlik', 'Miktar', 'Toplam Mt', 'Ağırlık\n(Kg)', 'Mekanik\nİşlem No', 'Paketleme Şekli', 'Birim\nFiyat\n(TL)', 'Toplam Tutar\n(TL)']
-#         # İstenen sütunları seç
-#         subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Paketleme Şekli"]]
-#         subset["Musteri"] = customer_name
-#         subset["Kesim(ad/saat)"] = ""
-#         subset["ÇalışacakPersonel"] = ""
-#         subset["PresPlanlamaBoyu"] = ""
-#         subset["BirBoydanÇıkacakAdet"] = ""
-#         subset["CNC(ad/saat)"] = ""
-#         subset["CNCÇalışacakPersonel"] = ""
-#         subset["AskiIzi"] = ""
-#         return subset
-    
-# def norm_key(s: str) -> str:
-#     if s is None: return ""
-#     s = str(s).strip()
-#     s = unicodedata.normalize("NFKD", s)
-#     s = "".join(ch for ch in s if not unicodedata.combining(ch))
-#     s = s.upper().translate(str.maketrans({"İ":"I","Ş":"S","Ğ":"G","Ü":"U","Ö":"O","Ç":"C"}))
-#     s = s.replace(" ", "")
-#     # drop non-alnum for robust match (e.g., 'AB-123/4' -> 'AB1234')
-#     return re.sub(r"[^A-Z0-9]", "", s)
-
-# # exact capture rules you requested
-# ASKI_LINE = re.compile(
-#     r'^Ask[ıi]\s*[İI]zi\s*:\s*(.*?)\s*(?:Mek\.?\s*İ?şlem\s*No\s*:|$)',
-#     re.IGNORECASE | re.UNICODE
-# )
-# TEDARIKCI_LINE = re.compile(
-#     r'^Tedarik[cç]i\s*[ÜU]rün\s*No\s*:\s*(.*?)\s*(?:Mekanik\s*İ?şlem\s*:|$)',
-#     re.IGNORECASE | re.UNICODE
-# )
-
-# def build_aski_map_sequential(pdf_path: str) -> dict[str, str]:
-#     """
-#     Scan each page in order. When we see:
-#       - 'Askı İzi : <X> [Mek.İşlem No : ...]'  -> capture <X>
-#       - 'Tedarikçi Ürün No : <Y> [Mekanik İşlem : ...]' -> capture <Y>
-#     Pair norm_key(Y) -> X (most recent Askı İzi seen above it).
-#     """
-#     aski_map: dict[str, str] = {}
-
-#     with pdfplumber.open(pdf_path) as pdf:
-#         for page in pdf.pages:
-#             text = page.extract_text() or ""
-#             if not text.strip():
-#                 continue
-
-#             lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-#             current_aski = None
-
-#             for ln in lines:
-#                 m_aski = ASKI_LINE.match(ln)
-#                 if m_aski:
-#                     current_aski = m_aski.group(1).strip()  # e.g. 'Askı İzli' / 'Askı İzsiz'
-#                     continue
-
-#                 m_ted = TEDARIKCI_LINE.match(ln)
-#                 if m_ted:
-#                     raw_no = m_ted.group(1).strip()         # e.g. '17227'
-#                     key = norm_key(raw_no)
-#                     if key not in aski_map or (not aski_map[key] and current_aski is not None):
-#                         aski_map[key] = current_aski or ""
-#                     current_aski = None  # reset after pairing
-
-#     return aski_map
-
-# def extract_pdf_data_all_pages(pdf_path: str) -> pd.DataFrame:
-#     """
-#     Extracts all tables (same header structure) from every page of a PDF.
-#     Merges them into a single DataFrame.
-#     """
-#     aski_map: dict[str, str] = {}
-#     customer_name = None
-#     with pdfplumber.open(pdf_path) as pdf:
-#         page = pdf.pages[0]
-#         text = page.extract_text()
-#         # Müşteri adını yakala
-#         customer_line = [line for line in text.split("\n") if "Alüminyum" in line]
-#         customer_name = " ".join(customer_line[0].strip().split()[:2]) if customer_line else "Müşteri bulunamadı"
-#         print(f"firma: {customer_name}")
-
-#     tables = []
-#     with pdfplumber.open(pdf_path) as pdf:
-#         for page in pdf.pages:
-#             table = page.extract_table()
-#             df = pd.DataFrame(table[1:], columns=table[0])
-#             # İstenen sütunları seç
-#             if df.empty or "Profil No" not in df.columns:
-#                 continue
-#             subset = df[["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli"]]
-#             tables.append(subset)
-#     if not tables:
-#         return pd.DataFrame(columns=["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli", "Musteri", "Kesim(ad/saat)", \
-#              "ÇalışacakPersonel", "PresPlanlamaBoyu", "BirBoydanÇıkacakAdet", "CNC(ad/saat)", "CNCÇalışacakPersonel", "AskiIzi"])
-
-#     combined = pd.concat(tables, ignore_index=True)
-    
-#     aski_map = build_aski_map_sequential(pdf_path)
-#     # Fill AskiIzi by matching Profil No <-> Tedarikçi Ürün No (normalized)
-#     combined["AskiIzi"] = combined["Profil No"].map(lambda x: aski_map.get(norm_key(x), ""))
-
-#     # Add your fixed customer info once
-#     combined["Musteri"] = customer_name
-#     combined["Kesim(ad/saat)"] = ""
-#     combined["ÇalışacakPersonel"] = ""
-#     combined["PresPlanlamaBoyu"] = ""
-#     combined["BirBoydanÇıkacakAdet"] = ""
-#     combined["CNC(ad/saat)"] = ""
-#     combined["CNCÇalışacakPersonel"] = ""
-
-#     return combined[["Profil No", "Boy\n(mm)", "Yüzey", "Mekanik\nİşlem No", "Paketleme Şekli", "Musteri", "Kesim(ad/saat)", \
-#              "ÇalışacakPersonel", "PresPlanlamaBoyu", "BirBoydanÇıkacakAdet", "CNC(ad/saat)", "CNCÇalışacakPersonel", "AskiIzi"]]
-
-# def _find_template_path() -> str:
-#     # looks under static/ and STATICFILES_DIRS / STATIC_ROOT
-#     path = finders.find("excel/taslak.xlsx")
-#     if not path:
-#         raise FileNotFoundError("excel/taslak.xlsx not found in staticfiles.")
-#     return path
-
-# REQUIRED_HEADERS = [
-#     "NO", "Müşteri", "Profil No", "Profil boyu (mm.)",
-#     "Kesim\n (ad/saat)", "Çalışacak Personel", "PRES PLANLAMA BOYU",
-#     "Bir Boydan Çıkacak Adet", "CNC (AD/SAAT)", "çalışacak personel",
-#     "yüzey", "AÇIKLAMA"
-# ]
-
-# def _find_header_row(ws, required_headers, search_rows=10):
-#     for r in range(1, min(search_rows, ws.max_row) + 1):
-#         values = [str(ws.cell(r, c).value).strip() if ws.cell(r, c).value is not None else ""
-#                   for c in range(1, ws.max_column + 1)]
-#         lower = [v.lower() for v in values]
-#         hits = {}
-#         for h in required_headers:
-#             try:
-#                 idx = lower.index(h.lower())
-#                 hits[h] = idx + 1
-#             except ValueError:
-#                 pass
-#         if len(hits) >= max(3, len(required_headers)//2):
-#             return r, hits
-#     # fallback: assume exact order on first row
-#     return 1, {h: i+1 for i, h in enumerate(required_headers)}
-
-# def _wrap_text(ws, cols, start_row, end_row):
-#     for r in range(start_row, end_row + 1):
-#         for c in cols:
-#             ws.cell(r, c).alignment = Alignment(wrap_text=True, vertical="center")
-
-# @csrf_exempt
-# def download_excel(request):
-#     if request.method != "POST":
-#         return JsonResponse({"error": "POST required"}, status=405)
-
-#     try:
-#         payload = json.loads(request.body.decode("utf-8"))
-#         rows = payload.get("rows", [])
-#         if not rows:
-#             return JsonResponse({"error": "No rows provided"}, status=400)
-#     except Exception as e:
-#         return JsonResponse({"error": f"Invalid JSON: {e}"}, status=400)
-
-#     try:
-#         template_path = _find_template_path()  # ✅ locate static/excel/taslak.xlsx
-#         wb = load_workbook(template_path)
-#     except Exception as e:
-#         return JsonResponse({"error": f"Template error: {e}"}, status=500)
-
-#     ws = wb.active  # or wb["Teklif"] if you have a named sheet
-
-#     header_row, header_map = _find_header_row(ws, REQUIRED_HEADERS)
-
-#     write_row = header_row + 1
-#     for i, row in enumerate(rows, start=1):
-#         for key, val in row.items():
-#             col = header_map.get(key)
-#             if col:
-#                 ws.cell(write_row, col, val)
-#         write_row += 1
-
-#     # Nice wrapping for long text columns (optional)
-#     wrap_cols = [header_map.get(h) for h in ["Müşteri", "yüzey", "AÇIKLAMA"] if h in header_map]
-#     _wrap_text(ws, wrap_cols, header_row + 1, write_row - 1)
-
-#     out = io.BytesIO()
-#     wb.save(out)
-#     out.seek(0)
-
-#     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M")
-#     filename = f"data_{ts}.xlsx"
-#     resp = HttpResponse(
-#         out.getvalue(),
-#         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-#     )
-#     resp["Content-Disposition"] = f'attachment; filename="{filename}"'
-#     return resp
-
-# def pdf_to_excel_page(request): 
-    # """PDF yükleme ve Excel oluşturma sayfası.""" 
-    # if request.method == "POST": 
-    #     files = request.FILES.getlist("pdf_files") or request.FILES.getlist("pdf_file") 
-    #     if not files: 
-    #         return JsonResponse({"error": "No PDFs uploaded"}, status=400) 
-    #     all_rows = [] 
-    #     filenames = [] 
-    #     for f in files: 
-    #         filenames.append(f.name)
-    #         # save to temp & extract 
-    #         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp: 
-    #             for chunk in f.chunks(): 
-    #                 tmp.write(chunk) 
-    #                 tmp_path = tmp.name 
-    #         try: 
-    #             # df = extract_pdf_data(tmp_path) # your existing function 
-    #             df = extract_pdf_data_all_pages(tmp_path) # Extract all pages 
-    #             all_rows.extend(df.to_dict(orient="records")) 
-    #         finally: 
-    #             os.unlink(tmp_path) 
-    #     return JsonResponse({"data": all_rows, "filenames": filenames}, status=200) 
-    # return render(request, "teklif/pdf_to_excel.html")
 
 def viewer_page(request):
     file_url = request.GET.get('url', '')  # read ?url=<...>
     return render(request, 'viewer/viewer3d.html', {'file_url': file_url})
-
-
 
 @require_GET
 @login_required
