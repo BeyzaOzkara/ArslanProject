@@ -273,7 +273,7 @@ def send_test_report(dieList, press, user_info):
         temsilci_adı = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız" # it gives the first and last name as one string
         temsilci = User.objects.get() #??
 
-        # siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+        siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
         status = 'Belirsiz'
         # if siparis_qs.exists():
         #     # 'ACIK' durumu var mı diye kontrol ediyoruz 
@@ -293,11 +293,11 @@ def send_test_report(dieList, press, user_info):
         #     # Eğer profil ile ilgili hiç sipariş yoksa
         #     status ='Sipariş Açık Değil'
 
-        siparis_qs = SiparisList.objects.using('dies').filter(
-            ProfilNo=profil_no,
-            Adet__gte=1,
-            BulunduguYer='TESTERE' # KartAktif=1 eklenmeli
-        )
+        # siparis_qs = SiparisList.objects.using('dies').filter(
+        #     ProfilNo=profil_no,
+        #     Adet__gte=1,
+        #     BulunduguYer='TESTERE' # KartAktif=1 eklenmeli
+        # )
 
         if siparis_qs.exists():
 
@@ -345,7 +345,7 @@ def send_single_die_report(die, press, user_info):
             to_addresses.add(rep_mail)
 
     order_status = ''
-    # siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
 
     # if siparis_qs.exists():
     #     # 'ACIK' durumu var mı diye kontrol ediyoruz
@@ -364,11 +364,11 @@ def send_single_die_report(die, press, user_info):
     #     # Eğer profil ile ilgili hiç sipariş yoksa
     #     order_status = 'Sipariş Açık Değil'
 
-    siparis_qs = SiparisList.objects.using('dies').filter(
-        ProfilNo=profile_no,
-        Adet__gte=1,
-        BulunduguYer='TESTERE' # KartAktif=1 eklenmeli
-    )
+    # siparis_qs = SiparisList.objects.using('dies').filter(
+    #     ProfilNo=profile_no,
+    #     Adet__gte=1,
+    #     BulunduguYer='TESTERE' # KartAktif=1 eklenmeli
+    # )
 
     if siparis_qs.exists():
 
