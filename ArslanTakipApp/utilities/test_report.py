@@ -345,23 +345,39 @@ def send_single_die_report(die, press, user_info):
             to_addresses.add(rep_mail)
 
     order_status = ''
-    siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+    # siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+
+    # if siparis_qs.exists():
+    #     # 'ACIK' durumu var mı diye kontrol ediyoruz
+    #     has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
+        
+    #     if has_open_order:
+    #         order_status= 'Sipariş Açık'
+    #     else: 
+    #         # Eğer 'ACIK' durumu yoksa, 'BLOKE' durumuna bakıyoruz
+    #         has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
+    #         if has_blocked_order:
+    #             order_status = 'Sipariş Bloke'
+    #         else:
+    #             order_status = 'Sipariş Açık Değil'
+    # else:
+    #     # Eğer profil ile ilgili hiç sipariş yoksa
+    #     order_status = 'Sipariş Açık Değil'
+
+    siparis_qs = SiparisList.objects.using('dies').filter(
+        ProfilNo=profile_no,
+        Adet__gte=1,
+        BulunduguYer='TESTERE' # KartAktif=1 eklenmeli
+    )
 
     if siparis_qs.exists():
-        # 'ACIK' durumu var mı diye kontrol ediyoruz
-        has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
-        
-        if has_open_order:
-            order_status= 'Sipariş Açık'
-        else: 
-            # Eğer 'ACIK' durumu yoksa, 'BLOKE' durumuna bakıyoruz
-            has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
-            if has_blocked_order:
-                order_status = 'Sipariş Bloke'
-            else:
-                order_status = 'Sipariş Açık Değil'
+
+        if siparis_qs.filter(SiparisDurum='BLOKE').exists():
+            order_status = 'Sipariş Bloke'
+        else:
+            order_status = 'Sipariş Açık'
+
     else:
-        # Eğer profil ile ilgili hiç sipariş yoksa
         order_status = 'Sipariş Açık Değil'
 
     result_list = [{'die': die.KalipNo, 'profile': profile_no, 'order_status': order_status, 'representative':client_rep}]
