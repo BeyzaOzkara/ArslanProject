@@ -273,24 +273,41 @@ def send_test_report(dieList, press, user_info):
         temsilci_adı = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız" # it gives the first and last name as one string
         temsilci = User.objects.get() #??
 
-        siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
+        # siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
         status = 'Belirsiz'
-        if siparis_qs.exists():
-            # 'ACIK' durumu var mı diye kontrol ediyoruz
-            has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
+        # if siparis_qs.exists():
+        #     # 'ACIK' durumu var mı diye kontrol ediyoruz 
+        #     # Sipariş olsa bile siparişdurum 'KAPALI' olduğu durumlarda da 'sipariş açık değil' yazıyor ama öyle olmalı mı? bunu sormalıyız
+        #     has_open_order = siparis_qs.filter(SiparisDurum='ACIK').exists()
             
-            if has_open_order:
+        #     if has_open_order:
+        #         status = 'Sipariş Açık'
+        #     else: 
+        #         # Eğer 'ACIK' durumu yoksa, 'BLOKE' durumuna bakıyoruz 
+        #         has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
+        #         if has_blocked_order:
+        #             status = 'Sipariş Bloke'
+        #         else:
+        #             status = 'Sipariş Açık Değil'
+        # else:
+        #     # Eğer profil ile ilgili hiç sipariş yoksa
+        #     status ='Sipariş Açık Değil'
+
+        siparis_qs = SiparisList.objects.using('dies').filter(
+            ProfilNo=profil_no,
+            Adet__gte=1,
+            BulunduguYer='TESTERE' # KartAktif=1 eklenmeli
+        )
+
+        if siparis_qs.exists():
+
+            if siparis_qs.filter(SiparisDurum='BLOKE').exists():
+                status = 'Sipariş Bloke'
+            else:
                 status = 'Sipariş Açık'
-            else: 
-                # Eğer 'ACIK' durumu yoksa, 'BLOKE' durumuna bakıyoruz 
-                has_blocked_order = siparis_qs.filter(SiparisDurum='BLOKE').exists()
-                if has_blocked_order:
-                    status = 'Sipariş Bloke'
-                else:
-                    status = 'Sipariş Açık Değil'
+
         else:
-            # Eğer profil ile ilgili hiç sipariş yoksa
-            status ='Sipariş Açık Değil'
+            status = 'Sipariş Açık Değil'
         result_list.append({'die': die.KalipNo, 'profile': profil_no, 'order_status': status, 'representative':temsilci_adı})
 
     result_list = sorted(result_list, key=lambda x: x['representative'])

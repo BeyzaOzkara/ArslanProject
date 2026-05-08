@@ -34,17 +34,17 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo
+    QRCode, KartDagilim, KalipMuadil, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo
 from django.template import loader
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+from django.utils.safestring import mark_safe
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
 from guardian.shortcuts import get_objects_for_user, get_objects_for_group, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
 from django.db.models import CharField, Q, Sum, Avg, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
-from django.db.models.functions import Cast, Replace, Coalesce
+from django.db.models.functions import Cast
 from django.db import transaction, IntegrityError
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -4353,7 +4353,7 @@ class Stacker4500View(generic.TemplateView):
         if sepet:
             context['ongoing_sepet_id'] = sepet.id
             context['ongoing_sepet_no'] = sepet.sepet_no[1:] if sepet.sepet_no.startswith("S") else sepet.sepet_no
-            context['yuklenen_data'] = json.dumps(sepet.yuklenen or [])
+            context['yuklenen_data'] = mark_safe(json.dumps(sepet.yuklenen or []))
         else:
             context['yuklenen_data'] = []
             context['ongoing_sepet_no'] = ''
