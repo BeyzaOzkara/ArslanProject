@@ -389,7 +389,7 @@ def send_single_die_report(die, press, user_info):
         'result_list': result_list,
     })
 
-    send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
+    # send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
 
 def send_new_dies_without_orders_report():
     # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
