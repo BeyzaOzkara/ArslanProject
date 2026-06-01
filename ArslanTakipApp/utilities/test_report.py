@@ -271,7 +271,7 @@ def send_test_report(dieList, press, user_info):
         print(f"profile: {profil_no}")
         musteri_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi').first()
         temsilci_adı = musteri_obj['MusteriTemsilcisi'] if musteri_obj else "Tanımsız" # it gives the first and last name as one string
-        temsilci = User.objects.get() #??
+        # temsilci = User.objects.get() #??
 
         siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profil_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
         status = 'Belirsiz'
@@ -389,7 +389,7 @@ def send_single_die_report(die, press, user_info):
         'result_list': result_list,
     })
 
-    # send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
+    send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
 
 def send_new_dies_without_orders_report():
     # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
