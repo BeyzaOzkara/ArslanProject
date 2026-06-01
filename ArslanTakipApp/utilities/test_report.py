@@ -237,7 +237,7 @@ def send_daily_test_report_for_all():
     result_list = sorted(result_list, key=lambda x: x['press'])
     to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
                         'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
-                        'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 
+                        'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com',
                         'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'yazilim@arslanaluminyum.com'
     ]
 
