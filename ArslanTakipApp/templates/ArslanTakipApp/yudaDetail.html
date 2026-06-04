@@ -345,7 +345,36 @@ body{
     50% { opacity: 0.6; }
     100% { opacity: 1; }
 }
-  </style>
+
+/* ---- Comment Visibility Controls ---- */
+.visibility-selector-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+.visibility-selector-wrapper select {
+    max-width: 200px;
+    font-size: 13px;
+}
+.visibility-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+.vis-everyone   { background: #e3f2fd; color: #1565c0; }
+.vis-only_me    { background: #fce4ec; color: #880e4f; }
+.vis-specific_users  { background: #e8f5e9; color: #2e7d32; }
+.vis-specific_groups { background: #fff3e0; color: #e65100; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -495,7 +524,25 @@ body{
         </div>
       </div>
       <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
-      <button type="button" class="btn btn-primary" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
+      <!-- Visibility selector for main comment form -->
+      <div class="visibility-selector-wrapper" id="visibilityWrapper">
+        <label class="mb-0" style="font-size:13px;"><i class="fas fa-eye mr-1"></i>Kimler görebilir?</label>
+        <select id="visibilitySelect" class="form-control form-control-sm" style="max-width:200px;" onchange="toggleVisibilityPickers('', this.value)">
+          <option value="everyone">Herkes</option>
+          <option value="only_me">Sadece Ben</option>
+          <option value="specific_users">Belirli Kullanıcılar</option>
+          <option value="specific_groups">Belirli Gruplar</option>
+        </select>
+        <div id="userPickerWrapper" style="display:none;">
+          <select id="userPicker" class="form-control form-control-sm" multiple style="min-width:180px;height:80px;">
+          </select>
+        </div>
+        <div id="groupPickerWrapper" style="display:none;">
+          <select id="groupPicker" class="form-control form-control-sm" multiple style="min-width:180px;height:80px;">
+          </select>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary mt-2" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
     </div>
   </div>
 
@@ -1113,6 +1160,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
                           <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
                           <span class="username" style="color: blue;">${reply.KullaniciAdi}</span>
                           <span class="description">${reply.Tarih}</span>
+                          ${buildVisibilityBadge(reply.visibility)}
                           ${reply.Kullanici_id == userID ? '<span class="spoiler-notice">This spoiler is only visible to you</span>' : ''}
                       </div>`;
     // Process spoilers in reply content
@@ -1194,6 +1242,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
                           <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
                           <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
                           <span class="description">${comment.Tarih}</span>
+                          ${buildVisibilityBadge(comment.visibility)}
                           ${comment.Kullanici_id == userID ? '<span class="spoiler-notice">This spoiler is only visible to you</span>' : ''}
                       </div>`;
     // Process spoilers in comment content
@@ -1404,6 +1453,18 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     editData.append("commentId", commentId);
     editData.append("commentText", textareaValue);
+    // Append visibility data if an edit-visibility select exists for this comment
+    const editVisibility = document.getElementById(`editVisibilitySelect${commentId}`);
+    if (editVisibility) {
+      editData.append('visibility', editVisibility.value);
+      if (editVisibility.value === 'specific_users') {
+        const userSel = document.getElementById(`editUserPicker${commentId}`);
+        if (userSel) Array.from(userSel.selectedOptions).forEach(o => editData.append('visibility_users[]', o.value));
+      } else if (editVisibility.value === 'specific_groups') {
+        const grpSel = document.getElementById(`editGroupPicker${commentId}`);
+        if (grpSel) Array.from(grpSel.selectedOptions).forEach(o => editData.append('visibility_groups[]', o.value));
+      }
+    }
 
     $.ajax({
       url: '/yudaDCEdit',
@@ -1433,6 +1494,31 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     });
     if (yId != "") {
       yorumData.append("replyID", yId);
+      // Reply visibility: read from reply-specific picker if present
+      const replyVisEl = document.getElementById(`replyVisibilitySelect${yId}`);
+      if (replyVisEl) {
+        yorumData.append('visibility', replyVisEl.value);
+        if (replyVisEl.value === 'specific_users') {
+          const ru = document.getElementById(`replyUserPicker${yId}`);
+          if (ru) Array.from(ru.selectedOptions).forEach(o => yorumData.append('visibility_users[]', o.value));
+        } else if (replyVisEl.value === 'specific_groups') {
+          const rg = document.getElementById(`replyGroupPicker${yId}`);
+          if (rg) Array.from(rg.selectedOptions).forEach(o => yorumData.append('visibility_groups[]', o.value));
+        }
+      }
+    } else {
+      // Main comment: read from main visibility selector
+      const visEl = document.getElementById('visibilitySelect');
+      if (visEl) {
+        yorumData.append('visibility', visEl.value);
+        if (visEl.value === 'specific_users') {
+          const up = document.getElementById('userPicker');
+          if (up) Array.from(up.selectedOptions).forEach(o => yorumData.append('visibility_users[]', o.value));
+        } else if (visEl.value === 'specific_groups') {
+          const gp = document.getElementById('groupPicker');
+          if (gp) Array.from(gp.selectedOptions).forEach(o => yorumData.append('visibility_groups[]', o.value));
+        }
+      }
     }
 
     $.ajax({
@@ -1451,8 +1537,76 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
 
   };
 
+  // ---- Visibility helpers ----
+
+  // Map visibility value to label + CSS class
+  const visibilityMeta = {
+    'everyone':        { label: 'Herkes',                   icon: 'fa-globe',  cls: 'vis-everyone' },
+    'only_me':         { label: 'Sadece Ben',               icon: 'fa-lock',   cls: 'vis-only_me' },
+    'specific_users':  { label: 'Belirli Kullan\u0131c\u0131lar', icon: 'fa-users', cls: 'vis-specific_users' },
+    'specific_groups': { label: 'Belirli Gruplar',          icon: 'fa-layer-group', cls: 'vis-specific_groups' },
+  };
+
+  function buildVisibilityBadge(visibility) {
+    const v = visibility || 'everyone';
+    const meta = visibilityMeta[v] || visibilityMeta['everyone'];
+    return `<span class="visibility-badge ${meta.cls}"><i class="fas ${meta.icon}"></i> ${meta.label}</span>`;
+  }
+
+  function toggleVisibilityPickers(suffix, val) {
+    const userWrapper = document.getElementById(`userPickerWrapper${suffix}`);
+    const groupWrapper = document.getElementById(`groupPickerWrapper${suffix}`);
+    if (userWrapper) userWrapper.style.display = (val === 'specific_users') ? '' : 'none';
+    if (groupWrapper) groupWrapper.style.display = (val === 'specific_groups') ? '' : 'none';
+  }
+
+  function buildVisibilitySelector(suffix, currentVal) {
+    const options = [
+      {v:'everyone', t:'Herkes'},
+      {v:'only_me', t:'Sadece Ben'},
+      {v:'specific_users', t:'Belirli Kullan\u0131c\u0131lar'},
+      {v:'specific_groups', t:'Belirli Gruplar'},
+    ].map(o => `<option value="${o.v}"${currentVal===o.v?' selected':''}>${o.t}</option>`).join('');
+    return `
+      <div class="visibility-selector-wrapper mt-1">
+        <label class="mb-0" style="font-size:12px;"><i class="fas fa-eye mr-1"></i>G\u00f6r\u00fcn\u00fcrl\u00fck:</label>
+        <select id="visibilitySelect${suffix}" class="form-control form-control-sm" style="max-width:180px;"
+                onchange="toggleVisibilityPickers('${suffix}', this.value)">${options}</select>
+        <div id="userPickerWrapper${suffix}" style="display:${currentVal==='specific_users'?'':'none'};">
+          <select id="userPicker${suffix}" class="form-control form-control-sm" multiple style="min-width:160px;height:70px;"></select>
+        </div>
+        <div id="groupPickerWrapper${suffix}" style="display:${currentVal==='specific_groups'?'':'none'};">
+          <select id="groupPicker${suffix}" class="form-control form-control-sm" multiple style="min-width:160px;height:70px;"></select>
+        </div>
+      </div>`;
+  }
+
+  // Cached user/group lists for pickers
+  let _cachedUsers = [];
+  let _cachedGroups = [];
+
+  function loadVisibilityLists() {
+    $.getJSON('/api/comment-users-list/', function(data) {
+      _cachedUsers = data;
+      // Populate main picker
+      const up = document.getElementById('userPicker');
+      if (up) data.forEach(u => up.append(new Option(u.name, u.id)));
+    });
+    $.getJSON('/api/comment-groups-list/', function(data) {
+      _cachedGroups = data;
+      const gp = document.getElementById('groupPicker');
+      if (gp) data.forEach(g => gp.append(new Option(g.name, g.id)));
+    });
+  }
+
+  function populateDynamicPicker(selectEl, list) {
+    if (!selectEl || !list.length) return;
+    list.forEach(item => selectEl.append(new Option(item.name, item.id)));
+  }
+
   LoadDetail();
   LoadComments(comments);
+  loadVisibilityLists();
 
   var anketSecimi  = "";
   // Use event delegation for dynamically added elements

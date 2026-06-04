@@ -68,6 +68,16 @@
     .cross-pin {
         position:absolute; top:6px; right:28px; font-size:14px; opacity:.9; cursor:pointer;
     }
+    /* ---- Comment Visibility Badge ---- */
+    .visibility-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 11px; padding: 2px 8px; border-radius: 12px;
+        font-weight: 600; vertical-align: middle; margin-left: 6px;
+    }
+    .vis-everyone   { background: #e3f2fd; color: #1565c0; }
+    .vis-only_me    { background: #fce4ec; color: #880e4f; }
+    .vis-specific_users  { background: #e8f5e9; color: #2e7d32; }
+    .vis-specific_groups { background: #fff3e0; color: #e65100; }
 </style>
   
 {% endblock %}
@@ -739,6 +749,23 @@ function createPostComment(type) {
     const newCommentHTML = `
         <div id="${div_id}" style="margin-top: 20px; margin-bottom:20px">
             <textarea id="${text_id}" class="textarea"></textarea>
+            <!-- Visibility selector -->
+            <div class="visibility-selector-wrapper" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;">
+              <label class="mb-0" style="font-size:13px;"><i class="fas fa-eye mr-1"></i>Kimler görebilir?</label>
+              <select id="visSelect_${type}" class="form-control form-control-sm" style="max-width:200px;"
+                      onchange="toggleVisPickers_${type}(this.value)">
+                <option value="everyone">Herkes</option>
+                <option value="only_me">Sadece Ben</option>
+                <option value="specific_users">Belirli Kullanıcılar</option>
+                <option value="specific_groups">Belirli Gruplar</option>
+              </select>
+              <div id="userPickerWrap_${type}" style="display:none;">
+                <select id="userPicker_${type}" class="form-control form-control-sm" multiple style="min-width:170px;height:75px;"></select>
+              </div>
+              <div id="groupPickerWrap_${type}" style="display:none;">
+                <select id="groupPicker_${type}" class="form-control form-control-sm" multiple style="min-width:170px;height:75px;"></select>
+              </div>
+            </div>
             <button id="submit${type}CommentButton" onclick="sendComment(this)" data-action="Paylas" data-type="${type}" class="btn btn-primary mt-2">Paylaş</button>
         </div>
         <hr style="margin: 20px 0; border: 1px solid #ccc;">
@@ -788,7 +815,34 @@ function postComment(type="die", commentId="") {
     selectedFiles.forEach(function(file) {
         yorumData.append('yfiles', file);
     });
-    if (commentId != "") { yorumData.append("replyID", commentId); }
+    if (commentId != "") {
+        yorumData.append("replyID", commentId);
+        // Reply visibility: from reply-specific picker if available
+        const replyVisEl = document.getElementById(`visSelect_reply_${commentId}`);
+        if (replyVisEl) {
+            yorumData.append('visibility', replyVisEl.value);
+            if (replyVisEl.value === 'specific_users') {
+                const ru = document.getElementById(`userPicker_reply_${commentId}`);
+                if (ru) Array.from(ru.selectedOptions).forEach(o => yorumData.append('visibility_users[]', o.value));
+            } else if (replyVisEl.value === 'specific_groups') {
+                const rg = document.getElementById(`groupPicker_reply_${commentId}`);
+                if (rg) Array.from(rg.selectedOptions).forEach(o => yorumData.append('visibility_groups[]', o.value));
+            }
+        }
+    } else {
+        // Main comment visibility
+        const visEl = document.getElementById(`visSelect_${type}`);
+        if (visEl) {
+            yorumData.append('visibility', visEl.value);
+            if (visEl.value === 'specific_users') {
+                const up = document.getElementById(`userPicker_${type}`);
+                if (up) Array.from(up.selectedOptions).forEach(o => yorumData.append('visibility_users[]', o.value));
+            } else if (visEl.value === 'specific_groups') {
+                const gp = document.getElementById(`groupPicker_${type}`);
+                if (gp) Array.from(gp.selectedOptions).forEach(o => yorumData.append('visibility_groups[]', o.value));
+            }
+        }
+    }
     $.ajax({
             url: `postcomment`,
             type: 'POST',
@@ -817,6 +871,18 @@ function editComment(type="die", commentId="") {
     editData.append("csrfmiddlewaretoken", "{{csrf_token}}");
     editData.append("commentId", commentId);
     editData.append("commentText", textareaValue);
+    // Send visibility data if an edit-visibility picker was provided
+    const editVisEl = document.getElementById(`editVisSelect_${commentId}`);
+    if (editVisEl) {
+        editData.append('visibility', editVisEl.value);
+        if (editVisEl.value === 'specific_users') {
+            const eu = document.getElementById(`editUserPicker_${commentId}`);
+            if (eu) Array.from(eu.selectedOptions).forEach(o => editData.append('visibility_users[]', o.value));
+        } else if (editVisEl.value === 'specific_groups') {
+            const eg = document.getElementById(`editGroupPicker_${commentId}`);
+            if (eg) Array.from(eg.selectedOptions).forEach(o => editData.append('visibility_groups[]', o.value));
+        }
+    }
 
     $.ajax({
         url: 'editcomment',
@@ -862,10 +928,20 @@ function renderReplies(replies, indentLevel=1) {
 }
 
 function createUserBlock(comment) {
+    const vis = comment.visibility || 'everyone';
+    const visMeta = {
+        'everyone':        { cls:'vis-everyone',        icon:'fa-globe',       label:'Herkes' },
+        'only_me':         { cls:'vis-only_me',         icon:'fa-lock',        label:'Sadece Ben' },
+        'specific_users':  { cls:'vis-specific_users',  icon:'fa-users',       label:'Belirli Kullan\u0131c\u0131lar' },
+        'specific_groups': { cls:'vis-specific_groups', icon:'fa-layer-group', label:'Belirli Gruplar' },
+    };
+    const m = visMeta[vis] || visMeta['everyone'];
+    const badge = `<span class="visibility-badge ${m.cls}"><i class="fas ${m.icon}"></i> ${m.label}</span>`;
     return `<div class="user-block">
                 <img class="img-circle img-bordered-sm" src="/static/ArslanTakipApp/aaLogo.png" alt="user image">
                 <span class="username" style="color: blue;">${comment.KullaniciAdi}</span>
                 <span class="description">${comment.Tarih}</span>
+                ${badge}
             </div>`;
 };
 
@@ -1038,8 +1114,10 @@ function replyEditBtnClick(commentId, action, type) {
     const textareaContainer = $(`#divTextArea${commentId}`);
     const existingTextarea = $(`#${type}CommentTextarea${commentId}`);
     const existingSendButton = $(`#send${commentId}`);
+    const existingVisWrap = $(`#visWrap${commentId}`);
     const otherTextareas = $(`.btnText[id^="${type}CommentTextarea"]:not(#${type}CommentTextarea${commentId})`);
     const otherSendButtons = $(`button[id^="send"]:not(#send${commentId})`);
+    const otherVisWraps = $(`div[id^="visWrap"]:not(#visWrap${commentId})`);
     selectedFiles = [];
     // Remove all other textareas (if reply or edit is already open elsewhere)
     otherTextareas.each(function () {
@@ -1049,19 +1127,60 @@ function replyEditBtnClick(commentId, action, type) {
     otherSendButtons.each(function () {
         $(this).remove();
     });
+    otherVisWraps.each(function () {
+        $(this).remove();
+    });
 
     // Remove existing textarea for this comment
     if (existingTextarea.length > 0) {
         existingTextarea.summernote('destroy'); // Destroy the Summernote instance
         existingTextarea.remove(); // Remove the textarea element
         existingSendButton.remove();
+        existingVisWrap.remove();
         if (existingTextarea.hasClass(action)) {return;} // Exit if the textarea was removed
     }
 
     // Create a new textarea for reply or edit
     const textarea = $(`<textarea id="${type}CommentTextarea${commentId}" class="textarea btnText ${action}"></textarea>`);
     const sendButton =  $(`<button id="send${commentId}" onclick="sendComment(this)" data-type="${type}" class="btn btn-primary mb-2" data-comment=${commentId} data-action=${action}>${action}</button>`);
-    textareaContainer.append(textarea, sendButton);
+    
+    const visPrefix = action === 'Düzenle' ? 'edit' : 'reply';
+    const visHtml = $(`
+        <div class="visibility-selector-wrapper" id="visWrap${commentId}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;margin-bottom:6px;">
+            <label class="mb-0" style="font-size:13px;"><i class="fas fa-eye mr-1"></i>Kimler görebilir?</label>
+            <select id="${visPrefix}VisSelect_${commentId}" class="form-control form-control-sm" style="max-width:200px;"
+                    onchange="toggleVisPickers_dynamic(this.value, '${visPrefix}', '${commentId}')">
+              <option value="everyone">Herkes</option>
+              <option value="only_me">Sadece Ben</option>
+              <option value="specific_users">Belirli Kullanıcılar</option>
+              <option value="specific_groups">Belirli Gruplar</option>
+            </select>
+            <div id="${visPrefix}UserPickerWrap_${commentId}" style="display:none;">
+              <select id="${visPrefix}UserPicker_${commentId}" class="form-control form-control-sm" multiple style="min-width:170px;height:75px;"></select>
+            </div>
+            <div id="${visPrefix}GroupPickerWrap_${commentId}" style="display:none;">
+              <select id="${visPrefix}GroupPicker_${commentId}" class="form-control form-control-sm" multiple style="min-width:170px;height:75px;"></select>
+            </div>
+        </div>
+    `);
+
+    textareaContainer.append(textarea, visHtml, sendButton);
+
+    // Populate user and group pickers dynamically
+    $.getJSON('/api/comment-users-list/', function(data) {
+        const uSel = document.getElementById(`${visPrefix}UserPicker_${commentId}`);
+        if (uSel) {
+            uSel.innerHTML = '';
+            data.forEach(u => uSel.append(new Option(u.name, u.id)));
+        }
+    });
+    $.getJSON('/api/comment-groups-list/', function(data) {
+        const gSel = document.getElementById(`${visPrefix}GroupPicker_${commentId}`);
+        if (gSel) {
+            gSel.innerHTML = '';
+            data.forEach(g => gSel.append(new Option(g.name, g.id)));
+        }
+    });
 
     // Initialize Summernote
     textarea.summernote({
@@ -1439,6 +1558,64 @@ var tableKalip = new Tabulator("#kalipListe-table", {
         },
     ],
 }); 
+
+// ---- Comment Visibility helpers for kalip.html ----
+function toggleVisPickers_dynamic(val, prefix, commentId) {
+    const uw = document.getElementById(`${prefix}UserPickerWrap_${commentId}`);
+    const gw = document.getElementById(`${prefix}GroupPickerWrap_${commentId}`);
+    if (uw) uw.style.display = (val === 'specific_users') ? '' : 'none';
+    if (gw) gw.style.display = (val === 'specific_groups') ? '' : 'none';
+}
+
+window.toggleVisPickers_dynamic = toggleVisPickers_dynamic;
+
+function toggleVisPickers_die(val) {
+    const uw = document.getElementById('userPickerWrap_die');
+    const gw = document.getElementById('groupPickerWrap_die');
+    if (uw) uw.style.display = (val === 'specific_users') ? '' : 'none';
+    if (gw) gw.style.display = (val === 'specific_groups') ? '' : 'none';
+}
+function toggleVisPickers_profile(val) {
+    const uw = document.getElementById('userPickerWrap_profile');
+    const gw = document.getElementById('groupPickerWrap_profile');
+    if (uw) uw.style.display = (val === 'specific_users') ? '' : 'none';
+    if (gw) gw.style.display = (val === 'specific_groups') ? '' : 'none';
+}
+
+function loadVisibilityListsForKalip() {
+    $.getJSON('/api/comment-users-list/', function(data) {
+        ['die', 'profile'].forEach(function(type) {
+            const sel = document.getElementById(`userPicker_${type}`);
+            if (sel && sel.options.length === 0) {
+                data.forEach(u => sel.append(new Option(u.name, u.id)));
+            }
+        });
+    });
+    $.getJSON('/api/comment-groups-list/', function(data) {
+        ['die', 'profile'].forEach(function(type) {
+            const sel = document.getElementById(`groupPicker_${type}`);
+            if (sel && sel.options.length === 0) {
+                data.forEach(g => sel.append(new Option(g.name, g.id)));
+            }
+        });
+    });
+}
+
+// Expose toggleVisPickers globally (called from dynamic HTML)
+window.toggleVisPickers_die = toggleVisPickers_die;
+window.toggleVisPickers_profile = toggleVisPickers_profile;
+
+// Hook into comment initialization so pickers are populated after DOM insertion
+const _origInitDie = initializeDieComments;
+initializeDieComments = function() {
+    _origInitDie.apply(this, arguments);
+    setTimeout(loadVisibilityListsForKalip, 300);
+};
+const _origInitProfile = initializeProfileComments;
+initializeProfileComments = function() {
+    _origInitProfile.apply(this, arguments);
+    setTimeout(loadVisibilityListsForKalip, 300);
+};
 
 </script>
 

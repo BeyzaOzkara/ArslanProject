@@ -34,17 +34,17 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo
+    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo
 from django.template import loader
 from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
+from django.utils.html import strip_tags
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator
 from guardian.shortcuts import get_objects_for_user, get_objects_for_group, assign_perm, get_groups_with_perms
 from guardian.models import UserObjectPermission, GroupObjectPermission
 from django.db.models import CharField, Q, Sum, Avg, Max, Min, ExpressionWrapper, Count, Case, When, OuterRef, Subquery, FloatField, F, Value
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Replace, Coalesce
 from django.db import transaction, IntegrityError
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -754,6 +754,22 @@ def get_viewed_users(request, cId):
         # If the request is not a GET, return a bad request response
         return HttpResponseBadRequest("Invalid request method.")
 
+def comment_users_list(request):
+    """Return all active users for the comment visibility selector."""
+    if request.method == 'GET':
+        users = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+        data = [{'id': u.id, 'name': u.get_full_name() or u.username} for u in users]
+        return JsonResponse(data, safe=False)
+    return HttpResponseBadRequest("Invalid request method.")
+
+def comment_groups_list(request):
+    """Return all groups for the comment visibility selector."""
+    if request.method == 'GET':
+        groups = Group.objects.all().order_by('name')
+        data = [{'id': g.id, 'name': g.name} for g in groups]
+        return JsonResponse(data, safe=False)
+    return HttpResponseBadRequest("Invalid request method.")
+
 #gelen id başka konumların parenti ise altındakileri listele??
 def location_hareket1(request):
     params = json.loads(unquote(request.GET.get('params')))
@@ -890,7 +906,7 @@ def kalip_tum(request):
 
 def kalip_getcomments(request, kId):
     if request.method == "GET":
-        yudaComments = getParentComments("KalipMs", kId).order_by('-IsPinned', "Tarih")
+        yudaComments = getParentComments("KalipMs", kId, user=request.user).order_by('-IsPinned', "Tarih")
         yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
         comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -911,7 +927,17 @@ def kalip_comments_post(request):
                 c.ReplyTo = Comment.objects.get(id=replyID)
                 c.FormModelId = c.ReplyTo.FormModelId
             c.Aciklama = req['yorum']
+            # --- Visibility ---
+            c.visibility = req.get('visibility', 'everyone')
             c.save()
+
+            # Save M2M visibility relations
+            if c.visibility == 'specific_users':
+                user_ids = req.getlist('visibility_users[]')
+                c.visibility_users.set(User.objects.filter(id__in=user_ids))
+            elif c.visibility == 'specific_groups':
+                group_ids = req.getlist('visibility_groups[]')
+                c.visibility_groups.set(Group.objects.filter(id__in=group_ids))
 
             for file in request.FILES.getlist('yfiles'):
                 UploadFile.objects.create(
@@ -923,7 +949,7 @@ def kalip_comments_post(request):
                     Note = "",
                 )
             
-            yudaComments = getParentComments(req['modelName'], c.FormModelId).order_by("Tarih")
+            yudaComments = getParentComments(req['modelName'], c.FormModelId, user=request.user).order_by("Tarih")
             yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
             comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
@@ -939,9 +965,21 @@ def kalip_comments_edit(request):
         try:
             c = Comment.objects.get(id=req["commentId"])
             c.Aciklama = req["commentText"]
+            # Update visibility if provided
+            if 'visibility' in req:
+                c.visibility = req['visibility']
+                if c.visibility == 'specific_users':
+                    user_ids = req.getlist('visibility_users[]')
+                    c.visibility_users.set(User.objects.filter(id__in=user_ids))
+                elif c.visibility == 'specific_groups':
+                    group_ids = req.getlist('visibility_groups[]')
+                    c.visibility_groups.set(Group.objects.filter(id__in=group_ids))
+                else:
+                    c.visibility_users.clear()
+                    c.visibility_groups.clear()
             c.save()
             #dosyalar için olan bölüm de eklenecek
-            yudaComments = getParentComments("KalipMs", c.FormModelId).order_by("Tarih")
+            yudaComments = getParentComments("KalipMs", c.FormModelId, user=request.user).order_by("Tarih")
             yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
             comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
@@ -1153,7 +1191,7 @@ def kalip_hareket(request):
 def kalip_yorum(request):
     kalip_no = request.GET.get('kalipNo')
     if request.method == "GET":
-        comments = getParentComments("KalipMs", kalip_no).order_by("-IsPinned", "-Tarih")
+        comments = getParentComments("KalipMs", kalip_no, user=request.user).order_by("-IsPinned", "-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
@@ -1161,7 +1199,7 @@ def kalip_yorum(request):
 def kalip_profile_yorum(request):
     profil_no = request.GET.get('profilNo')
     if request.method == "GET":
-        comments = getParentComments("ProfilMs", profil_no).order_by("-IsPinned", "-Tarih")
+        comments = getParentComments("ProfilMs", profil_no, user=request.user).order_by("-IsPinned", "-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
@@ -3134,14 +3172,19 @@ def yudas_list(request):
 
     for o in yudaList:
         o['Tarih'] = format_date_time(o['Tarih'])
-        if o['GüncelTarih'] != None:
-            if Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id']).exclude(Silindi=True).exists():
-                o_comment = Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id']).exclude(Silindi=True).order_by('-Tarih').values()[0]
-                o_comment_user = get_user_full_name(o_comment['Kullanici_id'])
-                o['GüncelTarih'] = o_comment_user + "<br>" + format_date_time_without_year(o['GüncelTarih'])
-            else:
-                o['GüncelTarih'] = ""
-        else: o['GüncelTarih'] = ""
+        # Last comment time: show only the most recent comment the current user can see
+        last_visible_time = get_last_visible_comment_time(o['id'], request.user)
+        if last_visible_time:
+            last_visible_qs = filter_visible_comments(
+                Comment.objects.filter(FormModel='YudaForm', FormModelId=o['id'], Silindi=False),
+                request.user
+            ).order_by('-Tarih')
+            last_comment = last_visible_qs.first()
+            o_comment_user = get_user_full_name(last_comment.Kullanici_id) if last_comment else ''
+            o['GüncelTarih'] = o_comment_user + "<br>" + format_date_time_without_year(last_visible_time)
+        else:
+            o['GüncelTarih'] = ""
+
         o['MusteriTemsilcisi'] = get_user_full_name(int(o['YudaAcanKisi_id']))
         o['durumlar'] = {}
         for group in [group.name.split(' Bolumu')[0] for group, perms in get_groups_with_perms(y.get(id=o['id']), attach_perms=True).items() if perms == ['gorme_yuda'] and group.name != 'Proje Bolumu']:
@@ -3181,8 +3224,14 @@ def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum
     comment['Tarih'] = format_date_time(comment['Tarih'])
     comment['Is_Viewed'] = user in views
     comment['cfiles'] = list(getFiles("Comment", comment['id']))
-    comment['replies'] = [process_comment(user, comment) for comment in Comment.objects.filter(ReplyTo = comment['id'], Silindi=False).values()] 
+    # Expose visibility info so frontend can show the appropriate badge
+    comment['visibility'] = comment.get('visibility') or 'everyone'
+    # Fetch and filter replies using the same visibility rules (each reply has its own independent visibility)
+    reply_qs = Comment.objects.filter(ReplyTo=comment['id'], Silindi=False)
+    reply_qs = filter_visible_comments(reply_qs, user)
+    comment['replies'] = [process_comment(user, reply) for reply in reply_qs.values()]
     return comment
+
 
 def format_yuda_details2(yList):
     for i in yList:
@@ -3423,7 +3472,7 @@ def yudaDetail(request, yId):
     yudaFiles = getFiles("YudaForm", yId)
     files = json.dumps(list(yudaFiles), sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     
-    yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
+    yudaComments = getParentComments("YudaForm", yId, user=request.user).order_by("Tarih")
     yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
@@ -3479,7 +3528,7 @@ def yudaDetail2(request, yId):
         fi = UploadFile.objects.get(Q(FileModel = "YudaForm") & Q(FileModelId = yId) & Q(FileTitle = 'Şartname'))
         svgData = yudaDetailSvg(request, fi.File.path)
         
-    yudaComments = getParentComments("YudaForm", yId).order_by("Tarih")
+    yudaComments = getParentComments("YudaForm", yId, user=request.user).order_by("Tarih")
     yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
     comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
 
@@ -3516,7 +3565,17 @@ def yudaDetailComment(request):
             if 'replyID' in req:
                 replyID = req['replyID']
                 c.ReplyTo = Comment.objects.get(id=replyID)
+            # --- Visibility ---
+            c.visibility = req.get('visibility', 'everyone')
             c.save()
+
+            # Save M2M visibility relations
+            if c.visibility == 'specific_users':
+                user_ids = req.getlist('visibility_users[]')
+                c.visibility_users.set(User.objects.filter(id__in=user_ids))
+            elif c.visibility == 'specific_groups':
+                group_ids = req.getlist('visibility_groups[]')
+                c.visibility_groups.set(Group.objects.filter(id__in=group_ids))
 
             y = YudaForm.objects.get(id=req['formID'])
             y.GüncelTarih = datetime.datetime.now()
@@ -3535,7 +3594,12 @@ def yudaDetailComment(request):
             allowed_groups = [group for group, perms in get_groups_with_perms(y, attach_perms=True).items() if 'gorme_yuda' in perms]
 
             if request.user.id != 1:
-                for u in User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id):
+                # Get all users who have access to this Yuda
+                candidate_users = User.objects.filter(groups__in=allowed_groups).exclude(id=request.user.id)
+                # Filter to only those who can see this comment
+                notifiable_users = [u for u in candidate_users if _can_user_see_comment(u, c)]
+
+                for u in notifiable_users:
                     notification = Notification.objects.create(
                         user=u,
                         message=f'{y.MusteriFirmaAdi[:11]}.. projesine yorum yaptı.',
@@ -3574,12 +3638,25 @@ def yudaDetailComment(request):
             response.status_code = 500 #server error
     return response
 
+
 def yudaDCEdit(request):
     if request.method == 'POST':
         req = request.POST
         try:
             c = Comment.objects.get(id=req["commentId"])
             c.Aciklama = req["commentText"]
+            # Update visibility if provided
+            if 'visibility' in req:
+                c.visibility = req['visibility']
+                if c.visibility == 'specific_users':
+                    user_ids = req.getlist('visibility_users[]')
+                    c.visibility_users.set(User.objects.filter(id__in=user_ids))
+                elif c.visibility == 'specific_groups':
+                    group_ids = req.getlist('visibility_groups[]')
+                    c.visibility_groups.set(Group.objects.filter(id__in=group_ids))
+                else:
+                    c.visibility_users.clear()
+                    c.visibility_groups.clear()
             c.save()
             #dosyalar için olan bölüm de eklenecek
             response = JsonResponse({'message': 'Kayıt başarılı'})
@@ -4050,11 +4127,61 @@ def getFiles(ref, mId):
 
     return filteredFiles
 
-def getParentComments(ref, mId):
-    allComments = Comment.objects.all()
-    filteredComments = allComments.filter(Q(FormModel = ref) & Q(FormModelId = mId) & Q(ReplyTo__isnull = True) & Q(Silindi= False)).values()
-    
-    return filteredComments
+def filter_visible_comments(qs, user):
+    """Return only comments the given user may see, based on visibility field.
+    Superusers always see all comments.
+    """
+    if user.is_superuser:
+        return qs
+    return qs.filter(
+        Q(visibility='everyone') |
+        Q(visibility__isnull=True) |  # legacy rows with no visibility set
+        Q(Kullanici=user) |           # author always sees their own comment
+        Q(visibility='only_me', Kullanici=user) |
+        Q(visibility='specific_users', visibility_users=user) |
+        Q(visibility='specific_groups', visibility_groups__in=user.groups.all())
+    ).distinct()
+
+
+def _can_user_see_comment(user, comment):
+    """Return True if the given user is allowed to see the given comment instance.
+    Superusers always see everything.
+    """
+    if user.is_superuser:
+        return True
+    vis = comment.visibility or 'everyone'
+    if vis == 'everyone':
+        return True
+    if comment.Kullanici_id == user.id:  # author always sees their own comment
+        return True
+    if vis == 'only_me':
+        return False
+    if vis == 'specific_users':
+        return comment.visibility_users.filter(id=user.id).exists()
+    if vis == 'specific_groups':
+        return comment.visibility_groups.filter(id__in=user.groups.values_list('id', flat=True)).exists()
+    return False
+
+
+def get_last_visible_comment_time(yuda_id, user):
+    """Return the timestamp of the most recent comment on a YudaForm that the user can see."""
+    qs = Comment.objects.filter(FormModel='YudaForm', FormModelId=yuda_id, Silindi=False)
+    qs = filter_visible_comments(qs, user)
+    last = qs.order_by('-Tarih').first()
+    return last.Tarih if last else None
+
+
+def getParentComments(ref, mId, user=None):
+    """Return parent (top-level) comments for a given model/id.
+    If user is provided, results are filtered by visibility rules.
+    """
+    qs = Comment.objects.filter(
+        Q(FormModel=ref) & Q(FormModelId=mId) & Q(ReplyTo__isnull=True) & Q(Silindi=False)
+    )
+    if user is not None:
+        qs = filter_visible_comments(qs, user)
+    return qs.values()
+
 
 class UretimPlanlamaView(generic.TemplateView):
     template_name = 'ArslanTakipApp/uretimPlani.html'
@@ -4353,7 +4480,7 @@ class Stacker4500View(generic.TemplateView):
         if sepet:
             context['ongoing_sepet_id'] = sepet.id
             context['ongoing_sepet_no'] = sepet.sepet_no[1:] if sepet.sepet_no.startswith("S") else sepet.sepet_no
-            context['yuklenen_data'] = mark_safe(json.dumps(sepet.yuklenen or []))
+            context['yuklenen_data'] = json.dumps(sepet.yuklenen or [])
         else:
             context['yuklenen_data'] = []
             context['ongoing_sepet_no'] = ''
@@ -4394,7 +4521,7 @@ class Stacker4500View(generic.TemplateView):
 def get_kalip_no_list(request):
     if request.method == 'GET':
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=240) #168e döndür
+        start_time = end_time - datetime.timedelta(hours=168)
 
         plc_data = EventData.objects.using('dms') \
             .filter(start_time__gte=start_time, event_type='Extrusion') \
@@ -4461,7 +4588,7 @@ def get_billet_lot_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=240)
+        start_time = end_time - datetime.timedelta(hours=168)
         billet_lot_list = list(EventData.objects.using('dms').filter(start_time__gte=start_time, static_data__contains={'DieNumber':kalip_no}).values_list('static_data__BilletLot', flat=True).distinct())
         # billet_lot_list = list(PlcData.objects.using('plc4').filter(start__gte=start_time, singular_params__contains={'DieNumber':kalip_no}).values_list('singular_params__BilletLot', flat=True).distinct())
         return JsonResponse(billet_lot_list, safe=False)
@@ -4764,6 +4891,161 @@ def get_kart_info(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
         
+def push_to_mssql_erp(kart_dagilimi, secilen_ext):
+    from django.db import connections
+    from django.utils.dateparse import parse_datetime
+    import datetime
+
+    ext_kalip_no = secilen_ext[0].get('kalip_no', '') if secilen_ext else ''
+    ext_billet_lot = secilen_ext[0].get('billet_lot', '') if secilen_ext else ''
+
+    with connections['testms'].cursor() as cursor:
+        for kart in kart_dagilimi:
+            # 1. Generate new PresTestereNo
+            cursor.execute("DECLARE @_PresTestereNo INT = -1; EXEC dbo.TC_DWP_PRESSCreateID @_PresTestereNo OUTPUT; SELECT @_PresTestereNo;")
+            row = cursor.fetchone()
+            if not row:
+                raise Exception("Could not generate PresTestereNo")
+            pres_testere_no = row[0]
+            
+            # 2. TC_DWP_PRESSCreateItems
+            billet_adet = float(kart.get('billetAdet', 1))
+            billet_boy = float(kart.get('billetBoy', 50))
+            ara_is_mm = 25.0
+            billet_kg = 17.0
+            eks_boy = float(kart.get('uretBoy', 0))
+            
+            cursor.execute("""
+                DECLARE @Sonuc VARCHAR(250);
+                EXEC dbo.TC_DWP_PRESSCreateItems 
+                    @_PresTestereNo = %s,
+                    @_BilletAdet = %s,
+                    @_BilletBoy = %s,
+                    @_AraIsMm = %s,
+                    @_BilletKg = %s,
+                    @_EksBoy = %s,
+                    @Sonuc = @Sonuc OUTPUT;
+                SELECT @Sonuc;
+            """, [pres_testere_no, billet_adet, billet_boy, ara_is_mm, billet_kg, eks_boy])
+            res = cursor.fetchone()
+            if res and res[0] != "BASARILI":
+                raise Exception(f"TC_DWP_PRESSCreateItems failed: {res[0]}")
+            
+            # 3. TC_DWP_PRESSCreateOrderItems
+            baslangic_str = kart.get('Baslangic', '')
+            bitis_str = kart.get('Bitis', '')
+            baslangic = parse_datetime(baslangic_str) if baslangic_str else datetime.datetime.now()
+            bitis = parse_datetime(bitis_str) if bitis_str else datetime.datetime.now()
+            
+            # Remove timezone info for MSSQL datetime
+            if baslangic and baslangic.tzinfo:
+                baslangic = baslangic.replace(tzinfo=None)
+            if bitis and bitis.tzinfo:
+                bitis = bitis.replace(tzinfo=None)
+                
+            sure_dakika = (bitis - baslangic).total_seconds() / 60.0 if bitis and baslangic else 0
+
+            cursor.execute("""
+                DECLARE @Sonuc VARCHAR(250);
+                EXEC dbo.TC_DWP_PRESSCreateOrderItems 
+                    @_PresTestereNo = %s,
+                    @_KartNo = %s,
+                    @_Tarih = %s,
+                    @_Vardiya = %s,
+                    @_VardiyaAmiri = %s,
+                    @_BaslamaSaati = %s,
+                    @_BitisSaati = %s,
+                    @_Sure = %s,
+                    @_KaliteSorumlusu = %s,
+                    @_KisiSayisi = %s,
+                    @_Operator = %s,
+                    @_PresKodu = %s,
+                    @_KalipNo = %s,
+                    @_StokKodu = %s,
+                    @_DepoKodu = %s,
+                    @_PartiNo = %s,
+                    @_Numunemm = %s,
+                    @_Numunekg = %s,
+                    @_Gerceklesen = %s,
+                    @_HataKodu = %s,
+                    @_HataTuru = %s,
+                    @_Durum = %s,
+                    @_BilletAdet = %s,
+                    @_BilletBoy = %s,
+                    @_AraIsMm = %s,
+                    @_BilletKg = %s,
+                    @_OrtEksBoy = %s,
+                    @_BaskiHizi = %s,
+                    @_CikisSicaklik = %s,
+                    @_HammaddeSicaklik = %s,
+                    @_KalipSicaklik = %s,
+                    @_FixDummy = %s,
+                    @_PullerBoyu = %s,
+                    @_IlkBilletPatlamaBasinci = %s,
+                    @_CalismaPatlamaBasinci = %s,
+                    @_Azot = %s,
+                    @_Sulu = %s,
+                    @_GermePayi = %s,
+                    @_Sogutma_Fan1 = %s,
+                    @_Sogutma_Fan2 = %s,
+                    @_Sogutma_Fan3 = %s,
+                    @_Sogutma_Fan4 = %s,
+                    @_Sogutma_Fan5 = %s,
+                    @_Sogutma_Fan6 = %s,
+                    @Sonuc = @Sonuc OUTPUT;
+                SELECT @Sonuc;
+            """, [
+                pres_testere_no,
+                int(kart.get('KartNo', 0)),
+                bitis, 
+                "A", 
+                "", 
+                baslangic,
+                bitis,
+                sure_dakika,
+                "", 
+                1, 
+                "", 
+                "4500-1", 
+                ext_kalip_no,
+                "", 
+                "2.FAB.PRES.", 
+                ext_billet_lot, 
+                1000.0, 
+                float(kart.get('Gramaj', 0)), 
+                float(kart.get('Gramaj', 0)) / 1000.0 if float(kart.get('Gramaj', 0)) else 0, 
+                101, 
+                "Uygun", 
+                "Uygun", 
+                billet_adet,
+                billet_boy,
+                ara_is_mm,
+                billet_kg,
+                eks_boy, 
+                float(kart.get('ImalatHizi', 0)), 
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+            ])
+            
+            res = cursor.fetchone()
+            if res and res[0] != "BASARILI":
+                raise Exception(f"TC_DWP_PRESSCreateOrderItems failed: {res[0]}")
+                
+            # 4. TC_DWP_PRESSCreatePost
+            cursor.execute("""
+                DECLARE @Sonuc VARCHAR(250);
+                EXEC dbo.TC_DWP_PRESSCreatePost 
+                    @_PresTestereNo = %s,
+                    @Sonuc = @Sonuc OUTPUT;
+                SELECT @Sonuc;
+            """, [pres_testere_no])
+            
+            res = cursor.fetchone()
+            if res and res[0] != "BASARILI":
+                raise Exception(f"TC_DWP_PRESSCreatePost failed: {res[0]}")
+
+
+
 def sepete_dagit(request):
     if request.method == 'POST':
         try:
@@ -4793,24 +5075,28 @@ def sepete_dagit(request):
 
             grouped_sepetler = [{"id": sepet_id, "items": items} for sepet_id, items in sepetler_grouped.items()]
             print(grouped_sepetler)
-            with transaction.atomic():
-                for sepetler in grouped_sepetler:
-                    sepet = Sepet.objects.get(id=sepetler['id']) 
-                    yuklenen_veri = sepet.yuklenen
-                    # ProfilNo ile eşleşen eski verileri sil
-                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
-                    for item in sepetler['items']:
-                        yuklenen_veri.append(item)
-                    sepet.yuklenen = yuklenen_veri
-                    sepet.save()
-                KartDagilim.objects.create(
-                    profil_no = profil_no,
-                    profil_gr = profil_gr,
-                    secilen_ext = secilen_ext,
-                    secilen_sepet = secilen_sepet,
-                    secilen_siparis = secilen_siparis,
-                    dagitilan_kartlar = kart_dagilimi
-                )
+            
+            # PUSH TO MSSQL (Test Database) and DO NOT save to PostgreSQL
+            push_to_mssql_erp(kart_dagilimi, secilen_ext)
+            
+            # with transaction.atomic():
+            #     for sepetler in grouped_sepetler:
+            #         sepet = Sepet.objects.get(id=sepetler['id']) 
+            #         yuklenen_veri = sepet.yuklenen
+            #         # ProfilNo ile eşleşen eski verileri sil
+            #         yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
+            #         for item in sepetler['items']:
+            #             yuklenen_veri.append(item)
+            #         sepet.yuklenen = yuklenen_veri
+            #         sepet.save()
+            #     KartDagilim.objects.create(
+            #         profil_no = profil_no,
+            #         profil_gr = profil_gr,
+            #         secilen_ext = secilen_ext,
+            #         secilen_sepet = secilen_sepet,
+            #         secilen_siparis = secilen_siparis,
+            #         dagitilan_kartlar = kart_dagilimi
+            #     )
 
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
@@ -5171,24 +5457,28 @@ def sepete_dagit2(request):
 
             grouped_sepetler = [{"id": sepet_id, "items": items} for sepet_id, items in sepetler_grouped.items()]
             print(grouped_sepetler)
-            with transaction.atomic():
-                for sepetler in grouped_sepetler:
-                    sepet = Sepet.objects.get(id=sepetler['id']) 
-                    yuklenen_veri = sepet.yuklenen
-                    # ProfilNo ile eşleşen eski verileri sil
-                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
-                    for item in sepetler['items']:
-                        yuklenen_veri.append(item)
-                    sepet.yuklenen = yuklenen_veri
-                    sepet.save()
-                KartDagilim.objects.create(
-                    profil_no = profil_no,
-                    profil_gr = profil_gr,
-                    secilen_ext = secilen_ext,
-                    secilen_sepet = secilen_sepet,
-                    secilen_siparis = secilen_siparis,
-                    dagitilan_kartlar = kart_dagilimi
-                )
+            
+            # PUSH TO MSSQL (Test Database) and DO NOT save to PostgreSQL
+            push_to_mssql_erp(kart_dagilimi, secilen_ext)
+            
+            # with transaction.atomic():
+            #     for sepetler in grouped_sepetler:
+            #         sepet = Sepet.objects.get(id=sepetler['id']) 
+            #         yuklenen_veri = sepet.yuklenen
+            #         # ProfilNo ile eşleşen eski verileri sil
+            #         yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
+            #         for item in sepetler['items']:
+            #             yuklenen_veri.append(item)
+            #         sepet.yuklenen = yuklenen_veri
+            #         sepet.save()
+            #     KartDagilim.objects.create(
+            #         profil_no = profil_no,
+            #         profil_gr = profil_gr,
+            #         secilen_ext = secilen_ext,
+            #         secilen_sepet = secilen_sepet,
+            #         secilen_siparis = secilen_siparis,
+            #         dagitilan_kartlar = kart_dagilimi
+            #     )
 
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:

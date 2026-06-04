@@ -464,6 +464,13 @@ class UploadFile(models.Model):
     def __str__(self):
         return self.File
 
+COMMENT_VISIBILITY_CHOICES = [
+    ('everyone', 'Herkes'),
+    ('only_me', 'Sadece Ben'),
+    ('specific_users', 'Belirli Kullanıcılar'),
+    ('specific_groups', 'Belirli Gruplar'),
+]
+
 class Comment(models.Model):
     Kullanici = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     FormModel = models.CharField(null=True, blank=True)
@@ -477,6 +484,21 @@ class Comment(models.Model):
     ViewedUsers = models.ManyToManyField(User, related_name='viewed_comments', blank=True)  # Field to track viewed users
     IsPinned = models.BooleanField(default=False, null=True, blank=True)
     OriginId = models.IntegerField(null=True, blank=True)  # ProfilNoya Sabitle denildiğinde orijinal yorumun ID'si
+    # --- Visibility control ---
+    visibility = models.CharField(
+        max_length=20,
+        choices=COMMENT_VISIBILITY_CHOICES,
+        default='everyone',
+        null=True, blank=True
+    )
+    visibility_users = models.ManyToManyField(
+        User, related_name='permitted_comments', blank=True,
+        help_text="'specific_users' görünürlüğünde bu yorumu görebilecek kullanıcılar"
+    )
+    visibility_groups = models.ManyToManyField(
+        Group, related_name='permitted_comments', blank=True,
+        help_text="'specific_groups' görünürlüğünde bu yorumu görebilecek gruplar"
+    )
 
     def mark_viewed(self, user):
         """

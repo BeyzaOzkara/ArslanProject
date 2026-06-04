@@ -215,5 +215,9 @@ urlpatterns = [
 path("location/kalip-all", views.location_kalip_all, name="location_kalip_all"),
 path("location/kalip-split/", views.location_kalip_split, name="location_kalip_split"),
 
+    # Comment visibility API
+    path('api/comment-users-list/', views.comment_users_list, name='comment_users_list'),
+    path('api/comment-groups-list/', views.comment_groups_list, name='comment_groups_list'),
+
 
 ]
