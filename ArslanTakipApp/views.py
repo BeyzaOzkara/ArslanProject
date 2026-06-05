@@ -5077,26 +5077,26 @@ def sepete_dagit(request):
             print(grouped_sepetler)
             
             # PUSH TO MSSQL (Test Database) and DO NOT save to PostgreSQL
-            push_to_mssql_erp(kart_dagilimi, secilen_ext)
+            # push_to_mssql_erp(kart_dagilimi, secilen_ext)
             
-            # with transaction.atomic():
-            #     for sepetler in grouped_sepetler:
-            #         sepet = Sepet.objects.get(id=sepetler['id']) 
-            #         yuklenen_veri = sepet.yuklenen
-            #         # ProfilNo ile eşleşen eski verileri sil
-            #         yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
-            #         for item in sepetler['items']:
-            #             yuklenen_veri.append(item)
-            #         sepet.yuklenen = yuklenen_veri
-            #         sepet.save()
-            #     KartDagilim.objects.create(
-            #         profil_no = profil_no,
-            #         profil_gr = profil_gr,
-            #         secilen_ext = secilen_ext,
-            #         secilen_sepet = secilen_sepet,
-            #         secilen_siparis = secilen_siparis,
-            #         dagitilan_kartlar = kart_dagilimi
-            #     )
+            with transaction.atomic():
+                for sepetler in grouped_sepetler:
+                    sepet = Sepet.objects.get(id=sepetler['id']) 
+                    yuklenen_veri = sepet.yuklenen
+                    # ProfilNo ile eşleşen eski verileri sil
+                    yuklenen_veri = [item for item in yuklenen_veri if item["ProfilNo"] not in alternative_dies]
+                    for item in sepetler['items']:
+                        yuklenen_veri.append(item)
+                    sepet.yuklenen = yuklenen_veri
+                    sepet.save()
+                KartDagilim.objects.create(
+                    profil_no = profil_no,
+                    profil_gr = profil_gr,
+                    secilen_ext = secilen_ext,
+                    secilen_sepet = secilen_sepet,
+                    secilen_siparis = secilen_siparis,
+                    dagitilan_kartlar = kart_dagilimi
+                )
 
             return JsonResponse({'success': True}, safe=False)
         except Exception as e:
