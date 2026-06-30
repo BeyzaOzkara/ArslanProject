@@ -78,6 +78,10 @@
     .vis-only_me    { background: #fce4ec; color: #880e4f; }
     .vis-specific_users  { background: #e8f5e9; color: #2e7d32; }
     .vis-specific_groups { background: #fff3e0; color: #e65100; }
+    /* Override Bootstrap's "Browse" button text on file inputs */
+    .custom-file-input ~ .custom-file-label::after {
+        content: "Gözat";
+    }
 </style>
   
 {% endblock %}
