@@ -624,16 +624,7 @@ function initializeDieComments() {
                     ['height', ['height']],
                     ['table'],
                     ['custom', ['specialchars']],
-                    ['insert', ['picture', 'file']],
                 ],
-                callbacks: {
-                    onInit: function () {
-                        const fileInput = $('.note-group-select-from-files input[type="file"]');
-                        if (fileInput.length) fileInput.attr('multiple', 'multiple');
-                    },
-                    onImageUpload: function (files) { handleFileSelection(files, 'images'); },
-                    onFileUpload: function (files) { handleFileSelection(files, 'files'); },
-                },
             });
             
             fulfillPendingOriginIn(document.getElementById('die-comments-content'));
@@ -677,16 +668,7 @@ function initializeProfileComments() {
                     ['height', ['height']],
                     ['table'],
                     ['custom', ['specialchars']],
-                    ['insert', ['picture', 'file']],
                 ],
-                callbacks: {
-                    onInit: function () {
-                        const fileInput = $('.note-group-select-from-files input[type="file"]');
-                        if (fileInput.length) fileInput.attr('multiple', 'multiple');
-                    },
-                    onImageUpload: function (files) { handleFileSelection(files, 'images'); },
-                    onFileUpload: function (files) { handleFileSelection(files, 'files'); },
-                },
             });
 
             fulfillPendingOriginIn(document.getElementById('profile-comments-content'));
@@ -749,6 +731,27 @@ function createPostComment(type) {
     const newCommentHTML = `
         <div id="${div_id}" style="margin-top: 20px; margin-bottom:20px">
             <textarea id="${text_id}" class="textarea"></textarea>
+                        <!-- Standalone file upload panel -->
+            <div style="margin-top:6px;">
+                <i class="fas fa-paperclip ml-1 mr-2" style="cursor:pointer;" title="Dosya Ekle"
+                   onclick="kalipDosyaEkle('${type}')"></i>
+                <span style="font-size:12px; color:#666;">Dosya eklemek için tıklayın</span>
+            </div>
+            <div id="dosyaEkleCol_${type}" style="display:none; margin-top:8px;">
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="fileInput_${type}" lang="tr"
+                               onchange="kalipFileInputChange(event, '${type}')" multiple>
+                        <label class="custom-file-label" for="fileInput_${type}" style="overflow:hidden;">Dosyaları Seçin</label>
+                    </div>
+                    <div class="input-group-append">
+                        <span class="input-group-text" style="cursor:pointer;"
+                              onclick="kalipDosyaTemizle('${type}')">Temizle</span>
+                    </div>
+                </div>
+                <div id="fileTitles_${type}" class="form-group border border-secondary rounded mt-2"
+                     style="max-height:200px; overflow-y:auto; padding:6px;"></div>
+            </div>
             <!-- Visibility selector -->
             <div class="visibility-selector-wrapper" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;">
               <label class="mb-0" style="font-size:13px;"><i class="fas fa-eye mr-1"></i>Kimler görebilir?</label>
@@ -843,16 +846,67 @@ function postComment(type="die", commentId="") {
             }
         }
     }
+
+    
+    // --- UI: disable submit button and show upload progress ---
+    const submitBtnId = commentId
+        ? `send${commentId}`
+        : `submit${type}CommentButton`;
+    const $submitBtn = $(`#${submitBtnId}`);
+    const origBtnHtml = $submitBtn.html();
+
+    // Inject a progress bar below the file panel (or below the editor)
+    const progressWrapperId = `uploadProgress_${commentId || type}`;
+    $(`#${progressWrapperId}`).remove(); // clear any previous
+    const $progressWrap = $(`
+        <div id="${progressWrapperId}" style="margin-top:8px;">
+            <div class="d-flex align-items-center mb-1" style="font-size:12px; color:#555;">
+                <span class="spinner-border spinner-border-sm mr-2" role="status"></span>
+                <span id="${progressWrapperId}_label">Yükleniyor…</span>
+            </div>
+            <div class="progress" style="height:8px;">
+                <div id="${progressWrapperId}_bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                     role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    `);
+    $submitBtn.before($progressWrap);
+    $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm mr-1" role="status"></span> Gönderiliyor…');
+
+    function resetSubmitBtn() {
+        $submitBtn.prop('disabled', false).html(origBtnHtml);
+        $(`#${progressWrapperId}`).remove();
+    }
+
     $.ajax({
             url: `postcomment`,
             type: 'POST',
             data: yorumData,
             contentType: false,
             processData: false,
+            xhr: function() {
+            const xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const pct = Math.round((e.loaded / e.total) * 100);
+                    $(`#${progressWrapperId}_bar`).css('width', pct + '%').attr('aria-valuenow', pct);
+                    $(`#${progressWrapperId}_label`).text(
+                        pct < 100 ? `Yükleniyor… %${pct}` : 'Sunucuya kaydediliyor…'
+                    );
+                }
+            }, false);
+            return xhr;
+        },
             success: function(response) {
+                
+            resetSubmitBtn();
                 alert("Paylaşım başarılı.");
                 $(`.textarea`).summernote('code', '');
                 selectedFiles = [];
+                
+            // Also clear all kalip file panels
+            kalipUpdateFileList(type);
+            if (commentId) kalipUpdateFileList('reply_' + commentId);
                 if (type=="die"){
                     initializeDieComments();
                 }else if (type=="profile") {
@@ -861,6 +915,10 @@ function postComment(type="die", commentId="") {
             },
             error: function(response) {
                 alert('Paylaşım kaydedilemedi. '+response.responseJSON.error);
+            resetSubmitBtn();
+            const msg = (response.responseJSON && response.responseJSON.error)
+                ? response.responseJSON.error : response.statusText;
+            alert('Paylaşım kaydedilemedi. ' + msg);
             }
     });
 }
@@ -1039,8 +1097,8 @@ function createEditButton(id, type) {
     return `<span><a role="button" class="ml-2" style="color:blue; cursor:pointer;" data-toggle="collapse" onclick="replyEditBtnClick(${id}, 'Düzenle', '${type}')" aria-expanded="false" aria-controls="collapseExample">düzenle</a></span>`;
 }
 
-function createDeleteButton(id) {
-    return `<span><a role="button" class="ml-2" style="color:red; cursor:pointer;" onclick="deleteComment(${id})">sil</a></span>`;
+function createDeleteButton(id, type) {
+    return `<span><a role="button" class="ml-2" style="color:red; cursor:pointer;" onclick="deleteComment(${id}, '${type}')">sil</a></span>`;
 }
 
 function createButtons(comment, type) {
@@ -1056,7 +1114,7 @@ function createButtons(comment, type) {
             onclick="shareCommentLink(${comment.id}, '${type}')">linki kopyala</a></span>`
     );
     if (String(comment.Kullanici_id) === userID || userIsSuper) {
-        buttonHtml.append(createEditButton(comment.id, type), createDeleteButton(comment.id));
+        buttonHtml.append(createEditButton(comment.id, type), createDeleteButton(comment.id, type));
     }
     return buttonHtml;
 }
@@ -1163,8 +1221,31 @@ function replyEditBtnClick(commentId, action, type) {
             </div>
         </div>
     `);
+    // Standalone file upload panel for reply/edit
+    const replyFilePanel = $(`
+        <div style="margin-top:6px;">
+            <i class="fas fa-paperclip ml-1 mr-2" style="cursor:pointer;" title="Dosya Ekle"
+               onclick="kalipDosyaEkle('reply_${commentId}')"></i>
+            <span style="font-size:12px; color:#666;">Dosya eklemek için tıklayın</span>
+        </div>
+        <div id="dosyaEkleCol_reply_${commentId}" style="display:none; margin-top:8px;">
+            <div class="input-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="fileInput_reply_${commentId}" lang="tr"
+                           onchange="kalipFileInputChange(event, 'reply_${commentId}')" multiple>
+                    <label class="custom-file-label" for="fileInput_reply_${commentId}" style="overflow:hidden;">Dosyaları Seçin</label>
+                </div>
+                <div class="input-group-append">
+                    <span class="input-group-text" style="cursor:pointer;"
+                          onclick="kalipDosyaTemizle('reply_${commentId}')">Temizle</span>
+                </div>
+            </div>
+            <div id="fileTitles_reply_${commentId}" class="form-group border border-secondary rounded mt-2"
+                 style="max-height:180px; overflow-y:auto; padding:6px;"></div>
+        </div>
+    `);
 
-    textareaContainer.append(textarea, visHtml, sendButton);
+    textareaContainer.append(textarea, visHtml, replyFilePanel, sendButton);
 
     // Populate user and group pickers dynamically
     $.getJSON('/api/comment-users-list/', function(data) {
@@ -1196,16 +1277,7 @@ function replyEditBtnClick(commentId, action, type) {
             ['height', ['height']],
             ['table'],
             ['custom', ['specialchars']],
-            ['insert', ['picture', 'file']],
         ],
-        callbacks: {
-            onImageUpload: function(files) {
-                handleFileSelection(files, 'images');
-            },
-            onFileUpload: function(files) {
-                handleFileSelection(files, 'files');
-            }
-        }
 
     });
     if (action == 'Düzenle') {
@@ -1216,15 +1288,20 @@ function replyEditBtnClick(commentId, action, type) {
 
 }
 
-function deleteComment(cId) {
+function deleteComment(cId, commentType) {
     let con = confirm("Silmek istediğinize emin misiniz?");
     if (con == true) {
       $.ajax({
         url: 'deletecomment/'+cId,
         type: 'GET',
         success: function (response) {
-            $(`.${cId}`).remove();
             alert(response.message);
+            // Reload the correct comment list
+            if (commentType === 'profile') {
+                initializeProfileComments();
+            } else {
+                initializeDieComments();
+            }
         },
         error: function (error) {
           alert('Yorum silinemedi. '+error);
@@ -1256,32 +1333,64 @@ function pinComment(cId, pin_type) { // kalıp tabindeyken kalıba, profildeyken
       });
 }
 
-function handleFileSelection(files, type) {
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
-        if (isDuplicate) {
-            console.warn(`File "${file.name}" has already been added.`);
-            continue; // Skip this file
-        }
-        const reader = new FileReader();
+// ---- Standalone file-upload helpers for kalip comment editors ----
 
-        reader.onload = function(e) {
-            // Preview the file in the editor without uploading
-            if (type === 'images') {
-                $('.btnText').summernote('insertImage', e.target.result);
-            } else if (type === 'files') {
-                const fileLink = `<a href="${e.target.result}" target="_blank">${file.name}</a> | `;
-                $('.btnText').summernote('code', $('.btnText').summernote('code') + fileLink);
-            }
-        };
-
-        reader.readAsDataURL(file);
-        selectedFiles.push(file); // Store the file for later upload
-        console.log(selectedFiles)
-    }
+function kalipDosyaEkle(scopeKey) {
+    const panel = document.getElementById('dosyaEkleCol_' + scopeKey);
+    if (!panel) return;
+    panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
 }
 
+function kalipFileAlreadySelected(newFile) {
+    return selectedFiles.some(f => f.name === newFile.name && f.size === newFile.size);
+}
+
+function kalipFileInputChange(event, scopeKey) {
+    Array.from(event.target.files).forEach(function(newFile) {
+        if (!kalipFileAlreadySelected(newFile)) {
+            selectedFiles.push(newFile);
+        } else {
+            console.warn('Dosya zaten seçili:', newFile.name);
+        }
+    });
+    kalipUpdateFileList(scopeKey);
+}
+
+function kalipUpdateFileList(scopeKey) {
+    const container = document.getElementById('fileTitles_' + scopeKey);
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (selectedFiles.length === 0) return;
+
+    selectedFiles.forEach(function(file, index) {
+        const fileType = file.name.split('.').pop().toLowerCase();
+        const item = document.createElement('div');
+        item.className = 'd-flex align-items-center justify-content-between border rounded p-1 mb-1';
+        item.innerHTML = `
+            <span class="fiv-cla fiv-icon-${fileType} mr-2" style="font-size:1.4em;"></span>
+            <span class="flex-grow-1 text-truncate" style="font-size:12px;" title="${file.name}">${file.name}</span>
+            <button type="button" class="btn btn-sm btn-link text-danger p-0 ml-2"
+                    onclick="kalipRemoveFile(${index}, '${scopeKey}')">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        container.appendChild(item);
+    });
+}
+
+function kalipDosyaTemizle(scopeKey) {
+    selectedFiles = [];
+    kalipUpdateFileList(scopeKey);
+    // Also reset the file input so the same files can be re-selected
+    const inp = document.getElementById('fileInput_' + scopeKey);
+    if (inp) inp.value = '';
+}
+
+window.kalipRemoveFile = function(index, scopeKey) {
+    selectedFiles.splice(index, 1);
+    kalipUpdateFileList(scopeKey);
+};
 function handleDieChange(kalipNo) {
     loadedData.data = {};
     loadedData.currentDie = kalipNo;
