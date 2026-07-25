@@ -10,22 +10,21 @@ email_mapping = {
     '1100-1': { 
         'to': ['eski1100pres@arslanaluminyum.com', 'planlama1@arslanaluminyum.com',
                 'hasanhuseyinkurut@arslanaluminyum.com', 'eloksalkalite@arslanaluminyum.com'],
-        'cc': ['nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com',
+        'cc': ['pres1@arslanaluminyum.com',
                 'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
                 'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
     },
     '1200-1': {
         'to': ['1200pres@arslanaluminyum.com', 'planlama1@arslanaluminyum.com',
                 'hasanhuseyinkurut@arslanaluminyum.com', 'eloksalkalite@arslanaluminyum.com'],
-        'cc': ['nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com',
+        'cc': ['pres1@arslanaluminyum.com',
                 'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
                 'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
     },
     '1600-1': {
         'to': ['1600PRES@arslanaluminyum.com', 'planlama1@arslanaluminyum.com',
                 'hasanhuseyinkurut@arslanaluminyum.com', 'eloksalkalite@arslanaluminyum.com'],
-        'cc': ['nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com',
-                'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
+        'cc': ['pres1@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
                 'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
     },
     '2750-1': {
@@ -54,7 +53,7 @@ email_mapping = {
     },
     '4500-1': {
         'to': ['4.fabrikabakim@arslanaluminyum.com', 'fabrika4kalite@arslanaluminyum.com'],
-        'cc': ['nuraydincavdir@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
+        'cc': ['akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
                 'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
     }
 }
@@ -236,7 +235,7 @@ def send_daily_test_report_for_all():
 
     result_list = sorted(result_list, key=lambda x: x['press'])
     to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
-                        'nuraydincavdir@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
+                        'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
                         'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com',
                         'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'yazilim@arslanaluminyum.com'
     ]
