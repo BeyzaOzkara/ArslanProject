@@ -6278,7 +6278,7 @@ def transfer_mesaj_ekle(request, tid):
         return JsonResponse({'error': 'Yalnızca POST desteklenir.'}, status=405)
     try:
         transfer = get_object_or_404(TransitTransfer, id=tid)
-        if transfer.durum == 'COMPLETED':
+        if transfer.durum == 'COMPLETED' and transfer.islem_sonucu != 'SARTLI_KABUL':
             return JsonResponse({'error': 'Tamamlanan transfere mesaj eklenemez.'}, status=400)
 
         mesaj_metni = request.POST.get('mesaj_metni', '').strip()

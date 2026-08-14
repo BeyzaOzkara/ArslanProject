@@ -343,6 +343,15 @@
         <div class="msg-system-inner">
           <i class="fas fa-info-circle mr-1"></i>{{ m.mesaj_metni }}
           <div style="font-size:0.65rem;margin-top:3px;opacity:0.8">{{ m.olusturma_tarihi|date:"d.m.Y H:i" }}</div>
+          {% if fotolar %}
+          <div class="msg-foto-grid justify-content-center mt-2">
+            {% for uf in fotolar %}
+            <a href="{{ uf.File.url }}" data-lightbox="{{ uf.File.url }}" class="lightbox-trigger">
+              <img src="{{ uf.File.url }}" alt="Fotoğraf" loading="lazy">
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
       </div>
 
