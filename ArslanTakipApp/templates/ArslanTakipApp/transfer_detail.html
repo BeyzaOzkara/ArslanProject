@@ -1,0 +1,613 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse{% endblock %}{% endblock %}
+{% load static %}
+
+{% block title %}Transfer #{{ transfer.id }} — Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<style>
+  :root {
+    --transit-blue: #1a73e8;
+    --transit-green: #34a853;
+    --transit-red: #ea4335;
+    --chat-bg: #f0f4fb;
+    --system-bg: rgba(0,0,0,0.06);
+    --bubble-user: #d2e3fc;
+    --bubble-mine: #e9ffe7;
+    --input-bar-h: 80px;
+  }
+
+  /* ─── Genel ─────────────────────────────────────── */
+  body { background: var(--chat-bg); }
+  .content-wrapper { background: var(--chat-bg); }
+
+  /* ─── Üst Başlık Kartı ──────────────────────────── */
+  .transfer-header-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.10);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .transfer-header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .icon-transit { background: #d2e3fc; color: var(--transit-blue); }
+  .icon-done    { background: #ceead6; color: var(--transit-green); }
+
+  .transfer-header-info { flex: 1; min-width: 0; }
+  .transfer-route-big {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #202124;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .transfer-sub {
+    font-size: 0.82rem;
+    color: #5f6368;
+    margin-top: 2px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .status-transit   { background: #d2e3fc; color: var(--transit-blue); }
+  .status-completed { background: #ceead6; color: var(--transit-green); }
+
+  /* ─── Chat Timeline ─────────────────────────────── */
+  .chat-area {
+    padding: 12px 0;
+    padding-bottom: calc(var(--input-bar-h) + 20px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Sistem mesajı: ortalanmış badge */
+  .msg-system {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0;
+  }
+  .msg-system-inner {
+    background: var(--system-bg);
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 0.78rem;
+    color: #5f6368;
+    text-align: center;
+    max-width: 85%;
+    white-space: pre-line;
+  }
+
+  /* Kullanıcı chat balonu */
+  .msg-user {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 80%;
+  }
+  .msg-user.mine {
+    margin-left: auto;
+    flex-direction: row-reverse;
+  }
+  .msg-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--transit-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .msg-user.mine .msg-avatar { background: var(--transit-green); }
+
+  .msg-bubble {
+    background: var(--bubble-user);
+    border-radius: 18px 18px 18px 4px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    color: #202124;
+    max-width: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    position: relative;
+    word-break: break-word;
+    white-space: pre-line;
+  }
+  .msg-user.mine .msg-bubble {
+    background: var(--bubble-mine);
+    border-radius: 18px 18px 4px 18px;
+  }
+  .msg-meta {
+    font-size: 0.7rem;
+    color: #9aa0a6;
+    margin-top: 4px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .msg-user.mine .msg-meta { justify-content: flex-end; }
+
+  /* Fotoğraf thumbnail grid */
+  .msg-foto-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .msg-foto-grid a {
+    display: block;
+    width: 90px;
+    height: 90px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.7);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    transition: transform 0.15s;
+  }
+  .msg-foto-grid a:hover { transform: scale(1.04); }
+  .msg-foto-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ─── Sabitlenmiş Alt Bar ───────────────────────── */
+  .chat-input-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #e8eaed;
+    padding: 10px 16px;
+    z-index: 1040;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .chat-input-bar textarea {
+    flex: 1;
+    border: 1px solid #dadce0;
+    border-radius: 24px;
+    padding: 10px 16px;
+    resize: none;
+    font-size: 0.9rem;
+    max-height: 120px;
+    overflow-y: auto;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.4;
+  }
+  .chat-input-bar textarea:focus { border-color: var(--transit-blue); }
+  .chat-input-bar .icon-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f3f4;
+    color: #5f6368;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .chat-input-bar .icon-btn:hover { background: #e8eaed; }
+  .chat-input-bar .send-btn {
+    background: var(--transit-blue);
+    color: #fff;
+  }
+  .chat-input-bar .send-btn:hover { background: #1558b8; }
+
+  /* Tamamla Butonu */
+  .btn-tamamla {
+    background: var(--transit-green);
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 9px 20px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  .btn-tamamla:hover { background: #2d9044; }
+
+  /* Foto seçimi için gizli input */
+  #fotoInputMsg { display: none; }
+
+  /* Foto önizleme */
+  #pendingFotoPreview { display: flex; flex-wrap: wrap; gap: 6px; }
+  #pendingFotoPreview img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #e8eaed;
+  }
+
+  /* Lightbox Modal */
+  #lightboxModal .modal-dialog { max-width: 90vw; }
+  #lightboxModal img { max-width: 100%; max-height: 80vh; object-fit: contain; }
+
+  /* Tamamla Modal */
+  #tamamlaModal .modal-header { background: var(--transit-green); color: #fff; }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .chat-input-bar { left: 250px; } /* AdminLTE sidebar offset */
+  }
+  @media (max-width: 576px) {
+    .msg-user { max-width: 92%; }
+    .msg-foto-grid a { width: 70px; height: 70px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3" style="max-width: 860px;">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb bg-transparent p-0 mb-0">
+      <li class="breadcrumb-item"><a href="/transfer/">Transfer Takip</a></li>
+      <li class="breadcrumb-item active">Transfer #{{ transfer.id }}</li>
+    </ol>
+  </nav>
+
+  <!-- Üst başlık -->
+  <div class="transfer-header-card">
+    <div class="transfer-header-icon {% if transfer.durum == 'IN_TRANSIT' %}icon-transit{% else %}icon-done{% endif %}">
+      <i class="fas {% if transfer.durum == 'IN_TRANSIT' %}fa-truck-moving{% else %}fa-check{% endif %}"></i>
+    </div>
+    <div class="transfer-header-info">
+      <div class="transfer-route-big">
+        {{ transfer.kaynak_lokasyon.locationName }}
+        <i class="fas fa-arrow-right fa-sm" style="color:#9aa0a6"></i>
+        {{ transfer.hedef_lokasyon.locationName }}
+        <span class="status-badge {% if transfer.durum == 'IN_TRANSIT' %}status-transit{% else %}status-completed{% endif %}">
+          {% if transfer.durum == 'IN_TRANSIT' %}YOLDA{% else %}TAMAMLANDI{% endif %}
+        </span>
+      </div>
+      <div class="transfer-sub">
+        Başlatan: <strong>{{ transfer.baslatan.get_full_name|default:transfer.baslatan.username }}</strong>
+        &nbsp;·&nbsp; {{ transfer.olusturma_tarihi|date:"d.m.Y H:i" }}
+      </div>
+    </div>
+    {% if transfer.durum == 'IN_TRANSIT' %}
+    <button class="btn-tamamla" data-toggle="modal" data-target="#tamamlaModal">
+      <i class="fas fa-check-circle"></i> Teslim Al
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Timeline -->
+  <div class="chat-area" id="chatArea">
+    {% for item in mesaj_data %}
+    {% with m=item.obj fotolar=item.fotolar %}
+
+      {% if m.sistem_mesaji %}
+      <!-- Sistem mesajı -->
+      <div class="msg-system">
+        <div class="msg-system-inner">
+          <i class="fas fa-info-circle mr-1"></i>{{ m.mesaj_metni }}
+          <div style="font-size:0.65rem;margin-top:3px;opacity:0.8">{{ m.olusturma_tarihi|date:"d.m.Y H:i" }}</div>
+        </div>
+      </div>
+
+      {% else %}
+      <!-- Kullanıcı mesajı -->
+      <div class="msg-user {% if m.yazar == request.user %}mine{% endif %}">
+        <div class="msg-avatar" title="{{ m.yazar.get_full_name|default:m.yazar.username }}">
+          {{ m.yazar.first_name|first|upper }}{{ m.yazar.last_name|first|upper }}
+        </div>
+        <div>
+          <div class="msg-bubble">
+            {% if m.mesaj_metni %}{{ m.mesaj_metni }}{% endif %}
+            {% if fotolar %}
+            <div class="msg-foto-grid">
+              {% for uf in fotolar %}
+              <a href="{{ uf.File.url }}" data-lightbox="{{ uf.File.url }}" class="lightbox-trigger">
+                <img src="{{ uf.File.url }}" alt="Fotoğraf" loading="lazy">
+              </a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          <div class="msg-meta {% if m.yazar == request.user %}text-right{% endif %}">
+            <span>{{ m.yazar.get_full_name|default:m.yazar.username }}</span>
+            <span>·</span>
+            <span>{{ m.olusturma_tarihi|date:"d.m H:i" }}</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    {% endwith %}
+    {% endfor %}
+
+    <!-- Yeni mesajlar buraya eklenir (AJAX) -->
+    <div id="newMessagesAnchor"></div>
+  </div>
+
+</div>
+
+<!-- ─── Alt Input Bar ──────────────────────────────────────────────────────── -->
+{% if transfer.durum == 'IN_TRANSIT' %}
+<div class="chat-input-bar" id="chatInputBar">
+  <input type="file" id="fotoInputMsg" multiple accept="image/*" capture="environment">
+  <button class="icon-btn" onclick="document.getElementById('fotoInputMsg').click()" title="Fotoğraf ekle">
+    <i class="fas fa-camera"></i>
+  </button>
+
+  <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+    <div id="pendingFotoPreview"></div>
+    <textarea id="msgText" placeholder="Mesaj yaz..." rows="1"
+      oninput="autoResize(this)" onkeydown="handleEnter(event)"></textarea>
+  </div>
+
+  <button class="icon-btn send-btn" onclick="mesajGonder()" title="Gönder">
+    <i class="fas fa-paper-plane"></i>
+  </button>
+</div>
+{% else %}
+<div class="chat-input-bar" style="justify-content:center;padding:12px 16px;">
+  <span style="color:#9aa0a6;font-size:0.9rem;">
+    <i class="fas fa-lock mr-2"></i>Bu transfer tamamlandı. Yeni mesaj eklenemez.
+  </span>
+</div>
+{% endif %}
+
+<!-- ─── Lightbox Modal ─────────────────────────────────────────────────────── -->
+<div class="modal fade" id="lightboxModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background:transparent;border:none;">
+      <div class="modal-body text-center p-0 position-relative">
+        <button type="button" class="close text-white" data-dismiss="modal"
+          style="position:absolute;top:-30px;right:0;font-size:2rem;z-index:2;">&times;</button>
+        <img id="lightboxImg" src="" class="img-fluid rounded shadow" alt="">
+        <div class="mt-2">
+          <a id="lightboxDownload" href="" download class="btn btn-sm btn-light">
+            <i class="fas fa-download mr-1"></i>İndir
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Teslim Al Modal ───────────────────────────────────────────────────── -->
+<div class="modal fade" id="tamamlaModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-check-circle mr-2"></i>Transferi Tamamla</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="font-weight-bold">Son Not <span class="text-muted font-weight-normal">(isteğe bağlı)</span></label>
+          <textarea id="tamamlaNot" class="form-control" rows="2"
+            placeholder="Teslim notu, hasar durumu vb."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Fotoğraf <span class="text-muted font-weight-normal">(isteğe bağlı)</span></label>
+          <input type="file" id="tamamlaFoto" class="form-control-file" multiple accept="image/*" capture="environment">
+        </div>
+        <div id="tamamlaAlert" class="alert alert-danger d-none mt-2" role="alert"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+        <button type="button" class="btn btn-success" id="btnTamamlaConfirm" onclick="tamamlaTransfer()">
+          <i class="fas fa-check mr-1"></i>Evet, Teslim Aldım
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var TRANSFER_ID = {{ transfer.id }};
+
+  // ─── Scroll to bottom ────────────────────────────────────────────────────
+  function scrollToBottom() {
+    var anchor = document.getElementById('newMessagesAnchor');
+    if (anchor) anchor.scrollIntoView({ behavior: 'smooth' });
+  }
+  scrollToBottom();
+
+  // ─── Fotoğraf önizleme (mesaj input) ─────────────────────────────────────
+  document.getElementById('fotoInputMsg') && document.getElementById('fotoInputMsg').addEventListener('change', function() {
+    var preview = document.getElementById('pendingFotoPreview');
+    if (!preview) return;
+    preview.innerHTML = '';
+    Array.from(this.files).forEach(function(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // ─── Textarea otomatik büyüme ─────────────────────────────────────────────
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleEnter(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      mesajGonder();
+    }
+  }
+
+  // ─── Mesaj Gönder ─────────────────────────────────────────────────────────
+  function mesajGonder() {
+    var text = (document.getElementById('msgText').value || '').trim();
+    var fotoInput = document.getElementById('fotoInputMsg');
+    var fotolar = fotoInput ? fotoInput.files : [];
+
+    if (!text && fotolar.length === 0) return;
+
+    var formData = new FormData();
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    formData.append('mesaj_metni', text);
+    Array.from(fotolar).forEach(function(f) { formData.append('fotolar', f); });
+
+    $.ajax({
+      url: '/transfer/' + TRANSFER_ID + '/mesaj',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(res) {
+        if (res.success) {
+          appendMessage(res);
+          document.getElementById('msgText').value = '';
+          document.getElementById('msgText').style.height = 'auto';
+          if (fotoInput) { fotoInput.value = ''; }
+          document.getElementById('pendingFotoPreview').innerHTML = '';
+          scrollToBottom();
+        }
+      },
+      error: function(xhr) {
+        alert('Mesaj gönderilemedi: ' + (JSON.parse(xhr.responseText || '{}').error || 'Hata'));
+      }
+    });
+  }
+
+  function appendMessage(res) {
+    var anchor = document.getElementById('newMessagesAnchor');
+    var div = document.createElement('div');
+    div.className = 'msg-user mine';
+    var avatarHtml = '<div class="msg-avatar" style="background:var(--transit-green);">' +
+      (res.yazar ? res.yazar[0].toUpperCase() : '?') + '</div>';
+
+    var fotosHtml = '';
+    if (res.fotolar && res.fotolar.length > 0) {
+      fotosHtml = '<div class="msg-foto-grid">';
+      res.fotolar.forEach(function(url) {
+        fotosHtml += '<a href="' + url + '" class="lightbox-trigger">' +
+          '<img src="' + url + '" loading="lazy"></a>';
+      });
+      fotosHtml += '</div>';
+    }
+
+    var bubbleHtml = '<div><div class="msg-bubble">' +
+      (res.mesaj_metni ? escapeHtml(res.mesaj_metni) : '') +
+      fotosHtml + '</div>' +
+      '<div class="msg-meta text-right"><span>' + escapeHtml(res.yazar) + '</span><span>·</span><span>' + res.tarih + '</span></div></div>';
+
+    div.innerHTML = avatarHtml + bubbleHtml;
+    anchor.parentNode.insertBefore(div, anchor);
+
+    // Lightbox handler'ları güncelle
+    bindLightboxTriggers();
+  }
+
+  // ─── Lightbox ─────────────────────────────────────────────────────────────
+  function bindLightboxTriggers() {
+    document.querySelectorAll('.lightbox-trigger').forEach(function(a) {
+      a.onclick = function(e) {
+        e.preventDefault();
+        var src = this.getAttribute('href') || this.dataset.lightbox;
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightboxDownload').href = src;
+        $('#lightboxModal').modal('show');
+      };
+    });
+  }
+  bindLightboxTriggers();
+
+  // ─── Tamamla ──────────────────────────────────────────────────────────────
+  function tamamlaTransfer() {
+    var btn = document.getElementById('btnTamamlaConfirm');
+    var alertEl = document.getElementById('tamamlaAlert');
+    alertEl.classList.add('d-none');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Kaydediliyor...';
+
+    var formData = new FormData();
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    formData.append('son_not', document.getElementById('tamamlaNot').value);
+    var tFoto = document.getElementById('tamamlaFoto');
+    if (tFoto && tFoto.files) {
+      Array.from(tFoto.files).forEach(function(f) { formData.append('fotolar', f); });
+    }
+
+    $.ajax({
+      url: '/transfer/' + TRANSFER_ID + '/tamamla',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(res) {
+        if (res.success) {
+          window.location.reload();
+        } else {
+          alertEl.textContent = res.error || 'Hata oluştu.';
+          alertEl.classList.remove('d-none');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check mr-1"></i>Evet, Teslim Aldım';
+        }
+      },
+      error: function(xhr) {
+        var msg = 'Sunucu hatası.';
+        try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) {}
+        alertEl.textContent = msg;
+        alertEl.classList.remove('d-none');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check mr-1"></i>Evet, Teslim Aldım';
+      }
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+{% endblock %}

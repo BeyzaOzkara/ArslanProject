@@ -12,6 +12,8 @@ class Location(models.Model):
     locationRelationID = models.ForeignKey("self", on_delete=models.CASCADE, blank =True, null=True)
     isPhysical = models.BooleanField(verbose_name="Fiziksel Bir Konum mu?")
     capacity = models.IntegerField(null=True, blank=True)
+    # NULL → Kalıp Arşivi lokasyonu | 'transfer' → yalnızca Transfer Takip | 'universal' → her iki modül
+    module_tag = models.CharField(max_length=50, null=True, blank=True, verbose_name="Modül Etiketi")
     
     def __str__(self):
         return self.locationName
@@ -636,3 +638,62 @@ class DieInfo(models.Model):
     class Meta:
         # DieInfo edit yetkisi
         permissions = [("edit_dieinfo", "DieInfo Düzenleme Yetkisi")]
+
+
+# ─── İntralogistik / Fabrika İçi Transfer Takip ───────────────────────────────
+
+class TransitTransfer(models.Model):
+    STATUS_CHOICES = [
+        ('IN_TRANSIT', 'Yolda'),
+        ('COMPLETED', 'Tamamlandı'),
+    ]
+    kaynak_lokasyon = models.ForeignKey(
+        Location, on_delete=models.CASCADE,
+        related_name='transfer_kaynak', verbose_name='Kaynak Lokasyon'
+    )
+    hedef_lokasyon = models.ForeignKey(
+        Location, on_delete=models.CASCADE,
+        related_name='transfer_hedef', verbose_name='Hedef Lokasyon'
+    )
+    durum = models.CharField(
+        max_length=20, choices=STATUS_CHOICES,
+        default='IN_TRANSIT', verbose_name='Durum'
+    )
+    baslatan = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='baslattigi_transferler', verbose_name='Başlatan'
+    )
+    olusturma_tarihi = models.DateTimeField(auto_now_add=True, verbose_name='Oluşturma Tarihi')
+    guncelleme_tarihi = models.DateTimeField(auto_now=True, verbose_name='Güncelleme Tarihi')
+
+    class Meta:
+        verbose_name = 'Transfer'
+        verbose_name_plural = 'Transferler'
+        ordering = ['-olusturma_tarihi']
+
+    def __str__(self):
+        return f"#{self.pk} {self.kaynak_lokasyon} → {self.hedef_lokasyon}"
+
+
+class TransferMessage(models.Model):
+    transfer = models.ForeignKey(
+        TransitTransfer, on_delete=models.CASCADE,
+        related_name='mesajlar', verbose_name='Transfer'
+    )
+    yazar = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name='Yazar'
+    )
+    mesaj_metni = models.TextField(null=True, blank=True, verbose_name='Mesaj')
+    # Fotoğraflar mevcut UploadFile modeli üzerinden saklanır:
+    # FileModel='TransferMessage', FileModelId=<bu_mesaj.id>
+    sistem_mesaji = models.BooleanField(default=False, verbose_name='Sistem Mesajı mı?')
+    olusturma_tarihi = models.DateTimeField(auto_now_add=True, verbose_name='Oluşturma Tarihi')
+
+    class Meta:
+        verbose_name = 'Transfer Mesajı'
+        verbose_name_plural = 'Transfer Mesajları'
+        ordering = ['olusturma_tarihi']
+
+    def __str__(self):
+        return f"Mesaj #{self.pk} — Transfer #{self.transfer_id}"

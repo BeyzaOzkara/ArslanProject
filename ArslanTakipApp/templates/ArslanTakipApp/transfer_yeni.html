@@ -1,0 +1,476 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse{% endblock %}{% endblock %}
+{% load static %}
+
+{% block title %}Yeni Transfer — Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<style>
+  :root {
+    --transit-blue: #1a73e8;
+  }
+
+  .form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+  }
+
+  .form-card-header {
+    background: var(--transit-blue);
+    color: #fff;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .loc-tables-wrap {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .loc-table-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .loc-table-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #5f6368;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .loc-selected-badge {
+    display: inline-block;
+    background: var(--transit-blue);
+    color: #fff;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .loc-selected-badge.empty {
+    background: #dadce0;
+    color: #5f6368;
+  }
+
+  /* Accordion Styles */
+  .loc-accordion {
+    border: 1px solid #e8eaed;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .loc-acc-item {
+    border-bottom: 1px solid #e8eaed;
+  }
+
+  .loc-acc-item:last-child {
+    border-bottom: none;
+  }
+
+  .loc-acc-header {
+    background: #f8f9fa;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #202124;
+    transition: background 0.2s;
+  }
+
+  .loc-acc-header:hover {
+    background: #f1f3f4;
+  }
+
+  .loc-acc-header i {
+    transition: transform 0.2s;
+    color: #9aa0a6;
+  }
+
+  .loc-acc-header.open i {
+    transform: rotate(180deg);
+  }
+
+  .loc-acc-body {
+    display: none;
+    background: #fff;
+    padding: 0;
+  }
+
+  .loc-child-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .loc-child-item {
+    padding: 10px 16px 10px 32px;
+    border-bottom: 1px solid #f1f3f4;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    color: #5f6368;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .loc-child-item:last-child {
+    border-bottom: none;
+  }
+
+  .loc-child-item:hover {
+    background: #f8f9fa;
+    color: var(--transit-blue);
+  }
+
+  .loc-child-item.selected {
+    background: #e8f0fe;
+    color: var(--transit-blue);
+    font-weight: 600;
+  }
+
+  .loc-child-item i {
+    margin-right: 8px;
+    opacity: 0.6;
+  }
+
+
+  .btn-start {
+    background: var(--transit-blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .btn-start:hover:not(:disabled) {
+    background: #1558b8;
+    box-shadow: 0 4px 14px rgba(26, 115, 232, 0.35);
+    color: #fff;
+  }
+
+  .btn-start:disabled {
+    background: #dadce0;
+    color: #9aa0a6;
+    cursor: not-allowed;
+  }
+
+  .foto-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 10px 16px;
+    border: 2px dashed #dadce0;
+    border-radius: 8px;
+    color: #5f6368;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+  }
+
+  .foto-label:hover {
+    border-color: var(--transit-blue);
+    color: var(--transit-blue);
+  }
+
+  #fotoPreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  #fotoPreview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #e8eaed;
+  }
+
+  @media (max-width: 576px) {
+    .loc-tables-wrap {
+      flex-direction: column;
+    }
+  }
+
+  .alert-form {
+    border-radius: 8px;
+    font-size: 0.88rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3" style="max-width: 900px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-transparent p-0">
+      <li class="breadcrumb-item"><a href="/transfer/">Transfer Takip</a></li>
+      <li class="breadcrumb-item active">Yeni Transfer</li>
+    </ol>
+  </nav>
+
+  <div class="form-card">
+    <div class="form-card-header">
+      <i class="fas fa-truck-moving"></i> Yeni Transfer Başlat
+    </div>
+    <div class="p-4">
+
+      <div id="alertBox" class="alert alert-danger alert-form d-none" role="alert"></div>
+
+      <!-- Lokasyon Seçimi -->
+      <div class="form-group">
+        <div class="loc-tables-wrap">
+          <div class="loc-table-col">
+            <div class="loc-table-label">
+              <i class="fas fa-map-marker-alt text-danger"></i> Kaynak Lokasyon
+            </div>
+            <div id="selected-kaynak-wrap" class="mb-2">
+              <span id="selectedKaynakBadge" class="loc-selected-badge empty">Seçilmedi</span>
+            </div>
+            <div class="loc-accordion" id="accKaynak"></div>
+          </div>
+          <div class="loc-table-col">
+            <div class="loc-table-label">
+              <i class="fas fa-map-marker-check text-success"></i> Hedef Lokasyon
+            </div>
+            <div id="selected-hedef-wrap" class="mb-2">
+              <span id="selectedHedefBadge" class="loc-selected-badge empty">Seçilmedi</span>
+            </div>
+            <div class="loc-accordion" id="accHedef"></div>
+          </div>
+        </div>
+        <input type="hidden" id="kaynakId" name="kaynak_id">
+        <input type="hidden" id="hedefId" name="hedef_id">
+      </div>
+
+      <!-- Not -->
+      <div class="form-group mt-3">
+        <label for="notMetni" class="font-weight-bold">
+          <i class="fas fa-sticky-note mr-1"></i>Başlangıç Notu <span class="text-muted font-weight-normal">(isteğe
+            bağlı)</span>
+        </label>
+        <textarea id="notMetni" name="not_metni" class="form-control" rows="3"
+          placeholder="Yük hakkında bilgi, dikkat edilmesi gerekenler..."></textarea>
+      </div>
+
+      <!-- Fotoğraf -->
+      <div class="form-group mt-3">
+        <label class="font-weight-bold d-block">
+          <i class="fas fa-camera mr-1"></i>Fotoğraf <span class="text-muted font-weight-normal">(isteğe bağlı,
+            çoklu)</span>
+        </label>
+        <label class="foto-label" for="fotoInput">
+          <i class="fas fa-image fa-lg"></i> Fotoğraf seç veya kamera ile çek
+          <input type="file" id="fotoInput" name="fotolar" multiple accept="image/*" capture="environment"
+            class="d-none">
+        </label>
+        <div id="fotoPreview"></div>
+      </div>
+
+      <!-- Gönder -->
+      <div class="mt-4 d-flex align-items-center gap-3">
+        <button id="btnBaslat" class="btn-start" disabled onclick="transferBaslat()">
+          <i class="fas fa-paper-plane mr-2"></i>Transferi Başlat
+        </button>
+        <a href="/transfer/" class="btn btn-outline-secondary ml-3">İptal</a>
+        <span id="loadingSpinner" class="d-none ml-3">
+          <i class="fas fa-spinner fa-spin text-primary"></i> Kaydediliyor...
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var locationData = JSON.parse('{{ location_json|escapejs }}');
+  var kaynakId = null;
+  var kaynakAdi = '';
+  var hedefId = null;
+  var hedefAdi = '';
+
+  // Accordion Builder
+  function renderAccordion(containerId, data, type) {
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+
+    data.forEach(function (parent, index) {
+      if (parent._children && parent._children.length > 0) {
+        var itemDiv = document.createElement('div');
+        itemDiv.className = 'loc-acc-item';
+
+        var headerDiv = document.createElement('div');
+        headerDiv.className = 'loc-acc-header';
+        headerDiv.innerHTML = '<span><i class="far fa-building mr-2"></i>' + parent.locationName + '</span><i class="fas fa-chevron-down"></i>';
+
+        var bodyDiv = document.createElement('div');
+        bodyDiv.className = 'loc-acc-body';
+
+        var childList = document.createElement('ul');
+        childList.className = 'loc-child-list';
+
+        parent._children.forEach(function (child) {
+          if (child.isPhysical) {
+            var childLi = document.createElement('li');
+            childLi.className = 'loc-child-item loc-child-' + type;
+            childLi.innerHTML = '<i class="fas fa-circle" style="font-size:6px;"></i> ' + child.locationName;
+            childLi.dataset.id = child.id;
+            childLi.dataset.name = parent.locationName + ' - ' + child.locationName;
+
+            childLi.onclick = function () {
+              // Reset all in this accordion
+              document.querySelectorAll('.loc-child-' + type).forEach(function (el) {
+                el.classList.remove('selected');
+              });
+              this.classList.add('selected');
+
+              if (type === 'kaynak') {
+                kaynakId = this.dataset.id;
+                kaynakAdi = this.dataset.name;
+                document.getElementById('kaynakId').value = kaynakId;
+                document.getElementById('selectedKaynakBadge').textContent = kaynakAdi;
+                document.getElementById('selectedKaynakBadge').classList.remove('empty');
+              } else {
+                hedefId = this.dataset.id;
+                hedefAdi = this.dataset.name;
+                document.getElementById('hedefId').value = hedefId;
+                document.getElementById('selectedHedefBadge').textContent = hedefAdi;
+                document.getElementById('selectedHedefBadge').classList.remove('empty');
+              }
+              checkForm();
+            };
+            childList.appendChild(childLi);
+          }
+        });
+
+        bodyDiv.appendChild(childList);
+
+        headerDiv.onclick = function () {
+          var isOpen = this.classList.contains('open');
+          // Close all
+          container.querySelectorAll('.loc-acc-header').forEach(function (el) { el.classList.remove('open'); });
+          container.querySelectorAll('.loc-acc-body').forEach(function (el) { el.style.display = 'none'; });
+
+          if (!isOpen) {
+            this.classList.add('open');
+            bodyDiv.style.display = 'block';
+          }
+        };
+
+        itemDiv.appendChild(headerDiv);
+        itemDiv.appendChild(bodyDiv);
+        container.appendChild(itemDiv);
+      }
+    });
+  }
+
+  // Initialize Accordions
+  renderAccordion('accKaynak', locationData, 'kaynak');
+  renderAccordion('accHedef', locationData, 'hedef');
+
+  function checkForm() {
+    var btn = document.getElementById('btnBaslat');
+    btn.disabled = !(kaynakId && hedefId && String(kaynakId) !== String(hedefId));
+  }
+
+  // ─── Fotoğraf Önizleme ──────────────────────────────────────────────────────
+  document.getElementById('fotoInput').addEventListener('change', function () {
+    var preview = document.getElementById('fotoPreview');
+    preview.innerHTML = '';
+    Array.from(this.files).forEach(function (file) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // ─── Transfer Gönder ────────────────────────────────────────────────────────
+  function transferBaslat() {
+    var alertBox = document.getElementById('alertBox');
+    alertBox.classList.add('d-none');
+
+    if (!kaynakId || !hedefId) {
+      showAlert('Lütfen kaynak ve hedef lokasyon seçiniz.');
+      return;
+    }
+    if (String(kaynakId) === String(hedefId)) {
+      showAlert('Kaynak ve hedef lokasyon aynı olamaz.');
+      return;
+    }
+
+    document.getElementById('btnBaslat').disabled = true;
+    document.getElementById('loadingSpinner').classList.remove('d-none');
+
+    var formData = new FormData();
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    formData.append('kaynak_id', kaynakId);
+    formData.append('hedef_id', hedefId);
+    formData.append('not_metni', document.getElementById('notMetni').value);
+    var fotoInput = document.getElementById('fotoInput');
+    Array.from(fotoInput.files).forEach(function (f) { formData.append('fotolar', f); });
+
+    $.ajax({
+      url: '/transfer/yeni',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (res) {
+        if (res.success) {
+          window.location.href = '/transfer/' + res.transfer_id + '/';
+        } else {
+          showAlert(res.error || 'Bir hata oluştu.');
+          document.getElementById('btnBaslat').disabled = false;
+          document.getElementById('loadingSpinner').classList.add('d-none');
+        }
+      },
+      error: function (xhr) {
+        var msg = 'Sunucu hatası.';
+        try { msg = JSON.parse(xhr.responseText).error || msg; } catch (e) { }
+        showAlert(msg);
+        document.getElementById('btnBaslat').disabled = false;
+        document.getElementById('loadingSpinner').classList.add('d-none');
+      }
+    });
+  }
+
+  function showAlert(msg) {
+    var a = document.getElementById('alertBox');
+    a.textContent = msg;
+    a.classList.remove('d-none');
+    a.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+{% endblock %}

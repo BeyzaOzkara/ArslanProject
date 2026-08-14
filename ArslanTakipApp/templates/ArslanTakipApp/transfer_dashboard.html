@@ -1,0 +1,278 @@
+{% extends 'adminlte/base.html' %}
+{% block body_class %}{% block bodyclass %}sidebar-collapse{% endblock %}{% endblock %}
+{% load static %}
+
+{% block title %}Transfer Takip — Arslan Alüminyum{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<style>
+  :root {
+    --transit-blue: #1a73e8;
+    --transit-green: #34a853;
+    --transit-gray: #5f6368;
+    --transit-bg: #f8f9fa;
+    --bubble-mine: #d2e3fc;
+    --bubble-other: #ffffff;
+  }
+
+  .transfer-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--transit-gray);
+    padding: 12px 16px 6px;
+    border-bottom: 1px solid #e8eaed;
+  }
+
+  .transfer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .transfer-card {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e8eaed;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .transfer-card:hover {
+    background: #f1f3f4;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .transfer-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    margin-right: 14px;
+  }
+
+  .avatar-transit {
+    background: #d2e3fc;
+    color: var(--transit-blue);
+  }
+
+  .avatar-done {
+    background: #ceead6;
+    color: var(--transit-green);
+  }
+
+  .transfer-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .transfer-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 3px;
+  }
+
+  .transfer-route {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+  }
+
+  .transfer-time {
+    font-size: 0.72rem;
+    color: var(--transit-gray);
+    white-space: nowrap;
+  }
+
+  .transfer-preview {
+    font-size: 0.82rem;
+    color: var(--transit-gray);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .badge-transit {
+    display: inline-block;
+    background: var(--transit-blue);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+  .badge-done {
+    display: inline-block;
+    background: var(--transit-green);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+
+  .dashboard-columns {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .dashboard-col {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  @media (max-width: 767px) {
+    .dashboard-columns {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    /* Mobil ekranda AdminLTE footer gizleme */
+    .main-footer {
+      display: none !important;
+    }
+
+    /* Mobil ekranda "TAMAMLANDI" vb. badgeleri gizleyerek taşmayı önleme */
+    .badge-done,
+    .badge-transit {
+      display: none !important;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9aa0a6;
+  }
+
+  .empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="fas fa-truck-moving mr-2 text-primary"></i>Fabrika İçi Transfer Takip</h4>
+    <a href="/transfer/yeni" class="btn btn-primary">
+      <i class="fas fa-plus mr-sm-2"></i><span class="d-none d-sm-inline">Yeni Transfer</span>
+    </a>
+  </div>
+
+  <div class="dashboard-columns">
+    <!-- Aktif Transferler -->
+    <div class="dashboard-col">
+      <div class="transfer-section-title">
+        <i class="fas fa-shipping-fast mr-1" style="color:var(--transit-blue)"></i>
+        Aktif Transferler
+        <span class="badge badge-primary ml-1">{{ aktif|length }}</span>
+      </div>
+      <ul class="transfer-list">
+        {% for t in aktif %}
+        <li>
+          <a href="/transfer/{{ t.id }}/" class="transfer-card">
+            <div class="transfer-avatar avatar-transit">
+              <i class="fas fa-truck-moving"></i>
+            </div>
+            <div class="transfer-meta">
+              <div class="transfer-meta-top">
+                <span class="transfer-route">
+                  {{ t.kaynak_lokasyon.locationName }} → {{ t.hedef_lokasyon.locationName }}
+                </span>
+                <span class="transfer-time">
+                  {{ t.olusturma_tarihi|date:"d.m H:i" }}
+                </span>
+              </div>
+              <div class="transfer-preview">
+                <i class="fas fa-user fa-xs mr-1"></i>
+                {{ t.baslatan.get_full_name|default:t.baslatan.username }}
+                &nbsp;·&nbsp;
+                <i class="fas fa-comment-alt fa-xs mr-1"></i>{{ t.mesajlar.count }} mesaj
+              </div>
+            </div>
+            <span class="badge-transit ml-2">YOLDA</span>
+          </a>
+        </li>
+        {% empty %}
+        <li class="empty-state">
+          <i class="fas fa-inbox"></i>
+          Aktif transfer yok
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Son Tamamlananlar -->
+    <div class="dashboard-col">
+      <div class="transfer-section-title">
+        <i class="fas fa-check-circle mr-1" style="color:var(--transit-green)"></i>
+        Son Tamamlananlar
+      </div>
+      <ul class="transfer-list">
+        {% for t in tamamlanan %}
+        <li>
+          <a href="/transfer/{{ t.id }}/" class="transfer-card">
+            <div class="transfer-avatar avatar-done">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="transfer-meta">
+              <div class="transfer-meta-top">
+                <span class="transfer-route">
+                  {{ t.kaynak_lokasyon.locationName }} → {{ t.hedef_lokasyon.locationName }}
+                </span>
+                <span class="transfer-time">
+                  {{ t.guncelleme_tarihi|date:"d.m H:i" }}
+                </span>
+              </div>
+              <div class="transfer-preview">
+                <i class="fas fa-user fa-xs mr-1"></i>
+                {{ t.baslatan.get_full_name|default:t.baslatan.username }}
+                &nbsp;·&nbsp;
+                <i class="fas fa-comment-alt fa-xs mr-1"></i>{{ t.mesajlar.count }} mesaj
+              </div>
+            </div>
+            <span class="badge-done ml-2">TAMAMLANDI</span>
+          </a>
+        </li>
+        {% empty %}
+        <li class="empty-state">
+          <i class="fas fa-clipboard-check"></i>
+          Henüz tamamlanan transfer yok
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+{% endblock %}

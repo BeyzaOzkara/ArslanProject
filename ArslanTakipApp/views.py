@@ -34,7 +34,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo
+    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo, TransitTransfer, TransferMessage
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -6098,3 +6098,228 @@ def takimlama_save(request): # kaydetme yetkisi varsa kaydetsin yoksa 403
     di.save(update_fields=["meta_data"])
 
     return JsonResponse({"ok": True})
+
+
+# ─── İntralogistik / Fabrika İçi Transfer Takip ───────────────────────────────
+
+def _build_transfer_location_tree():
+    """Transfer modülüne özel lokasyonları ağaç yapısında döndürür.
+    Sadece module_tag alanı 'transfer' veya 'universal' olanlar getirilir."""
+    loc_list = list(
+        Location.objects.filter(module_tag__in=['transfer', 'universal']).values().order_by('id')
+    )
+    loc_dict = {item['id']: item for item in loc_list}
+    root_nodes = []
+    for item in loc_list:
+        parent_id = item['locationRelationID_id']
+        if parent_id:
+            parent = loc_dict.get(parent_id)
+            if parent:
+                parent.setdefault('_children', []).append(item)
+        else:
+            root_nodes.append(item)
+    return json.dumps(root_nodes)
+
+
+@login_required
+def transfer_dashboard(request):
+    """Dashboard: aktif ve tamamlanan transferleri listeler."""
+    aktif = TransitTransfer.objects.filter(durum='IN_TRANSIT').select_related(
+        'kaynak_lokasyon', 'hedef_lokasyon', 'baslatan'
+    ).prefetch_related('mesajlar')
+
+    tamamlanan = TransitTransfer.objects.filter(durum='COMPLETED').select_related(
+        'kaynak_lokasyon', 'hedef_lokasyon', 'baslatan'
+    ).prefetch_related('mesajlar').order_by('-guncelleme_tarihi')[:20]
+
+    return render(request, 'ArslanTakipApp/transfer_dashboard.html', {
+        'aktif': aktif,
+        'tamamlanan': tamamlanan,
+    })
+
+
+@login_required
+def transfer_yeni(request):
+    """Yeni transfer başlat: GET → form, POST → kaydet + ilk mesajı oluştur."""
+    if request.method == 'POST':
+        try:
+            kaynak_id = request.POST.get('kaynak_id')
+            hedef_id = request.POST.get('hedef_id')
+            not_metni = request.POST.get('not_metni', '').strip()
+
+            if not kaynak_id or not hedef_id:
+                return JsonResponse({'error': 'Kaynak ve hedef lokasyon seçilmelidir.'}, status=400)
+            if kaynak_id == hedef_id:
+                return JsonResponse({'error': 'Kaynak ve hedef lokasyon aynı olamaz.'}, status=400)
+
+            kaynak = Location.objects.get(id=kaynak_id)
+            hedef = Location.objects.get(id=hedef_id)
+
+            transfer = TransitTransfer.objects.create(
+                kaynak_lokasyon=kaynak,
+                hedef_lokasyon=hedef,
+                baslatan=request.user,
+                durum='IN_TRANSIT',
+            )
+
+            # Sistem başlangıç mesajı
+            sistem_notu = f"Transfer başlatıldı: {kaynak.locationName} → {hedef.locationName}"
+            if not_metni:
+                sistem_notu += f"\nNot: {not_metni}"
+
+            mesaj = TransferMessage.objects.create(
+                transfer=transfer,
+                yazar=request.user,
+                mesaj_metni=sistem_notu,
+                sistem_mesaji=True,
+            )
+
+            # Fotoğraflar UploadFile üzerinden kaydedilir
+            for foto in request.FILES.getlist('fotolar'):
+                UploadFile.objects.create(
+                    File=foto,
+                    FileModel='TransferMessage',
+                    FileModelId=str(mesaj.id),
+                    FileSize=foto.size,
+                    UploadedBy=request.user,
+                    Note='',
+                )
+
+            return JsonResponse({'success': True, 'transfer_id': transfer.id})
+        except Location.DoesNotExist:
+            return JsonResponse({'error': 'Geçersiz lokasyon.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    # GET — form sayfasını render et
+    location_tree = _build_transfer_location_tree()
+    return render(request, 'ArslanTakipApp/transfer_yeni.html', {
+        'location_json': location_tree,
+    })
+
+
+@login_required
+def transfer_detail(request, tid):
+    """Transfer detay / chat thread sayfası."""
+    transfer = get_object_or_404(
+        TransitTransfer.objects.select_related('kaynak_lokasyon', 'hedef_lokasyon', 'baslatan'),
+        id=tid
+    )
+    mesajlar = transfer.mesajlar.select_related('yazar').order_by('olusturma_tarihi')
+
+    # Her mesaj için UploadFile fotoğraflarını al
+    mesaj_ids = [str(m.id) for m in mesajlar]
+    upload_files = UploadFile.objects.filter(
+        FileModel='TransferMessage',
+        FileModelId__in=mesaj_ids
+    )
+    # mesaj_id -> dosya listesi
+    foto_map = {}
+    for uf in upload_files:
+        foto_map.setdefault(uf.FileModelId, []).append(uf)
+
+    mesaj_data = []
+    for m in mesajlar:
+        mesaj_data.append({
+            'obj': m,
+            'fotolar': foto_map.get(str(m.id), []),
+        })
+
+    return render(request, 'ArslanTakipApp/transfer_detail.html', {
+        'transfer': transfer,
+        'mesaj_data': mesaj_data,
+    })
+
+
+@login_required
+def transfer_mesaj_ekle(request, tid):
+    """Mevcut bir transfer iş parçacığına yorum veya fotoğraf ekle (POST)."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Yalnızca POST desteklenir.'}, status=405)
+    try:
+        transfer = get_object_or_404(TransitTransfer, id=tid)
+        if transfer.durum == 'COMPLETED':
+            return JsonResponse({'error': 'Tamamlanan transfere mesaj eklenemez.'}, status=400)
+
+        mesaj_metni = request.POST.get('mesaj_metni', '').strip()
+        fotolar = request.FILES.getlist('fotolar')
+
+        if not mesaj_metni and not fotolar:
+            return JsonResponse({'error': 'Mesaj veya fotoğraf ekleyiniz.'}, status=400)
+
+        mesaj = TransferMessage.objects.create(
+            transfer=transfer,
+            yazar=request.user,
+            mesaj_metni=mesaj_metni or None,
+            sistem_mesaji=False,
+        )
+
+        for foto in fotolar:
+            UploadFile.objects.create(
+                File=foto,
+                FileModel='TransferMessage',
+                FileModelId=str(mesaj.id),
+                FileSize=foto.size,
+                UploadedBy=request.user,
+                Note='',
+            )
+
+        # Fotoğraf URL'lerini döndür
+        foto_urls = []
+        for uf in UploadFile.objects.filter(FileModel='TransferMessage', FileModelId=str(mesaj.id)):
+            foto_urls.append(uf.File.url if uf.File else '')
+
+        return JsonResponse({
+            'success': True,
+            'mesaj_id': mesaj.id,
+            'yazar': request.user.get_full_name() or request.user.username,
+            'mesaj_metni': mesaj.mesaj_metni,
+            'tarih': format_date_time(mesaj.olusturma_tarihi),
+            'fotolar': foto_urls,
+            'sistem_mesaji': False,
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def transfer_tamamla(request, tid):
+    """Transferi tamamla: durum → COMPLETED, sistem mesajı ekle."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Yalnızca POST desteklenir.'}, status=405)
+    try:
+        transfer = get_object_or_404(TransitTransfer, id=tid)
+        if transfer.durum == 'COMPLETED':
+            return JsonResponse({'error': 'Transfer zaten tamamlandı.'}, status=400)
+
+        son_not = request.POST.get('son_not', '').strip()
+        fotolar = request.FILES.getlist('fotolar')
+
+        transfer.durum = 'COMPLETED'
+        transfer.save()
+
+        tamamlayan = request.user.get_full_name() or request.user.username
+        sistem_metni = f"Transfer tamamlandı. Teslim alan: {tamamlayan}"
+        if son_not:
+            sistem_metni += f"\nSon not: {son_not}"
+
+        mesaj = TransferMessage.objects.create(
+            transfer=transfer,
+            yazar=request.user,
+            mesaj_metni=sistem_metni,
+            sistem_mesaji=True,
+        )
+
+        for foto in fotolar:
+            UploadFile.objects.create(
+                File=foto,
+                FileModel='TransferMessage',
+                FileModelId=str(mesaj.id),
+                FileSize=foto.size,
+                UploadedBy=request.user,
+                Note='',
+            )
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

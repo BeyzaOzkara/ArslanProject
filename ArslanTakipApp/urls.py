@@ -219,5 +219,11 @@ path("location/kalip-split/", views.location_kalip_split, name="location_kalip_s
     path('api/comment-users-list/', views.comment_users_list, name='comment_users_list'),
     path('api/comment-groups-list/', views.comment_groups_list, name='comment_groups_list'),
 
+    # ─── İntralogistik / Fabrika İçi Transfer Takip ───────────────────────────
+    path('transfer/', login_required(views.transfer_dashboard), name='transfer_dashboard'),
+    path('transfer/yeni', login_required(views.transfer_yeni), name='transfer_yeni'),
+    path('transfer/<int:tid>/', login_required(views.transfer_detail), name='transfer_detail'),
+    path('transfer/<int:tid>/mesaj', login_required(views.transfer_mesaj_ekle), name='transfer_mesaj_ekle'),
+    path('transfer/<int:tid>/tamamla', login_required(views.transfer_tamamla), name='transfer_tamamla'),
 
 ]
