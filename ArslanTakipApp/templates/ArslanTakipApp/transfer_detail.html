@@ -470,6 +470,7 @@
         <div class="form-group">
           <label class="font-weight-bold">Fotoğraf <span class="text-muted font-weight-normal">(isteğe bağlı)</span></label>
           <input type="file" id="tamamlaFoto" class="form-control-file" multiple accept="image/*">
+          <div id="tamamlaFotoPreview" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
         </div>
         <div id="tamamlaAlert" class="alert alert-danger d-none mt-2" role="alert"></div>
       </div>
@@ -515,6 +516,7 @@
         <div class="form-group">
           <label class="font-weight-bold">Fotoğraf <span class="text-muted font-weight-normal">(isteğe bağlı)</span></label>
           <input type="file" id="iadeFoto" class="form-control-file" multiple accept="image/*">
+          <div id="iadeFotoPreview" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
         </div>
         <div id="iadeAlert" class="alert alert-danger d-none mt-2" role="alert"></div>
       </div>
@@ -542,20 +544,63 @@
   scrollToBottom();
 
   // ─── Fotoğraf önizleme (mesaj input) ─────────────────────────────────────
+  var pendingMsgFiles = [];
+
   document.getElementById('fotoInputMsg') && document.getElementById('fotoInputMsg').addEventListener('change', function() {
+    Array.from(this.files).forEach(function(file) {
+      pendingMsgFiles.push(file);
+    });
+    this.value = ''; // Reset input to allow selecting the same file again
+    renderMsgFotoPreview();
+  });
+
+  function renderMsgFotoPreview() {
     var preview = document.getElementById('pendingFotoPreview');
     if (!preview) return;
     preview.innerHTML = '';
-    Array.from(this.files).forEach(function(file) {
+    pendingMsgFiles.forEach(function(file, index) {
       var reader = new FileReader();
       reader.onload = function(e) {
+        var wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+
         var img = document.createElement('img');
         img.src = e.target.result;
-        preview.appendChild(img);
+        img.style.width = '52px';
+        img.style.height = '52px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '6px';
+        img.style.border = '2px solid #e8eaed';
+
+        var removeBtn = document.createElement('div');
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.style.position = 'absolute';
+        removeBtn.style.top = '-4px';
+        removeBtn.style.right = '-4px';
+        removeBtn.style.background = 'rgba(0,0,0,0.6)';
+        removeBtn.style.color = '#fff';
+        removeBtn.style.borderRadius = '50%';
+        removeBtn.style.width = '18px';
+        removeBtn.style.height = '18px';
+        removeBtn.style.display = 'flex';
+        removeBtn.style.alignItems = 'center';
+        removeBtn.style.justifyContent = 'center';
+        removeBtn.style.fontSize = '10px';
+        removeBtn.style.cursor = 'pointer';
+
+        removeBtn.onclick = function() {
+          pendingMsgFiles.splice(index, 1);
+          renderMsgFotoPreview();
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        preview.appendChild(wrapper);
       };
       reader.readAsDataURL(file);
     });
-  });
+  }
 
   // ─── Textarea otomatik büyüme ─────────────────────────────────────────────
   function autoResize(el) {
@@ -573,15 +618,13 @@
   // ─── Mesaj Gönder ─────────────────────────────────────────────────────────
   function mesajGonder() {
     var text = (document.getElementById('msgText').value || '').trim();
-    var fotoInput = document.getElementById('fotoInputMsg');
-    var fotolar = fotoInput ? fotoInput.files : [];
 
-    if (!text && fotolar.length === 0) return;
+    if (!text && pendingMsgFiles.length === 0) return;
 
     var formData = new FormData();
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
     formData.append('mesaj_metni', text);
-    Array.from(fotolar).forEach(function(f) { formData.append('fotolar', f); });
+    pendingMsgFiles.forEach(function(f) { formData.append('fotolar', f); });
 
     $.ajax({
       url: '/transfer/' + TRANSFER_ID + '/mesaj',
@@ -594,7 +637,7 @@
           appendMessage(res);
           document.getElementById('msgText').value = '';
           document.getElementById('msgText').style.height = 'auto';
-          if (fotoInput) { fotoInput.value = ''; }
+          pendingMsgFiles = [];
           document.getElementById('pendingFotoPreview').innerHTML = '';
           scrollToBottom();
         }
@@ -649,6 +692,32 @@
   bindLightboxTriggers();
 
   // ─── Tamamla ──────────────────────────────────────────────────────────────
+  var pendingTamamlaFiles = [];
+  document.getElementById('tamamlaFoto') && document.getElementById('tamamlaFoto').addEventListener('change', function() {
+    Array.from(this.files).forEach(function(f) { pendingTamamlaFiles.push(f); });
+    this.value = '';
+    renderTamamlaPreview();
+  });
+  function renderTamamlaPreview() {
+    var p = document.getElementById('tamamlaFotoPreview');
+    p.innerHTML = '';
+    pendingTamamlaFiles.forEach(function(f, i) {
+      var r = new FileReader();
+      r.onload = function(e) {
+        var w = document.createElement('div'); w.style.position = 'relative';
+        var img = document.createElement('img'); img.src = e.target.result;
+        img.style.width='52px'; img.style.height='52px'; img.style.objectFit='cover'; img.style.borderRadius='6px';
+        var btn = document.createElement('div'); btn.innerHTML = '<i class="fas fa-times"></i>';
+        btn.style.position='absolute'; btn.style.top='-4px'; btn.style.right='-4px'; btn.style.background='rgba(0,0,0,0.6)';
+        btn.style.color='#fff'; btn.style.borderRadius='50%'; btn.style.width='16px'; btn.style.height='16px';
+        btn.style.display='flex'; btn.style.alignItems='center'; btn.style.justifyContent='center'; btn.style.fontSize='10px'; btn.style.cursor='pointer';
+        btn.onclick = function() { pendingTamamlaFiles.splice(i,1); renderTamamlaPreview(); };
+        w.appendChild(img); w.appendChild(btn); p.appendChild(w);
+      };
+      r.readAsDataURL(f);
+    });
+  }
+
   function tamamlaTransfer() {
     var btn = document.getElementById('btnTamamlaConfirm');
     var alertEl = document.getElementById('tamamlaAlert');
@@ -669,10 +738,7 @@
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
     formData.append('islem_sonucu', islemSonucu.value);
     formData.append('son_not', document.getElementById('tamamlaNot').value);
-    var tFoto = document.getElementById('tamamlaFoto');
-    if (tFoto && tFoto.files) {
-      Array.from(tFoto.files).forEach(function(f) { formData.append('fotolar', f); });
-    }
+    pendingTamamlaFiles.forEach(function(f) { formData.append('fotolar', f); });
 
     $.ajax({
       url: '/transfer/' + TRANSFER_ID + '/tamamla',
@@ -702,6 +768,32 @@
   }
 
   // ─── İade İşlem (Yeniden Gönder / İptal) ──────────────────────────────────
+  var pendingIadeFiles = [];
+  document.getElementById('iadeFoto') && document.getElementById('iadeFoto').addEventListener('change', function() {
+    Array.from(this.files).forEach(function(f) { pendingIadeFiles.push(f); });
+    this.value = '';
+    renderIadePreview();
+  });
+  function renderIadePreview() {
+    var p = document.getElementById('iadeFotoPreview');
+    p.innerHTML = '';
+    pendingIadeFiles.forEach(function(f, i) {
+      var r = new FileReader();
+      r.onload = function(e) {
+        var w = document.createElement('div'); w.style.position = 'relative';
+        var img = document.createElement('img'); img.src = e.target.result;
+        img.style.width='52px'; img.style.height='52px'; img.style.objectFit='cover'; img.style.borderRadius='6px';
+        var btn = document.createElement('div'); btn.innerHTML = '<i class="fas fa-times"></i>';
+        btn.style.position='absolute'; btn.style.top='-4px'; btn.style.right='-4px'; btn.style.background='rgba(0,0,0,0.6)';
+        btn.style.color='#fff'; btn.style.borderRadius='50%'; btn.style.width='16px'; btn.style.height='16px';
+        btn.style.display='flex'; btn.style.alignItems='center'; btn.style.justifyContent='center'; btn.style.fontSize='10px'; btn.style.cursor='pointer';
+        btn.onclick = function() { pendingIadeFiles.splice(i,1); renderIadePreview(); };
+        w.appendChild(img); w.appendChild(btn); p.appendChild(w);
+      };
+      r.readAsDataURL(f);
+    });
+  }
+
   function iadeIslemYap() {
     var btn = document.getElementById('btnIadeConfirm');
     var alertEl = document.getElementById('iadeAlert');
@@ -722,10 +814,7 @@
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
     formData.append('islem_sonucu', iadeIslem.value);
     formData.append('son_not', document.getElementById('iadeNot').value);
-    var tFoto = document.getElementById('iadeFoto');
-    if (tFoto && tFoto.files) {
-      Array.from(tFoto.files).forEach(function(f) { formData.append('fotolar', f); });
-    }
+    pendingIadeFiles.forEach(function(f) { formData.append('fotolar', f); });
 
     $.ajax({
       url: '/transfer/' + TRANSFER_ID + '/yeniden_gonder',

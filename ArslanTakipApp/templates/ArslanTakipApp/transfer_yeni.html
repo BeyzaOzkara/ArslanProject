@@ -398,19 +398,63 @@
   }
 
   // ─── Fotoğraf Önizleme ──────────────────────────────────────────────────────
+  var pendingFiles = [];
+
   document.getElementById('fotoInput').addEventListener('change', function () {
     var preview = document.getElementById('fotoPreview');
-    preview.innerHTML = '';
     Array.from(this.files).forEach(function (file) {
+      pendingFiles.push(file);
+    });
+    this.value = ''; // Reset input so same file can be selected again
+    renderPreview();
+  });
+
+  function renderPreview() {
+    var preview = document.getElementById('fotoPreview');
+    preview.innerHTML = '';
+    pendingFiles.forEach(function (file, index) {
       var reader = new FileReader();
       reader.onload = function (e) {
+        var wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+
         var img = document.createElement('img');
         img.src = e.target.result;
-        preview.appendChild(img);
+        img.style.width = '80px';
+        img.style.height = '80px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '6px';
+        img.style.border = '2px solid #e8eaed';
+
+        var removeBtn = document.createElement('div');
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.style.position = 'absolute';
+        removeBtn.style.top = '-6px';
+        removeBtn.style.right = '-6px';
+        removeBtn.style.background = 'rgba(0,0,0,0.7)';
+        removeBtn.style.color = '#fff';
+        removeBtn.style.borderRadius = '50%';
+        removeBtn.style.width = '22px';
+        removeBtn.style.height = '22px';
+        removeBtn.style.display = 'flex';
+        removeBtn.style.alignItems = 'center';
+        removeBtn.style.justifyContent = 'center';
+        removeBtn.style.fontSize = '12px';
+        removeBtn.style.cursor = 'pointer';
+
+        removeBtn.onclick = function () {
+          pendingFiles.splice(index, 1);
+          renderPreview();
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        preview.appendChild(wrapper);
       };
       reader.readAsDataURL(file);
     });
-  });
+  }
 
   // ─── Transfer Gönder ────────────────────────────────────────────────────────
   function transferBaslat() {
@@ -434,8 +478,8 @@
     formData.append('kaynak_id', kaynakId);
     formData.append('hedef_id', hedefId);
     formData.append('not_metni', document.getElementById('notMetni').value);
-    var fotoInput = document.getElementById('fotoInput');
-    Array.from(fotoInput.files).forEach(function (f) { formData.append('fotolar', f); });
+    
+    pendingFiles.forEach(function (f) { formData.append('fotolar', f); });
 
     $.ajax({
       url: '/transfer/yeni',
