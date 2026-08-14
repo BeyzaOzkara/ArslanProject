@@ -226,5 +226,6 @@ path("location/kalip-split/", views.location_kalip_split, name="location_kalip_s
     path('transfer/<int:tid>/', login_required(views.transfer_detail), name='transfer_detail'),
     path('transfer/<int:tid>/mesaj', login_required(views.transfer_mesaj_ekle), name='transfer_mesaj_ekle'),
     path('transfer/<int:tid>/tamamla', login_required(views.transfer_tamamla), name='transfer_tamamla'),
+    path('transfer/<int:tid>/yeniden_gonder', login_required(views.transfer_yeniden_gonder), name='transfer_yeniden_gonder'),
 
 ]

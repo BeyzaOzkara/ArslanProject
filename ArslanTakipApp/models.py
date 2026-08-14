@@ -645,7 +645,13 @@ class DieInfo(models.Model):
 class TransitTransfer(models.Model):
     STATUS_CHOICES = [
         ('IN_TRANSIT', 'Yolda'),
+        ('REJECTED', 'Reddedildi / İade'),
         ('COMPLETED', 'Tamamlandı'),
+    ]
+    ISLEM_SONUCU_CHOICES = [
+        ('KABUL', 'Kabul'),
+        ('SARTLI_KABUL', 'Şartlı Kabul'),
+        ('RET', 'Ret'),
     ]
     kaynak_lokasyon = models.ForeignKey(
         Location, on_delete=models.CASCADE,
@@ -658,6 +664,10 @@ class TransitTransfer(models.Model):
     durum = models.CharField(
         max_length=20, choices=STATUS_CHOICES,
         default='IN_TRANSIT', verbose_name='Durum'
+    )
+    islem_sonucu = models.CharField(
+        max_length=20, choices=ISLEM_SONUCU_CHOICES,
+        null=True, blank=True, verbose_name='İşlem Sonucu'
     )
     baslatan = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True,

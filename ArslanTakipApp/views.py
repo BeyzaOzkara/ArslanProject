@@ -6126,7 +6126,7 @@ from django.template.loader import render_to_string
 @login_required
 def transfer_dashboard(request):
     """Dashboard: aktif ve tamamlanan transferleri listeler (ilk 3 kayıt)."""
-    aktif = TransitTransfer.objects.filter(durum='IN_TRANSIT').select_related(
+    aktif = TransitTransfer.objects.filter(durum__in=['IN_TRANSIT', 'REJECTED']).select_related(
         'kaynak_lokasyon', 'hedef_lokasyon', 'baslatan'
     ).prefetch_related('mesajlar').order_by('-olusturma_tarihi')[:3]
 
@@ -6155,7 +6155,7 @@ def transfer_list_api(request):
     qs = TransitTransfer.objects.select_related('kaynak_lokasyon', 'hedef_lokasyon', 'baslatan').prefetch_related('mesajlar')
 
     if list_type == 'aktif':
-        qs = qs.filter(durum='IN_TRANSIT').order_by('-olusturma_tarihi')
+        qs = qs.filter(durum__in=['IN_TRANSIT', 'REJECTED']).order_by('-olusturma_tarihi')
     else:
         qs = qs.filter(durum='COMPLETED').order_by('-guncelleme_tarihi')
 
@@ -6324,24 +6324,91 @@ def transfer_mesaj_ekle(request, tid):
 
 @login_required
 def transfer_tamamla(request, tid):
-    """Transferi tamamla: durum → COMPLETED, sistem mesajı ekle."""
+    """Transferi tamamla/işlem yap: islem_sonucu'nu al, durum güncelle ve mesaj at."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Yalnızca POST desteklenir.'}, status=405)
     try:
         transfer = get_object_or_404(TransitTransfer, id=tid)
         if transfer.durum == 'COMPLETED':
             return JsonResponse({'error': 'Transfer zaten tamamlandı.'}, status=400)
+            
+        if transfer.baslatan == request.user:
+            return JsonResponse({'error': 'Kendi başlattığınız transfer üzerinde işlem yapamazsınız.'}, status=403)
 
+        son_not = request.POST.get('son_not', '').strip()
+        islem_sonucu = request.POST.get('islem_sonucu')
+        fotolar = request.FILES.getlist('fotolar')
+
+        tamamlayan = request.user.get_full_name() or request.user.username
+
+        if islem_sonucu == 'RET':
+            transfer.durum = 'REJECTED'
+            transfer.islem_sonucu = 'RET'
+            sistem_metni = f"Transfer reddedildi. Mallar ilk lokasyona ({transfer.kaynak_lokasyon.locationName}) geri gönderiliyor.\nİşlem Yapan: {tamamlayan}"
+        elif islem_sonucu == 'SARTLI_KABUL':
+            transfer.durum = 'COMPLETED'
+            transfer.islem_sonucu = 'SARTLI_KABUL'
+            sistem_metni = f"Transfer 'Şartlı Kabul' edildi.\nİşlem Yapan: {tamamlayan}"
+        else:
+            transfer.durum = 'COMPLETED'
+            transfer.islem_sonucu = 'KABUL'
+            sistem_metni = f"Transfer 'Kabul' edilerek tamamlandı.\nTeslim Alan: {tamamlayan}"
+
+        transfer.save()
+
+        if son_not:
+            sistem_metni += f"\nNot: {son_not}"
+
+        mesaj = TransferMessage.objects.create(
+            transfer=transfer,
+            yazar=request.user,
+            mesaj_metni=sistem_metni,
+            sistem_mesaji=True,
+        )
+
+        for foto in fotolar:
+            UploadFile.objects.create(
+                File=foto,
+                FileModel='TransferMessage',
+                FileModelId=str(mesaj.id),
+                FileSize=foto.size,
+                UploadedBy=request.user,
+                Note='',
+            )
+
+        return JsonResponse({'success': True, 'islem_sonucu': islem_sonucu})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def transfer_yeniden_gonder(request, tid):
+    """Reddedilen transferi kaynak lokasyonun yeniden göndermesi veya iptal etmesi."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Yalnızca POST desteklenir.'}, status=405)
+    try:
+        transfer = get_object_or_404(TransitTransfer, id=tid)
+        if transfer.durum != 'REJECTED':
+            return JsonResponse({'error': 'Sadece reddedilmiş transferler yeniden gönderilebilir.'}, status=400)
+
+        islem_sonucu = request.POST.get('islem_sonucu') # YENIDEN_GONDER or IPTAL
         son_not = request.POST.get('son_not', '').strip()
         fotolar = request.FILES.getlist('fotolar')
 
-        transfer.durum = 'COMPLETED'
+        tamamlayan = request.user.get_full_name() or request.user.username
+
+        if islem_sonucu == 'IPTAL':
+            transfer.durum = 'COMPLETED' # Veya tamamen silinebilir ama log kalması için COMPLETED yapıp islem_sonucunu İPTAL yapabiliriz
+            transfer.islem_sonucu = 'RET' # Zaten RET'ti, aynı kalabilir
+            sistem_metni = f"İade teslim alındı, transfer iptal edildi/sonlandırıldı.\nİşlem Yapan: {tamamlayan}"
+        else: # YENIDEN_GONDER
+            transfer.durum = 'IN_TRANSIT'
+            transfer.islem_sonucu = None
+            sistem_metni = f"Eksikler giderildi. Transfer hedef lokasyona yeniden yola çıktı.\nİşlem Yapan: {tamamlayan}"
+
         transfer.save()
 
-        tamamlayan = request.user.get_full_name() or request.user.username
-        sistem_metni = f"Transfer tamamlandı. Teslim alan: {tamamlayan}"
         if son_not:
-            sistem_metni += f"\nSon not: {son_not}"
+            sistem_metni += f"\nNot: {son_not}"
 
         mesaj = TransferMessage.objects.create(
             transfer=transfer,

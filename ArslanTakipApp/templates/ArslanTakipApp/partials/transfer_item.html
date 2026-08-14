@@ -1,16 +1,25 @@
 {% load static %}
 <li>
   <a href="/transfer/{{ t.id }}/" class="transfer-card">
-    <div class="transfer-avatar {% if t.durum == 'IN_TRANSIT' %}avatar-transit{% else %}avatar-done{% endif %}">
-      <i class="{% if t.durum == 'IN_TRANSIT' %}fas fa-truck-moving{% else %}fas fa-check{% endif %}"></i>
+    <div class="transfer-avatar 
+      {% if t.durum == 'REJECTED' %}bg-danger text-white
+      {% elif t.islem_sonucu == 'SARTLI_KABUL' %}bg-warning text-dark
+      {% elif t.durum == 'IN_TRANSIT' %}avatar-transit
+      {% else %}avatar-done{% endif %}">
+      
+      <i class="
+      {% if t.durum == 'REJECTED' %}fas fa-times
+      {% elif t.durum == 'IN_TRANSIT' %}fas fa-truck-moving
+      {% else %}fas fa-check{% endif %}"></i>
     </div>
+    
     <div class="transfer-meta">
       <div class="transfer-meta-top">
         <span class="transfer-route">
           {{ t.kaynak_lokasyon.locationName }} → {{ t.hedef_lokasyon.locationName }}
         </span>
         <span class="transfer-time">
-          {% if t.durum == 'IN_TRANSIT' %}
+          {% if t.durum == 'IN_TRANSIT' or t.durum == 'REJECTED' %}
             {{ t.olusturma_tarihi|date:"d.m H:i" }}
           {% else %}
             {{ t.guncelleme_tarihi|date:"d.m H:i" }}
@@ -24,8 +33,16 @@
         <i class="fas fa-comment-alt fa-xs mr-1"></i>{{ t.mesajlar.count }} mesaj
       </div>
     </div>
-    <span class="{% if t.durum == 'IN_TRANSIT' %}badge-transit{% else %}badge-done{% endif %} ml-2">
-      {% if t.durum == 'IN_TRANSIT' %}YOLDA{% else %}TAMAMLANDI{% endif %}
+    
+    <span class="ml-2 badge 
+      {% if t.durum == 'REJECTED' %}badge-danger
+      {% elif t.islem_sonucu == 'SARTLI_KABUL' %}badge-warning
+      {% elif t.durum == 'IN_TRANSIT' %}badge-primary
+      {% else %}badge-success{% endif %}" style="padding: 0.4em 0.6em; border-radius: 6px;">
+      {% if t.durum == 'REJECTED' %}RET
+      {% elif t.islem_sonucu == 'SARTLI_KABUL' %}ŞARTLI KABUL
+      {% elif t.durum == 'IN_TRANSIT' %}YOLDA
+      {% else %}KABUL{% endif %}
     </span>
   </a>
 </li>
