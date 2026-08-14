@@ -191,41 +191,28 @@
       <div class="transfer-section-title">
         <i class="fas fa-shipping-fast mr-1" style="color:var(--transit-blue)"></i>
         Aktif Transferler
-        <span class="badge badge-primary ml-1">{{ aktif|length }}</span>
       </div>
-      <ul class="transfer-list">
+      <div class="px-3 pt-2 pb-2" style="background: #f8f9fa; border-bottom: 1px solid #e8eaed;">
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-muted"></i></span>
+          </div>
+          <input type="text" id="searchAktif" class="form-control border-left-0" placeholder="Ara...">
+        </div>
+      </div>
+      <ul class="transfer-list" id="listAktif">
         {% for t in aktif %}
-        <li>
-          <a href="/transfer/{{ t.id }}/" class="transfer-card">
-            <div class="transfer-avatar avatar-transit">
-              <i class="fas fa-truck-moving"></i>
-            </div>
-            <div class="transfer-meta">
-              <div class="transfer-meta-top">
-                <span class="transfer-route">
-                  {{ t.kaynak_lokasyon.locationName }} → {{ t.hedef_lokasyon.locationName }}
-                </span>
-                <span class="transfer-time">
-                  {{ t.olusturma_tarihi|date:"d.m H:i" }}
-                </span>
-              </div>
-              <div class="transfer-preview">
-                <i class="fas fa-user fa-xs mr-1"></i>
-                {{ t.baslatan.get_full_name|default:t.baslatan.username }}
-                &nbsp;·&nbsp;
-                <i class="fas fa-comment-alt fa-xs mr-1"></i>{{ t.mesajlar.count }} mesaj
-              </div>
-            </div>
-            <span class="badge-transit ml-2">YOLDA</span>
-          </a>
-        </li>
+          {% include 'ArslanTakipApp/partials/transfer_item.html' %}
         {% empty %}
-        <li class="empty-state">
+        <li class="empty-state" id="emptyAktif">
           <i class="fas fa-inbox"></i>
           Aktif transfer yok
         </li>
         {% endfor %}
       </ul>
+      <div class="p-2 text-center" id="wrapperLoadAktif" {% if aktif|length < 3 %}style="display:none;"{% endif %}>
+        <button id="btnLoadAktif" class="btn btn-sm btn-outline-primary" style="width: 100%;" onclick="loadMore('aktif')">Daha Fazla Yükle</button>
+      </div>
     </div>
 
     <!-- Son Tamamlananlar -->
@@ -234,39 +221,27 @@
         <i class="fas fa-check-circle mr-1" style="color:var(--transit-green)"></i>
         Son Tamamlananlar
       </div>
-      <ul class="transfer-list">
+      <div class="px-3 pt-2 pb-2" style="background: #f8f9fa; border-bottom: 1px solid #e8eaed;">
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-muted"></i></span>
+          </div>
+          <input type="text" id="searchTamamlanan" class="form-control border-left-0" placeholder="Ara...">
+        </div>
+      </div>
+      <ul class="transfer-list" id="listTamamlanan">
         {% for t in tamamlanan %}
-        <li>
-          <a href="/transfer/{{ t.id }}/" class="transfer-card">
-            <div class="transfer-avatar avatar-done">
-              <i class="fas fa-check"></i>
-            </div>
-            <div class="transfer-meta">
-              <div class="transfer-meta-top">
-                <span class="transfer-route">
-                  {{ t.kaynak_lokasyon.locationName }} → {{ t.hedef_lokasyon.locationName }}
-                </span>
-                <span class="transfer-time">
-                  {{ t.guncelleme_tarihi|date:"d.m H:i" }}
-                </span>
-              </div>
-              <div class="transfer-preview">
-                <i class="fas fa-user fa-xs mr-1"></i>
-                {{ t.baslatan.get_full_name|default:t.baslatan.username }}
-                &nbsp;·&nbsp;
-                <i class="fas fa-comment-alt fa-xs mr-1"></i>{{ t.mesajlar.count }} mesaj
-              </div>
-            </div>
-            <span class="badge-done ml-2">TAMAMLANDI</span>
-          </a>
-        </li>
+          {% include 'ArslanTakipApp/partials/transfer_item.html' %}
         {% empty %}
-        <li class="empty-state">
+        <li class="empty-state" id="emptyTamamlanan">
           <i class="fas fa-clipboard-check"></i>
           Henüz tamamlanan transfer yok
         </li>
         {% endfor %}
       </ul>
+      <div class="p-2 text-center" id="wrapperLoadTamamlanan" {% if tamamlanan|length < 3 %}style="display:none;"{% endif %}>
+        <button id="btnLoadTamamlanan" class="btn btn-sm btn-outline-primary" style="width: 100%;" onclick="loadMore('tamamlanan')">Daha Fazla Yükle</button>
+      </div>
     </div>
   </div>
 </div>
@@ -275,4 +250,83 @@
 
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
+<script>
+  const state = {
+    aktif: { offset: 3, query: '' },
+    tamamlanan: { offset: 3, query: '' }
+  };
+
+  function fetchTransfers(type, isLoadMore = false) {
+    const listEl = document.getElementById('list' + (type === 'aktif' ? 'Aktif' : 'Tamamlanan'));
+    const btnWrapper = document.getElementById('wrapperLoad' + (type === 'aktif' ? 'Aktif' : 'Tamamlanan'));
+    const btn = document.getElementById('btnLoad' + (type === 'aktif' ? 'Aktif' : 'Tamamlanan'));
+    const query = state[type].query;
+    const offset = state[type].offset;
+
+    if (!isLoadMore) {
+      listEl.innerHTML = '<li class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin mr-2"></i>Yükleniyor...</li>';
+      btnWrapper.style.display = 'none';
+    } else {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Yükleniyor...';
+      btn.disabled = true;
+    }
+
+    $.ajax({
+      url: '/transfer/api/list',
+      data: { type: type, q: query, offset: offset },
+      success: function(res) {
+        if (!isLoadMore) {
+          listEl.innerHTML = res.html || `<li class="empty-state"><i class="fas ${type==='aktif'?'fa-inbox':'fa-clipboard-check'}"></i>Kayıt bulunamadı</li>`;
+        } else {
+          listEl.insertAdjacentHTML('beforeend', res.html);
+          btn.innerHTML = 'Daha Fazla Yükle';
+          btn.disabled = false;
+        }
+
+        if (res.has_more) {
+          btnWrapper.style.display = 'block';
+        } else {
+          btnWrapper.style.display = 'none';
+        }
+      },
+      error: function() {
+        if (!isLoadMore) listEl.innerHTML = '<li class="text-center py-4 text-danger">Yükleme hatası</li>';
+        else { btn.innerHTML = 'Daha Fazla Yükle'; btn.disabled = false; }
+      }
+    });
+  }
+
+  function loadMore(type) {
+    fetchTransfers(type, true);
+    state[type].offset += 5;
+  }
+
+  // Debounce helper
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  // Attach search listeners
+  const handleSearchAktif = debounce(function(e) {
+    state.aktif.query = e.target.value;
+    state.aktif.offset = 0;
+    fetchTransfers('aktif', false);
+    state.aktif.offset += 5; // next loadMore will fetch from 5
+  }, 300);
+
+  const handleSearchTamamlanan = debounce(function(e) {
+    state.tamamlanan.query = e.target.value;
+    state.tamamlanan.offset = 0;
+    fetchTransfers('tamamlanan', false);
+    state.tamamlanan.offset += 5;
+  }, 300);
+
+  document.getElementById('searchAktif').addEventListener('input', handleSearchAktif);
+  document.getElementById('searchTamamlanan').addEventListener('input', handleSearchTamamlanan);
+
+</script>
 {% endblock %}

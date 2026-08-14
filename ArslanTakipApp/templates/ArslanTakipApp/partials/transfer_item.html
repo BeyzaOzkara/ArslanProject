@@ -1,0 +1,31 @@
+{% load static %}
+<li>
+  <a href="/transfer/{{ t.id }}/" class="transfer-card">
+    <div class="transfer-avatar {% if t.durum == 'IN_TRANSIT' %}avatar-transit{% else %}avatar-done{% endif %}">
+      <i class="{% if t.durum == 'IN_TRANSIT' %}fas fa-truck-moving{% else %}fas fa-check{% endif %}"></i>
+    </div>
+    <div class="transfer-meta">
+      <div class="transfer-meta-top">
+        <span class="transfer-route">
+          {{ t.kaynak_lokasyon.locationName }} → {{ t.hedef_lokasyon.locationName }}
+        </span>
+        <span class="transfer-time">
+          {% if t.durum == 'IN_TRANSIT' %}
+            {{ t.olusturma_tarihi|date:"d.m H:i" }}
+          {% else %}
+            {{ t.guncelleme_tarihi|date:"d.m H:i" }}
+          {% endif %}
+        </span>
+      </div>
+      <div class="transfer-preview">
+        <i class="fas fa-user fa-xs mr-1"></i>
+        {{ t.baslatan.get_full_name|default:t.baslatan.username }}
+        &nbsp;·&nbsp;
+        <i class="fas fa-comment-alt fa-xs mr-1"></i>{{ t.mesajlar.count }} mesaj
+      </div>
+    </div>
+    <span class="{% if t.durum == 'IN_TRANSIT' %}badge-transit{% else %}badge-done{% endif %} ml-2">
+      {% if t.durum == 'IN_TRANSIT' %}YOLDA{% else %}TAMAMLANDI{% endif %}
+    </span>
+  </a>
+</li>

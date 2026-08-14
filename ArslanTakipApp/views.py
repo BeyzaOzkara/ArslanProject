@@ -170,7 +170,7 @@ def location_kalip_split(request):
         return JsonResponse({"error": "location_id sayı olmalı"}, status=400)
 
     # kullanıcının görebildiği lokasyonlar
-    loc_qs = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location)
+    loc_qs = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location).exclude(module_tag='transfer')
     loc_list = list(loc_qs.values())
     allowed_ids = {l["id"] for l in loc_list}
 
@@ -276,7 +276,7 @@ def location_kalip_all(request):
         return JsonResponse({"error": "location_id gerekli"}, status=400)
 
     # kullanıcının görebildiği lokasyonlar
-    loc_qs = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location)
+    loc_qs = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location).exclude(module_tag='transfer')
     loc_list = list(loc_qs.values())
     allowed_ids = {l["id"] for l in loc_list}
 
@@ -365,7 +365,7 @@ def hareketSave(dieList, lRec, dieTo, request):
 @permission_required("ArslanTakipApp.view_location") #izin yoksa login sayfasına yönlendiriyor
 @login_required #user must be logged in
 def location(request):
-    loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location) #Location.objects.all()
+    loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location).exclude(module_tag='transfer') #Location.objects.all()
     loc_list = list(loc.values().order_by('id'))
     # Create a dictionary for O(1) lookups
     loc_dict = {item['id']: item for item in loc_list}
@@ -497,7 +497,7 @@ def send_email_notification(request, dieList, dieTo_press):
         print(f"Error sending email: {e}")
     
 def location_list(a):
-    gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location)
+    gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location).exclude(module_tag='transfer')
     gonderLoc_list = list(gonderLoc.values().order_by('id'))
 
     gonder_dict = {item['id']: item for item in gonderLoc_list}
@@ -535,13 +535,13 @@ def location_kalip(request): #kalıp arşivi sayfasındaki kalıplar
         filter_list = params["filter"]
         q = {}
 
-        loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location)
+        loc = get_objects_for_user(request.user, "ArslanTakipApp.dg_view_location", klass=Location).exclude(module_tag='transfer')
         loc_list = list(loc.values())
         locs = [l['id'] for l in loc_list]
         query = DiesLocation.objects.filter(kalipVaris_id__in = locs).order_by('kalipNo')
 
         if request.user.is_superuser:
-            query = DiesLocation.objects.all().order_by('kalipNo')
+            query = DiesLocation.objects.exclude(kalipVaris__module_tag='transfer').order_by('kalipNo')
 
         if len(filter_list)>0:
             for i in filter_list: # bir lokasyona tıklandığında o lokasyon ve altında kalan her lokasyon içindeki kalıp sayısı dönsün
@@ -838,7 +838,7 @@ def location_hareket(request):
 
             elif i['type'] == 'like':
                 konumId = i['value']
-                locations = list(get_objects_for_user(request.user, "ArslanTakipApp.gonder_view_location", klass=Location).values().order_by('id'))
+                locations = list(get_objects_for_user(request.user, "ArslanTakipApp.gonder_view_location", klass=Location).exclude(module_tag='transfer').values().order_by('id'))
                 child_location_ids = filter_locations(locations, konumId, depth=4) # Adjust depth if needed
                 hareket_query = Hareket.objects.filter(
                     kalipKonum_id__in=child_location_ids
@@ -6121,21 +6121,61 @@ def _build_transfer_location_tree():
     return json.dumps(root_nodes)
 
 
+from django.template.loader import render_to_string
+
 @login_required
 def transfer_dashboard(request):
-    """Dashboard: aktif ve tamamlanan transferleri listeler."""
+    """Dashboard: aktif ve tamamlanan transferleri listeler (ilk 3 kayıt)."""
     aktif = TransitTransfer.objects.filter(durum='IN_TRANSIT').select_related(
         'kaynak_lokasyon', 'hedef_lokasyon', 'baslatan'
-    ).prefetch_related('mesajlar')
+    ).prefetch_related('mesajlar').order_by('-olusturma_tarihi')[:3]
 
     tamamlanan = TransitTransfer.objects.filter(durum='COMPLETED').select_related(
         'kaynak_lokasyon', 'hedef_lokasyon', 'baslatan'
-    ).prefetch_related('mesajlar').order_by('-guncelleme_tarihi')[:20]
+    ).prefetch_related('mesajlar').order_by('-guncelleme_tarihi')[:3]
 
     return render(request, 'ArslanTakipApp/transfer_dashboard.html', {
         'aktif': aktif,
         'tamamlanan': tamamlanan,
     })
+
+
+@login_required
+def transfer_list_api(request):
+    """AJAX endpoint: pagination (load more) and search for dashboard lists."""
+    list_type = request.GET.get('type', 'aktif')
+    query = request.GET.get('q', '').strip()
+    try:
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        offset = 0
+
+    limit = 5  # Load 5 items per click
+
+    qs = TransitTransfer.objects.select_related('kaynak_lokasyon', 'hedef_lokasyon', 'baslatan').prefetch_related('mesajlar')
+
+    if list_type == 'aktif':
+        qs = qs.filter(durum='IN_TRANSIT').order_by('-olusturma_tarihi')
+    else:
+        qs = qs.filter(durum='COMPLETED').order_by('-guncelleme_tarihi')
+
+    if query:
+        from django.db.models import Q
+        qs = qs.filter(
+            Q(kaynak_lokasyon__locationName__icontains=query) |
+            Q(hedef_lokasyon__locationName__icontains=query) |
+            Q(baslatan__first_name__icontains=query) |
+            Q(baslatan__username__icontains=query)
+        )
+
+    items = list(qs[offset:offset+limit])
+    has_more = qs.count() > (offset + limit)
+
+    html = ''
+    for item in items:
+        html += render_to_string('ArslanTakipApp/partials/transfer_item.html', {'t': item}, request=request)
+
+    return JsonResponse({'html': html, 'has_more': has_more})
 
 
 @login_required
