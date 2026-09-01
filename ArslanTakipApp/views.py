@@ -418,8 +418,12 @@ def location(request):
                 kalipList = KalipMs.objects.using('dies').annotate(trimmed_kalipno=Func(F('KalipNo'), function='REPLACE', template="%(function)s(%(expressions)s, ' ', '')"))
                 clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
                 dies = kalipList.filter(trimmed_kalipno__in=clean_dieList).exclude(Silindi=1).exclude(AktifPasif='Pasif')
+                
+                processed_dies = set()
                 for die in dies:
-                    send_single_die_report(die, lRec.presKodu, user_info)
+                    if die.trimmed_kalipno not in processed_dies:
+                        send_single_die_report(die, lRec.presKodu, user_info)
+                        processed_dies.add(die.trimmed_kalipno)
             response = JsonResponse({'message': "Kalıplar Başarıyla Gönderildi."})
         except Exception as e:
             response = JsonResponse({'error':  'İşlem gerçekleştirilemedi. ' + str(e)})
