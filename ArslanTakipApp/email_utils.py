@@ -1,5 +1,6 @@
 from collections import defaultdict
 import re
+import os
 import time
 from bs4 import BeautifulSoup
 from exchangelib import Credentials, Account, Message, DELEGATE, HTMLBody, Configuration, Folder
@@ -12,8 +13,8 @@ from django.db.models.functions import Replace
 logger = logging.getLogger(__name__)
 
 def send_email(to_addresses, cc_recipients, subject, body):
-    email = 'ai@arslanaluminyum.com'
-    password = 'Arslan123.'
+    email = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
+    password = os.environ.get('AI_EMAIL_PASSWORD', '')
     credentials = Credentials(email, password)
     ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
     # Kimlik bilgileri ve hesap oluşturma
@@ -93,8 +94,8 @@ def listen_for_emails(username, password, server, check_interval=60):
         time.sleep(check_interval)  # Belirtilen süre kadar bekle (saniye cinsinden)
 
 def check_new_emails():
-    email = 'ai@arslanaluminyum.com'
-    password = 'Arslan123.'
+    email = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
+    password = os.environ.get('AI_EMAIL_PASSWORD', '')
     credentials = Credentials(email, password)
     ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 

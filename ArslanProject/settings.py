@@ -26,10 +26,10 @@ load_dotenv(dotenv_path)
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = str(os.getenv('SECRET_KEY')) #'django-insecure-5a3gd-zj_#1h$bstcn)(o3a7--(j!95a(g(kbz-e=khb-%_qwi'
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['arslan.izgi.me', '0.0.0.0', '127.0.0.1', '192.168.150.43', 'arslan', '192.168.8.21', '192.168.150.230']
 
@@ -106,7 +106,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'arslanBy',
         'USER': 'arslan',
-        'PASSWORD': 'gqTYe5HdX0VQ',
+        'PASSWORD': os.environ.get('DB_PASSWORD_ARSLAN', ''),
         'HOST': '192.168.150.230', 
         'PORT': '5432',
     },
@@ -114,7 +114,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': 'ARSLAN_2026',
         'USER': 'arsbyz',
-        'PASSWORD': '123',
+        'PASSWORD': os.environ.get('DB_PASSWORD_DIES', ''),
         'HOST': '192.168.180.200', 
         'PORT': '1433',
         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
@@ -124,7 +124,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': 'KALIPHANE',
         'USER': 'arsbyz',
-        'PASSWORD': '123',
+        'PASSWORD': os.environ.get('DB_PASSWORD_KH', ''),
         'HOST': '192.168.180.200', 
         'PORT': '1433',
         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server", 
@@ -134,7 +134,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'fabrika4',
         'USER': 'arslan',
-        'PASSWORD': 'gqTYe5HdX0VQ',
+        'PASSWORD': os.environ.get('DB_PASSWORD_PLC4', ''),
         'HOST': '192.168.150.230', 
         'PORT': '5432',
     },
@@ -142,7 +142,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'dms',
         'USER': 'arslan',
-        'PASSWORD': 'gqTYe5HdX0VQ',
+        'PASSWORD': os.environ.get('DB_PASSWORD_DMS', ''),
         'HOST': '192.168.150.230',
         'PORT': '5432',
     }
@@ -207,8 +207,8 @@ AUTHENTICATION_BACKENDS = (
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = "mailer.backend.DbBackend"
 EMAIL_HOST = 'webmail.arslanaluminyum.com'
-EMAIL_HOST_USER = 'yazilim@arslanaluminyum.com' #str(os.getenv('EMAIL_USER'))
-EMAIL_HOST_PASSWORD = 'rHE7Je' #str(os.getenv('EMAIL_PASSWORD'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', 'yazilim@arslanaluminyum.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 EMAIL_USE_TLS = True
 EMAIL_TLS_VERSION = 'TLSv1.2'
 EMAIL_PORT = 587

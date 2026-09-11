@@ -27,6 +27,7 @@ urlpatterns = [
     path("accounts/", include("ArslanTakipApp.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path('inventory/', include('inventory.urls')),
+    path('dms/', include('DMS.urls')),
 ]
 
 if settings.DEBUG:

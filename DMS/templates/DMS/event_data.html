@@ -1,0 +1,229 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}DMS Event Data{% endblock %}
+
+{% block stylesheets %}
+{% include 'adminlte/lib/_styles.html' %}
+<!-- Tabulator CSS -->
+<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+<!-- Flatpickr for Date Range -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .filter-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+    }
+    .filter-item label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .filter-item input, .filter-item select {
+        padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    #event-table {
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0">DMS Olay Verileri</h1>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="filter-container">
+            <div class="filter-item">
+                <label>Tarih Aralığı</label>
+                <input type="text" id="date-range" placeholder="Tarih Seçin">
+            </div>
+            <div class="filter-item">
+                <label>Olay Tipi</label>
+                <input type="text" id="event-type" placeholder="Olay Tipi">
+            </div>
+            <div class="filter-item">
+                <label>Makine Adı</label>
+                <input type="text" id="machine-name" placeholder="Makine Adı">
+            </div>
+            <div class="filter-item">
+                <label>Kalıp No</label>
+                <input type="text" id="die-number" placeholder="Kalıp No">
+            </div>
+            <div class="filter-item">
+                <button id="filter-btn" class="btn btn-primary">Filtrele</button>
+            </div>
+            <div class="filter-item">
+                <button id="clear-btn" class="btn btn-secondary">Temizle</button>
+            </div>
+        </div>
+
+        <div id="event-table"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+<!-- Tabulator JS -->
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = flatpickr.formatDate(new Date(), "Y-m-d");
+
+        // Init Date Picker
+        const datePicker = flatpickr("#date-range", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "tr",
+            defaultDate: [today, today]
+        });
+
+        const csrfToken = "{{ csrf_token }}";
+
+        // Tabulator Configuration
+        var table = new Tabulator("#event-table", {
+            layout: "fitColumns",
+            pagination: "local",
+            paginationSize: 20,
+            ajaxURL: "{% url 'DMS:api_get_event_data' %}?start_date=" + today + "&end_date=" + today,
+            ajaxConfig: "GET",
+            columns: [
+                {title: "ID", field: "id", width: 70},
+                {title: "Olay Tipi", field: "event_type", width: 120},
+                {title: "Makine Adı", field: "machine_name", width: 120},
+                {title: "Başlangıç", field: "start_time", width: 160},
+                {title: "Bitiş", field: "end_time", width: 160},
+                // Editable static_data fields
+                {title: "Kart No", field: "kartNo", editor: "input"},
+                {title: "Operatör", field: "operator", editor: "input"},
+                {title: "Profil No", field: "profiles", editor: "input"},
+                {title: "Şarj No", field: "BilletLot", editor: "input"},
+                {title: "Kalıp No", field: "DieNumber", editor: "list", editorParams: {
+                    valuesURL: "{% url 'DMS:api_get_kalip_nos' %}",
+                    autocomplete: true,
+                    listOnEmpty: true,
+                    clearable: true,
+                    filterFunc: function(term, label, value, item) {
+                        return String(label).toLowerCase().startsWith(String(term).toLowerCase());
+                    }
+                }},
+                {title: "Duruş Sebebi", field: "StopCause", editor: "input"},
+                {title: "Billet Uzunluğu (Pusher)", field: "Billet_Length_Pusher", editor: "input"}
+            ],
+        });
+
+        // Trigger on cell edited
+        table.on("cellEdited", function(cell){
+            var oldValue = cell.getOldValue();
+            var newValue = cell.getValue();
+            
+            // Eğer değer boş bırakıldıysa veya değişmediyse (iptal edildiyse) işlemi geri al
+            if (newValue === "" || newValue === null || newValue === undefined || oldValue === newValue) {
+                if (newValue === "" || newValue === null || newValue === undefined) {
+                    cell.restoreOldValue();
+                }
+                return;
+            }
+
+            if (!confirm("Bu değeri değiştirmek istediğinize emin misiniz?")) {
+                cell.restoreOldValue();
+                return;
+            }
+
+            var rowData = cell.getRow().getData();
+            
+            fetch("{% url 'DMS:api_update_event_data' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    id: rowData.id,
+                    kartNo: rowData.kartNo,
+                    operator: rowData.operator,
+                    profiles: rowData.profiles,
+                    BilletLot: rowData.BilletLot,
+                    DieNumber: rowData.DieNumber,
+                    StopCause: rowData.StopCause,
+                    Billet_Length_Pusher: rowData.Billet_Length_Pusher
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status !== 'success') {
+                    alert('Hata: ' + data.message);
+                    cell.restoreOldValue();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Güncelleme sırasında bir hata oluştu.');
+                cell.restoreOldValue();
+            });
+        });
+
+        // Clear DieNumber input when editing starts
+        table.on("cellEditing", function(cell){
+            if(cell.getField() === "DieNumber"){
+                setTimeout(function(){
+                    var input = cell.getElement().querySelector("input");
+                    if(input){
+                        input.value = "";
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }, 10);
+            }
+        });
+
+        // Filtering logic
+        document.getElementById("filter-btn").addEventListener("click", function(){
+            var dates = datePicker.selectedDates;
+            var startDate = dates.length > 0 ? flatpickr.formatDate(dates[0], "Y-m-d") : "";
+            var endDate = dates.length > 1 ? flatpickr.formatDate(dates[1], "Y-m-d") : startDate; // Use same day if only one selected
+            
+            var eventType = document.getElementById("event-type").value;
+            var machineName = document.getElementById("machine-name").value;
+            
+            // Re-fetch data with query params
+            table.setData("{% url 'DMS:api_get_event_data' %}?start_date=" + startDate + "&end_date=" + endDate + "&event_type=" + eventType + "&machine_name=" + machineName);
+        });
+
+        // Clear logic
+        document.getElementById("clear-btn").addEventListener("click", function(){
+            datePicker.clear();
+            document.getElementById("event-type").value = "";
+            document.getElementById("machine-name").value = "";
+            document.getElementById("die-number").value = "";
+            
+            // Remove Tabulator local filters (for DieNumber) and reset ajax
+            table.clearFilter();
+            table.setData("{% url 'DMS:api_get_event_data' %}?start_date=" + today + "&end_date=" + today);
+        });
+
+        // Local filter for DieNumber
+        document.getElementById("die-number").addEventListener("input", function(e){
+            table.setFilter("DieNumber", "starts", e.target.value);
+        });
+    });
+</script>
+{% endblock %}

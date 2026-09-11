@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os
 from .email_utils import send_email, read_emails, listen_for_emails
 
 # Mail gönderme ve okuma ayarları
-username = 'ai@arslanaluminyum.com'
-password = 'Arslan123.'
+username = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
+password = os.environ.get('AI_EMAIL_PASSWORD', '')
 server = 'webmail.arslanaluminyum.com'  # Sadece sunucu adresi, protokol yok
 to_address = 'ufukizgi@arslanaluminyum.com'
 subject = 'Deneme E-postası'
