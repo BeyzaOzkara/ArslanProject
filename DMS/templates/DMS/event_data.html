@@ -44,7 +44,7 @@
 <div class="container-fluid">
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1 class="m-0">DMS Olay Verileri</h1>
+            <h1 class="m-0">DMS Ekstrüzyon Verileri</h1>
         </div>
     </div>
 </div>
@@ -91,14 +91,17 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const today = flatpickr.formatDate(new Date(), "Y-m-d");
+        const today = flatpickr.formatDate(new Date(), "Y-m-d 00:00");
+        const todayEnd = flatpickr.formatDate(new Date(), "Y-m-d 23:59");
 
         // Init Date Picker
         const datePicker = flatpickr("#date-range", {
             mode: "range",
-            dateFormat: "Y-m-d",
+            enableTime: true,
+            time_24hr: true,
+            dateFormat: "Y-m-d H:i",
             locale: "tr",
-            defaultDate: [today, today]
+            defaultDate: [today, todayEnd]
         });
 
         const csrfToken = "{{ csrf_token }}";
@@ -108,7 +111,7 @@
             layout: "fitColumns",
             pagination: "local",
             paginationSize: 20,
-            ajaxURL: "{% url 'DMS:api_get_event_data' %}?start_date=" + today + "&end_date=" + today,
+            ajaxURL: "{% url 'DMS:api_get_event_data' %}?start_date=" + today + "&end_date=" + todayEnd,
             ajaxConfig: "GET",
             columns: [
                 {title: "ID", field: "id", width: 70},
@@ -202,8 +205,8 @@
         // Filtering logic
         document.getElementById("filter-btn").addEventListener("click", function(){
             var dates = datePicker.selectedDates;
-            var startDate = dates.length > 0 ? flatpickr.formatDate(dates[0], "Y-m-d") : "";
-            var endDate = dates.length > 1 ? flatpickr.formatDate(dates[1], "Y-m-d") : startDate; // Use same day if only one selected
+            var startDate = dates.length > 0 ? flatpickr.formatDate(dates[0], "Y-m-d H:i") : "";
+            var endDate = dates.length > 1 ? flatpickr.formatDate(dates[1], "Y-m-d H:i") : startDate; // Use same day if only one selected
             
             var eventType = document.getElementById("event-type").value;
             var machineName = document.getElementById("machine-name").value;
@@ -221,7 +224,7 @@
             
             // Remove Tabulator local filters (for DieNumber) and reset ajax
             table.clearFilter();
-            table.setData("{% url 'DMS:api_get_event_data' %}?start_date=" + today + "&end_date=" + today);
+            table.setData("{% url 'DMS:api_get_event_data' %}?start_date=" + today + "&end_date=" + todayEnd);
         });
 
         // Local filter for DieNumber

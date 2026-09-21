@@ -86,9 +86,9 @@ def api_get_event_data(request):
     events = EventData.objects.using('dms').all()
     
     if start_date:
-        events = events.filter(start_time__date__gte=start_date)
+        events = events.filter(start_time__gte=start_date)
     if end_date:
-        events = events.filter(start_time__date__lte=end_date)
+        events = events.filter(start_time__lte=end_date)
     if event_type:
         events = events.filter(event_type__icontains=event_type)
     if machine_name:
@@ -101,8 +101,8 @@ def api_get_event_data(request):
             'id': e.id,
             'event_type': e.event_type,
             'machine_name': e.machine_name,
-            'start_time': e.start_time.strftime('%H-%M %d-%m-%y') if e.start_time else None,
-            'end_time': e.end_time.strftime('%H-%M %d-%m-%y') if e.end_time else None,
+            'start_time': e.start_time.strftime('%H:%M %d-%m-%y') if e.start_time else None,
+            'end_time': e.end_time.strftime('%H:%M %d-%m-%y') if e.end_time else None,
             'kartNo': static_data.get('kartNo', ''),
             'operator': static_data.get('operator', ''),
             'profiles': static_data.get('profiles', ''),
