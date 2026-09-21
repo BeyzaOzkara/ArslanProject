@@ -6,7 +6,7 @@
 {% block stylesheets %}
 {% include 'adminlte/lib/_styles.html' %}
 <!-- Tabulator CSS -->
-<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
 <!-- Flatpickr for Date Range -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
@@ -32,6 +32,10 @@
     }
     #event-table {
         margin-top: 20px;
+    }
+    .tabulator { 
+        background-color: #ccc;
+        font-weight: bold;
     }
 </style>
 {% endblock %}

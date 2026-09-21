@@ -10,51 +10,50 @@
 <link rel="stylesheet" type="text/css" href="{% static 'tabulator/dist/css/tabulator_bootstrap5.min.css' %}">
 
 <style>
+    .timeDiv {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
 
-.timeDiv {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
+    .timeDiv label {
+        margin-right: 5px;
+    }
 
-.timeDiv label {
-    margin-right: 5px;
-}
+    .timeDiv input {
+        width: auto;
+    }
 
-.timeDiv input {
-    width: auto;
-}
+    .profilDiv {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-.profilDiv {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    .profilDiv label {
+        margin-right: 5px;
+    }
 
-.profilDiv label {
-    margin-right: 5px;
-}
+    .profilDiv select,
+    .profilDiv input {
+        width: auto;
+    }
 
-.profilDiv select,
-.profilDiv input {
-    width: auto;
-}
+    .kartlarSonucInfo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
 
-.kartlarSonucInfo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
+    .kartlarSonucInfo label {
+        margin-right: 5px;
+    }
 
-.kartlarSonucInfo label {
-    margin-right: 5px;
-}
-
-.kartlarSonucInfo input {
-    width: auto;
-}
+    .kartlarSonucInfo input {
+        width: auto;
+    }
 </style>
 {% endblock %}
 
@@ -63,6 +62,7 @@
     <div class="timeDiv">
         <label for="timeInput">Son Kaç Saat İçinde</label>
         <input type="number" class="form-control" name="timeInput" id="timeInput" min="1" max="336">
+        <a href="{% url 'DMS:event_data' %}" class="btn btn-info" style="margin-left: auto;">Olay Verileri</a>
     </div>
     <div class="profilDiv" style="display: none;">
         <label for="profilSelect">Profil Numarası Seçiniz: </label>
@@ -80,7 +80,7 @@
             </div>
             <div class="sepetDiv col-6">
                 <div id="sepetTable"></div>
-            </div>       
+            </div>
         </div>
         <div class="siparisDiv mt-2">
             <div id="siparisTable"></div>
@@ -88,7 +88,7 @@
         <div class="buttonDiv">
             <hr>
             <button id="hesaplaButton" class="btn btn-primary form-control">Hesapla</button>
-        </div>        
+        </div>
     </div>
 
 </div>
@@ -116,569 +116,593 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    var timeInput = document.getElementById('timeInput');
-    var profilSelect = document.getElementById('profilSelect');
-    var hideDiv = document.querySelector('.hideDiv');
-    var secimDiv = document.querySelector('.secimDiv');
-    var kartSonucDiv = document.querySelector('.kartSonucDiv');
-    var sepetDagitDiv = document.querySelector('.sepetDagitDiv');
-    var hesaplaButton = document.getElementById('hesaplaButton');
-    var sepetButton = document.getElementById('sepeteDagitButton');
-    var onaylaButton = document.getElementById('onaylaButton');
-    var duzenleButton = document.getElementById('editButton');
-    var gramajInp = document.getElementById('gramaj');
-    var genelFireInp = document.getElementById('genelFire');
-    var genelImalatHiziInp = document.getElementById('genelImalatHizi');
-    var data = [];
-    var profil = "";
+    document.addEventListener("DOMContentLoaded", function () {
+        var timeInput = document.getElementById('timeInput');
+        var profilSelect = document.getElementById('profilSelect');
+        var hideDiv = document.querySelector('.hideDiv');
+        var secimDiv = document.querySelector('.secimDiv');
+        var kartSonucDiv = document.querySelector('.kartSonucDiv');
+        var sepetDagitDiv = document.querySelector('.sepetDagitDiv');
+        var hesaplaButton = document.getElementById('hesaplaButton');
+        var sepetButton = document.getElementById('sepeteDagitButton');
+        var onaylaButton = document.getElementById('onaylaButton');
+        var duzenleButton = document.getElementById('editButton');
+        var gramajInp = document.getElementById('gramaj');
+        var genelFireInp = document.getElementById('genelFire');
+        var genelImalatHiziInp = document.getElementById('genelImalatHizi');
+        var data = [];
+        var profil = "";
 
-    $('#timeInput').on('change', function() {
-        let timespan = $(this).val();
-        $.ajax({
-            url: '/4500/hesaplama/get_profils/',
-            type: 'GET',
-            data: {
-                timespan: timespan,
-                pres: '4500'
-            },
-            success: function (response) {
-                let select = $('#profilSelect');
-                select.empty();
-                select.append('<option disabled selected>Profil No</option>');
+        $('#timeInput').on('change', function () {
+            let timespan = $(this).val();
+            $.ajax({
+                url: '/4500/hesaplama/get_profils/',
+                type: 'GET',
+                data: {
+                    timespan: timespan,
+                    pres: '4500'
+                },
+                success: function (response) {
+                    let select = $('#profilSelect');
+                    select.empty();
+                    select.append('<option disabled selected>Profil No</option>');
 
-                $.each(response.profiller, function (index, profil) {
-                    select.append(
-                        $('<option></option>').val(profil).text(profil)
-                    );
-                });
+                    $.each(response.profiller, function (index, profil) {
+                        select.append(
+                            $('<option></option>').val(profil).text(profil)
+                        );
+                    });
 
-                $('.profilDiv').show();
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching Ext info:", error);
-            }
-        });
-    })
-
-    
-    function initializeExtTable(data) { 
-        extTable = new Tabulator("#extTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Ext Geçmişi",
-            data: data || '[]',
-            reactiveData:false,
-            columns: [
-                {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                    cell.getRow().toggleSelect();
-                }},
-                { title: "Kart", field: "kart_no" },
-                { title: "Kalıp No", field: "kalip_no" },
-                { title: "Şarj", field: "billet_lot" },
-                { title: "Başlangıç", field: "imalat_baslangici_2" },
-                { title: "Bitiş", field: "imalat_sonu_2" },
-                { title: "Brüt", field: "brüt_imalat", formatter:"money", formatterParams:{
-                    decimal:",",
-                    thousand:".",
-                    symbol:"kg",
-                    symbolAfter:"kg",
-                    precision:true,
-                } },
-                { title: "Billet Sayısı", field: "billet_count" },
-                { title: "Ort. Billet Boyu", field:"ortalama_billet_boyu"}
-            ]
-        });
-
-    }
-
-    function initializeSepetTable(data) {
-        sepetTable = new Tabulator("#sepetTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Sepetler",
-            reactiveData:false,
-            data: data || '[]',
-            columns: [
-                {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                    cell.getRow().toggleSelect();
-                }},
-                { title: "Sepet No", field: "SepetNo" },
-                { title: "Kart No", field: "KartNo" },
-                { title: "Kalıp No", field: "KalipNo" },
-                { title: "Şarj No", field: "BilletLot" },
-                { title: "Adet", field: "Adet" },
-                { title: "Boy", field: "Boy" },
-            ]
-        });
-    }
-    
-    function initializeSiparisTable(data) {
-        siparisTable = new Tabulator("#siparisTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Siparisler",
-            data: data || '[]',
-            reactiveData:false,
-            movableRows:true,
-            columns: [
-                {rowHandle:true, formatter:"handle", title:"", headerSort:false, frozen:true, width:40, minWidth:40},
-                {formatter:"rowSelection", titleFormatter:"rowSelection", width:40, hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                    cell.getRow().toggleSelect();
-                }},
-                { title: "Kart No", field: "KartNo" },
-                { title: "Kg", field: "Kg" },
-                { title: "Adet", field: "Adet" },
-                { title: "Boy", field: "PlanlananMm" },
-                { title: "Kondüsyon", field: "KondusyonTuru" },
-                { title: "Yüzey", field: "YuzeyOzelligi" },
-                { title: "Termin", field: "SonTermin" },
-                { title: "Firma", field: "FirmaAdi" },
-            ]
-        });
-        
-    }
-    // gramaj ve profil no gibi sabit olanlar tek bir satırda gösterilsin.
-    // genel fire ve genel imalat hızı da bu satırda.
-    
-    
-    profilSelect.addEventListener("change",function () {
-        gramajInp.value = "";
-        profil = this.value;
-        timespan = timeInput.value;
-        $.ajax({
-            url: '/4500/hesaplama/get_ext_info/',
-            type: 'GET',
-            data: {
-                profil_no: profil,
-                timespan: timespan
-            },
-            success: function (response) {
-                console.log(response.ext_data);
-                initializeExtTable(response.ext_data);
-                // extTable.replaceData(response.ext_data);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching Ext info:", error);
-            }
-        });
-        
-        $.ajax({
-            url: '/4500/hesaplama/get_sepet_info/',
-            type: 'GET',
-            data: {
-                profil_no: profil,
-                timespan: timespan
-            },
-            success: function (response) {
-                console.log(response.sepet_data);
-                // sepetTable.replaceData(response.sepet_data);
-                initializeSepetTable(response.sepet_data)
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching Ext info:", error);
-            }
-        });
-
-        $.ajax({
-            url: '/4500/hesaplama/get_kart_info/',
-            type: 'GET',
-            data: {
-                profil_no: profil,
-                timespan: timespan
-            },
-            success: function (response) {
-                console.log(response.siparis_data);
-                initializeSiparisTable(response.siparis_data)
-                // siparisTable.replaceData(response.siparis_data);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching Ext info:", error);
-            }
-        });
-
-        hideDiv.style.display = 'block';
-    });
-
-    function initializeKartSonuc(data) {
-        kartSonucTable = new Tabulator("#kartSonucTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Kart Dağılımı",
-            reactiveData:true,
-            data: data || '[]',
-            columns: [
-                { title: "Kart No", field: "KartNo" },
-                { title: "Sip. Boyu", field: "SipBoy" },
-                { title: "Sip. Adeti", field: "SipAdet" },
-                { title: "Baslangıç", field: "Baslangic", formatter:function(cell, formatterParams, onRendered){
-                    var value = cell.getValue();
-                    value = moment(value).format("DD/MM HH:mm");
-                    return value;
-                }},
-                { title: "Bitiş", field: "Bitis", formatter:function(cell, formatterParams, onRendered){
-                    var value = cell.getValue();
-                    value = moment(value).format("DD/MM HH:mm");
-                    return value;
-                }},
-                { title: "Adet", field: "hesapAdet" },
-                { title: "Billet Boyu", field: "billetBoy", formatter:"money", formatterParams:{
-                    decimal:",",
-                    thousand:".",
-                    symbol:" cm",
-                    symbolAfter:" cm",
-                    precision:false,
-                } },
-                { title: "Billet Adeti", field: "billetAdet" },
-                { title: "Pres Üretilen", field: "presUret" , formatter:"money", formatterParams:{
-                    decimal:",",
-                    thousand:".",
-                    precision:true,
-                }},
-                { title: "Fire", field: "Fire" , formatter:"money", formatterParams:{
-                    decimal:",",
-                    thousand:".",
-                    symbol:"% ",
-                    precision:true,
-                }},
-                { title: "İmalat Hızı", field: "ImalatHizi" , formatter:"money", formatterParams:{
-                    decimal:",",
-                    thousand:".",
-                    symbol:" kg/sa",
-                    symbolAfter:" kg/sa",
-                    precision:false,
-                } },
-                { title: "İ. Fazlası", field: "ImalatFazlasi", formatter:"money", formatterParams:{
-                    decimal:",",
-                    thousand:".",
-                    symbol:"% ",
-                    precision:true,
-                }  },
-                { title: "Firma", field: "FirmaAdi" },
-                { title: "Termin", field: "SonTermin" },
-            ]
-        });
-        
-    }
-
-    function initializeSepetSonuc(data) {
-       sepetDagitTable = new Tabulator("#sepetDagitTable", {
-            height: "250px",
-            layout:"fitColumns",
-            placeholder: "Kart Dağılımı",
-            data: data || '[]',
-            columns: [
-                { title: "Sepet No", field: "SepetNo" },
-                { title: "Kart No", field: "KartNo" },
-                { title: "Adet", field: "Adet" },
-                { title: "Boy", field: "Boy" },
-            ]
-        });
- 
-    }
-
-    // hesaplaButton.addEventListener("click", function () { 
-    //     var ext = JSON.parse(JSON.stringify(extTable.getSelectedData()));
-    //     var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
-    //     var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
-    //     var gramaj = gramajInp.value;
-    //     var sonuc = [];
-
-    //     if (!gramaj) {
-    //         alert("Lütfen gramaj girin.");
-    //         return;
-    //     }
-
-    //     if (ext.length === 0 || sepet.length === 0 || siparis.length === 0) {
-    //         alert("Lütfen her tablodan seçim yapın.");
-    //         return;
-    //     }
-
-    //     var extGroupedByKalipBillet = new Map();
-    //     for (var i = 0; i < ext.length; i++) {
-    //         var key = ext[i].kalip_no + "_" + ext[i].billet_lot;
-    //         if (!extGroupedByKalipBillet.has(key)) {
-    //             extGroupedByKalipBillet.set(key, []);
-    //         }
-    //         extGroupedByKalipBillet.get(key).push(ext[i]);
-    //     }
-
-    //     var sepetGroupedByBoy = new Map();
-    //     for (var i = 0; i < sepet.length; i++) {
-    //         var boy = sepet[i].Boy;
-    //         if (!sepetGroupedByBoy.has(boy)) {
-    //             sepetGroupedByBoy.set(boy, new Map());
-    //         }
-    //         var key = sepet[i].KalipNo + "_" + sepet[i].BilletLot;
-    //         if (!sepetGroupedByBoy.get(boy).has(key)) {
-    //             sepetGroupedByBoy.get(boy).set(key, []);
-    //         }
-    //         sepetGroupedByBoy.get(boy).get(key).push(sepet[i]);
-    //     }
-
-    //     var siparisByBoy = new Map();
-    //     for (var i = 0; i < siparis.length; i++) {
-    //         var boy = siparis[i].PlanlananMm;
-    //         if (!siparisByBoy.has(boy)) {
-    //             siparisByBoy.set(boy, []);
-    //         }
-    //         siparisByBoy.get(boy).push(siparis[i]);
-    //     }
-
-    //     for (let [boy, siparisler] of siparisByBoy) {
-              
-    //     }
-        
-
-        
-    // });
-
-    hesaplaButton.addEventListener("click", function () { 
-        // 3 tabulatorden de seçim yapılmış mı kontrol et.
-        // yapılmayan varsa alert ile uyar işlem yapma.
-        var ext = JSON.parse(JSON.stringify(extTable.getSelectedData()));
-        var firstBilletLot = ext[0]?.billet_lot;
-        var sameBilletLot = ext.every(item => item.billet_lot === firstBilletLot);
-
-        if (!sameBilletLot) {
-            alert("Lütfen aynı Şarj'a sahip kayıtları seçin.");
-            return;
-        }
-        
-        var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
-        var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
-        var gramaj = gramajInp.value;
-        var sonuc = [];
-
-        if (!gramaj) {
-            alert("Lütfen gramaj girin.");
-            return;
-        }
-
-        if (ext.length === 0 || sepet.length === 0 || siparis.length === 0) {
-            alert("Lütfen her tablodan seçim yapın.");
-            return;
-        }
-        
-        var netSepet = 0;
-        var totalNetBoy = 0;
-        for (var i = 0; i < sepet.length; i++) {
-            var net = sepet[i].Adet * sepet[i].Boy * gramaj / 1000;
-            netSepet += net;
-            totalNetBoy += sepet[i].Adet * sepet[i].Boy / 1000;
-        }
-        console.log("Net Sepet: ", netSepet);
-        console.log("Toplam Net Boy: ", totalNetBoy);
-
-        var brutExt = 0;
-        var toplamBilletAdet = 0;
-        var minStartTime = Infinity;
-        var maxEndTime = -Infinity;
-        for (var i = 0; i < ext.length; i++) {
-            brutExt += ext[i].brüt_imalat;
-
-            var start = new Date(ext[i].imalat_baslangici);
-            var end = new Date(ext[i].imalat_sonu);
-            if (start < minStartTime) minStartTime = start;
-            if (end > maxEndTime) maxEndTime = end;
-
-            toplamBilletAdet += ext[i].billet_count;
-        }
-        console.log("Brüt Ext: ", brutExt);
-        console.log("Toplam Billet Adet: ", toplamBilletAdet);
-        var sure = (maxEndTime - minStartTime) / 60000;
-        console.log("Süre: ", sure);
-
-        var baslangicSaat = minStartTime;
-
-        var verim = netSepet / brutExt;
-        console.log("Verim: ", verim);
-        var genelFire = ((1- verim) * 100).toFixed(1);
-        console.log("Genel Fire: ", genelFire);
-        genelFireInp.value = "% " + genelFire;
-
-        var genelImalatHizi = Math.round(totalNetBoy * gramaj*60 / sure);
-        console.log("Genel İmalat Hızı: ", genelImalatHizi);
-        genelImalatHiziInp.value =genelImalatHizi;
-
-        var netUretimHizi = sure / totalNetBoy;
-        console.log("Net Üretim Hızı: ", netUretimHizi);
-
-        var ortBilletBoyu = brutExt / toplamBilletAdet / 1.367;
-        console.log("Ortalama Billet Boyu: ", ortBilletBoyu);
-
-        var siparisByBoy = new Map();
-        // Boylara göre grupla
-        for (var i = 0; i < siparis.length; i++) {
-            var boy = siparis[i].PlanlananMm;
-            console.log("siparisBoy: ", boy);
-            if (!siparisByBoy.has(boy)) {
-                siparisByBoy.set(boy, []);
-            }
-            
-            // Push the current order (siparis[i]) to the respective group, preserving FIFO order
-            siparisByBoy.get(boy).push(siparis[i]);
-        }
-        console.log("siparisByBoy (FIFO Order):", Array.from(siparisByBoy.entries()));
-
-        for (let [boy, siparisler] of siparisByBoy) {
-            console.log("siparisByBoy: ", boy);
-            // var siparisler = siparisByBoy[boy];
-
-            var toplamSepetAdet = 0;
-            var toplamSepetBoy = 0;
-            for (var i = 0; i < sepet.length; i++) {
-                if (sepet[i].Boy === parseFloat(boy)) {
-                    toplamSepetAdet += parseFloat(sepet[i].Adet);
-                    toplamSepetBoy += parseFloat(sepet[i].Boy);
+                    $('.profilDiv').show();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Ext info:", error);
                 }
-            }
-            var toplamKartAdet = 0;
-            for (var i = 0; i < siparisler.length; i++) {
-                toplamKartAdet += parseInt(siparisler[i].Adet);
-            }
-            var fazlaUretim = toplamSepetAdet / toplamKartAdet;
-            console.log("toplamSepetAdet: ", toplamSepetAdet);
-            console.log("toplamSepetBoy: ", toplamSepetBoy);
-            console.log("toplamKartAdet: ", toplamKartAdet);
-            console.log("fazlaUretim: ", fazlaUretim);
+            });
+        })
 
-            var harcananAdet = 0;
-            siparisler.forEach(function(siparisData) {
-                if (toplamSepetAdet > 0) {
-                    if (fazlaUretim > 1) { 
-                        var hesaplananAdet = Math.round(parseFloat(siparisData.Adet) * fazlaUretim);
-                    }
-                    else {
-                        var hesaplananAdet = Math.round(parseFloat(siparisData.Adet) * 1.05);
-                    }
-                    if (hesaplananAdet>toplamSepetAdet) {
-                        hesaplananAdet = toplamSepetAdet;
-                    }
-                    toplamSepetAdet -= hesaplananAdet;
-                    var kalanAdet = toplamSepetAdet - hesaplananAdet;
-                    console.log("HesaplananAdet: ", hesaplananAdet);
-                    var uretilenBoy = hesaplananAdet * parseInt(siparisData.PlanlananMm) / 1000; // metre
-                    console.log("uretilenBoy", uretilenBoy);
-                    var hesaplananSure = uretilenBoy * netUretimHizi; // metre * dk/metre = dk
-                    console.log("hesaplananSure", hesaplananSure)
-                    var hesaplananBrut = (uretilenBoy * gramaj) / (verim * 1.367);
-                    console.log("Hesaplanan Brüt: ", hesaplananBrut);
-                    var hesaplananBilletAdeti = Math.round(hesaplananBrut / ortBilletBoyu);
-                    if (hesaplananBrut < ortBilletBoyu) {
-                        hesaplananBilletAdeti = 1
-                    }
-                    console.log("Hesaplanan Billet Adeti: ", hesaplananBilletAdeti);
-                    var hesaplananBilletBoyu = hesaplananBrut / hesaplananBilletAdeti;
-                    if (hesaplananBilletBoyu > 150) {
-                        hesaplananBilletBoyu = 150;
-                    }
-                    console.log("Hesaplanan Billet Boyu: ", hesaplananBilletBoyu);
-                    console.log(baslangicSaat);
-                    var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
-                    console.log(bitisSaati);
-                    var yuzdeFire = (1 - ((uretilenBoy*gramaj)/(hesaplananBrut*1.367))) * 100;
-                    var imalatHizi = Math.round(uretilenBoy*gramaj*60 / hesaplananSure);
-                    var imalatFazlasi = ((hesaplananAdet / parseInt(siparisData.Adet)) - 1)*100;
-                    var presUretilen = (hesaplananBilletAdeti * hesaplananBilletBoyu * 1.367);
-                    var row = {"KartNo": siparisData.KartNo, "SipAdet":siparisData.Adet, "SipBoy": siparisData.PlanlananMm,
-                    "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy, "presUret": presUretilen, 
-                    "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
-                    "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi};
-                    sonuc.push(row);
-                    baslangicSaat = bitisSaati;
-                    
-                }
+
+        function initializeExtTable(data) {
+            extTable = new Tabulator("#extTable", {
+                height: "250px",
+                layout: "fitColumns",
+                placeholder: "Ext Geçmişi",
+                data: data || '[]',
+                reactiveData: false,
+                columns: [
+                    {
+                        formatter: "rowSelection", titleFormatter: "rowSelection", width: 40, hozAlign: "center", headerSort: false, cellClick: function (e, cell) {
+                            cell.getRow().toggleSelect();
+                        }
+                    },
+                    { title: "Kart", field: "kart_no" },
+                    { title: "Kalıp No", field: "kalip_no" },
+                    { title: "Şarj", field: "billet_lot" },
+                    { title: "Başlangıç", field: "imalat_baslangici_2" },
+                    { title: "Bitiş", field: "imalat_sonu_2" },
+                    {
+                        title: "Brüt", field: "brüt_imalat", formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: "kg",
+                            symbolAfter: "kg",
+                            precision: true,
+                        }
+                    },
+                    { title: "Billet Sayısı", field: "billet_count" },
+                    { title: "Ort. Billet Boyu", field: "ortalama_billet_boyu" }
+                ]
             });
 
         }
-        
-        initializeKartSonuc(sonuc); 
-        // kartSonucTable.replaceData(sonuc);
-        secimDiv.style.display = 'none';
-        kartSonucDiv.style.display = 'block';
-        sendKartDagilimi(JSON.stringify(sonuc));
-    
-    });
 
-
-    sepetButton.addEventListener("click", function() {
-        var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
-        var sonuc = JSON.parse(JSON.stringify(kartSonucTable.getData()));
-        var dagilan = [];
-
-        for (var i = 0; i < sepet.length; i++) {
-            console.log(sepet[i])
-            for (var j = 0; j < sonuc.length; j++) {
-                if (sepet[i].Boy == sonuc[j].SipBoy && sonuc[j].hesapAdet >0) {
-                    var sepetAdet = sepet[i].Adet;
-                    var sonucAdet = sonuc[j].hesapAdet;
-                    var yazilacak = sonucAdet;
-                    if (sonucAdet >= sepetAdet) {
-                        yazilacak = sepetAdet;
-                    }
-                    if (yazilacak>0) {
-                        sonuc[j].hesapAdet -= yazilacak;
-                        sepet[i].Adet -= yazilacak;
-                        var row = {"id": sepet[i].id, "SepetNo":sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy, "KalipNo": sepet[i].KalipNo, "BilletLot": sepet[i].BilletLot};
-                        dagilan.push(row);
-                    }
-                }
-            }
-            if (sepet[i].Adet > 0) {
-                dagilan.push(sepet[i]);
-            }
+        function initializeSepetTable(data) {
+            sepetTable = new Tabulator("#sepetTable", {
+                height: "250px",
+                layout: "fitColumns",
+                placeholder: "Sepetler",
+                reactiveData: false,
+                data: data || '[]',
+                columns: [
+                    {
+                        formatter: "rowSelection", titleFormatter: "rowSelection", width: 40, hozAlign: "center", headerSort: false, cellClick: function (e, cell) {
+                            cell.getRow().toggleSelect();
+                        }
+                    },
+                    { title: "Sepet No", field: "SepetNo" },
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Kalıp No", field: "KalipNo" },
+                    { title: "Şarj No", field: "BilletLot" },
+                    { title: "Adet", field: "Adet" },
+                    { title: "Boy", field: "Boy" },
+                ]
+            });
         }
-        initializeSepetSonuc(dagilan);
-        // sepetDagitTable.replaceData(dagilan);
-        sepetDagitDiv.style.display = 'block';
-        sepetButton.style.display = 'none';
-        onaylaButton.style.display = 'block';
-    })
 
-    onaylaButton.addEventListener("click", function() {
-        var secilenSepetler = JSON.stringify(sepetTable.getSelectedData());
-        var secilenExt = JSON.stringify(extTable.getSelectedData());
-        var secilenSiparisler = JSON.stringify(siparisTable.getSelectedData());
-        var gonderSepet = JSON.stringify(sepetDagitTable.getData());
-        var gonderKart = JSON.stringify(kartSonucTable.getData());
-        var profil_gr = gramajInp.value;
-        console.log("gonder kart:", gonderKart);
-        $.ajax({
-            url: "/4500/hesaplama/sepete_dagit/", 
-            type: "POST",
-            data: {
-                secilen_ext: secilenExt,
-                secilen_sepet: secilenSepetler,
-                secilen_siparis: secilenSiparisler,
-                sonuc_sepetler: gonderSepet,
-                sonuc_kartlar: gonderKart,
-                profil_gr: profil_gr,
-                profil: profil,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function (response) {
-                if (response.success) {
-                    alert("Sepetlere Dağıtıldı.");
-                    window.location.reload();
+        function initializeSiparisTable(data) {
+            siparisTable = new Tabulator("#siparisTable", {
+                height: "250px",
+                layout: "fitColumns",
+                placeholder: "Siparisler",
+                data: data || '[]',
+                reactiveData: false,
+                movableRows: true,
+                columns: [
+                    { rowHandle: true, formatter: "handle", title: "", headerSort: false, frozen: true, width: 40, minWidth: 40 },
+                    {
+                        formatter: "rowSelection", titleFormatter: "rowSelection", width: 40, hozAlign: "center", headerSort: false, cellClick: function (e, cell) {
+                            cell.getRow().toggleSelect();
+                        }
+                    },
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Kg", field: "Kg" },
+                    { title: "Adet", field: "Adet" },
+                    { title: "Boy", field: "PlanlananMm" },
+                    { title: "Kondüsyon", field: "KondusyonTuru" },
+                    { title: "Yüzey", field: "YuzeyOzelligi" },
+                    { title: "Termin", field: "SonTermin" },
+                    { title: "Firma", field: "FirmaAdi" },
+                ]
+            });
+
+        }
+        // gramaj ve profil no gibi sabit olanlar tek bir satırda gösterilsin.
+        // genel fire ve genel imalat hızı da bu satırda.
+
+
+        profilSelect.addEventListener("change", function () {
+            gramajInp.value = "";
+            profil = this.value;
+            timespan = timeInput.value;
+            $.ajax({
+                url: '/4500/hesaplama/get_ext_info/',
+                type: 'GET',
+                data: {
+                    profil_no: profil,
+                    timespan: timespan
+                },
+                success: function (response) {
+                    console.log(response.ext_data);
+                    initializeExtTable(response.ext_data);
+                    // extTable.replaceData(response.ext_data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Ext info:", error);
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error setting sepets::", error);
-            }
-        });
-    });
+            });
 
-    duzenleButton.addEventListener("click", function() {
-        kartSonucDiv.style.display = 'none';
-        secimDiv.style.display = 'block';
-        sepetDagitDiv.style.display = 'none';
-        genelFireInp.value = "";
-        genelImalatHiziInp.value = "";
-        sepetButton.style.display = 'block';
-        onaylaButton.style.display = 'none';
-    })
-});
+            $.ajax({
+                url: '/4500/hesaplama/get_sepet_info/',
+                type: 'GET',
+                data: {
+                    profil_no: profil,
+                    timespan: timespan
+                },
+                success: function (response) {
+                    console.log(response.sepet_data);
+                    // sepetTable.replaceData(response.sepet_data);
+                    initializeSepetTable(response.sepet_data)
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Ext info:", error);
+                }
+            });
+
+            $.ajax({
+                url: '/4500/hesaplama/get_kart_info/',
+                type: 'GET',
+                data: {
+                    profil_no: profil,
+                    timespan: timespan
+                },
+                success: function (response) {
+                    console.log(response.siparis_data);
+                    initializeSiparisTable(response.siparis_data)
+                    // siparisTable.replaceData(response.siparis_data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Ext info:", error);
+                }
+            });
+
+            hideDiv.style.display = 'block';
+        });
+
+        function initializeKartSonuc(data) {
+            kartSonucTable = new Tabulator("#kartSonucTable", {
+                height: "250px",
+                layout: "fitColumns",
+                placeholder: "Kart Dağılımı",
+                reactiveData: true,
+                data: data || '[]',
+                columns: [
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Sip. Boyu", field: "SipBoy" },
+                    { title: "Sip. Adeti", field: "SipAdet" },
+                    {
+                        title: "Baslangıç", field: "Baslangic", formatter: function (cell, formatterParams, onRendered) {
+                            var value = cell.getValue();
+                            value = moment(value).format("DD/MM HH:mm");
+                            return value;
+                        }
+                    },
+                    {
+                        title: "Bitiş", field: "Bitis", formatter: function (cell, formatterParams, onRendered) {
+                            var value = cell.getValue();
+                            value = moment(value).format("DD/MM HH:mm");
+                            return value;
+                        }
+                    },
+                    { title: "Adet", field: "hesapAdet" },
+                    {
+                        title: "Billet Boyu", field: "billetBoy", formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: " cm",
+                            symbolAfter: " cm",
+                            precision: false,
+                        }
+                    },
+                    { title: "Billet Adeti", field: "billetAdet" },
+                    {
+                        title: "Pres Üretilen", field: "presUret", formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            precision: true,
+                        }
+                    },
+                    {
+                        title: "Fire", field: "Fire", formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: "% ",
+                            precision: true,
+                        }
+                    },
+                    {
+                        title: "İmalat Hızı", field: "ImalatHizi", formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: " kg/sa",
+                            symbolAfter: " kg/sa",
+                            precision: false,
+                        }
+                    },
+                    {
+                        title: "İ. Fazlası", field: "ImalatFazlasi", formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: "% ",
+                            precision: true,
+                        }
+                    },
+                    { title: "Firma", field: "FirmaAdi" },
+                    { title: "Termin", field: "SonTermin" },
+                ]
+            });
+
+        }
+
+        function initializeSepetSonuc(data) {
+            sepetDagitTable = new Tabulator("#sepetDagitTable", {
+                height: "250px",
+                layout: "fitColumns",
+                placeholder: "Kart Dağılımı",
+                data: data || '[]',
+                columns: [
+                    { title: "Sepet No", field: "SepetNo" },
+                    { title: "Kart No", field: "KartNo" },
+                    { title: "Adet", field: "Adet" },
+                    { title: "Boy", field: "Boy" },
+                ]
+            });
+
+        }
+
+        // hesaplaButton.addEventListener("click", function () { 
+        //     var ext = JSON.parse(JSON.stringify(extTable.getSelectedData()));
+        //     var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
+        //     var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
+        //     var gramaj = gramajInp.value;
+        //     var sonuc = [];
+
+        //     if (!gramaj) {
+        //         alert("Lütfen gramaj girin.");
+        //         return;
+        //     }
+
+        //     if (ext.length === 0 || sepet.length === 0 || siparis.length === 0) {
+        //         alert("Lütfen her tablodan seçim yapın.");
+        //         return;
+        //     }
+
+        //     var extGroupedByKalipBillet = new Map();
+        //     for (var i = 0; i < ext.length; i++) {
+        //         var key = ext[i].kalip_no + "_" + ext[i].billet_lot;
+        //         if (!extGroupedByKalipBillet.has(key)) {
+        //             extGroupedByKalipBillet.set(key, []);
+        //         }
+        //         extGroupedByKalipBillet.get(key).push(ext[i]);
+        //     }
+
+        //     var sepetGroupedByBoy = new Map();
+        //     for (var i = 0; i < sepet.length; i++) {
+        //         var boy = sepet[i].Boy;
+        //         if (!sepetGroupedByBoy.has(boy)) {
+        //             sepetGroupedByBoy.set(boy, new Map());
+        //         }
+        //         var key = sepet[i].KalipNo + "_" + sepet[i].BilletLot;
+        //         if (!sepetGroupedByBoy.get(boy).has(key)) {
+        //             sepetGroupedByBoy.get(boy).set(key, []);
+        //         }
+        //         sepetGroupedByBoy.get(boy).get(key).push(sepet[i]);
+        //     }
+
+        //     var siparisByBoy = new Map();
+        //     for (var i = 0; i < siparis.length; i++) {
+        //         var boy = siparis[i].PlanlananMm;
+        //         if (!siparisByBoy.has(boy)) {
+        //             siparisByBoy.set(boy, []);
+        //         }
+        //         siparisByBoy.get(boy).push(siparis[i]);
+        //     }
+
+        //     for (let [boy, siparisler] of siparisByBoy) {
+
+        //     }
+
+
+
+        // });
+
+        hesaplaButton.addEventListener("click", function () {
+            // 3 tabulatorden de seçim yapılmış mı kontrol et.
+            // yapılmayan varsa alert ile uyar işlem yapma.
+            var ext = JSON.parse(JSON.stringify(extTable.getSelectedData()));
+            var firstBilletLot = ext[0]?.billet_lot;
+            var sameBilletLot = ext.every(item => item.billet_lot === firstBilletLot);
+
+            if (!sameBilletLot) {
+                alert("Lütfen aynı Şarj'a sahip kayıtları seçin.");
+                return;
+            }
+
+            var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
+            var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
+            var gramaj = gramajInp.value;
+            var sonuc = [];
+
+            if (!gramaj) {
+                alert("Lütfen gramaj girin.");
+                return;
+            }
+
+            if (ext.length === 0 || sepet.length === 0 || siparis.length === 0) {
+                alert("Lütfen her tablodan seçim yapın.");
+                return;
+            }
+
+            var netSepet = 0;
+            var totalNetBoy = 0;
+            for (var i = 0; i < sepet.length; i++) {
+                var net = sepet[i].Adet * sepet[i].Boy * gramaj / 1000;
+                netSepet += net;
+                totalNetBoy += sepet[i].Adet * sepet[i].Boy / 1000;
+            }
+            console.log("Net Sepet: ", netSepet);
+            console.log("Toplam Net Boy: ", totalNetBoy);
+
+            var brutExt = 0;
+            var toplamBilletAdet = 0;
+            var minStartTime = Infinity;
+            var maxEndTime = -Infinity;
+            for (var i = 0; i < ext.length; i++) {
+                brutExt += ext[i].brüt_imalat;
+
+                var start = new Date(ext[i].imalat_baslangici);
+                var end = new Date(ext[i].imalat_sonu);
+                if (start < minStartTime) minStartTime = start;
+                if (end > maxEndTime) maxEndTime = end;
+
+                toplamBilletAdet += ext[i].billet_count;
+            }
+            console.log("Brüt Ext: ", brutExt);
+            console.log("Toplam Billet Adet: ", toplamBilletAdet);
+            var sure = (maxEndTime - minStartTime) / 60000;
+            console.log("Süre: ", sure);
+
+            var baslangicSaat = minStartTime;
+
+            var verim = netSepet / brutExt;
+            console.log("Verim: ", verim);
+            var genelFire = ((1 - verim) * 100).toFixed(1);
+            console.log("Genel Fire: ", genelFire);
+            genelFireInp.value = "% " + genelFire;
+
+            var genelImalatHizi = Math.round(totalNetBoy * gramaj * 60 / sure);
+            console.log("Genel İmalat Hızı: ", genelImalatHizi);
+            genelImalatHiziInp.value = genelImalatHizi;
+
+            var netUretimHizi = sure / totalNetBoy;
+            console.log("Net Üretim Hızı: ", netUretimHizi);
+
+            var ortBilletBoyu = brutExt / toplamBilletAdet / 1.367;
+            console.log("Ortalama Billet Boyu: ", ortBilletBoyu);
+
+            var siparisByBoy = new Map();
+            // Boylara göre grupla
+            for (var i = 0; i < siparis.length; i++) {
+                var boy = siparis[i].PlanlananMm;
+                console.log("siparisBoy: ", boy);
+                if (!siparisByBoy.has(boy)) {
+                    siparisByBoy.set(boy, []);
+                }
+
+                // Push the current order (siparis[i]) to the respective group, preserving FIFO order
+                siparisByBoy.get(boy).push(siparis[i]);
+            }
+            console.log("siparisByBoy (FIFO Order):", Array.from(siparisByBoy.entries()));
+
+            for (let [boy, siparisler] of siparisByBoy) {
+                console.log("siparisByBoy: ", boy);
+                // var siparisler = siparisByBoy[boy];
+
+                var toplamSepetAdet = 0;
+                var toplamSepetBoy = 0;
+                for (var i = 0; i < sepet.length; i++) {
+                    if (sepet[i].Boy === parseFloat(boy)) {
+                        toplamSepetAdet += parseFloat(sepet[i].Adet);
+                        toplamSepetBoy += parseFloat(sepet[i].Boy);
+                    }
+                }
+                var toplamKartAdet = 0;
+                for (var i = 0; i < siparisler.length; i++) {
+                    toplamKartAdet += parseInt(siparisler[i].Adet);
+                }
+                var fazlaUretim = toplamSepetAdet / toplamKartAdet;
+                console.log("toplamSepetAdet: ", toplamSepetAdet);
+                console.log("toplamSepetBoy: ", toplamSepetBoy);
+                console.log("toplamKartAdet: ", toplamKartAdet);
+                console.log("fazlaUretim: ", fazlaUretim);
+
+                var harcananAdet = 0;
+                siparisler.forEach(function (siparisData) {
+                    if (toplamSepetAdet > 0) {
+                        if (fazlaUretim > 1) {
+                            var hesaplananAdet = Math.round(parseFloat(siparisData.Adet) * fazlaUretim);
+                        }
+                        else {
+                            var hesaplananAdet = Math.round(parseFloat(siparisData.Adet) * 1.05);
+                        }
+                        if (hesaplananAdet > toplamSepetAdet) {
+                            hesaplananAdet = toplamSepetAdet;
+                        }
+                        toplamSepetAdet -= hesaplananAdet;
+                        var kalanAdet = toplamSepetAdet - hesaplananAdet;
+                        console.log("HesaplananAdet: ", hesaplananAdet);
+                        var uretilenBoy = hesaplananAdet * parseInt(siparisData.PlanlananMm) / 1000; // metre
+                        console.log("uretilenBoy", uretilenBoy);
+                        var hesaplananSure = uretilenBoy * netUretimHizi; // metre * dk/metre = dk
+                        console.log("hesaplananSure", hesaplananSure)
+                        var hesaplananBrut = (uretilenBoy * gramaj) / (verim * 1.367);
+                        console.log("Hesaplanan Brüt: ", hesaplananBrut);
+                        var hesaplananBilletAdeti = Math.round(hesaplananBrut / ortBilletBoyu);
+                        if (hesaplananBrut < ortBilletBoyu) {
+                            hesaplananBilletAdeti = 1
+                        }
+                        console.log("Hesaplanan Billet Adeti: ", hesaplananBilletAdeti);
+                        var hesaplananBilletBoyu = hesaplananBrut / hesaplananBilletAdeti;
+                        if (hesaplananBilletBoyu > 150) {
+                            hesaplananBilletBoyu = 150;
+                        }
+                        console.log("Hesaplanan Billet Boyu: ", hesaplananBilletBoyu);
+                        console.log(baslangicSaat);
+                        var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
+                        console.log(bitisSaati);
+                        var yuzdeFire = (1 - ((uretilenBoy * gramaj) / (hesaplananBrut * 1.367))) * 100;
+                        var imalatHizi = Math.round(uretilenBoy * gramaj * 60 / hesaplananSure);
+                        var imalatFazlasi = ((hesaplananAdet / parseInt(siparisData.Adet)) - 1) * 100;
+                        var presUretilen = (hesaplananBilletAdeti * hesaplananBilletBoyu * 1.367);
+                        var row = {
+                            "KartNo": siparisData.KartNo, "SipAdet": siparisData.Adet, "SipBoy": siparisData.PlanlananMm,
+                            "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy, "presUret": presUretilen,
+                            "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
+                            "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi
+                        };
+                        sonuc.push(row);
+                        baslangicSaat = bitisSaati;
+
+                    }
+                });
+
+            }
+
+            initializeKartSonuc(sonuc);
+            // kartSonucTable.replaceData(sonuc);
+            secimDiv.style.display = 'none';
+            kartSonucDiv.style.display = 'block';
+            sendKartDagilimi(JSON.stringify(sonuc));
+
+        });
+
+
+        sepetButton.addEventListener("click", function () {
+            var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
+            var sonuc = JSON.parse(JSON.stringify(kartSonucTable.getData()));
+            var dagilan = [];
+
+            for (var i = 0; i < sepet.length; i++) {
+                console.log(sepet[i])
+                for (var j = 0; j < sonuc.length; j++) {
+                    if (sepet[i].Boy == sonuc[j].SipBoy && sonuc[j].hesapAdet > 0) {
+                        var sepetAdet = sepet[i].Adet;
+                        var sonucAdet = sonuc[j].hesapAdet;
+                        var yazilacak = sonucAdet;
+                        if (sonucAdet >= sepetAdet) {
+                            yazilacak = sepetAdet;
+                        }
+                        if (yazilacak > 0) {
+                            sonuc[j].hesapAdet -= yazilacak;
+                            sepet[i].Adet -= yazilacak;
+                            var row = { "id": sepet[i].id, "SepetNo": sepet[i].SepetNo, "KartNo": sonuc[j].KartNo, "Adet": yazilacak, "Boy": sepet[i].Boy, "KalipNo": sepet[i].KalipNo, "BilletLot": sepet[i].BilletLot };
+                            dagilan.push(row);
+                        }
+                    }
+                }
+                if (sepet[i].Adet > 0) {
+                    dagilan.push(sepet[i]);
+                }
+            }
+            initializeSepetSonuc(dagilan);
+            // sepetDagitTable.replaceData(dagilan);
+            sepetDagitDiv.style.display = 'block';
+            sepetButton.style.display = 'none';
+            onaylaButton.style.display = 'block';
+        })
+
+        onaylaButton.addEventListener("click", function () {
+            var secilenSepetler = JSON.stringify(sepetTable.getSelectedData());
+            var secilenExt = JSON.stringify(extTable.getSelectedData());
+            var secilenSiparisler = JSON.stringify(siparisTable.getSelectedData());
+            var gonderSepet = JSON.stringify(sepetDagitTable.getData());
+            var gonderKart = JSON.stringify(kartSonucTable.getData());
+            var profil_gr = gramajInp.value;
+            console.log("gonder kart:", gonderKart);
+            $.ajax({
+                url: "/4500/hesaplama/sepete_dagit/",
+                type: "POST",
+                data: {
+                    secilen_ext: secilenExt,
+                    secilen_sepet: secilenSepetler,
+                    secilen_siparis: secilenSiparisler,
+                    sonuc_sepetler: gonderSepet,
+                    sonuc_kartlar: gonderKart,
+                    profil_gr: profil_gr,
+                    profil: profil,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert("Sepetlere Dağıtıldı.");
+                        window.location.reload();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error setting sepets::", error);
+                }
+            });
+        });
+
+        duzenleButton.addEventListener("click", function () {
+            kartSonucDiv.style.display = 'none';
+            secimDiv.style.display = 'block';
+            sepetDagitDiv.style.display = 'none';
+            genelFireInp.value = "";
+            genelImalatHiziInp.value = "";
+            sepetButton.style.display = 'block';
+            onaylaButton.style.display = 'none';
+        })
+    });
 </script>
 
 {% endblock %}
