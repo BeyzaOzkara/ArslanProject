@@ -46,6 +46,34 @@
         display: none;
     }
     body .modal-dialog { margin-left: 0 }
+
+    .time-range-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+    .time-range-group label {
+        font-weight: 600;
+        margin-right: 4px;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+    .time-range-group .btn-range {
+        border: 1px solid #6c757d;
+        background: #fff;
+        color: #495057;
+        border-radius: 20px;
+        padding: 3px 14px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+    }
+    .time-range-group .btn-range.active {
+        background: #007bff;
+        color: #fff;
+        border-color: #007bff;
+    }
 </style>
 {% endblock %}
 
@@ -65,6 +93,13 @@
         <button id="okButton" class="btn btn-primary btn-ok disabled" disabled>✔</button>
     </div>
     <div class="sepet-container" style="display: none;">
+        <div class="time-range-group">
+            <label>Zaman Aralığı:</label>
+            <button class="btn-range" data-hours="8">8 Saat</button>
+            <button class="btn-range active" data-hours="24">24 Saat</button>
+            <button class="btn-range" data-hours="48">48 Saat</button>
+            <button class="btn-range" data-hours="168">7 Gün</button>
+        </div>
         <div class="row">
 
             <select name="KalipNoSelect" class="form-control col" id="kalipNoSelect">
@@ -181,10 +216,24 @@
             }
         }
 
-        function getKalipNoList() { 
+        var selectedHours = 24;
+
+        // Time range pill buttons
+        document.querySelectorAll('.btn-range').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-range').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                selectedHours = parseInt(btn.dataset.hours);
+                getKalipNoList();
+            });
+        });
+
+        function getKalipNoList() {
+            kalipNoSelect.innerHTML = `<option value="" selected disabled>Yükleniyor...</option>`;
             $.ajax({
                 url: "/4500/stacker/get_kalip_nos/",
                 type: "GET",
+                data: { hours: selectedHours },
                 dataType: "json",
                 success: function (data) {
                     populateKalipNoSelect(data);

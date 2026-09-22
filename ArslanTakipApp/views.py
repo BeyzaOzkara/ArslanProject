@@ -4524,15 +4524,20 @@ class Stacker4500View(generic.TemplateView):
 
 def get_kalip_no_list(request):
     if request.method == 'GET':
+        try:
+            hours = int(request.GET.get('hours', 24))
+        except (ValueError, TypeError):
+            hours = 24
+
         end_time = timezone.now()
-        start_time = end_time - datetime.timedelta(hours=168)
+        start_time = end_time - datetime.timedelta(hours=hours)
 
         plc_data = EventData.objects.using('dms') \
             .filter(start_time__gte=start_time, event_type='Extrusion') \
             .values_list('static_data', flat=True)
 
-        profil_listesi = set()
-        cleaned_to_original = {}
+        seen_cleaned = set()
+        unique_dies = []
 
         for singular_params in plc_data:
             if not singular_params:
@@ -4542,51 +4547,17 @@ def get_kalip_no_list(request):
             if not die_number:
                 continue
 
-            cleaned_die_number = re.sub(r"-.*$", "", die_number).replace(" ", "")
-  
-            # Önce muadil grup bul 
-            alt_group = KalipMuadil.objects.filter(
-                profiller__contains=[cleaned_die_number]
-            ).first()
+            cleaned = re.sub(r"-.*$", "", die_number).replace(" ", "")
 
-            if alt_group:
-                # *** set() KULLANMA, sırasını bozmasın ***
-                for alternative_die in alt_group.profiller:
-                    alt_cleaned = alternative_die.replace(" ", "")
+            if cleaned not in seen_cleaned:
+                seen_cleaned.add(cleaned)
+                unique_dies.append(die_number)
 
-                    profil_listesi.add(alt_cleaned)
-
-                    if alt_cleaned not in cleaned_to_original:
-                        cleaned_to_original[alt_cleaned] = set()
-                    cleaned_to_original[alt_cleaned].add(die_number)
-            else:
-                # Muadil yoksa sadece kendi kalıbını ekle
-                profil_listesi.add(cleaned_die_number)
-
-                if cleaned_die_number not in cleaned_to_original:
-                    cleaned_to_original[cleaned_die_number] = set()
-                cleaned_to_original[cleaned_die_number].add(die_number)
-
-        siparis_query = SiparisList.objects.using('dies').filter(
-            Q(Adet__gt=0)
-            & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1))
-            & Q(BulunduguYer='TESTERE')
-        ).exclude(SiparisTamam='BLOKE')
-
-        siparisler = siparis_query.filter(
-            ProfilNo__in=profil_listesi
-        ).values_list('ProfilNo', flat=True).distinct()
-
-        final_list = [
-            original_die
-            for cleaned_die_number, original_dies in cleaned_to_original.items()
-            if cleaned_die_number in siparisler
-            for original_die in original_dies
-        ]
-
-        return JsonResponse(final_list, safe=False)
+        return JsonResponse(unique_dies, safe=False)
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
 
 def get_billet_lot_list(request):
     if request.method == 'GET':
