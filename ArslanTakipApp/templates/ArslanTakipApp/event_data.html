@@ -59,8 +59,12 @@
         <div class="card-body">
             <div class="filter-container">
                 <div class="filter-item">
-                    <label>Tarih Aralığı</label>
-                    <input type="text" id="date-range" placeholder="Tarih Seçin">
+                    <label>Başlangıç</label>
+                    <input type="text" id="start-date" placeholder="Başlangıç Tarihi">
+                </div>
+                <div class="filter-item">
+                    <label>Bitiş</label>
+                    <input type="text" id="end-date" placeholder="Bitiş Tarihi">
                 </div>
                 <div class="filter-item">
                     <label>Olay Tipi</label>
@@ -101,12 +105,10 @@
         const todayStr = moment().startOf('day').format('YYYY-MM-DD HH:mm');
         const todayEndStr = moment().endOf('day').format('YYYY-MM-DD HH:mm');
 
-        // Init Date Picker
-        $('#date-range').daterangepicker({
+        var drpConfig = {
+            singleDatePicker: true,
             timePicker: true,
             timePicker24Hour: true,
-            startDate: moment().startOf('day'),
-            endDate: moment().endOf('day'),
             locale: {
                 format: 'YYYY-MM-DD HH:mm',
                 cancelLabel: 'İptal',
@@ -114,7 +116,10 @@
                 daysOfWeek: ['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'],
                 monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
             }
-        });
+        };
+
+        $('#start-date').daterangepicker($.extend({}, drpConfig, { startDate: moment().startOf('day') }));
+        $('#end-date').daterangepicker($.extend({}, drpConfig, { startDate: moment().endOf('day') }));
 
         const csrfToken = "{{ csrf_token }}";
 
@@ -217,9 +222,8 @@
 
         // Filtering logic
         document.getElementById("filter-btn").addEventListener("click", function () {
-            var drp = $('#date-range').data('daterangepicker');
-            var startDate = drp ? drp.startDate.format('YYYY-MM-DD HH:mm') : "";
-            var endDate = drp ? drp.endDate.format('YYYY-MM-DD HH:mm') : startDate;
+            var startDate = $('#start-date').val();
+            var endDate = $('#end-date').val();
 
             var eventType = document.getElementById("event-type").value;
             var machineName = document.getElementById("machine-name").value;
@@ -230,10 +234,15 @@
 
         // Clear logic
         document.getElementById("clear-btn").addEventListener("click", function () {
-            var drp = $('#date-range').data('daterangepicker');
-            if (drp) {
-                drp.setStartDate(moment().startOf('day'));
-                drp.setEndDate(moment().endOf('day'));
+            var startDrp = $('#start-date').data('daterangepicker');
+            if (startDrp) {
+                startDrp.setStartDate(moment().startOf('day'));
+                startDrp.setEndDate(moment().startOf('day'));
+            }
+            var endDrp = $('#end-date').data('daterangepicker');
+            if (endDrp) {
+                endDrp.setStartDate(moment().endOf('day'));
+                endDrp.setEndDate(moment().endOf('day'));
             }
             document.getElementById("event-type").value = "";
             document.getElementById("machine-name").value = "";
