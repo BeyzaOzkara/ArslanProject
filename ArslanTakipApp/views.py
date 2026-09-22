@@ -4572,17 +4572,32 @@ def get_billet_lot_list(request):
 def get_siparis_no_list(request):
     if request.method == 'GET':
         kalip_no = request.GET.get('kalip_no')
-        profil_no = re.sub(r"-.*$", "", kalip_no).replace(" ", "")
-        profil_list = set()
-        alt_profil_list = KalipMuadil.objects.filter(profiller__contains=[profil_no]).first()
-        if alt_profil_list:
-            alt_profils = alt_profil_list.profiller
-            for alt in alt_profils:
-                profil_list.add(alt)
+
+        # Step 1: look up the true ProfilNo via KalipMs (die registry)
+        # e.g. KalipNo='17653 P' -> ProfilNo='17653'
+        kalip = KalipMs.objects.using('dies').filter(KalipNo=kalip_no).first()
+        if kalip and kalip.ProfilNo:
+            profil_no_from_db = kalip.ProfilNo
         else:
-            profil_list.add(profil_no)
-        siparis_list = SiparisList.objects.using('dies').filter(Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
-        kart_list = list(siparis_list.filter(ProfilNo__in=profil_list).values_list('KartNo', flat=True ).distinct())
+            # Fallback: strip suffix and spaces from the raw die number
+            profil_no_from_db = re.sub(r"-.*$", "", kalip_no).replace(" ", "")
+
+        # Step 2: check for muadil (equivalent) profiles
+        query_set = set()
+        alt_profil_list = KalipMuadil.objects.filter(profiller__contains=[profil_no_from_db]).first()
+        if alt_profil_list:
+            for alt in alt_profil_list.profiller:
+                query_set.add(alt)
+        else:
+            query_set.add(profil_no_from_db)
+
+        # Step 3: find active orders in SiparisList at TESTERE
+        siparis_list = SiparisList.objects.using('dies').filter(
+            Q(Adet__gt=0)
+            & Q(KartAktif=1)
+            & Q(BulunduguYer='TESTERE')
+        )
+        kart_list = list(siparis_list.filter(ProfilNo__in=query_set).values_list('KartNo', flat=True).distinct())
         return JsonResponse(kart_list, safe=False)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
@@ -4629,10 +4644,33 @@ def update_sepet_yuklenen(request):
                     item['Adet'] = int(item['Adet']) + adet
                     found = True
                     break
-            siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no)[0]
-            # Kart no yoksa yeni entry
+
             if not found:
-                yuklenen.append({'KartNo': kart_no, 'Adet': adet, 'ProfilNo': siparis.ProfilNo, 'KalipNo':kalip_no, 'BilletLot':billet_lot, 'Boy': siparis.PlanlananMm, 'Yuzey': siparis.YuzeyOzelligi, 'Kondusyon': siparis.KondusyonTuru, 'Atandi': False})
+                # Try to get order info from SiparisList via KartNo
+                siparis = SiparisList.objects.using('dies').filter(KartNo=kart_no).first() if kart_no else None
+
+                if siparis:
+                    profil_no  = siparis.ProfilNo
+                    boy        = siparis.PlanlananMm
+                    yuzey      = siparis.YuzeyOzelligi
+                    kondusyon  = siparis.KondusyonTuru
+                else:
+                    # No order found — fall back to KalipMs for the ProfilNo
+                    kalip = KalipMs.objects.using('dies').filter(KalipNo=kalip_no).first()
+                    profil_no = kalip.ProfilNo if kalip else kalip_no
+                    boy = kondusyon = yuzey = None
+
+                yuklenen.append({
+                    'KartNo': kart_no,
+                    'Adet': adet,
+                    'ProfilNo': profil_no,
+                    'KalipNo': kalip_no,
+                    'BilletLot': billet_lot,
+                    'Boy': boy,
+                    'Yuzey': yuzey,
+                    'Kondusyon': kondusyon,
+                    'Atandi': False
+                })
 
             # Update the yuklenen field
             sepet.yuklenen = yuklenen
