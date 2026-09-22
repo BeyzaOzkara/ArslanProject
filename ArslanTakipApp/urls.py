@@ -228,4 +228,9 @@ path("location/kalip-split/", views.location_kalip_split, name="location_kalip_s
     path('transfer/<int:tid>/tamamla', login_required(views.transfer_tamamla), name='transfer_tamamla'),
     path('transfer/<int:tid>/yeniden_gonder', login_required(views.transfer_yeniden_gonder), name='transfer_yeniden_gonder'),
 
+    # --- Moved from DMS ---
+    path('event_data/', views.event_data_view, name='event_data'),
+    path('api/get_event_data/', views.api_get_event_data, name='api_get_event_data'),
+    path('api/update_event_data/', views.api_update_event_data, name='api_update_event_data'),
+    path('api/get_kalip_nos/', views.api_get_kalip_nos, name='api_get_kalip_nos'),
 ]

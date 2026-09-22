@@ -6443,3 +6443,79 @@ def transfer_yeniden_gonder(request, tid):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# --- Moved from DMS ---
+from DMS.models import EventData
+
+def event_data_view(request):
+    return render(request, 'ArslanTakipApp/event_data.html')
+
+def api_get_event_data(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    event_type = request.GET.get('event_type')
+    machine_name = request.GET.get('machine_name')
+    
+    events = EventData.objects.using('dms').all()
+    
+    if start_date:
+        events = events.filter(start_time__gte=start_date)
+    if end_date:
+        events = events.filter(start_time__lte=end_date)
+    if event_type:
+        events = events.filter(event_type__icontains=event_type)
+    if machine_name:
+        events = events.filter(machine_name__icontains=machine_name)
+        
+    data = []
+    for e in events:
+        static_data = e.static_data or {}
+        data.append({
+            'id': e.id,
+            'event_type': e.event_type,
+            'machine_name': e.machine_name,
+            'start_time': e.start_time.strftime('%H:%M %d-%m-%y') if e.start_time else None,
+            'end_time': e.end_time.strftime('%H:%M %d-%m-%y') if e.end_time else None,
+            'kartNo': static_data.get('kartNo', ''),
+            'operator': static_data.get('operator', ''),
+            'profiles': static_data.get('profiles', ''),
+            'BilletLot': static_data.get('BilletLot', ''),
+            'DieNumber': static_data.get('DieNumber', ''),
+            'StopCause': static_data.get('StopCause', ''),
+            'Billet_Length_Pusher': static_data.get('Billet Length Pusher', ''),
+        })
+        
+    return JsonResponse(data, safe=False)
+
+def api_update_event_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            event_id = data.get('id')
+            event = EventData.objects.using('dms').get(id=event_id)
+            
+            static_data = event.static_data or {}
+            
+            if 'kartNo' in data: static_data['kartNo'] = data['kartNo']
+            if 'operator' in data: static_data['operator'] = data['operator']
+            if 'profiles' in data: static_data['profiles'] = data['profiles']
+            if 'BilletLot' in data: static_data['BilletLot'] = data['BilletLot']
+            if 'DieNumber' in data: static_data['DieNumber'] = data['DieNumber']
+            if 'StopCause' in data: static_data['StopCause'] = data['StopCause']
+            if 'Billet_Length_Pusher' in data: static_data['Billet Length Pusher'] = data['Billet_Length_Pusher']
+            
+            event.static_data = static_data
+            event.save(using='dms')
+            
+            return JsonResponse({'status': 'success'})
+        except EventData.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Kayıt bulunamadı.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Geçersiz istek.'}, status=400)
+
+def api_get_kalip_nos(request):
+    kalip_nos = list(KalipMs.objects.using('dies').values_list('KalipNo', flat=True).distinct())
+    return JsonResponse(kalip_nos, safe=False)
