@@ -651,6 +651,16 @@
             }
         });
     };
+
+    function toggleBariyerKodu(el) {
+        var div = document.getElementById('bariyerKoduDiv');
+        if (el.value === 'Var') {
+            div.style.display = 'block';
+        } else {
+            div.style.display = 'none';
+            document.getElementById('bariyerKodu').value = '';
+        }
+    }
    
 </script>
 {% endblock %}

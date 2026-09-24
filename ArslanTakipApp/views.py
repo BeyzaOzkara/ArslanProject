@@ -2966,7 +2966,15 @@ def yuda_kaydet(request):
                         durumlar = {'kaliphane': 2, 'mekanik': has_mekanik, 'satis': 1}
                         onay_durumu = determine_onay_durumu(durumlar)
                         y.OnayDurumu = onay_durumu
-                            
+
+                    # Bariyer secimi zorunlu
+                    if not request.POST.get('PaketlemeBariyer'):
+                        return JsonResponse({'error': 'Bariyer seçimi zorunludur.'}, status=400)
+
+                    # Bariyer "Yok" ise BariyerKodu degerini temizle (tutarlilik)
+                    if y.PaketlemeBariyer == 'Yok':
+                        y.BariyerKodu = None
+
                     y.save()
 
                     group_names = [

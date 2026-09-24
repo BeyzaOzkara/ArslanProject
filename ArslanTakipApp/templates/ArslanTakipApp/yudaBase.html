@@ -515,6 +515,33 @@
                                     </label>
                                 </div>
                             </div>
+                            <!-- Bariyer Var/Yok -->
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <small class="text-muted ml-1"><strong>BARİYER</strong></small>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="btn-group btn-group-toggle col-12" data-toggle="buttons">
+                                    <label class="btn btn-outline-danger">
+                                        <input type="radio" name="PaketlemeBariyer" class="kaydet" id="pBariyerVar" value="Var" autocomplete="off" required onchange="toggleBariyerKodu(this)"> VAR
+                                    </label>
+                                    <label class="btn btn-outline-danger">
+                                        <input type="radio" name="PaketlemeBariyer" class="kaydet" id="pBariyerYok" value="Yok" autocomplete="off" required onchange="toggleBariyerKodu(this)"> YOK
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Bariyer Kodu - sadece Var secildiginde gorunur -->
+                            <div class="row mt-2" id="bariyerKoduDiv" style="display:none;">
+                                <div class="col-12">
+                                    <div class="info-box bg-light">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-center text-bold">BARİYER KODU (İsteğe Bağlı)</span>
+                                        <input type="text" name="BariyerKodu" id="bariyerKodu" class="form-control mt-2 kaydet" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="info-box bg-light">

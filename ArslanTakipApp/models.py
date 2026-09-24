@@ -395,6 +395,8 @@ class YudaForm(models.Model):
     TalasliImalatAciklama = models.CharField(null=True, blank=True)
     Paketleme = models.CharField(null=True, blank=True)
     PaketlemeAciklama = models.CharField(null=True, blank=True)
+    PaketlemeBariyer = models.CharField(null=True, blank=True)  # "Var" veya "Yok"
+    BariyerKodu = models.CharField(null=True, blank=True)       # isteğe bağlı, sadece Bariyer="Var" ise
     Silindi = models.BooleanField(null=True)
     Silindi_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null =True)
     meta_data = models.JSONField(null=True, blank=True)

@@ -1051,7 +1051,13 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
               <div class="info-box-content">
                 <span class="info-box-text text-center text-muted">PAKETLEME</span>
                 <span class="info-box-number text-center text-muted mb-0">${i.Paketleme || " - - "} 
+                <br> Bariyer: ${i.PaketlemeBariyer || " - - "}
     `;
+    if (i.PaketlemeBariyer === 'Var' && i.BariyerKodu){
+      htmlContent += `
+                  <br> Bariyer Kodu: ${i.BariyerKodu}
+                    `;
+    }
     if (i.PaketlemeAciklama){
       htmlContent += `
                   <br> Açıklama: ${i.PaketlemeAciklama || " - - "}<span>
