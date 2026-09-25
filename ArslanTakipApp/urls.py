@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from . import api_views
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from .views import RegisterView, ResetPasswordView
@@ -7,6 +8,7 @@ from .views import RegisterView, ResetPasswordView
 app_name = 'ArslanTakipApp'
 
 urlpatterns = [
+    path('api/ai-query/', api_views.dynamic_ai_query, name='dynamic_ai_query'),
     path('', views.IndexView.as_view(), name='index'),
     path('login/', auth_views.LoginView.as_view()),
     # path('login/', views.user_login, name='login'),
