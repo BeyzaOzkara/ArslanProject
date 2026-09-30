@@ -4544,7 +4544,7 @@ def get_kalip_no_list(request):
             .filter(start_time__gte=start_time, event_type='Extrusion') \
             .values_list('static_data', flat=True)
 
-        seen_cleaned = set()
+        seen_exact = set()
         unique_dies = []
 
         for singular_params in plc_data:
@@ -4555,10 +4555,10 @@ def get_kalip_no_list(request):
             if not die_number:
                 continue
 
-            cleaned = re.sub(r"-.*$", "", die_number).replace(" ", "")
-
-            if cleaned not in seen_cleaned:
-                seen_cleaned.add(cleaned)
+            # Deduplicate on the exact DieNumber so all suffix variants
+            # (e.g. 13549-28, 13549-29, 13549-31) appear as separate entries.
+            if die_number not in seen_exact:
+                seen_exact.add(die_number)
                 unique_dies.append(die_number)
 
         return JsonResponse(unique_dies, safe=False)
