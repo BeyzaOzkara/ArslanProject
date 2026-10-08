@@ -4745,6 +4745,13 @@ def hesap_get_profils(request):
 
         ext_list = list(EventData.objects.using('dms').filter(machine_name=pres, start_time__gte=start_time, end_time__lte=end_time).values_list("static_data__DieNumber", flat=True).distinct())
         profil_list = list(KalipMs.objects.using('dies').filter(KalipNo__in = ext_list).values_list('ProfilNo', flat=True).distinct())
+        
+        for ext in ext_list:
+            if ext:
+                p_no = ext.split('-')[0]
+                if p_no not in profil_list:
+                    profil_list.append(p_no)
+
         siparis_query = SiparisList.objects.using('dies').filter(Q(PresKodu='4500-1') & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE')).exclude(SiparisTamam='BLOKE')
         gonderilecek_profiller = list(siparis_query.filter(ProfilNo__in=profil_list).values_list('ProfilNo', flat=True).distinct())
         fark_listesi = list(set(profil_list) - set(gonderilecek_profiller))

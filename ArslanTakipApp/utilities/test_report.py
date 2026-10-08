@@ -332,7 +332,11 @@ def send_single_die_report(die, press, user_info):
     cc_addresses = set(recipients['cc'])
 
     for rep in reps:
+        if not rep:
+            continue
         name_parts = rep.split()
+        if not name_parts:
+            continue
         last_name = name_parts[-1].upper()
         if '.' in last_name:
             last_name = last_name.split(".")[-1]
