@@ -34,7 +34,7 @@ from django.utils import timezone
 import urllib3
 from .models import BilletDepoTransfer, HammaddeBilletCubuk, HammaddeBilletStok, HammaddePartiListesi, LastCheckedUretimRaporu, Location, Hareket, KalipMs, DiesLocation, PlcData, \
     PresUretimRaporu, ProfilMs, Sepet, SiparisList, EkSiparis, LivePresFeed, TestereDepo, UretimBasilanBillet, YudaOnay, Parameter, UploadFile, YudaForm, Comment, Notification, EkSiparisKalip, YudaOnayDurum, PresUretimTakip, \
-    QRCode, KartDagilim, KalipMuadil, Termik, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo, TransitTransfer, TransferMessage
+    QRCode, KartDagilim, KalipMuadil, Yuda, MusteriFirma, KaliphaneIsEmri, DieInfo, TransitTransfer, TransferMessage
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags

@@ -227,7 +227,7 @@ class TestereDepo(models.Model):
         managed = False
         db_table = 'View051_TestereDepoListesi'
 
-class PlcData(models.Model):
+class PlcData(models.Model): # kullanılmıyor
     plc = models.CharField(blank=True, null=True)
     start = models.DateTimeField(null=True, blank=True)
     stop = models.DateTimeField(null=True, blank=True)
@@ -709,3 +709,26 @@ class TransferMessage(models.Model):
 
     def __str__(self):
         return f"Mesaj #{self.pk} — Transfer #{self.transfer_id}"
+
+class UretimPartiAnaliz(models.Model):
+    StokKodu = models.CharField(max_length=250, null=True, blank=True)
+    StokCinsi = models.CharField(max_length=250, null=True, blank=True)
+    PartiNo = models.CharField(max_length=250, null=True, blank=True)
+    Fe = models.FloatField(null=True, blank=True)
+    Si = models.FloatField(null=True, blank=True)
+    Cu = models.FloatField(null=True, blank=True)
+    Mn = models.FloatField(null=True, blank=True)
+    Mg = models.FloatField(null=True, blank=True)
+    Zn = models.FloatField(null=True, blank=True)
+    Ti = models.FloatField(null=True, blank=True)
+    Cr = models.FloatField(null=True, blank=True)
+    Ni = models.FloatField(null=True, blank=True)
+    Ga = models.FloatField(null=True, blank=True)
+    V = models.FloatField(null=True, blank=True)
+    Zr = models.FloatField(null=True, blank=True)
+    Al = models.FloatField(null=True, blank=True)
+    Cap = models.FloatField(null=True, blank=True)
+    Aciklama = models.CharField(max_length=250, null=True, blank=True)
+    class Meta:
+        managed = False
+        db_table = 'View095_UretimPartiAnaliz'

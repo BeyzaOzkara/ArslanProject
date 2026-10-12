@@ -5,7 +5,8 @@ from django.http import JsonResponse
 from django.db.models import Q, Sum, Count, Avg, Max, Min
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import KalipMs
+from django.apps import apps
+from django.db import DEFAULT_DB_ALIAS
 
 # Basic Token Authentication for the AI Agent
 AGENT_API_KEY = os.environ.get('AGENT_API_KEY', '123api')
@@ -27,12 +28,31 @@ def require_agent_token(view_func):
     return _wrapped_view
 
 # Allowed models and their corresponding databases
-ALLOWED_MODELS = {
-    'KalipMs': {
-        'model': KalipMs,
-        'db': 'dies'  # Change this if KalipMs is on a different database
-    }
+# Every registered model is allowed. Models can be referenced either by class name
+# (e.g. 'KalipMs') or by 'app_label.ClassName' (e.g. 'DMS.Document') to avoid clashes.
+DIES_MODELS = {
+    'KalipMs', 'ProfilMs', 'PresUretimRaporu', 'SiparisList', 'MusteriFirma',
+    'TestereDepo', 'BilletDepoTransfer', 'HammaddePartiListesi', 'UretimBasilanBillet', 'UretimPartiAnaliz'
 }
+DMS_MODELS = {'EventData', 'IO_List', 'Recipe'}
+
+def _db_for_model(m):
+    if m.__name__ in DIES_MODELS:
+        return 'dies'
+    if m.__name__ in DMS_MODELS:
+        return 'dms'
+    return DEFAULT_DB_ALIAS
+
+def _build_allowed_models():
+    allowed = {}
+    for m in apps.get_models():
+        config = {'model': m, 'db': _db_for_model(m)}
+        allowed[f"{m._meta.app_label}.{m.__name__}"] = config
+        # Plain class name; first registered model wins on name clashes
+        allowed.setdefault(m.__name__, config)
+    return allowed
+
+ALLOWED_MODELS = _build_allowed_models()
 
 ALLOWED_LOOKUPS = {
     'exact', 'iexact', 'contains', 'icontains', 
@@ -165,3 +185,56 @@ def dynamic_ai_query(request):
             
     except Exception as e:
         return JsonResponse({'error': f'Query execution failed: {str(e)}'}, status=500)
+
+
+@csrf_exempt
+@require_agent_token
+def model_schema(request):
+    """
+    GET: returns every allowed model with its db alias, db table, and fields/types.
+    Optional query param ?model=Name (class name or app_label.ClassName) for a single model.
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Only GET method is allowed'}, status=405)
+
+    def describe(cfg):
+        m = cfg['model']
+        fields = []
+        for f in m._meta.get_fields():
+            if not getattr(f, 'concrete', False):
+                continue  # skip reverse relations / non-column fields
+            info = {
+                'name': f.name,
+                'type': f.get_internal_type(),
+                'column': f.column,
+                'null': f.null,
+                'primary_key': f.primary_key,
+            }
+            if getattr(f, 'max_length', None):
+                info['max_length'] = f.max_length
+            if f.is_relation and f.related_model is not None:
+                info['related_model'] = f.related_model.__name__
+            fields.append(info)
+        return {
+            'model': m.__name__,
+            'app_label': m._meta.app_label,
+            'db': cfg['db'],
+            'db_table': m._meta.db_table,
+            'managed': m._meta.managed,
+            'fields': fields,
+        }
+
+    requested = request.GET.get('model')
+    if requested:
+        if requested not in ALLOWED_MODELS:
+            return JsonResponse({'error': f'Model {requested} is not allowed or does not exist.'}, status=400)
+        return JsonResponse({'data': describe(ALLOWED_MODELS[requested])})
+
+    # Plain-name aliases point to the same config, so list each model once
+    seen, result = set(), []
+    for cfg in ALLOWED_MODELS.values():
+        if cfg['model'] in seen:
+            continue
+        seen.add(cfg['model'])
+        result.append(describe(cfg))
+    return JsonResponse({'data': result})
