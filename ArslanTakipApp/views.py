@@ -910,7 +910,7 @@ def kalip_tum(request):
 
 def kalip_getcomments(request, kId):
     if request.method == "GET":
-        yudaComments = getParentComments("KalipMs", kId, user=request.user).order_by('-IsPinned', "Tarih")
+        yudaComments = getParentComments("KalipMs", kId, user=request.user).order_by(Coalesce('IsPinned', Value(False)).desc(), "Tarih")
         yudaCList = [process_comment(request.user, comment) for comment in yudaComments]
         comments = json.dumps(yudaCList, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         data = json.dumps(comments, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
@@ -1195,7 +1195,7 @@ def kalip_hareket(request):
 def kalip_yorum(request):
     kalip_no = request.GET.get('kalipNo')
     if request.method == "GET":
-        comments = getParentComments("KalipMs", kalip_no, user=request.user).order_by("-IsPinned", "-Tarih")
+        comments = getParentComments("KalipMs", kalip_no, user=request.user).order_by(Coalesce('IsPinned', Value(False)).desc(), "-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
@@ -1203,7 +1203,7 @@ def kalip_yorum(request):
 def kalip_profile_yorum(request):
     profil_no = request.GET.get('profilNo')
     if request.method == "GET":
-        comments = getParentComments("ProfilMs", profil_no, user=request.user).order_by("-IsPinned", "-Tarih")
+        comments = getParentComments("ProfilMs", profil_no, user=request.user).order_by(Coalesce('IsPinned', Value(False)).desc(), "-Tarih")
         comment_list = [process_comment(request.user, comment) for comment in comments]
         data = json.dumps(comment_list, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
         return HttpResponse(data)
@@ -3239,7 +3239,7 @@ def process_comment(user, comment): #biri parent yorumu silerse reply olan yorum
     # Expose visibility info so frontend can show the appropriate badge
     comment['visibility'] = comment.get('visibility') or 'everyone'
     # Fetch and filter replies using the same visibility rules (each reply has its own independent visibility)
-    reply_qs = Comment.objects.filter(ReplyTo=comment['id'], Silindi=False)
+    reply_qs = Comment.objects.filter(ReplyTo=comment['id'], Silindi=False).order_by("Tarih", "id")
     reply_qs = filter_visible_comments(reply_qs, user)
     comment['replies'] = [process_comment(user, reply) for reply in reply_qs.values()]
     return comment
