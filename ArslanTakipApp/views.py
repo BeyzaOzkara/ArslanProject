@@ -4826,7 +4826,7 @@ def get_ext_info(request):
                     continue
 
                 brüt_imalat = sum(
-                    (e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
+                    float(e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
                 )
                 billet_count = len(group)
                 imalat_baslangici = min(e.start_time for e in group)
@@ -5222,7 +5222,7 @@ def get_ext_info2(request):
                     continue
 
                 brüt_imalat = sum(
-                    (e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
+                    float(e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
                 )
                 billet_count = len(group)
                 imalat_baslangici = min(e.start_time for e in group)
@@ -5308,7 +5308,7 @@ def get_ext_info____old(request):
                     continue
 
                 brüt_imalat = sum(
-                    (e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
+                    float(e.static_data.get("Billet Length Pusher", 0) or 0) * 0.1367 for e in group
                 )
                 billet_count = len(group)
                 imalat_baslangici = min(e.start_time for e in group)
