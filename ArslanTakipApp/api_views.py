@@ -2,7 +2,8 @@ import json
 import os
 from functools import wraps
 from django.http import JsonResponse
-from django.db.models import Q, Sum, Count, Avg, Max, Min
+from django.db.models import Q, Sum, Count, Avg, Max, Min, FloatField, IntegerField, DecimalField, CharField
+from django.db.models.functions import Cast
 from django.views.decorators.csrf import csrf_exempt
 
 from django.apps import apps
@@ -66,6 +67,14 @@ ALLOWED_AGGREGATIONS = {
     'Avg': Avg,
     'Max': Max,
     'Min': Min,
+}
+
+# Output types an aggregation result may be cast to (Cast(<agg>, <Field>()))
+ALLOWED_CASTS = {
+    'float': lambda: FloatField(),
+    'int': lambda: IntegerField(),
+    'decimal': lambda: DecimalField(max_digits=38, decimal_places=10),
+    'str': lambda: CharField(),
 }
 
 @csrf_exempt
@@ -152,13 +161,24 @@ def dynamic_ai_query(request):
     for agg in aggregations_data:
         agg_type = agg.get('type')
         field = agg.get('field')
-        alias = agg.get('alias', f"{field}_{agg_type.lower()}")
+        alias = agg.get('alias', f"{field}_{str(agg_type).lower()}")
         
         if agg_type not in ALLOWED_AGGREGATIONS:
             return JsonResponse({'error': f'Invalid aggregation type: {agg_type}'}, status=400)
             
         AggFunction = ALLOWED_AGGREGATIONS[agg_type]
-        aggregation_kwargs[alias] = AggFunction(field)
+        # Optional default, e.g. Sum('Sure', default=0)
+        agg_kwargs = {'default': agg['default']} if 'default' in agg else {}
+        expression = AggFunction(field, **agg_kwargs)
+
+        # Optional cast, e.g. Cast(Sum(...), FloatField())
+        cast_type = agg.get('cast')
+        if cast_type is not None:
+            if cast_type not in ALLOWED_CASTS:
+                return JsonResponse({'error': f'Invalid cast type: {cast_type}. Allowed: {sorted(ALLOWED_CASTS)}'}, status=400)
+            expression = Cast(expression, ALLOWED_CASTS[cast_type]())
+
+        aggregation_kwargs[alias] = expression
 
     # Evaluate the Queryset securely
     try:
