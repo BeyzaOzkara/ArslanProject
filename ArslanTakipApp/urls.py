@@ -8,8 +8,9 @@ from .views import RegisterView, ResetPasswordView
 app_name = 'ArslanTakipApp'
 
 urlpatterns = [
-    path('api/ai-query/', api_views.dynamic_ai_query, name='dynamic_ai_query'),
-    path('api/model-schema/', api_views.model_schema, name='model_schema'),
+    path('api/ai-query/dynamic', api_views.dynamic_ai_query, name='dynamic_ai_query'),
+    path('api/ai-query/model-schema/', api_views.model_schema, name='model_schema'),
+    path('api/ai-query/models/', api_views.model_list, name='model_list'),
     path('', views.IndexView.as_view(), name='index'),
     path('login/', auth_views.LoginView.as_view()),
     # path('login/', views.user_login, name='login'),

@@ -189,6 +189,16 @@ def dynamic_ai_query(request):
 
 @csrf_exempt
 @require_agent_token
+def model_list(request):
+    """GET: returns a plain list of all allowed model class names."""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Only GET method is allowed'}, status=405)
+    names = sorted({cfg['model'].__name__ for cfg in ALLOWED_MODELS.values()})
+    return JsonResponse({'data': names})
+
+
+@csrf_exempt
+@require_agent_token
 def model_schema(request):
     """
     GET: returns every allowed model with its db alias, db table, and fields/types.
