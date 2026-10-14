@@ -181,6 +181,8 @@ class PresUretimRaporu(models.Model):
 
 #siparistamam bloke
 class SiparisList(models.Model):
+    SiparisNo = models.CharField(null=True, blank=True)
+    MSiparisNo = models.CharField(null=True, blank=True)
     Kimlik = models.IntegerField(primary_key=True)
     KartNo = models.IntegerField(null=True)
     ProfilNo = models.CharField(null=True)
@@ -729,6 +731,7 @@ class UretimPartiAnaliz(models.Model):
     Al = models.FloatField(null=True, blank=True)
     Cap = models.FloatField(null=True, blank=True)
     Aciklama = models.CharField(max_length=250, null=True, blank=True)
+
     class Meta:
         managed = False
         db_table = 'View095_UretimPartiAnaliz'
