@@ -183,6 +183,7 @@ class PresUretimRaporu(models.Model):
 class SiparisList(models.Model):
     SiparisNo = models.CharField(null=True, blank=True)
     MSiparisNo = models.CharField(null=True, blank=True)
+    Rota = models.CharField(null=True, blank=True)
     Kimlik = models.IntegerField(primary_key=True)
     KartNo = models.IntegerField(null=True)
     ProfilNo = models.CharField(null=True)
