@@ -101,6 +101,7 @@
             <input type="text" class="form-control ml-1" name="genelImalatHizi" id="genelImalatHizi" disabled>
         </div>
         <div id="kartSonucTable"></div>
+        <small class="text-muted">Her satır bir kesintisiz üretim aralığıdır. Birden fazla aralığa yayılan kartlarda miktarlar süre oranıyla tahmini bölüştürülür; adetler tam sayıya yuvarlanır ve kart toplamı korunur. Billet adeti aralığa düşen payı gösterir. İmalat fazlası kart toplamına aittir.</small>
     </div>
     <hr>
     <button id="editButton" class="btn btn-primary form-control">DÜZENLE</button>
@@ -333,6 +334,18 @@
                             return value;
                         }
                     },
+                    {
+                        title: "Üretim Aralıkları", field: "UretimAraliklari", width: 240,
+                        formatter: function (cell) {
+                            return (cell.getValue() || []).map(function (aralik) {
+                                return moment(aralik.Baslangic).format("DD/MM HH:mm") + " – " +
+                                    moment(aralik.Bitis).format("DD/MM HH:mm");
+                            }).join("<br>");
+                        }
+                    },
+                    { title: "Üretim Süresi (dk)", field: "UretimSuresiDakika", formatter: function (cell) {
+                        return Number(cell.getValue()).toFixed(2);
+                    } },
                     { title: "Adet", field: "hesapAdet" },
                     {
                         title: "Billet Boyu", field: "billetBoy", formatter: "money", formatterParams: {
@@ -343,7 +356,9 @@
                             precision: false,
                         }
                     },
-                    { title: "Billet Adeti", field: "billetAdet" },
+                    { title: "Billet Adeti", field: "billetAdet", formatter: function (cell) {
+                        return Number(cell.getValue()).toFixed(2);
+                    } },
                     {
                         title: "Pres Üretilen", field: "presUret", formatter: "money", formatterParams: {
                             decimal: ",",
@@ -455,6 +470,91 @@
 
         // });
 
+        // Birleşmeyen aralıklar arasındaki duruşlar üretim süresine dahil edilmez.
+        function createProductionTimeline(ext) {
+            var intervals = ext.map(function (item) {
+                var start = new Date(item.imalat_baslangici).getTime();
+                var end = new Date(item.imalat_sonu).getTime();
+                if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
+                    throw new Error("Seçilen ekstrüzyonların başlangıç ve bitiş saatlerini kontrol edin.");
+                }
+                return {start: start, end: end};
+            }).sort(function (a, b) { return a.start - b.start; });
+            var merged = [];
+            intervals.forEach(function (interval) {
+                var last = merged[merged.length - 1];
+                if (last && interval.start <= last.end) {
+                    last.end = Math.max(last.end, interval.end);
+                } else {
+                    merged.push({start: interval.start, end: interval.end});
+                }
+            });
+            var total = merged.reduce(function (sum, interval) {
+                return sum + interval.end - interval.start;
+            }, 0);
+            var used = 0;
+            return {
+                durationMinutes: total / 60000,
+                allocate: function (minutes) {
+                    var duration = minutes * 60000;
+                    if (!Number.isFinite(duration) || duration <= 0 || used + duration > total + 1) {
+                        throw new Error("Kartlara dağıtılan süre seçilen üretim aralıklarını aşıyor. Sepet ve kart seçimlerini kontrol edin.");
+                    }
+                    var offset = used;
+                    var remaining = Math.min(duration, total - used);
+                    var parts = [];
+                    merged.forEach(function (interval) {
+                        var length = interval.end - interval.start;
+                        if (offset >= length) {
+                            offset -= length;
+                            return;
+                        }
+                        if (remaining <= 0) return;
+                        var take = Math.min(remaining, length - offset);
+                        parts.push({Baslangic: new Date(interval.start + offset),
+                            Bitis: new Date(interval.start + offset + take)});
+                        remaining -= take;
+                        offset = 0;
+                    });
+                    used += Math.min(duration, total - used);
+                    return parts;
+                }
+            };
+        }
+
+        // Aralık miktarları süre oranıyla tahmin edilir; tam adetler kümülatif
+        // yuvarlanarak kart toplamının değişmesi önlenir.
+        function splitProductionRow(row) {
+            var elapsed = 0;
+            var allocatedCount = 0;
+            var allocatedBillets = 0;
+            var allocatedGross = 0;
+            var allocatedBrut = 0;
+            return row.UretimAraliklari.map(function (interval, index) {
+                var minutes = (interval.Bitis - interval.Baslangic) / 60000;
+                elapsed += minutes;
+                var last = index === row.UretimAraliklari.length - 1;
+                var ratio = minutes / row.UretimSuresiDakika;
+                var count = (last ? row.hesapAdet : Math.round(row.hesapAdet * elapsed / row.UretimSuresiDakika)) - allocatedCount;
+                var billets = last ? row.billetAdet - allocatedBillets : row.billetAdet * ratio;
+                var gross = last ? row.presUret - allocatedGross : row.presUret * ratio;
+                var brut = last ? row.Brut - allocatedBrut : row.Brut * ratio;
+                allocatedCount += count;
+                allocatedBillets += billets;
+                allocatedGross += gross;
+                allocatedBrut += brut;
+                var length = count * Number(row.SipBoy) / 1000;
+                return Object.assign({}, row, {
+                    Baslangic: interval.Baslangic, Bitis: interval.Bitis,
+                    UretimAraliklari: [interval], UretimSuresiDakika: minutes,
+                    hesapAdet: count, uretBoy: length, billetAdet: billets,
+                    presUret: gross, Brut: brut,
+                    Fire: gross > 0 ? (1 - length * row.Gramaj / gross) * 100 : 0,
+                    ImalatHizi: Math.round(length * row.Gramaj * 60 / minutes)
+                });
+            });
+        }
+
         hesaplaButton.addEventListener("click", function () {
             // 3 tabulatorden de seçim yapılmış mı kontrol et.
             // yapılmayan varsa alert ile uyar işlem yapma.
@@ -469,11 +569,11 @@
 
             var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
             var siparis = JSON.parse(JSON.stringify(siparisTable.getSelectedData()));
-            var gramaj = gramajInp.value;
+            var gramaj = Number(gramajInp.value.replace(',', '.'));
             var sonuc = [];
 
-            if (!gramaj) {
-                alert("Lütfen gramaj girin.");
+            if (!Number.isFinite(gramaj) || gramaj <= 0) {
+                alert("Lütfen geçerli bir gramaj girin.");
                 return;
             }
 
@@ -494,24 +594,27 @@
 
             var brutExt = 0;
             var toplamBilletAdet = 0;
-            var minStartTime = Infinity;
-            var maxEndTime = -Infinity;
+            var timeline;
+            try {
+                timeline = createProductionTimeline(ext);
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
             for (var i = 0; i < ext.length; i++) {
                 brutExt += ext[i].brüt_imalat;
-
-                var start = new Date(ext[i].imalat_baslangici);
-                var end = new Date(ext[i].imalat_sonu);
-                if (start < minStartTime) minStartTime = start;
-                if (end > maxEndTime) maxEndTime = end;
 
                 toplamBilletAdet += ext[i].billet_count;
             }
             console.log("Brüt Ext: ", brutExt);
             console.log("Toplam Billet Adet: ", toplamBilletAdet);
-            var sure = (maxEndTime - minStartTime) / 60000;
+            var sure = timeline.durationMinutes;
             console.log("Süre: ", sure);
 
-            var baslangicSaat = minStartTime;
+            if (totalNetBoy <= 0 || brutExt <= 0 || toplamBilletAdet <= 0) {
+                alert("Seçilen sepet ve ekstrüzyonların üretim miktarlarını kontrol edin.");
+                return;
+            }
 
             var verim = netSepet / brutExt;
             console.log("Verim: ", verim);
@@ -543,6 +646,7 @@
             }
             console.log("siparisByBoy (FIFO Order):", Array.from(siparisByBoy.entries()));
 
+            try {
             for (let [boy, siparisler] of siparisByBoy) {
                 console.log("siparisByBoy: ", boy);
                 // var siparisler = siparisByBoy[boy];
@@ -596,8 +700,9 @@
                             hesaplananBilletBoyu = 150;
                         }
                         console.log("Hesaplanan Billet Boyu: ", hesaplananBilletBoyu);
-                        console.log(baslangicSaat);
-                        var bitisSaati = moment(baslangicSaat).add(hesaplananSure, 'm').toDate();
+                        var uretimAraliklari = timeline.allocate(hesaplananSure);
+                        var baslangicSaat = uretimAraliklari[0].Baslangic;
+                        var bitisSaati = uretimAraliklari[uretimAraliklari.length - 1].Bitis;
                         console.log(bitisSaati);
                         var yuzdeFire = (1 - ((uretilenBoy * gramaj) / (hesaplananBrut * 1.367))) * 100;
                         var imalatHizi = Math.round(uretilenBoy * gramaj * 60 / hesaplananSure);
@@ -606,22 +711,25 @@
                         var row = {
                             "KartNo": siparisData.KartNo, "SipAdet": siparisData.Adet, "SipBoy": siparisData.PlanlananMm,
                             "Baslangic": baslangicSaat, "Bitis": bitisSaati, "hesapAdet": hesaplananAdet, "uretBoy": uretilenBoy, "presUret": presUretilen,
+                            "UretimAraliklari": uretimAraliklari, "UretimSuresiDakika": hesaplananSure,
                             "Brut": hesaplananBrut, "billetAdet": hesaplananBilletAdeti, "billetBoy": hesaplananBilletBoyu.toFixed(2), "Fire": yuzdeFire, "ImalatHizi": imalatHizi,
                             "ProfilNo": profil, "Gramaj": gramaj, "FirmaAdi": siparisData.FirmaAdi, "SonTermin": siparisData.SonTermin, "ImalatFazlasi": imalatFazlasi
                         };
-                        sonuc.push(row);
-                        baslangicSaat = bitisSaati;
+                        sonuc.push.apply(sonuc, splitProductionRow(row));
 
                     }
                 });
 
+            }
+            } catch (error) {
+                alert(error.message);
+                return;
             }
 
             initializeKartSonuc(sonuc);
             // kartSonucTable.replaceData(sonuc);
             secimDiv.style.display = 'none';
             kartSonucDiv.style.display = 'block';
-            sendKartDagilimi(JSON.stringify(sonuc));
 
         });
 
@@ -629,6 +737,17 @@
         sepetButton.addEventListener("click", function () {
             var sepet = JSON.parse(JSON.stringify(sepetTable.getSelectedData()));
             var sonuc = JSON.parse(JSON.stringify(kartSonucTable.getData()));
+            // Aynı kartın üretim aralıklarını sepet dağıtımında tek miktar olarak kullan.
+            var kartToplamlari = new Map();
+            sonuc.forEach(function (row) {
+                var key = JSON.stringify([row.KartNo, row.SipBoy]);
+                if (kartToplamlari.has(key)) {
+                    kartToplamlari.get(key).hesapAdet += row.hesapAdet;
+                } else {
+                    kartToplamlari.set(key, Object.assign({}, row));
+                }
+            });
+            sonuc = Array.from(kartToplamlari.values());
             var dagilan = [];
 
             for (var i = 0; i < sepet.length; i++) {
