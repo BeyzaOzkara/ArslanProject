@@ -374,6 +374,39 @@ body{
 .vis-only_me    { background: #fce4ec; color: #880e4f; }
 .vis-specific_users  { background: #e8f5e9; color: #2e7d32; }
 .vis-specific_groups { background: #fff3e0; color: #e65100; }
+/* Yorum düzenleyicisi ve anket, içerik boyuna göre normal akışta büyür. */
+.yuda-comment-row > [class*="col-"] {
+    min-width: 0;
+    margin-bottom: 1rem;
+}
+.yuda-comment-row .note-editor {
+    max-width: 100%;
+    margin-bottom: 0;
+}
+.yuda-comment-poll {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 255px;
+    margin-bottom: 1rem;
+}
+.yuda-comment-poll .chart-container {
+    position: relative;
+    height: 150px;
+    width: 200px;
+    max-width: 100%;
+}
+@media (max-width: 991.98px) {
+    #yorumCard .visibility-selector-wrapper > div,
+    #yorumCard .visibility-selector-wrapper select {
+        max-width: 100%;
+        min-width: 0 !important;
+    }
+    #yorumPaylas {
+        width: 100%;
+    }
+}
 </style>
 {% endblock %}
 
@@ -487,10 +520,10 @@ body{
         <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Daralt">
           <i class="fas fa-minus"></i></button>
       </div>
-    </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
+    </div>
     <div class="card-body" id="yorumCard">
-      <div class="row" style="height: 265px;">
-        <div class="col-12 col-md-12 col-lg-10 order-2 order-md-1" id="yorumTextCol">
+      <div class="row yuda-comment-row">
+        <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol">
           <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
                           style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
         </div>
@@ -505,22 +538,6 @@ body{
             </div>
           </div>
           <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
-        </div>
-        <div class="callout callout-info col-12 col-md-12 col-lg-2 order-2 order-md-1" style="height: 255px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-          <p style="font-weight: bold;">ONAY ANKETİ</p>
-          <div style="display: inline-block;">
-            <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected == True %} checked {% endif %} > ONAY
-            </label>
-            <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if Selected == False %} checked {% endif %} > RET 
-            </label>
-            <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
-          </div>
-          <br/>
-          <div class="chart-container" style="position: relative; height:150px; width:200px;">
-            <canvas id="onayChart"></canvas>
-          </div>
         </div>
       </div>
       <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
@@ -543,6 +560,26 @@ body{
         </div>
       </div>
       <button type="button" class="btn btn-primary mt-2" id="yorumPaylas" onclick="yorumPaylas()">Paylaş</button>
+    </div>
+  </div>
+
+  <div class="card" id="onayAnketCard">
+    <div class="card-header">
+      <h3 class="card-title">Onay Anketi</h3>
+    </div>
+    <div class="card-body yuda-comment-poll">
+      <div class="d-flex flex-wrap align-items-center justify-content-center mb-3">
+        <label class="mb-0 mr-3" for="onayRadio">
+          <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected == True %} checked {% endif %}> ONAY
+        </label>
+        <label class="mb-0 mr-3" for="redRadio">
+          <input type="radio" name="onay" id="redRadio" value="ret" {% if Selected == False %} checked {% endif %}> RET
+        </label>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>Oy Gönder</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="onayChart"></canvas>
+      </div>
     </div>
   </div>
 
@@ -1196,9 +1233,9 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
     const replyFormCollapse = $(`<div class="collapse" id="replyComment${reply.id}"></div>`).html(`
           <form>
               <div class="form-group">
-                <div class="row" style="height: 265px;">
+                <div class="row yuda-comment-row">
                   <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${reply.id}">
-                    <  class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
+                    <textarea class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
                                     style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
                   </div>
                   <div class="col-12 col-md-12 col-lg-4 order-2 order-md-1" id="dosyaEkleCol${reply.id}" style="height: 265px;display: none;">
@@ -1282,7 +1319,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
           <form>
               <div class="form-group">
 
-                <div class="row" style="height: 265px;">
+                <div class="row yuda-comment-row">
                   <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
                     <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
                                     style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
@@ -1369,7 +1406,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
  
   function DosyaEkle(a="") {
     let changedClass = ""
-    if (a ==""){changedClass = "col-12 col-md-12 col-lg-6 order-2 order-md-1";}
+    if (a ==""){changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";}
     else {changedClass = "col-12 col-md-12 col-lg-8 order-2 order-md-1";}
     
     document.getElementById('yorumTextCol'+a).setAttribute("class", changedClass);
