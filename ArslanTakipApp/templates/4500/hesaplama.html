@@ -101,7 +101,7 @@
             <input type="text" class="form-control ml-1" name="genelImalatHizi" id="genelImalatHizi" disabled>
         </div>
         <div id="kartSonucTable"></div>
-        <small class="text-muted">Her satır bir kesintisiz üretim aralığıdır. Birden fazla aralığa yayılan kartlarda miktarlar süre oranıyla tahmini bölüştürülür; adetler tam sayıya yuvarlanır ve kart toplamı korunur. Billet adeti aralığa düşen payı gösterir. İmalat fazlası kart toplamına aittir.</small>
+        <small class="text-muted">Her satır bir kesintisiz üretim aralığıdır. Birden fazla aralığa yayılan kartlarda miktarlar süre oranıyla tahmini bölüştürülür; ürün ve billet adetleri tam sayıya yuvarlanır ve kart toplamları korunur. Billet adedinin aralıklara dağılımı tahminidir; küçük paylar 0 olabilir. İmalat fazlası kart toplamına aittir.</small>
     </div>
     <hr>
     <button id="editButton" class="btn btn-primary form-control">DÜZENLE</button>
@@ -356,9 +356,7 @@
                             precision: false,
                         }
                     },
-                    { title: "Billet Adeti", field: "billetAdet", formatter: function (cell) {
-                        return Number(cell.getValue()).toFixed(2);
-                    } },
+                    { title: "Billet Adeti", field: "billetAdet" },
                     {
                         title: "Pres Üretilen", field: "presUret", formatter: "money", formatterParams: {
                             decimal: ",",
@@ -536,7 +534,7 @@
                 var last = index === row.UretimAraliklari.length - 1;
                 var ratio = minutes / row.UretimSuresiDakika;
                 var count = (last ? row.hesapAdet : Math.round(row.hesapAdet * elapsed / row.UretimSuresiDakika)) - allocatedCount;
-                var billets = last ? row.billetAdet - allocatedBillets : row.billetAdet * ratio;
+                var billets = (last ? row.billetAdet : Math.round(row.billetAdet * elapsed / row.UretimSuresiDakika)) - allocatedBillets;
                 var gross = last ? row.presUret - allocatedGross : row.presUret * ratio;
                 var brut = last ? row.Brut - allocatedBrut : row.Brut * ratio;
                 allocatedCount += count;
