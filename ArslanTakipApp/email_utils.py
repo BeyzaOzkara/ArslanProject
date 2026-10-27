@@ -3,7 +3,7 @@ import re
 import os
 import time
 from bs4 import BeautifulSoup
-from exchangelib import Credentials, Account, Message, DELEGATE, HTMLBody, Configuration, Folder
+from exchangelib import Credentials, Account, Message, DELEGATE, HTMLBody, Configuration, Folder, FileAttachment
 from .models import DiesLocation, LastProcessEmail, Hareket, Location, KalipMs
 from django.contrib.auth.models import User
 import logging
@@ -12,7 +12,8 @@ from django.db.models.functions import Replace
 
 logger = logging.getLogger(__name__)
 
-def send_email(to_addresses, cc_recipients, subject, body):
+def send_email(to_addresses, cc_recipients, subject, body, attachments=None):
+    logger.info('MAIL SEND START to=%s subject=%r', to_addresses, subject)
     email = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
     password = os.environ.get('AI_EMAIL_PASSWORD', '')
     credentials = Credentials(email, password)
@@ -29,7 +30,7 @@ def send_email(to_addresses, cc_recipients, subject, body):
             access_type=DELEGATE,
         )
     except Exception as e:
-        logger.error(f"An error occurred while setting up the email account: {e}")
+        logger.exception('MAIL SEND CONNECT ERROR account=%s', email)
         
         return False
     
@@ -44,7 +45,15 @@ def send_email(to_addresses, cc_recipients, subject, body):
     )
 
     # E-postayı gönderme
-    message.send()
+    try:
+        for name, content, content_type in attachments or []:
+            message.attach(FileAttachment(name=name, content=content, content_type=content_type))
+            logger.info('MAIL ATTACHMENT name=%s bytes=%s', name, len(content))
+        message.send()
+    except Exception:
+        logger.exception('MAIL SEND ERROR to=%s subject=%r', to_addresses, subject)
+        raise
+    logger.info('MAIL SEND OK Exchange gonderimi kabul etti to=%s subject=%r', to_addresses, subject)
     print("E-posta başarıyla gönderildi.")
     return True
 
@@ -102,6 +111,7 @@ def check_new_emails():
     credentials = Credentials(email, password)
     ews_url ='https://webmail.arslanaluminyum.com/EWS/Exchange.asmx'
 
+    logger.info('MAIL CHECK START mailbox=%s password_configured=%s', email, bool(password))
     try:
         config = Configuration(service_endpoint=ews_url, credentials=credentials)
         # Connect to the Exchange server
@@ -113,7 +123,7 @@ def check_new_emails():
             access_type=DELEGATE,
         )
     except Exception as e:
-        logger.error(f"An error occurred while setting up the email account: {e}")
+        logger.exception('MAIL CHECK CONNECT ERROR mailbox=%s', email)
         return
 
     inbox = account.inbox
@@ -123,9 +133,10 @@ def check_new_emails():
     except LastProcessEmail.DoesNotExist:
         latest_email_id = None
     except Exception as e:
-        logger.error(f"An error occurred while fetching the latest processed email: {e}")
+        logger.exception('MAIL CHECK CHECKPOINT READ ERROR')
         return
 
+    logger.info('MAIL CHECK CHECKPOINT present=%s', bool(latest_email_id))
     new_emails = []
     try:
         items = inbox.filter().order_by('-datetime_received')
@@ -134,14 +145,21 @@ def check_new_emails():
                 break
             new_emails.append(item)
     except Exception as e:
-        logger.error(f"An error occurred while fetching emails: {e}")
+        logger.exception('MAIL CHECK INBOX ERROR')
         return
 
+    logger.info('MAIL CHECK NEW count=%s', len(new_emails))
     if new_emails:
         for email in reversed(new_emails): #subject'e göre bakalım
+            logger.info('MAIL CHECK ITEM id=%s sender=%s subject=%r', email.id,
+                        getattr(getattr(email, 'sender', None), 'email_address', ''), email.subject)
             if is_sevkiyat_completed(email):
                 # Hata durumunda işaretçi ilerlemez; sonraki kontrolde tekrar denenir.
-                send_sevkiyat_report()
+                try:
+                    send_sevkiyat_report(shipment_datetime=email.datetime_sent or email.datetime_received)
+                except Exception:
+                    logger.exception('SEVKIYAT REPORT FAILED email_id=%s; mail tekrar denenecek', email.id)
+                    raise
             if email.subject == 'GÖNDERİLEN KALIPLAR':
                 print(f'Yeni e-posta - Gönderen: {email.sender.email_address}, Konu: {email.subject}')
                 movements = parse_die_movement(email.body)
@@ -153,7 +171,13 @@ def check_new_emails():
         
             # Her başarılı mailden sonra kaydet; sonraki mailin hatası önceki
             # raporların bütün partiyle birlikte yeniden gönderilmesine yol açmasın.
-            LastProcessEmail.objects.create(email_id=email.id)
+            try:
+                LastProcessEmail.objects.create(email_id=email.id)
+            except Exception:
+                logger.exception('MAIL CHECK CHECKPOINT WRITE ERROR email_id=%s', email.id)
+                raise
+            logger.info('MAIL CHECK ITEM DONE id=%s', email.id)
+    logger.info('MAIL CHECK DONE')
 
 def parse_die_movement(email_body):
     try:

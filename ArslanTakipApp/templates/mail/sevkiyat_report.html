@@ -1,10 +1,107 @@
 <!DOCTYPE html>
+
 <html lang="tr">
-<body>
-    <h2>Sevkiyat Raporu</h2>
-    <p>Sevkiyat tamam bildirimi alındı.</p>
-    <p><strong>Dönem:</strong> {{ period }}</p>
-    <p><strong>Bu ay toplam sevk edilen:</strong> {{ total_kg|floatformat:2 }} kg</p>
-    <p>Toplam, rapor hazırlanırken tüm firmaların ay içindeki sevkiyatlarından hesaplanmıştır.</p>
+<head>
+<meta charset="utf-8"/>
+<title>Günlük Sevkiyat Raporu – {{ report_date }} {{ report_time }}</title>
+</head>
+<body style="margin:0;padding:24px;background:#f2f2f2;font-family:Calibri,Arial,sans-serif;color:#222222;">
+<table align="center" cellpadding="0" cellspacing="0" role="presentation" style="width:720px;max-width:100%;background:#ffffff;border:1px solid #c9c9c9;" width="720">
+<tr>
+<td style="background:#1f3864;color:#ffffff;padding:18px 24px;">
+<div style="font-size:20px;font-weight:bold;letter-spacing:0.5px;">GÜNLÜK SEVKİYAT RAPORU</div>
+<div style="font-size:13px;margin-top:4px;">Rapor Tarihi: {{ report_date }} | Rapor Saati: {{ report_time }}</div>
+</td>
+</tr>
+<tr>
+<td style="padding:20px 24px 8px 24px;font-size:14px;line-height:1.5;">
+      {{ detail_date }} tarihine ait günlük sevkiyat dökümü, {{ report_date }} saat {{ report_time }} itibarıyla sistemde kayıtlı sevkiyatlar esas alınarak aşağıda sunulmuştur. Genel özet ve aylık sıralama da raporun hazırlandığı saate kadar sistemde kayıtlı verileri yansıtır. </td>
+</tr>
+<!-- GENEL ÖZET -->
+<tr>
+<td style="padding:12px 24px 4px 24px;font-size:15px;font-weight:bold;color:#1f3864;">1. Genel Özet</td>
+</tr>
+<tr>
+<td style="padding:0 24px 12px 24px;">
+<table cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:14px;" width="100%">
+<tr>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;">Gösterge</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;text-align:right;">Miktar (kg)</td>
+</tr>
+<tr>
+<td style="border:1px solid #8c8c8c;">Günlük Sevk Edilen ({{ today }})</td>
+<td style="border:1px solid #8c8c8c;text-align:right;">{{ daily_total_kg|floatformat:"2g" }}</td>
+</tr>
+<tr>
+<td style="border:1px solid #8c8c8c;">Bu Ay Toplam Sevk Edilen ({{ period }})</td>
+<td style="border:1px solid #8c8c8c;text-align:right;">{{ total_kg|floatformat:"2g" }}</td>
+</tr>
+</table>
+</td>
+</tr>
+<!-- GÜNLÜK DÖKÜM -->
+<tr>
+<td style="padding:12px 24px 4px 24px;font-size:15px;font-weight:bold;color:#1f3864;">2. Günlük Sevkiyat Dökümü – {{ detail_date }}</td>
+</tr>
+<tr>
+<td style="padding:0 24px 12px 24px;">
+<table cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:14px;" width="100%">
+<tr>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;width:40px;text-align:center;">Sıra</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;">Firma</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;">Satış Pozisyonu</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;text-align:right;">Toplam (kg)</td>
+</tr>
+
+
+
+
+
+
+{% for row in details %}
+<tr style="background:{% cycle '#ffffff' '#f7f7f7' %};">
+<td style="border:1px solid #8c8c8c;text-align:center;">{{ forloop.counter }}</td>
+<td style="border:1px solid #8c8c8c;">{{ row.Firma|default_if_none:"—" }}</td>
+<td style="border:1px solid #8c8c8c;">{{ row.SatisPozisyon|default_if_none:"—" }}</td>
+<td style="border:1px solid #8c8c8c;text-align:right;">{{ row.TOPLAM|floatformat:"2g" }}</td>
+</tr>
+{% empty %}<tr><td colspan="4" style="border:1px solid #8c8c8c;">Bu tarih için sevkiyat bulunamadı.</td></tr>{% endfor %}
+<tr><td colspan="3" style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;text-align:right;">GÜNLÜK SEVKİYAT TOPLAMI</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;text-align:right;">{{ detail_total_kg|floatformat:"2g" }}</td></tr></table>
+</td>
+</tr>
+<!-- İLK 5 FİRMA -->
+<tr>
+<td style="padding:12px 24px 4px 24px;font-size:15px;font-weight:bold;color:#1f3864;">3. Bu Ay En Çok Sevkiyat Yapılan 5 Firma – {{ period }}</td>
+</tr>
+<tr>
+<td style="padding:0 24px 16px 24px;">
+<table cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:14px;" width="100%">
+<tr>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;width:40px;text-align:center;">Sıra</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;">Firma</td>
+<td style="border:1px solid #8c8c8c;background:#d9e2f3;font-weight:bold;text-align:right;">Toplam (kg)</td>
+</tr>
+
+
+
+
+
+{% for row in top_firms %}
+<tr style="background:{% cycle '#ffffff' '#f7f7f7' %};">
+<td style="border:1px solid #8c8c8c;text-align:center;">{{ forloop.counter }}</td>
+<td style="border:1px solid #8c8c8c;">{{ row.Firma|default_if_none:"—" }}</td>
+<td style="border:1px solid #8c8c8c;text-align:right;">{{ row.TOPLAM|floatformat:"2g" }}</td>
+</tr>
+{% empty %}<tr><td colspan="3" style="border:1px solid #8c8c8c;">Bu ay için sevkiyat bulunamadı.</td></tr>{% endfor %}</table>
+</td>
+</tr>
+<tr>
+<td style="background:#f2f2f2;padding:14px 24px;font-size:14px;line-height:1.5;">Bilgilerinize sunar, iyi çalışmalar dileriz.<br/><br/>Bu rapor Arslan Takip sistemi tarafından otomatik olarak oluşturulmuş ve gönderilmiştir.</td>
+</tr>
+<tr>
+<td style="background:#f2f2f2;border-top:1px solid #c9c9c9;padding:10px 24px;font-size:11px;color:#666666;">Veriler {{ report_date }} saat {{ report_time }} itibarıyla alınmıştır. Miktarlar kilogram (kg) cinsindendir. Günlük döküm ve aylık ilk 5 listesi Fason dışındaki kartlarla eşleşen sevk edilmiş ürün çıkışlarını içerir; genel özetin filtreleri farklıdır.</td>
+</tr>
+</table>
 </body>
 </html>

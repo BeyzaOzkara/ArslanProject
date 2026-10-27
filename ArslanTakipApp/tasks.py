@@ -13,11 +13,21 @@ logger = logging.getLogger(__name__)
 
 @shared_task(ignore_result=True)
 def start_email_listener():
+    logger.info('MAIL TASK START')
     lock_id = 'incoming_email_listener_lock'
-    if not cache.add(lock_id, 'true', 60 * 15):
-        return
+    try:
+        if not cache.add(lock_id, 'true', 60 * 15):
+            logger.warning('MAIL TASK SKIP lock aktif: %s (kilit suresi 15 dakika)', lock_id)
+            return
+    except Exception:
+        logger.exception('MAIL TASK LOCK ERROR Redis/cache baglantisini kontrol edin')
+        raise
     try:
         check_new_emails()
+        logger.info('MAIL TASK DONE')
+    except Exception:
+        logger.exception('MAIL TASK FAILED')
+        raise
     finally:
         cache.delete(lock_id)
 

@@ -268,6 +268,9 @@ logger.addHandler(logging.StreamHandler())
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'diagnostic': {'format': '{asctime} {levelname} {name} {message}', 'style': '{'},
+    },
     'handlers': {
         'file': {
             'level': 'ERROR',
@@ -277,7 +280,9 @@ LOGGING = {
         'file2': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'formatter': 'diagnostic',
+            'encoding': 'utf-8',
         },
     },
     'loggers': {

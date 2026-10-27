@@ -120,3 +120,494 @@ An error occurred while processing the 570252: Field 'id' expected a number but 
 An error occurred while processing the 570253: Field 'id' expected a number but got <Location: 1600 TON PRES>.
 YUDA Notification is created. ID: 80070, Time: 28-02-25 10:25
 An error occurred while setting up the email account: Invalid credentials for https://webmail.arslanaluminyum.com/EWS/Exchange.asmx
+2026-10-27 10:46:29,487 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 10:46:29,490 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 10:46:29,494 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 10:46:29,495 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:46:29,507 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 10:46:29,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 10:50:52,786 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 10:50:52,786 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:50:52,786 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 10:50:53,112 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 10:50:53,117 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 10:50:53,257 ERROR ArslanTakipApp.email_utils MAIL SEND CONNECT ERROR account=ai@arslanaluminyum.com
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\email_utils.py", line 25, in send_email
+    account = Account(
+              ^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\account.py", line 205, in __init__
+    self.version = self.protocol.version.copy()
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 480, in version
+    self.config.version = Version.guess(self, api_version_hint=self.api_version_hint)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\version.py", line 202, in guess
+    list(ConvertId(protocol=protocol).call([AlternateId(id="DUMMY", format=EWS_ID, mailbox="DUMMY")], ENTRY_ID))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 216, in _elems_to_objs
+    for elem in elems:
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 279, in _chunked_get_elements
+    yield from self._get_elements(payload=payload_func(chunk, **kwargs))
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 300, in _get_elements
+    yield from self._response_generator(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 263, in _response_generator
+    response = self._get_response_xml(payload=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 396, in _get_response_xml
+    r = self._get_response(payload=payload, api_version=api_version)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\services\common.py", line 347, in _get_response
+    r, session = post_ratelimited(
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\util.py", line 866, in post_ratelimited
+    protocol.retry_policy.raise_response_errors(r)
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\Lib\site-packages\exchangelib\protocol.py", line 720, in raise_response_errors
+    raise UnauthorizedError(f"Invalid credentials for {response.url}")
+exchangelib.errors.UnauthorizedError: Invalid credentials for https://webmail.arslanaluminyum.com/EWS/Exchange.asmx
+2026-10-27 10:50:53,265 ERROR ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST FAILED
+Traceback (most recent call last):
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\views.py", line 101, in get_context_data
+    send_sevkiyat_report()
+  File "C:\Users\beyza.ozkara\ArslanDjango\env\ArslanProject\ArslanTakipApp\sevkiyat_report.py", line 79, in send_sevkiyat_report
+    raise RuntimeError('Sevkiyat raporu gönderilemedi.')
+RuntimeError: Sevkiyat raporu gönderilemedi.
+2026-10-27 10:53:48,981 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 10:53:48,981 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:53:48,981 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 10:53:49,167 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 10:53:49,167 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 10:53:49,552 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 10:53:49,553 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:57:23,790 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 10:57:23,794 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 10:57:23,797 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 10:57:23,798 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 10:57:23,813 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 10:57:23,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 11:09:05,855 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 11:09:05,856 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:09:05,856 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 11:09:05,993 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 11:09:05,993 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 11:09:05,993 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=0.0
+2026-10-27 11:09:05,993 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 11:09:06,447 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 11:09:06,447 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:15:14,239 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 11:15:14,239 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 11:15:14,239 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 11:15:14,254 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 11:15:14,254 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:15:14,270 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 11:15:14,270 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 11:17:23,598 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 11:17:23,598 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:17:23,598 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 11:17:23,711 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 11:17:23,711 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 11:17:23,711 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=0.0
+2026-10-27 11:17:24,033 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=5
+2026-10-27 11:17:24,038 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 11:17:24,537 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 11:17:24,537 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:23:39,172 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 11:23:39,172 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 11:23:39,187 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 11:23:39,190 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 11:23:39,192 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:23:39,206 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:23:39,208 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:23:39,208 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:23:39,210 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 11:23:39,211 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 11:23:39,212 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 11:23:39,212 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 11:23:39,212 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:23:39,212 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 11:23:39,212 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 11:23:39,217 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 11:25:01,323 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 11:25:01,323 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 11:25:01,323 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 11:25:01,493 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 11:25:01,493 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 11:25:01,520 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=0.0
+2026-10-27 11:25:01,746 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=5
+2026-10-27 11:25:01,976 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00 rows=5
+2026-10-27 11:25:01,978 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 11:25:02,445 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 10/2026'
+2026-10-27 11:25:02,446 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 12:03:46,314 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 12:03:46,327 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 12:03:46,327 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 12:03:46,327 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 12:03:46,327 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 12:03:46,353 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 12:03:46,356 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 12:03:46,356 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 12:03:46,358 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 12:03:46,358 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 12:03:46,358 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 12:03:46,358 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 12:03:46,359 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 12:03:46,359 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 12:03:46,359 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 12:03:46,364 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 12:06:12,997 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 12:06:12,997 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 12:06:12,998 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 12:06:13,154 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 12:06:13,154 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 12:06:13,154 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=0.0
+2026-10-27 12:06:13,392 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=5
+2026-10-27 12:06:13,657 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00 rows=5
+2026-10-27 12:06:13,670 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 12:06'
+2026-10-27 12:06:14,136 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 12:06'
+2026-10-27 12:06:14,136 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 12:09:19,327 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 12:09:19,327 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 12:09:19,327 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 12:09:19,433 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 12:09:19,433 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 12:09:19,433 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=0.0
+2026-10-27 12:09:19,660 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=5
+2026-10-27 12:09:19,891 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00 rows=5
+2026-10-27 12:09:19,899 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 12:09'
+2026-10-27 12:09:20,217 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 12:09'
+2026-10-27 12:09:20,218 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:11:25,733 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:11:25,741 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:11:25,744 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:11:25,747 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:11:25,752 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:11:26,045 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43621
+2026-10-27 13:11:26,045 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:11:26,048 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:11:26,048 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:11:26,050 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:11:26,050 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:11:26,050 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:11:26,051 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:11:26,051 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:11:26,051 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:11:26,053 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:11:26,058 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:11:26,066 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-11.pdf bytes=43607
+2026-10-27 13:12:06,667 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:12:06,680 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:12:06,687 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:12:06,687 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:12:06,693 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:12:06,934 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43621
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:12:06,947 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:12:06,947 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:12:06,973 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-12.pdf bytes=43607
+2026-10-27 13:14:55,163 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:14:55,169 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:14:55,169 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:14:55,169 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:14:55,180 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:14:55,427 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43649
+2026-10-27 13:14:55,427 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:14:55,430 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:14:55,430 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:14:55,431 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:14:55,431 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:14:55,453 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-14.pdf bytes=43612
+2026-10-27 13:24:25,775 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:24:25,782 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:24:25,785 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:24:25,788 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:24:25,794 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:24:26,029 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43668
+2026-10-27 13:24:26,029 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:24:26,032 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:24:26,033 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:24:26,034 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:24:26,034 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:24:26,034 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:24:26,036 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:24:26,036 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:24:26,037 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:24:26,037 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:24:26,037 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:24:26,037 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:24:26,037 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:24:26,041 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:24:26,052 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-24.pdf bytes=43629
+2026-10-27 13:28:55,210 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:28:55,215 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:28:55,215 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:28:55,215 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:28:55,229 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:28:55,471 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43647
+2026-10-27 13:28:55,471 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:28:55,474 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:28:55,475 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:28:55,476 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:28:55,476 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:28:55,477 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:28:55,478 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:28:55,479 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:28:55,479 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:28:55,479 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:28:55,479 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:28:55,479 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:28:55,480 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:28:55,482 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:28:55,499 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-28.pdf bytes=43610
+2026-10-27 13:32:54,531 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:32:54,538 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:32:54,542 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:32:54,544 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:32:54,550 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:32:55,018 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=344070
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:32:55,019 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:32:55,019 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:32:55,036 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:32:55,245 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-32.pdf bytes=344032
+2026-10-27 13:33:23,422 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:33:23,428 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:33:23,428 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:33:23,428 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:33:23,428 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:33:23,888 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=344071
+2026-10-27 13:33:23,888 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:33:23,888 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:33:23,888 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:33:23,895 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:33:23,896 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:33:23,897 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:33:23,898 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:33:23,898 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:33:23,898 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=serkankutluca@arslanaluminyum.com expected=yazilim@arslanaluminyum.com
+2026-10-27 13:33:23,899 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:33:23,899 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:33:23,899 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:33:23,899 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:33:23,902 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:33:24,111 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-33.pdf bytes=344033
+2026-10-27 13:36:24,501 INFO ArslanTakipApp.views SEVKIYAT LOCAL HOME TEST START
+2026-10-27 13:36:24,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:36:24,507 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 13:36:24,809 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=786993.0
+2026-10-27 13:36:24,809 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 13:36:24,813 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=0.0
+2026-10-27 13:36:25,040 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=5
+2026-10-27 13:36:25,258 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00 rows=5
+2026-10-27 13:36:25,702 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-36.pdf bytes=344642
+2026-10-27 13:36:25,703 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 13:36'
+2026-10-27 13:36:26,066 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=Sevkiyat_Raporu_2026-10-27_13-36.pdf bytes=344642
+2026-10-27 13:36:27,186 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 13:36'
+2026-10-27 13:36:27,186 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:41:19,828 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:41:19,831 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:41:19,835 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:41:19,836 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:19,836 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=yazilim@arslanaluminyum.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:19,838 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:19,847 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['serkankutluca@arslanaluminyum.com']
+2026-10-27 13:41:19,847 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-26 generated_at=2026-10-27 17:00:00+03:00
+2026-10-27 13:41:20,097 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43601
+2026-10-27 13:41:20,097 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['serkankutluca@arslanaluminyum.com']
+2026-10-27 13:41:20,100 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:41:20,100 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:41:20,100 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-27 generated_at=2026-10-27 13:41:20.100362+03:00
+2026-10-27 13:41:20,118 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-41.pdf bytes=43566
+2026-10-27 13:41:41,348 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:41:41,352 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:41:41,355 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:41:41,355 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL CHECK START mailbox=ai@arslanaluminyum.com password_configured=True
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL CHECK CHECKPOINT present=True
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL CHECK NEW count=1
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM id=new-mail sender=serkankutluca@arslanaluminyum.com subject='sevkiyat'
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM DONE id=new-mail
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL CHECK DONE
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:41:41,356 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:41,363 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:41:41,363 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 13:41:41,363 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=yazilim@arslanaluminyum.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 13:41:41,363 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:41:41,363 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:41,364 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:41:41,369 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['serkankutluca@arslanaluminyum.com']
+2026-10-27 13:41:41,369 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-26 generated_at=2026-10-27 17:00:00+03:00
+2026-10-27 13:41:41,614 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43601
+2026-10-27 13:41:41,614 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['serkankutluca@arslanaluminyum.com']
+2026-10-27 13:41:41,614 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:41:41,614 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:41:41,614 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-27 generated_at=2026-10-27 13:41:41.614869+03:00
+2026-10-27 13:41:41,628 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-41.pdf bytes=43566
+2026-10-27 13:44:47,398 INFO ArslanTakipApp.views SEVKIYAT FINAL LOCAL TEST START recipient=yazilim@arslanaluminyum.com
+2026-10-27 13:44:47,398 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 13:44:47,412 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 13:44:47,415 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 13:44:47,415 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:44:47,417 INFO ArslanTakipApp.email_utils MAIL CHECK START mailbox=ai@arslanaluminyum.com password_configured=True
+2026-10-27 13:44:47,418 INFO ArslanTakipApp.email_utils MAIL CHECK CHECKPOINT present=True
+2026-10-27 13:44:47,418 INFO ArslanTakipApp.email_utils MAIL CHECK NEW count=1
+2026-10-27 13:44:47,418 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM id=new-mail sender=serkankutluca@arslanaluminyum.com subject='sevkiyat'
+2026-10-27 13:44:47,418 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:44:47,419 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM DONE id=new-mail
+2026-10-27 13:44:47,419 INFO ArslanTakipApp.email_utils MAIL CHECK DONE
+2026-10-27 13:44:47,419 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 13:44:47,420 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 13:44:47,421 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 13:44:47,421 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:44:47,423 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 13:44:47,423 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 13:44:47,423 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=yazilim@arslanaluminyum.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 13:44:47,423 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 13:44:47,423 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:44:47,423 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 13:44:47,425 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['serkankutluca@arslanaluminyum.com']
+2026-10-27 13:44:47,425 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-26 generated_at=2026-10-27 17:00:00+03:00
+2026-10-27 13:44:47,665 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43601
+2026-10-27 13:44:47,665 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['serkankutluca@arslanaluminyum.com']
+2026-10-27 13:44:47,665 ERROR ArslanTakipApp.sevkiyat_report SEVKIYAT CONFIG ERROR SEVKIYAT_REPORT_TO bos
+2026-10-27 13:44:47,665 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient@example.com']
+2026-10-27 13:44:47,665 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-27 generated_at=2026-10-27 13:44:47.665040+03:00
+2026-10-27 13:44:47,692 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-44.pdf bytes=43566
+2026-10-27 13:45:21,513 INFO ArslanTakipApp.views SEVKIYAT FINAL LOCAL TEST START recipient=yazilim@arslanaluminyum.com
+2026-10-27 13:45:21,518 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 13:45:21,518 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-27 generated_at=2026-10-27 13:45:21.518127+03:00
+2026-10-27 13:45:21,518 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00
+2026-10-27 13:45:21,624 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=787803.0
+2026-10-27 13:45:21,624 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-10-27 00:00:00 end_exclusive=2026-10-28 00:00:00
+2026-10-27 13:45:21,624 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=810.0
+2026-10-27 13:45:21,850 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-27 rows=1
+2026-10-27 13:45:22,083 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-10-01 00:00:00 end_exclusive=2026-11-01 00:00:00 rows=5
+2026-10-27 13:45:22,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_13-45.pdf bytes=43898
+2026-10-27 13:45:22,277 INFO ArslanTakipApp.email_utils MAIL SEND START to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 13:45'
+2026-10-27 13:45:22,576 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=Sevkiyat_Raporu_2026-10-27_13-45.pdf bytes=43898
+2026-10-27 13:45:22,656 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['yazilim@arslanaluminyum.com'] subject='Sevkiyat Raporu - 27/10/2026 13:45'
+2026-10-27 13:45:22,656 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-27 15:18:07,266 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 15:18:07,269 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 15:18:07,272 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 15:18:07,273 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:18:07,275 INFO ArslanTakipApp.email_utils MAIL CHECK START mailbox=ai@arslanaluminyum.com password_configured=True
+2026-10-27 15:18:07,275 INFO ArslanTakipApp.email_utils MAIL CHECK CHECKPOINT present=True
+2026-10-27 15:18:07,276 INFO ArslanTakipApp.email_utils MAIL CHECK NEW count=1
+2026-10-27 15:18:07,276 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM id=new-mail sender=serkankutluca@arslanaluminyum.com subject='sevkiyat'
+2026-10-27 15:18:07,276 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:18:07,276 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM DONE id=new-mail
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.email_utils MAIL CHECK DONE
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=yazilim@arslanaluminyum.com expected=serkankutluca@arslanaluminyum.com
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['burakduman@arslanaluminyum.com', 'doganyilmaz@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'paketleme2@arslanaluminyum.com', 'paketleme@arslanaluminyum.com', 'mekanikislem@arslanaluminyum.com', 'ozkankavak@arslanaluminyum.com', 'yuzeyislem@arslanaluminyum.com', 'eloksal@arslanaluminyum.com', 'ozgurcubukcu@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'boyahane2@arslanaluminyum.com', 'serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com', 'hasanhuseyinkurut@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com', 'fatmadeniz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'cagataycevik@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com', 'export@arslanaluminyum.com', 'huseyindogruoz@arslanaluminyum.com'] cc=['ersoy@arslanaluminyum.com', 'aosman@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'turkerozdener@arslanaluminyum.com', 'haruncan@arslanaluminyum.com']
+2026-10-27 15:18:07,277 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-26 generated_at=2026-10-27 17:00:00+03:00
+2026-10-27 15:18:07,621 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43601
+2026-10-27 15:18:07,621 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['burakduman@arslanaluminyum.com', 'doganyilmaz@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'paketleme2@arslanaluminyum.com', 'paketleme@arslanaluminyum.com', 'mekanikislem@arslanaluminyum.com', 'ozkankavak@arslanaluminyum.com', 'yuzeyislem@arslanaluminyum.com', 'eloksal@arslanaluminyum.com', 'ozgurcubukcu@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'boyahane2@arslanaluminyum.com', 'serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com', 'hasanhuseyinkurut@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com', 'fatmadeniz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'cagataycevik@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com', 'export@arslanaluminyum.com', 'huseyindogruoz@arslanaluminyum.com']
+2026-10-27 15:18:07,625 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['burakduman@arslanaluminyum.com', 'doganyilmaz@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'paketleme2@arslanaluminyum.com', 'paketleme@arslanaluminyum.com', 'mekanikislem@arslanaluminyum.com', 'ozkankavak@arslanaluminyum.com', 'yuzeyislem@arslanaluminyum.com', 'eloksal@arslanaluminyum.com', 'ozgurcubukcu@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'boyahane2@arslanaluminyum.com', 'serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com', 'hasanhuseyinkurut@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com', 'fatmadeniz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'cagataycevik@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com', 'export@arslanaluminyum.com', 'huseyindogruoz@arslanaluminyum.com'] cc=['ersoy@arslanaluminyum.com', 'aosman@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'turkerozdener@arslanaluminyum.com', 'haruncan@arslanaluminyum.com']
+2026-10-27 15:18:07,626 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-27 generated_at=2026-10-27 15:18:07.625542+03:00
+2026-10-27 15:18:07,640 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_15-18.pdf bytes=43566
+2026-10-27 15:23:03,750 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT DETAIL date=2026-10-26 rows=1
+2026-10-27 15:23:03,752 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY database=dies start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT QUERY OK total_kg=125.5
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='baska konu' expected=sevkiyat
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=12 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=yazilim@arslanaluminyum.com expected=('serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com')
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL CHECK START mailbox=ai@arslanaluminyum.com password_configured=True
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL CHECK CHECKPOINT present=True
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL CHECK NEW count=1
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM id=new-mail sender=serkankutluca@arslanaluminyum.com subject='sevkiyat'
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL CHECK ITEM DONE id=new-mail
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL CHECK DONE
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL SEND START to=['recipient@example.com'] subject='Test'
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL ATTACHMENT name=report.pdf bytes=9
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.email_utils MAIL SEND OK Exchange gonderimi kabul etti to=['recipient@example.com'] subject='Test'
+2026-10-27 15:23:03,755 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=18 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,765 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MONTHLY TOP5 start=2026-12-01 00:00:00 end_exclusive=2027-01-01 00:00:00 rows=1
+2026-10-27 15:23:03,765 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=other@example.com expected=('serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com')
+2026-10-27 15:23:03,765 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP subject='Re: sevkiyat' expected=sevkiyat
+2026-10-27 15:23:03,765 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=20 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,765 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP body_matches=False body_length=0 (imza/ek metin eslesmeyi engeller)
+2026-10-27 15:23:03,769 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['burakduman@arslanaluminyum.com', 'doganyilmaz@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'paketleme2@arslanaluminyum.com', 'paketleme@arslanaluminyum.com', 'mekanikislem@arslanaluminyum.com', 'ozkankavak@arslanaluminyum.com', 'yuzeyislem@arslanaluminyum.com', 'eloksal@arslanaluminyum.com', 'ozgurcubukcu@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'boyahane2@arslanaluminyum.com', 'serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com', 'hasanhuseyinkurut@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com', 'fatmadeniz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'cagataycevik@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com', 'export@arslanaluminyum.com', 'huseyindogruoz@arslanaluminyum.com'] cc=['ersoy@arslanaluminyum.com', 'aosman@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'turkerozdener@arslanaluminyum.com', 'haruncan@arslanaluminyum.com']
+2026-10-27 15:23:03,769 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-26 generated_at=2026-10-27 17:00:00+03:00
+2026-10-27 15:23:04,024 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43601
+2026-10-27 15:23:04,024 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['burakduman@arslanaluminyum.com', 'doganyilmaz@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'paketleme2@arslanaluminyum.com', 'paketleme@arslanaluminyum.com', 'mekanikislem@arslanaluminyum.com', 'ozkankavak@arslanaluminyum.com', 'yuzeyislem@arslanaluminyum.com', 'eloksal@arslanaluminyum.com', 'ozgurcubukcu@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'boyahane2@arslanaluminyum.com', 'serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com', 'hasanhuseyinkurut@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com', 'fatmadeniz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'cagataycevik@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com', 'export@arslanaluminyum.com', 'huseyindogruoz@arslanaluminyum.com']
+2026-10-27 15:23:04,024 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['burakduman@arslanaluminyum.com', 'doganyilmaz@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', 'paketleme2@arslanaluminyum.com', 'paketleme@arslanaluminyum.com', 'mekanikislem@arslanaluminyum.com', 'ozkankavak@arslanaluminyum.com', 'yuzeyislem@arslanaluminyum.com', 'eloksal@arslanaluminyum.com', 'ozgurcubukcu@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'boyahane2@arslanaluminyum.com', 'serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com', 'hasanhuseyinkurut@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com', 'fatmadeniz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'cagataycevik@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com', 'export@arslanaluminyum.com', 'huseyindogruoz@arslanaluminyum.com'] cc=['ersoy@arslanaluminyum.com', 'aosman@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'turkerozdener@arslanaluminyum.com', 'haruncan@arslanaluminyum.com']
+2026-10-27 15:23:04,031 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-27 generated_at=2026-10-27 15:23:04.024697+03:00
+2026-10-27 15:23:04,045 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_15-23.pdf bytes=43566

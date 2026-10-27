@@ -78,10 +78,23 @@ class UrunCikisi(models.Model):
     Tarih = models.DateTimeField(null=True, blank=True)
     FirmaKodu = models.CharField(null=True, blank=True)
     ToplamKg = models.FloatField(null=True, blank=True)
+    FirmaAdi = models.CharField(null=True, blank=True)
+    SatisPozisyon = models.CharField(null=True, blank=True)
+    SevkEdildi = models.CharField(null=True, blank=True)
 
     class Meta:
         managed = False
         db_table = 'UrunCikisi'
+
+
+class SevkiyatRaporu(models.Model):
+    # View satırları aynı Kimlik'i tekrarlayabilir; yalnızca okuma için kullanılır.
+    Kimlik = models.IntegerField(primary_key=True)
+    KartTuru = models.CharField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View060_SevkiyatRaporu'
 
 
 class SevkiyatFaturaListesi(models.Model):
