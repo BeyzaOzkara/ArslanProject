@@ -5,7 +5,7 @@ from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
-from django.db.models import Case, CharField, F, Q, Sum, Value, When
+from django.db.models import Sum
 from django.template.loader import render_to_string
 
 from .models import Firma, SevkiyatFaturaListesi, SevkiyatRaporu, UrunCikisi
@@ -116,14 +116,12 @@ def get_shipped_kg(start, end):
 def get_daily_shipment_breakdown(day):
     start = datetime.combine(day, time.min)
     end = start + timedelta(days=1)
-    rows = list(get_normalized_shipments(start, end).values(
-        'Firma', 'SatisPozisyon',
-    ).annotate(TOPLAM=Sum('ToplamKg')).order_by('-TOPLAM'))
+    rows = get_shipment_groups(start, end, by_sales_position=True)
     logger.info('SEVKIYAT DETAIL date=%s rows=%s', day, len(rows))
     return rows
 
 
-def get_normalized_shipments(start, end):
+def get_shipment_queryset(start, end):
     # SQL'deki != NULL satırlarını da dışlar; exclude tek başına aynı değildir.
     shipment_ids = SevkiyatRaporu.objects.using('dies').filter(
         KartTuru__isnull=False,
@@ -131,13 +129,38 @@ def get_normalized_shipments(start, end):
     return UrunCikisi.objects.using('dies').filter(
         Tarih__gte=start, Tarih__lt=end,
         SevkEdildi='EVET', Kimlik__in=shipment_ids,
-    ).annotate(Firma=Case(
-        When(FirmaAdi__icontains='Alumeco', then=Value('Alumeco')),
-        When(Q(FirmaAdi__icontains='PERPOLIO')
-             | Q(FirmaAdi__icontains='ALUFORTİS')
-             | Q(FirmaAdi__icontains='ALUFORTIS'), then=Value('PERPOLIO/ALUFORTİS')),
-        default=F('FirmaAdi'), output_field=CharField(),
-    ))
+    )
+
+
+def normalize_company_name(name):
+    normalized = normalize_text(name)
+    if 'alumeco' in normalized:
+        return 'Alumeco'
+    if 'perpolio' in normalized or 'alufortis' in normalized:
+        return 'PERPOLIO/ALUFORTİS'
+    return name
+
+
+def get_shipment_groups(start, end, by_sales_position=False):
+    # Eski mssql-django sürümlerinde CASE ifadesiyle GROUP BY hatalı SQL
+    # üretebiliyor. SQL'de gerçek kolonları grupla; normalize adları sonra birleştir.
+    fields = ['FirmaAdi', 'SatisPozisyon'] if by_sales_position else ['FirmaAdi']
+    raw_rows = get_shipment_queryset(start, end).order_by().values(*fields).annotate(
+        TOPLAM=Sum('ToplamKg'),
+    )
+    groups = {}
+    for row in raw_rows:
+        company = normalize_company_name(row['FirmaAdi'])
+        key = (company, row['SatisPozisyon']) if by_sales_position else (company,)
+        if key not in groups:
+            groups[key] = {'Firma': company, 'TOPLAM': None}
+            if by_sales_position:
+                groups[key]['SatisPozisyon'] = row['SatisPozisyon']
+        if row['TOPLAM'] is not None:
+            groups[key]['TOPLAM'] = (groups[key]['TOPLAM'] or 0) + row['TOPLAM']
+    rows = sorted(groups.values(), key=lambda row: row['Firma'] or '')
+    # SQL Server DESC sıralamasındaki gibi NULL toplamlar en sonda.
+    return sorted(rows, key=lambda row: (row['TOPLAM'] is not None, row['TOPLAM'] or 0), reverse=True)
 
 
 def get_monthly_top_shipment_firms(now=None):
@@ -147,9 +170,7 @@ def get_monthly_top_shipment_firms(now=None):
     start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     end = start.replace(year=start.year + (start.month == 12), month=start.month % 12 + 1)
     # Bir firmanın tüm satış pozisyonlarını tek toplamda birleştir.
-    rows = list(get_normalized_shipments(start, end).values('Firma').annotate(
-        TOPLAM=Sum('ToplamKg'),
-    ).order_by('-TOPLAM', 'Firma')[:5])
+    rows = get_shipment_groups(start, end)[:5]
     logger.info('SEVKIYAT MONTHLY TOP5 start=%s end_exclusive=%s rows=%s', start, end, len(rows))
     return rows
 

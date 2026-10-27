@@ -12,6 +12,7 @@ from .sevkiyat_report import (
     get_daily_shipped_kg,
     get_daily_shipment_breakdown,
     get_monthly_top_shipment_firms,
+    get_shipment_groups,
     is_sevkiyat_completed,
     send_sevkiyat_report,
 )
@@ -190,10 +191,10 @@ class SevkiyatReportTests(SimpleTestCase):
     def test_breakdown_filters_and_groups_like_sql(self):
         with patch('ArslanTakipApp.sevkiyat_report.SevkiyatRaporu') as view, \
                 patch('ArslanTakipApp.sevkiyat_report.UrunCikisi') as shipments:
-            normalized = shipments.objects.using.return_value.filter.return_value.annotate.return_value
+            normalized = shipments.objects.using.return_value.filter.return_value.order_by.return_value
             grouped = normalized.values.return_value
-            grouped.annotate.return_value.order_by.return_value = [
-                {'Firma': 'Firma A', 'SatisPozisyon': 'Yurtici', 'TOPLAM': 100.0},
+            grouped.annotate.return_value = [
+                {'FirmaAdi': 'Firma A', 'SatisPozisyon': 'Yurtici', 'TOPLAM': 100.0},
             ]
             rows = get_daily_shipment_breakdown(date(2026, 10, 26))
             filters = shipments.objects.using.return_value.filter.call_args.kwargs
@@ -202,20 +203,38 @@ class SevkiyatReportTests(SimpleTestCase):
             self.assertEqual(filters['SevkEdildi'], 'EVET')
             view.objects.using.return_value.filter.assert_called_once_with(KartTuru__isnull=False)
             view.objects.using.return_value.filter.return_value.exclude.assert_called_once_with(KartTuru='Fason')
-            normalized.values.assert_called_once_with('Firma', 'SatisPozisyon')
-            grouped.annotate.return_value.order_by.assert_called_once_with('-TOPLAM')
+            normalized.values.assert_called_once_with('FirmaAdi', 'SatisPozisyon')
             self.assertEqual(rows[0]['TOPLAM'], 100.0)
 
-    @patch('ArslanTakipApp.sevkiyat_report.get_normalized_shipments')
-    def test_monthly_top_five_combines_sales_positions(self, normalized):
-        ordered = normalized.return_value.values.return_value.annotate.return_value.order_by.return_value
-        ordered.__getitem__.return_value = [{'Firma': 'Alumeco', 'TOPLAM': 500.0}]
+    @patch('ArslanTakipApp.sevkiyat_report.get_shipment_groups')
+    def test_monthly_top_five_combines_sales_positions(self, groups):
+        groups.return_value = [{'Firma': f'Firma {i}', 'TOPLAM': 100-i} for i in range(7)]
         rows = get_monthly_top_shipment_firms(datetime(2026, 12, 31))
-        normalized.assert_called_once_with(datetime(2026, 12, 1), datetime(2027, 1, 1))
-        normalized.return_value.values.assert_called_once_with('Firma')
-        normalized.return_value.values.return_value.annotate.return_value.order_by.assert_called_once_with('-TOPLAM', 'Firma')
-        ordered.__getitem__.assert_called_once_with(slice(None, 5))
-        self.assertEqual(rows[0]['Firma'], 'Alumeco')
+        groups.assert_called_once_with(datetime(2026, 12, 1), datetime(2027, 1, 1))
+        self.assertEqual(rows, groups.return_value[:5])
+
+    @patch('ArslanTakipApp.sevkiyat_report.get_shipment_queryset')
+    def test_normalized_firms_are_merged_after_sql_aggregation(self, shipments):
+        raw = shipments.return_value.order_by.return_value.values.return_value.annotate
+        raw.return_value = [
+            {'FirmaAdi': 'Alumeco A', 'SatisPozisyon': 'Yurt İçi', 'TOPLAM': 100.0},
+            {'FirmaAdi': 'ALUMECO B', 'SatisPozisyon': 'Yurt İçi', 'TOPLAM': 200.0},
+            {'FirmaAdi': 'Alumeco A', 'SatisPozisyon': 'İhracat', 'TOPLAM': 50.0},
+            {'FirmaAdi': 'PERPOLIO A', 'SatisPozisyon': 'Yurt İçi', 'TOPLAM': 40.0},
+            {'FirmaAdi': 'ALUFORTİS B', 'SatisPozisyon': 'Yurt İçi', 'TOPLAM': 60.0},
+            {'FirmaAdi': 'ALUFORTIS C', 'SatisPozisyon': 'Yurt İçi', 'TOPLAM': 20.0},
+            {'FirmaAdi': 'Boş Toplam', 'SatisPozisyon': None, 'TOPLAM': None},
+        ]
+        start, end = datetime(2026, 10, 26), datetime(2026, 10, 27)
+        daily = get_shipment_groups(start, end, by_sales_position=True)
+        self.assertEqual(daily[0], {'Firma': 'Alumeco', 'SatisPozisyon': 'Yurt İçi', 'TOPLAM': 300.0})
+        self.assertEqual(daily[1]['Firma'], 'PERPOLIO/ALUFORTİS')
+        self.assertEqual(daily[1]['TOPLAM'], 120.0)
+        self.assertEqual(daily[2]['TOPLAM'], 50.0)
+        self.assertIsNone(daily[-1]['TOPLAM'])
+        monthly = get_shipment_groups(start, end)
+        self.assertEqual(monthly[0], {'Firma': 'Alumeco', 'TOPLAM': 350.0})
+        self.assertEqual(monthly[1]['TOPLAM'], 120.0)
 
 
 class HomepageHasNoEmailTriggerTests(SimpleTestCase):

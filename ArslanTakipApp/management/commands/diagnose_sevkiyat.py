@@ -1,5 +1,7 @@
 """Mail göndermeden ve işlenen mail kaydını değiştirmeden teşhis."""
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from django.core.management.base import BaseCommand, CommandError
 from exchangelib import Account, Configuration, Credentials, DELEGATE
@@ -7,7 +9,8 @@ from exchangelib import Account, Configuration, Credentials, DELEGATE
 from ArslanTakipApp.models import LastProcessEmail
 from ArslanTakipApp.sevkiyat_report import (
     SEVKIYAT_SENDERS, SEVKIYAT_REPORT_TO, SEVKIYAT_REPORT_CC, SEVKIYAT_TEST_SENDER,
-    get_monthly_shipped_kg, is_sevkiyat_completed,
+    get_monthly_shipped_kg, get_daily_shipped_kg, get_daily_shipment_breakdown,
+    get_monthly_top_shipment_firms, is_sevkiyat_completed,
 )
 
 
@@ -59,6 +62,15 @@ class Command(BaseCommand):
                 stage = 'SQL Server sevkiyat sorgusu'
                 period, total = get_monthly_shipped_kg()
                 self.stdout.write(f'Sorgu OK: {period:%m/%Y} toplam={total} kg')
+                stage = 'Gunluk sevkiyat toplami'
+                today, daily = get_daily_shipped_kg()
+                self.stdout.write(f'Gunluk toplam OK: {today:%d.%m.%Y} toplam={daily} kg')
+                stage = 'Gunluk firma ve satis pozisyonu dokumu'
+                details = get_daily_shipment_breakdown(datetime.now(ZoneInfo('Europe/Istanbul')).date())
+                self.stdout.write(f'Gunluk dokum OK: {len(details)} satir')
+                stage = 'Aylik ilk 5 firma'
+                top = get_monthly_top_shipment_firms()
+                self.stdout.write(f'Aylik ilk 5 OK: {len(top)} firma')
         except Exception as exc:
             raise CommandError(f'{stage} HATA: {type(exc).__name__}: {exc}') from exc
         self.stdout.write(self.style.SUCCESS('Teshis tamamlandi. Mail gonderilmedi; kayit degistirilmedi.'))
