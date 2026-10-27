@@ -231,7 +231,7 @@ presler = {
     '1600-1':542, '1200':543, '1100':544, '4000':570, 
     '2750':571, '1600-2':572, 'Y1100':573, '4500':1105,
     '1.Fabrika Kalıp Hazırlama': 547, '2.Fabrika Kalıp Hazırlama': 766,
-    'Kalıp Arşivi': 575, 'Kalıp Depo':1132, 'Kalıphane':1133
+    'Kalıp Arşivi': 575, 'KalıpArşivi': 575, 'Kalıp Depo':1132, 'Kalıphane':1133
 }
 
 def save_move(movements):
