@@ -62,6 +62,42 @@ class Hareket(models.Model):
     def __str__(self):
         return str(self.kalipNo)
 
+class Firma(models.Model):
+    FirmaKodu = models.CharField(primary_key=True)
+    FirmaAdi = models.CharField(null=True, blank=True)
+    FirmaKisaAdi = models.CharField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Firma'
+
+
+class UrunCikisi(models.Model):
+    # Sevkiyat toplamı için gereken mevcut SQL Server kolonları.
+    Kimlik = models.IntegerField(primary_key=True)
+    Tarih = models.DateTimeField(null=True, blank=True)
+    FirmaKodu = models.CharField(null=True, blank=True)
+    ToplamKg = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'UrunCikisi'
+
+
+class SevkiyatFaturaListesi(models.Model):
+    # View aynı Kimlik için birden fazla satır döndürebilir. Kimlik burada
+    # ORM eşlemesi içindir; bu model üzerinden kayıt güncellenmemelidir.
+    Kimlik = models.IntegerField(primary_key=True)
+    Tarih = models.DateTimeField(null=True, blank=True)
+    FirmaAdi = models.CharField(null=True, blank=True)
+    KartTuru = models.CharField(null=True, blank=True)
+    SevkEdildi = models.CharField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'View030_SevkiyatFaturaListesi'
+
+
 class MusteriFirma(models.Model):
     FirmaKodu = models.CharField(blank=True, primary_key=True)
     FirmaAdi = models.CharField(null=True, blank=True)

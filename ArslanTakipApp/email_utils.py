@@ -31,7 +31,7 @@ def send_email(to_addresses, cc_recipients, subject, body):
     except Exception as e:
         logger.error(f"An error occurred while setting up the email account: {e}")
         
-        return
+        return False
     
     # E-posta mesajını oluşturma
     message = Message(
@@ -46,6 +46,7 @@ def send_email(to_addresses, cc_recipients, subject, body):
     # E-postayı gönderme
     message.send()
     print("E-posta başarıyla gönderildi.")
+    return True
 
 def read_emails(username, password, server, folder='inbox', num_emails=10):
     # Kimlik bilgileri ve hesap oluşturma
@@ -94,6 +95,8 @@ def listen_for_emails(username, password, server, check_interval=60):
         time.sleep(check_interval)  # Belirtilen süre kadar bekle (saniye cinsinden)
 
 def check_new_emails():
+    from .sevkiyat_report import is_sevkiyat_completed, send_sevkiyat_report
+
     email = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
     password = os.environ.get('AI_EMAIL_PASSWORD', '')
     credentials = Credentials(email, password)
@@ -135,8 +138,10 @@ def check_new_emails():
         return
 
     if new_emails:
-        latest_email_id = new_emails[0].id
         for email in reversed(new_emails): #subject'e göre bakalım
+            if is_sevkiyat_completed(email):
+                # Hata durumunda işaretçi ilerlemez; sonraki kontrolde tekrar denenir.
+                send_sevkiyat_report()
             if email.subject == 'GÖNDERİLEN KALIPLAR':
                 print(f'Yeni e-posta - Gönderen: {email.sender.email_address}, Konu: {email.subject}')
                 movements = parse_die_movement(email.body)
@@ -146,11 +151,9 @@ def check_new_emails():
                 # maili atan kişiye başarılı ve başarısız olan kalıp numaralarını mail at.
                 send_results([email.sender.email_address], wrong_numbers, saved_numbers)
         
-        # Save the ID of the last processed email
-        try:
-            LastProcessEmail.objects.create(email_id=latest_email_id)
-        except Exception as e:
-            logger.error(f"An error occurred while saving the last processed email ID: {e}")
+            # Her başarılı mailden sonra kaydet; sonraki mailin hatası önceki
+            # raporların bütün partiyle birlikte yeniden gönderilmesine yol açmasın.
+            LastProcessEmail.objects.create(email_id=email.id)
 
 def parse_die_movement(email_body):
     try:

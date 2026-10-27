@@ -11,6 +11,17 @@ from django.core.cache import cache
 logger = logging.getLogger(__name__)
 
 
+@shared_task(ignore_result=True)
+def start_email_listener():
+    lock_id = 'incoming_email_listener_lock'
+    if not cache.add(lock_id, 'true', 60 * 15):
+        return
+    try:
+        check_new_emails()
+    finally:
+        cache.delete(lock_id)
+
+
 @shared_task # 
 def start_rapor_listener():
     check_new_rapor()
