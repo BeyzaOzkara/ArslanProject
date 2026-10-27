@@ -12,9 +12,11 @@ from .models import Firma, SevkiyatFaturaListesi, SevkiyatRaporu, UrunCikisi
 
 logger = logging.getLogger(__name__)
 
+SEVKIYAT_TEST_SENDER = 'yazilim@arslanaluminyum.com'
 SEVKIYAT_SENDERS = (
     'serkankutluca@arslanaluminyum.com',
     'furkankaya@arslanaluminyum.com',
+    SEVKIYAT_TEST_SENDER,
 )
 SEVKIYAT_REPORT_TO = [
     'burakduman@arslanaluminyum.com',
@@ -152,12 +154,16 @@ def get_monthly_top_shipment_firms(now=None):
     return rows
 
 
-def send_sevkiyat_report(shipment_datetime=None):
+def send_sevkiyat_report(shipment_datetime=None, sender_email=None):
     from .email_utils import send_email
     from .sevkiyat_pdf import build_sevkiyat_pdf
 
-    recipients = list(SEVKIYAT_REPORT_TO)
-    cc_recipients = list(SEVKIYAT_REPORT_CC)
+    if normalize_text(sender_email) == SEVKIYAT_TEST_SENDER:
+        recipients = [SEVKIYAT_TEST_SENDER]
+        cc_recipients = [SEVKIYAT_TEST_SENDER]
+    else:
+        recipients = list(SEVKIYAT_REPORT_TO)
+        cc_recipients = list(SEVKIYAT_REPORT_CC)
     logger.info('SEVKIYAT REPORT START recipients=%s cc=%s', recipients, cc_recipients)
     now = datetime.now(ZoneInfo('Europe/Istanbul'))
     shipment_datetime = shipment_datetime or now

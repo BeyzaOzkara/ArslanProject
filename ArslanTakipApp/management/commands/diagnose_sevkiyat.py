@@ -6,7 +6,7 @@ from exchangelib import Account, Configuration, Credentials, DELEGATE
 
 from ArslanTakipApp.models import LastProcessEmail
 from ArslanTakipApp.sevkiyat_report import (
-    SEVKIYAT_SENDERS, SEVKIYAT_REPORT_TO, SEVKIYAT_REPORT_CC,
+    SEVKIYAT_SENDERS, SEVKIYAT_REPORT_TO, SEVKIYAT_REPORT_CC, SEVKIYAT_TEST_SENDER,
     get_monthly_shipped_kg, is_sevkiyat_completed,
 )
 
@@ -27,6 +27,7 @@ class Command(BaseCommand):
         self.stdout.write('Beklenen gonderenler: ' + ', '.join(SEVKIYAT_SENDERS))
         self.stdout.write('Rapor alicilari: ' + ', '.join(SEVKIYAT_REPORT_TO))
         self.stdout.write('Rapor CC: ' + ', '.join(SEVKIYAT_REPORT_CC))
+        self.stdout.write(f'Deneme gondereni {SEVKIYAT_TEST_SENDER}: TO ve CC yalnizca bu adres.')
         self.stdout.write('Konu: sevkiyat | Icerik: sevkiyat tamam (imza/ek metin olmamali)')
         if not password:
             raise CommandError('AI_EMAIL_PASSWORD tanimli degil veya bos.')

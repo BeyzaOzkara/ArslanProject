@@ -41,8 +41,11 @@ class SevkiyatReportTests(SimpleTestCase):
         self.assertTrue(is_sevkiyat_completed(self.message(sender=sender)))
         self.assertFalse(is_sevkiyat_completed(self.message(sender=sender, subject='baska konu')))
         self.assertFalse(is_sevkiyat_completed(self.message(sender=sender, text_body='devam ediyor')))
-        self.assertFalse(is_sevkiyat_completed(self.message(
-            sender=SimpleNamespace(email_address='yazilim@arslanaluminyum.com'),
+
+    def test_yazilim_matches_uppercase_subject_and_body(self):
+        self.assertTrue(is_sevkiyat_completed(self.message(
+            sender=SimpleNamespace(email_address='YAZILIM@arslanaluminyum.com'),
+            subject='SEVKİYAT', text_body='SEVKİYAT TAMAM',
         )))
 
     def test_rejects_other_subject_or_extra_body_text(self):
@@ -68,7 +71,8 @@ class SevkiyatReportTests(SimpleTestCase):
             message, SimpleNamespace(id='previous-mail'),
         ]
         check_new_emails()
-        report.assert_called_once_with(shipment_datetime=sent)
+        report.assert_called_once_with(shipment_datetime=sent,
+                                       sender_email='serkankutluca@arslanaluminyum.com')
         checkpoint.objects.create.assert_called_once_with(email_id='new-mail')
 
     def test_december_boundary_and_total(self):
@@ -119,10 +123,18 @@ class SevkiyatReportTests(SimpleTestCase):
         self.assertEqual(attachment[0], 'Sevkiyat_Raporu_2026-10-27_17-00.pdf')
         self.assertTrue(attachment[1].startswith(b'%PDF-'))
         self.assertEqual(attachment[2], 'application/pdf')
+        daily.assert_called_once_with(datetime(2026, 10, 26, 23, 0, tzinfo=ZoneInfo('Europe/Istanbul')))
+        # Test mailinde gerçek dağıtım listesi TO veya CC'ye sızmamalı.
+        send_sevkiyat_report(sender_email=' YAZILIM@arslanaluminyum.com ')
+        self.assertEqual(send.call_args.args[0], ['yazilim@arslanaluminyum.com'])
+        self.assertEqual(send.call_args.args[1], ['yazilim@arslanaluminyum.com'])
+        for sender in ('serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com'):
+            send_sevkiyat_report(sender_email=sender)
+            self.assertEqual(send.call_args.args[0], SEVKIYAT_REPORT_TO)
+            self.assertEqual(send.call_args.args[1], SEVKIYAT_REPORT_CC)
         self.assertNotIn('cid:sevkiyat-logo', send.call_args.args[3])
         self.assertNotIn('Deneme:', send.call_args.args[3])
         self.assertIn('GÜNLÜK SEVKİYAT TOPLAMI', send.call_args.args[3])
-        daily.assert_called_once_with(datetime(2026, 10, 26, 23, 0, tzinfo=ZoneInfo('Europe/Istanbul')))
 
     @patch('ArslanTakipApp.email_utils.Account')
     @patch('ArslanTakipApp.email_utils.Message')

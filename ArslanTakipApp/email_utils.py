@@ -156,7 +156,10 @@ def check_new_emails():
             if is_sevkiyat_completed(email):
                 # Hata durumunda işaretçi ilerlemez; sonraki kontrolde tekrar denenir.
                 try:
-                    send_sevkiyat_report(shipment_datetime=email.datetime_sent or email.datetime_received)
+                    send_sevkiyat_report(
+                        shipment_datetime=email.datetime_sent or email.datetime_received,
+                        sender_email=email.sender.email_address,
+                    )
                 except Exception:
                     logger.exception('SEVKIYAT REPORT FAILED email_id=%s; mail tekrar denenecek', email.id)
                     raise
