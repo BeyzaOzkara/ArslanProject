@@ -104,7 +104,7 @@ def listen_for_emails(username, password, server, check_interval=60):
         time.sleep(check_interval)  # Belirtilen süre kadar bekle (saniye cinsinden)
 
 def check_new_emails():
-    from .sevkiyat_report import is_sevkiyat_completed, send_sevkiyat_report
+    from .sevkiyat_report import is_sevkiyat_completed, send_sevkiyat_report, normalize_text
 
     email = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
     password = os.environ.get('AI_EMAIL_PASSWORD', '')
@@ -139,11 +139,20 @@ def check_new_emails():
     logger.info('MAIL CHECK CHECKPOINT present=%s', bool(latest_email_id))
     new_emails = []
     try:
-        items = inbox.filter().order_by('-datetime_received')
-        for item in items:
+        # Tüm alanları istemek her mail için GetItem çağrıları ve gövde indirmesi
+        # oluşturur. Önce yalnızca hafif FindItem alanlarıyla işaretçiyi bul.
+        items = inbox.filter().only('subject', 'datetime_received').order_by('-datetime_received')
+        found_checkpoint = False
+        logger.info('MAIL CHECK SCAN START mode=headers_only')
+        for scanned, item in enumerate(items, 1):
             if latest_email_id and item.id == latest_email_id:
+                found_checkpoint = True
                 break
             new_emails.append(item)
+            if scanned == 1 or scanned % 100 == 0:
+                logger.info('MAIL CHECK SCAN scanned=%s received=%s', scanned, item.datetime_received)
+        if latest_email_id and not found_checkpoint:
+            logger.warning('MAIL CHECK CHECKPOINT NOT FOUND; mevcut mailler atlanmadan islenecek')
     except Exception as e:
         logger.exception('MAIL CHECK INBOX ERROR')
         return
@@ -151,6 +160,9 @@ def check_new_emails():
     logger.info('MAIL CHECK NEW count=%s', len(new_emails))
     if new_emails:
         for email in reversed(new_emails): #subject'e göre bakalım
+            if normalize_text(email.subject) == 'sevkiyat' or email.subject == 'GÖNDERİLEN KALIPLAR':
+                logger.info('MAIL CHECK FETCH DETAIL id=%s subject=%r', email.id, email.subject)
+                email = inbox.get(id=email.id)
             logger.info('MAIL CHECK ITEM id=%s sender=%s subject=%r', email.id,
                         getattr(getattr(email, 'sender', None), 'email_address', ''), email.subject)
             if is_sevkiyat_completed(email):

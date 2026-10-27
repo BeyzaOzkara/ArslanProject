@@ -67,13 +67,34 @@ class SevkiyatReportTests(SimpleTestCase):
         message = self.message(id='new-mail', datetime_sent=sent,
                                datetime_received=datetime(2026, 10, 27, tzinfo=ZoneInfo('UTC')))
         checkpoint.objects.latest.return_value.email_id = 'previous-mail'
-        account.return_value.inbox.filter.return_value.order_by.return_value = [
+        inbox = account.return_value.inbox
+        inbox.filter.return_value.only.return_value.order_by.return_value = [
             message, SimpleNamespace(id='previous-mail'),
         ]
+        inbox.get.return_value = message
         check_new_emails()
+        inbox.filter.return_value.only.assert_called_once_with('subject', 'datetime_received')
+        inbox.get.assert_called_once_with(id='new-mail')
         report.assert_called_once_with(shipment_datetime=sent,
                                        sender_email='serkankutluca@arslanaluminyum.com')
         checkpoint.objects.create.assert_called_once_with(email_id='new-mail')
+
+    @patch('ArslanTakipApp.email_utils.LastProcessEmail')
+    @patch('ArslanTakipApp.email_utils.Account')
+    @patch('ArslanTakipApp.sevkiyat_report.send_sevkiyat_report')
+    def test_unrelated_mail_does_not_download_body(self, report, account, checkpoint):
+        from ArslanTakipApp.email_utils import check_new_emails
+        inbox = account.return_value.inbox
+        checkpoint.objects.latest.return_value.email_id = 'previous-mail'
+        inbox.filter.return_value.only.return_value.order_by.return_value = [
+            SimpleNamespace(id='other-mail', subject='Başka konu',
+                            datetime_received=datetime(2026, 10, 27)),
+            SimpleNamespace(id='previous-mail'),
+        ]
+        check_new_emails()
+        inbox.get.assert_not_called()
+        report.assert_not_called()
+        checkpoint.objects.create.assert_called_once_with(email_id='other-mail')
 
     def test_december_boundary_and_total(self):
         with patch('ArslanTakipApp.sevkiyat_report.SevkiyatFaturaListesi') as view, \
