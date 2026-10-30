@@ -5,58 +5,8 @@ from django.db.models import Func, F, Q, Count, Sum, Max
 from datetime import datetime, date, timedelta
 from django.template.loader import render_to_string
 from ..email_utils import send_email
+from ..mail_report_settings import get_scheduled_report_recipients, get_event_report_recipients, get_report_settings
 
-email_mapping = {
-    '1100-1': { 
-        'to': ['eski1100pres@arslanaluminyum.com', 'planlama1@arslanaluminyum.com',
-                'hasanhuseyinkurut@arslanaluminyum.com', 'eloksalkalite@arslanaluminyum.com'],
-        'cc': ['pres1@arslanaluminyum.com',
-                'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-                'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    },
-    '1200-1': {
-        'to': ['1200pres@arslanaluminyum.com', 'planlama1@arslanaluminyum.com',
-                'hasanhuseyinkurut@arslanaluminyum.com', 'eloksalkalite@arslanaluminyum.com'],
-        'cc': ['pres1@arslanaluminyum.com',
-                'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-                'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    },
-    '1600-1': {
-        'to': ['1600PRES@arslanaluminyum.com', 'planlama1@arslanaluminyum.com',
-                'hasanhuseyinkurut@arslanaluminyum.com', 'eloksalkalite@arslanaluminyum.com'],
-        'cc': ['pres1@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-                'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    },
-    '2750-1': {
-        'to': ['PRES2750@arslanaluminyum.com', 'planlama2@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com',
-               'planlamasaha@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com'],
-        'cc': ['akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-               'pres2@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'], 
-    },
-    'Yeni 1100': {
-        'to': ['pres1100@arslanaluminyum.com', 'planlama2@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com',
-               'planlamasaha@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com'],
-        'cc': ['akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-               'pres2@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    },
-    '1600-2': {
-        'to': ['yeni1600pres@arslanaluminyum.com', 'planlama2@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com',
-               'planlamasaha@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com'],
-        'cc':['akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-               'pres2@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    },
-    '4000-1': {
-        'to': ['4000pres@arslanaluminyum.com', 'planlama2@arslanaluminyum.com', 'kalitemuhendisi@arslanaluminyum.com',
-               'planlamasaha@arslanaluminyum.com', 'kalitekontrol@arslanaluminyum.com'],
-        'cc': ['akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-               'pres2@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    },
-    '4500-1': {
-        'to': ['4.fabrikabakim@arslanaluminyum.com', 'fabrika4kalite@arslanaluminyum.com'],
-        'cc': ['akenanatagur@arslanaluminyum.com', 'argemuhendisi2@arslanaluminyum.com',
-                'kaliphazirlama1ofis@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com'],
-    }
-}
 
 def deneme_test():
     print("=== DEBUG: Test raporu başlıyor ===")
@@ -179,6 +129,11 @@ def deneme_test():
 
 
 def send_daily_test_report_for_all():
+    distribution = get_scheduled_report_recipients('daily_test')
+    if distribution is None:
+        return
+    to_addresses, cc_addresses = distribution
+
     # her presin TEST konumunu al (locationNme'i TEST olan konumlar, hangi pres oldukları presKodu'unda yazıyor)
     # her bir konumda kalıp var mı bak varsa kalıpları getir
     # bu kalıpların profillerine ait sipariş durumlarına bak
@@ -234,13 +189,7 @@ def send_daily_test_report_for_all():
         result_list = sorted(result_list, key=lambda x: x['press'])
 
     result_list = sorted(result_list, key=lambda x: x['press'])
-    to_addresses = ['doganyilmaz@arslanaluminyum.com', 'hasanpasa@arslanaluminyum.com', 'kaliphazirlama1ofis@arslanaluminyum.com', 'mkaragoz@arslanaluminyum.com',
-                        'pres1@arslanaluminyum.com', 'pres2@arslanaluminyum.com', 'kevsermolla@arslanaluminyum.com', 
-                        'akenanatagur@arslanaluminyum.com', 'burakduman@arslanaluminyum.com', 'nilgunhaydar@arslanaluminyum.com', '4.fabrikabakim@arslanaluminyum.com',
-                        'hacerbayram@arslanaluminyum.com', 'songulyurttapan@arslanaluminyum.com', 'mehmetsimsir@arslanaluminyum.com', 'aysegularabaci@arslanaluminyum.com', 'yazilim@arslanaluminyum.com'
-    ]
 
-    cc_addresses =  ['aosman@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'haruncan@arslanaluminyum.com', 'pinararslan@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com', 'ufukizgi@arslanaluminyum.com']
 
     # cc_addresses = ['yazilim@arslanaluminyum.com']
     # to_addresses = ['ai@arslanaluminyum.com']
@@ -254,6 +203,11 @@ def send_daily_test_report_for_all():
 
 # her hareketten sonra gönderilen
 def send_test_report(dieList, press, user_info):
+    distribution = get_event_report_recipients('die_test', press)
+    if distribution is None:
+        return
+    to_addresses, cc_addresses = distribution
+
     print(f"dieList: {dieList}")
     print(f"press: {press}, user: {user_info}")
     result_list = []
@@ -261,9 +215,6 @@ def send_test_report(dieList, press, user_info):
     clean_dieList = [kalip.replace(" ", "") for kalip in dieList]
     dies = kalipList.filter(trimmed_kalipno__in=clean_dieList).exclude(Silindi=1).exclude(AktifPasif='Pasif')
 
-    recipients = email_mapping[press]
-    to_addresses = recipients['to']
-    cc_addresses = recipients['cc']
 
     for die in dies:
         profil_no = die.ProfilNo
@@ -321,15 +272,18 @@ def send_test_report(dieList, press, user_info):
 
 
 def send_single_die_report(die, press, user_info):
+    report_settings = get_report_settings('die_test')
+    if not report_settings.is_active:
+        return
+
     profile_no = die.ProfilNo
     client_obj = MusteriFirma.objects.using('dies').filter(FirmaKodu=die.FirmaKodu).values('MusteriTemsilcisi').first()
     client_rep = client_obj['MusteriTemsilcisi'] if client_obj else "Tanımsız"
     
-    reps = [rep.strip() for rep in client_obj['MusteriTemsilcisi'].split(',')] # ['TUNCAY KURTULMUŞ', 'N.HAYDAR']  ya da ['FATMA DENİZ']
+    reps = ([rep.strip() for rep in (client_rep or '').split(',')]
+            if client_obj and report_settings.include_representative else [])
 
-    recipients = email_mapping[press]
-    to_addresses = set(recipients['to'])
-    cc_addresses = set(recipients['cc'])
+    representative_emails = []
 
     for rep in reps:
         if not rep:
@@ -344,8 +298,14 @@ def send_single_die_report(die, press, user_info):
         in_group_user = rep_user.filter(Q(groups__name="Yurt Ici Satis Bolumu") | Q(groups__name="Yurt Disi Satis Bolumu"))
         if in_group_user.exists():
             rep_mail = in_group_user.values()[0]['email']
-            # to_addresses.append(rep_mail)
-            to_addresses.add(rep_mail)
+            representative_emails.append(rep_mail)
+
+    distribution = get_event_report_recipients(
+        'die_test', press, representative_emails=representative_emails, report_settings=report_settings,
+    )
+    if distribution is None:
+        return
+    to_addresses, cc_addresses = distribution
 
     order_status = ''
     siparis_qs = SiparisList.objects.using('dies').filter(Q(ProfilNo=profile_no) & Q(Adet__gt=0) & ((Q(KartAktif=1) | Q(BulunduguYer='DEPO')) & Q(Adet__gte=1)) & Q(BulunduguYer='TESTERE'))
@@ -395,6 +355,11 @@ def send_single_die_report(die, press, user_info):
     send_email(to_addresses=list(to_addresses), cc_recipients=list(cc_addresses), subject=subject, body=html_message)
 
 def send_new_dies_without_orders_report():
+    distribution = get_scheduled_report_recipients('profiles_without_orders')
+    if distribution is None:
+        return
+    to_addresses, cc_addresses = distribution
+
     # son 6 ayda kalipmsye eklenen ve o profil numarasında brüt imalatı 0 olan kalıpları getir
     date_filter = datetime.now() - timedelta(days=183)
     queryset = (
@@ -442,8 +407,6 @@ def send_new_dies_without_orders_report():
 
     if len(profilno_no_open_order) >= 1:
         profilno_no_open_order.sort(key=lambda x: (not x['profile'][0].isdigit(), re.sub(r'\D', '', x['profile'])))
-        to_addresses = ['hasanpasa@arslanaluminyum.com']
-        cc_addresses = ['ufukizgi@arslanaluminyum.com', 'yazilim@arslanaluminyum.com']
         # cc_addresses = ['yazilim@arslanaluminyum.com']
         # to_addresses = ['ai@arslanaluminyum.com']
 

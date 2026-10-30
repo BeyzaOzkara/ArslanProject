@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.db import models
 from django.http.request import HttpRequest
 from .models import *
 from guardian.admin import GuardedModelAdmin
@@ -48,6 +49,13 @@ class YudaFormAdmin(GuardedModelAdmin):
 admin.site.register(YudaForm, YudaFormAdmin)
 
 
+class MailReportRouteInline(admin.TabularInline):
+    model = MailReportRoute
+    extra = 0
+    fields = ('route_key', 'is_active', 'to_addresses', 'cc_addresses')
+    formfield_overrides = {models.TextField: {'widget': forms.Textarea(attrs={'rows': 3, 'cols': 40})}}
+
+
 @admin.register(MailReportSettings)
 class MailReportSettingsAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active', 'updated_at')
@@ -60,6 +68,22 @@ class MailReportSettingsAdmin(admin.ModelAdmin):
         ('Tetikleme ve deneme', {'fields': ('sender_addresses', 'test_sender_addresses')}),
         ('Kayıt bilgisi', {'fields': ('updated_at',)}),
     )
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if obj and obj.code != 'sevkiyat':
+            fieldsets = tuple(section for section in fieldsets if section[0] != 'Tetikleme ve deneme')
+        if obj and obj.code in ('die_transfer', 'die_test'):
+            dynamic_field = 'include_actor' if obj.code == 'die_transfer' else 'include_representative'
+            fieldsets += (('Harekete göre dağıtım', {
+                'fields': (dynamic_field,),
+                'description': 'Üstteki ortak TO/CC listelerine, aşağıdaki ilgili pres satırının adresleri eklenir. '
+                               'Bir presi pasife almak o hedef için bütün gönderimi durdurur.',
+            }),)
+        return fieldsets
+
+    def get_inlines(self, request, obj=None):
+        return [MailReportRouteInline] if obj and obj.code in ('die_transfer', 'die_test') else []
 
     def has_add_permission(self, request):
         # Desteklenen raporlar migration ile oluşturulur.

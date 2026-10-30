@@ -10,10 +10,14 @@ from .mail_report_settings import parse_email_addresses
 
 class MailReportSettings(models.Model):
     code = models.CharField('Rapor kodu', max_length=50, unique=True,
-                            choices=[('sevkiyat', 'Sevkiyat Raporu')])
+                            choices=[('sevkiyat', 'Sevkiyat Raporu'),
+                                     ('daily_test', 'Güncel Test Raporu'),
+                                     ('profiles_without_orders', 'Profil Sipariş Takip Raporu'),
+                                     ('die_transfer', 'Kalıp Transferi'),
+                                     ('die_test', 'Test Alınması Gereken Kalıp')])
     name = models.CharField('Rapor adı', max_length=150)
     is_active = models.BooleanField('Gönderim aktif', default=True, help_text=(
-        'Pasifken gelen bildirimler rapor üretmez. Yeniden etkinleştirmek geçmiş bildirimleri tekrar göndermez.'
+        'Pasifken rapor gönderilmez. Yeniden etkinleştirmek geçmiş bildirimleri veya kaçırılan saatleri tekrar göndermez.'
     ))
     to_addresses = models.TextField('Alıcılar (TO)', blank=True,
                                     help_text='Her satıra bir e-posta adresi yazın. Virgül ve noktalı virgül de kullanılabilir.')
@@ -26,6 +30,8 @@ class MailReportSettings(models.Model):
         'yalnızca bildirimi gönderen adres olur; normal dağıtım listesine gönderilmez.'
     ))
     updated_at = models.DateTimeField('Son güncelleme', auto_now=True)
+    include_actor = models.BooleanField('İşlemi yapan kullanıcıya da gönder', default=False)
+    include_representative = models.BooleanField('İlgili müşteri temsilcisine de gönder', default=False)
 
     class Meta:
         verbose_name = 'Mail raporu ayarı'
@@ -49,12 +55,61 @@ class MailReportSettings(models.Model):
             except ValidationError as exc:
                 errors[field] = exc.messages
         if self.is_active:
-            for field in ('to_addresses', 'sender_addresses'):
+            if self.code == 'sevkiyat':
+                required_fields = ('to_addresses', 'sender_addresses')
+            elif self.code in ('die_transfer', 'die_test'):
+                required_fields = ()  # Ortak liste boş olabilir; pres satırlarında alıcı tanımlanır.
+            else:
+                required_fields = ('to_addresses',)
+            for field in required_fields:
                 if field in parsed and not parsed[field]:
                     errors[field] = 'Gönderim aktifken en az bir adres girilmelidir.'
         if 'sender_addresses' in parsed and 'test_sender_addresses' in parsed:
             if not set(parsed['test_sender_addresses']).issubset(parsed['sender_addresses']):
                 errors['test_sender_addresses'] = 'Deneme göndericilerini izin verilen göndericilere de ekleyin.'
+        if self.code != 'sevkiyat':
+            for field in ('sender_addresses', 'test_sender_addresses'):
+                if parsed.get(field):
+                    errors[field] = 'Bu raporda mail adresiyle tetikleyen gönderici tanımlanmaz.'
+        if errors:
+            raise ValidationError(errors)
+
+
+class MailReportRoute(models.Model):
+    report = models.ForeignKey(MailReportSettings, on_delete=models.CASCADE, related_name='routes',
+                               verbose_name='Mail raporu')
+    route_key = models.CharField('Pres / hedef kodu', max_length=100,
+                                 help_text='Lokasyondaki pres koduyla aynı olmalı. Örnek: 1100-1, Yeni 1100.')
+    is_active = models.BooleanField('Bu hedefe gönderim aktif', default=True)
+    to_addresses = models.TextField('Ek alıcılar (TO)', blank=True)
+    cc_addresses = models.TextField('Ek bilgi (CC)', blank=True)
+    updated_at = models.DateTimeField('Son güncelleme', auto_now=True)
+
+    class Meta:
+        verbose_name = 'Mail raporu pres dağıtımı'
+        verbose_name_plural = 'Mail raporu pres dağıtımları'
+        ordering = ['route_key']
+        constraints = [models.UniqueConstraint(fields=['report', 'route_key'], name='unique_mail_report_route')]
+
+    def __str__(self):
+        return f'{self.report} / {self.route_key}'
+
+    def addresses(self, field):
+        return parse_email_addresses(getattr(self, field))
+
+    def clean(self):
+        super().clean()
+        self.route_key = self.route_key.strip()
+        errors = {}
+        if not self.route_key:
+            errors['route_key'] = 'Pres / hedef kodu boş bırakılamaz.'
+        if self.report_id and self.report.code not in ('die_transfer', 'die_test'):
+            errors['report'] = 'Pres dağıtımı yalnızca hareket sonrası mail raporları için kullanılır.'
+        for field in ('to_addresses', 'cc_addresses'):
+            try:
+                setattr(self, field, '\n'.join(self.addresses(field)))
+            except ValidationError as exc:
+                errors[field] = exc.messages
         if errors:
             raise ValidationError(errors)
 

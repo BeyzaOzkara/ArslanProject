@@ -58,6 +58,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.dateformat import DateFormat
 from django.db.models.functions import ExtractHour, ExtractMinute
 from .email_utils import send_email
+from .mail_report_settings import get_event_report_recipients
 from django.core.cache import cache
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -460,31 +461,13 @@ def check_last_location_press1(request, dieList, dieTo):
 
 def send_email_notification(request, dieList, dieTo_press):
     try:
+        distribution = get_event_report_recipients(
+            'die_transfer', dieTo_press, actor_email=request.user.email,
+        )
+        if distribution is None:
+            return
+        to_addresses, cc_addresses = distribution
         user_info = get_user_full_name(request.user.id)
-        cc_addresses = ['pres2@arslanaluminyum.com', 'pres1@arslanaluminyum.com', 'kaliphazirlama@arslanaluminyum.com' ,
-            'kaliphazirlama1@arslanaluminyum.com','mkaragoz@arslanaluminyum.com' ,'kevsermolla@arslanaluminyum.com',
-            'nuraydincavdir@arslanaluminyum.com' ,'planlamaofis2@arslanaluminyum.com', 
-            'doganyilmaz@arslanaluminyum.com' ,'planlama2@arslanaluminyum.com', 'akenanatagur@arslanaluminyum.com', 
-            'ufukizgi@arslanaluminyum.com', 'ersoy@arslanaluminyum.com', 'serdarfurtuna@arslanaluminyum.com'] 
-        
-        email_mapping = {
-            '1100-1': 'eski1100pres@arslanaluminyum.com',
-            '1200-1': '1200pres@arslanaluminyum.com',
-            '1600-1': '1600PRES@arslanaluminyum.com',
-            '2750-1': 'PRES2750@arslanaluminyum.com',
-            'Yeni 1100': 'pres1100@arslanaluminyum.com',
-            '1600-2': 'yeni1600pres@arslanaluminyum.com',
-            '4000-1': '4000pres@arslanaluminyum.com',
-            '4500-1': '4.fabrikabakim@arslanaluminyum.com',
-            '1. Fabrika Kalıp Hazırlama': 'kaliphazirlama1ofis@arslanaluminyum.com',
-            '1. Fabrika Kalıp Arşivi': 'kaliphazirlama1ofis@arslanaluminyum.com',
-            '2. Fabrika Kalıp Hazırlama': 'kaliphazirlama@arslanaluminyum.com',
-            '2. Fabrika Kalıp Arşivi': 'kaliparsivi@arslanaluminyum.com'
-        }
-        
-        to_addresses = [request.user.email, 'hasanpasa@arslanaluminyum.com']
-        if dieTo_press in email_mapping:
-            to_addresses.append(email_mapping[dieTo_press])
 
         subject = f"Kalıp Transferi"
         html_message = render_to_string('mail/die_move.html', {
@@ -497,8 +480,8 @@ def send_email_notification(request, dieList, dieTo_press):
         # Send email
         send_email(to_addresses=to_addresses, cc_recipients=cc_addresses, subject= subject, body= body)
         print("Email sent successfully.")
-    except Exception as e:
-        print(f"Error sending email: {e}")
+    except Exception:
+        logger.exception('TRANSFER MAIL FAILED target=%s', dieTo_press)
     
 def location_list(a):
     gonderLoc = get_objects_for_user(a, "ArslanTakipApp.gonder_view_location", klass=Location).exclude(module_tag='transfer')
