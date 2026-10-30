@@ -5,71 +5,32 @@ from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Sum
 from django.template.loader import render_to_string
 
+from .mail_report_settings import get_sevkiyat_settings
 from .models import Firma, SevkiyatFaturaListesi, SevkiyatRaporu, UrunCikisi
 
 logger = logging.getLogger(__name__)
 
-SEVKIYAT_TEST_SENDER = 'yazilim@arslanaluminyum.com'
-SEVKIYAT_SENDERS = (
-    'serkankutluca@arslanaluminyum.com',
-    'furkankaya@arslanaluminyum.com',
-    SEVKIYAT_TEST_SENDER,
-)
-SEVKIYAT_REPORT_TO = [
-    'burakduman@arslanaluminyum.com',
-    'doganyilmaz@arslanaluminyum.com',
-    'nilgunhaydar@arslanaluminyum.com',
-    'paketleme2@arslanaluminyum.com',
-    'paketleme@arslanaluminyum.com',
-    'mekanikislem@arslanaluminyum.com',
-    'ozkankavak@arslanaluminyum.com',
-    'yuzeyislem@arslanaluminyum.com',
-    'eloksal@arslanaluminyum.com',
-    'ozgurcubukcu@arslanaluminyum.com',
-    'kalitemuhendisi@arslanaluminyum.com',
-    'kalitekontrol@arslanaluminyum.com',
-    'akenanatagur@arslanaluminyum.com',
-    'boyahane2@arslanaluminyum.com',
-    'serkankutluca@arslanaluminyum.com',
-    'furkankaya@arslanaluminyum.com',
-    'hasanhuseyinkurut@arslanaluminyum.com',
-    'mehmetsimsir@arslanaluminyum.com',
-    'aysegularabaci@arslanaluminyum.com',
-    'pres2@arslanaluminyum.com',
-    'pres1@arslanaluminyum.com',
-    '4.fabrikabakim@arslanaluminyum.com',
-    'fatmadeniz@arslanaluminyum.com',
-    'hasanpasa@arslanaluminyum.com',
-    'cagataycevik@arslanaluminyum.com',
-    'argemuhendisi2@arslanaluminyum.com',
-    'export@arslanaluminyum.com',
-    'huseyindogruoz@arslanaluminyum.com',
-    'kevsermolla@arslanaluminyum.com'
-]
-SEVKIYAT_REPORT_CC = [
-    'ersoy@arslanaluminyum.com',
-    'aosman@arslanaluminyum.com',
-    'ufukizgi@arslanaluminyum.com',
-    'pinararslan@arslanaluminyum.com',
-    'serdarfurtuna@arslanaluminyum.com',
-    'turkerozdener@arslanaluminyum.com',
-    'haruncan@arslanaluminyum.com',
-]
 
 def normalize_text(value):
     return ' '.join((value or '').replace('İ', 'i').casefold().split())
 
 
 def is_sevkiyat_completed(message):
-    sender = getattr(getattr(message, 'sender', None), 'email_address', '')
-    if normalize_text(sender) not in SEVKIYAT_SENDERS:
-        logger.info('SEVKIYAT SKIP sender=%s expected=%s', sender, SEVKIYAT_SENDERS)
-        return False
     if normalize_text(message.subject) != 'sevkiyat':
         logger.info('SEVKIYAT SKIP subject=%r expected=sevkiyat', message.subject)
+        return False
+    report_settings = get_sevkiyat_settings()
+    if not report_settings.is_active:
+        logger.info('SEVKIYAT SKIP report disabled in admin')
+        return False
+    sender = getattr(getattr(message, 'sender', None), 'email_address', '')
+    allowed_senders = report_settings.addresses('sender_addresses')
+    if normalize_text(sender) not in allowed_senders:
+        logger.info('SEVKIYAT SKIP sender=%s expected=%s', sender, allowed_senders)
         return False
     text = message.text_body
     if not text:
@@ -180,12 +141,22 @@ def send_sevkiyat_report(shipment_datetime=None, sender_email=None):
     from .email_utils import send_email
     from .sevkiyat_pdf import build_sevkiyat_pdf
 
-    if normalize_text(sender_email) == SEVKIYAT_TEST_SENDER:
-        recipients = [SEVKIYAT_TEST_SENDER]
-        cc_recipients = [SEVKIYAT_TEST_SENDER]
+    report_settings = get_sevkiyat_settings()
+    if not report_settings.is_active:
+        logger.info('SEVKIYAT REPORT SKIP report disabled in admin')
+        return False
+    sender = normalize_text(sender_email)
+    if sender_email and sender not in report_settings.addresses('sender_addresses'):
+        logger.info('SEVKIYAT REPORT SKIP sender no longer allowed: %s', sender)
+        return False
+    if sender and sender in report_settings.addresses('test_sender_addresses'):
+        recipients = [sender]
+        cc_recipients = [sender]
     else:
-        recipients = list(SEVKIYAT_REPORT_TO)
-        cc_recipients = list(SEVKIYAT_REPORT_CC)
+        recipients = report_settings.addresses('to_addresses')
+        cc_recipients = report_settings.addresses('cc_addresses')
+    if not recipients:
+        raise ImproperlyConfigured('Sevkiyat raporunun alıcı listesi boş. Admin panelindeki ayarı kontrol edin.')
     logger.info('SEVKIYAT REPORT START recipients=%s cc=%s', recipients, cc_recipients)
     now = datetime.now(ZoneInfo('Europe/Istanbul'))
     shipment_datetime = shipment_datetime or now

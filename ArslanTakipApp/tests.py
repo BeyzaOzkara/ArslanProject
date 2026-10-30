@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase, RequestFactory, override_settings
 
+from .models import MailReportSettings
+
 from .sevkiyat_report import (
-    SEVKIYAT_REPORT_TO,
-    SEVKIYAT_REPORT_CC,
     get_monthly_shipped_kg,
     get_daily_shipped_kg,
     get_daily_shipment_breakdown,
@@ -19,6 +19,19 @@ from .sevkiyat_report import (
 
 
 class SevkiyatReportTests(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+        self.mail_settings = MailReportSettings(
+            code='sevkiyat', name='Sevkiyat Raporu', is_active=True,
+            to_addresses='recipient1@example.com\nrecipient2@example.com',
+            cc_addresses='cc@example.com',
+            sender_addresses='serkankutluca@arslanaluminyum.com\nfurkankaya@arslanaluminyum.com\nyazilim@arslanaluminyum.com',
+            test_sender_addresses='yazilim@arslanaluminyum.com',
+        )
+        self.settings_lookup = self.enterContext(patch(
+            'ArslanTakipApp.sevkiyat_report.get_sevkiyat_settings', return_value=self.mail_settings,
+        ))
+
     def message(self, **kwargs):
         values = dict(
             sender=SimpleNamespace(email_address='serkankutluca@arslanaluminyum.com'),
@@ -122,10 +135,10 @@ class SevkiyatReportTests(SimpleTestCase):
         with patch('ArslanTakipApp.sevkiyat_report.datetime') as clock:
             clock.now.return_value = datetime(2026, 10, 27, 17, 0, tzinfo=ZoneInfo('Europe/Istanbul'))
             send_sevkiyat_report(datetime(2026, 10, 26, 20, 0, tzinfo=ZoneInfo('UTC')))
-        self.assertEqual(send.call_args.args[0], SEVKIYAT_REPORT_TO)
-        self.assertEqual(send.call_args.args[1], SEVKIYAT_REPORT_CC)
-        self.assertEqual(len(set(send.call_args.args[0])), 28)
-        self.assertEqual(len(set(send.call_args.args[1])), 7)
+        self.assertEqual(send.call_args.args[0], self.mail_settings.addresses('to_addresses'))
+        self.assertEqual(send.call_args.args[1], self.mail_settings.addresses('cc_addresses'))
+        self.assertEqual(len(set(send.call_args.args[0])), 2)
+        self.assertEqual(len(set(send.call_args.args[1])), 1)
         self.assertNotIn('yazilim@arslanaluminyum.com', send.call_args.args[0])
         self.assertEqual(send.call_args.args[2], 'Sevkiyat Raporu - 27/10/2026 17:00')
         self.assertIn('27.10.2026', send.call_args.args[3])
@@ -152,8 +165,13 @@ class SevkiyatReportTests(SimpleTestCase):
         self.assertEqual(send.call_args.args[1], ['yazilim@arslanaluminyum.com'])
         for sender in ('serkankutluca@arslanaluminyum.com', 'furkankaya@arslanaluminyum.com'):
             send_sevkiyat_report(sender_email=sender)
-            self.assertEqual(send.call_args.args[0], SEVKIYAT_REPORT_TO)
-            self.assertEqual(send.call_args.args[1], SEVKIYAT_REPORT_CC)
+            self.assertEqual(send.call_args.args[0], self.mail_settings.addresses('to_addresses'))
+            self.assertEqual(send.call_args.args[1], self.mail_settings.addresses('cc_addresses'))
+        self.mail_settings.to_addresses = 'new-recipient@example.com'
+        self.mail_settings.cc_addresses = 'new-copy@example.com'
+        send_sevkiyat_report(sender_email='serkankutluca@arslanaluminyum.com')
+        self.assertEqual(send.call_args.args[0], ['new-recipient@example.com'])
+        self.assertEqual(send.call_args.args[1], ['new-copy@example.com'])
         self.assertNotIn('cid:sevkiyat-logo', send.call_args.args[3])
         self.assertNotIn('Deneme:', send.call_args.args[3])
         self.assertIn('GÜNLÜK SEVKİYAT TOPLAMI', send.call_args.args[3])
@@ -169,7 +187,6 @@ class SevkiyatReportTests(SimpleTestCase):
         self.assertEqual(attached.content, b'%PDF-test')
         message.return_value.send.assert_called_once_with()
 
-    @patch.dict('os.environ', {'SEVKIYAT_REPORT_TO': 'recipient@example.com'})
     @patch('ArslanTakipApp.sevkiyat_report.get_monthly_top_shipment_firms', return_value=[])
     @patch('ArslanTakipApp.sevkiyat_report.get_daily_shipment_breakdown', return_value=[])
     @patch('ArslanTakipApp.sevkiyat_report.get_daily_shipped_kg',

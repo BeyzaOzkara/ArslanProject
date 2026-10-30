@@ -1,9 +1,62 @@
 import datetime
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import Index, Q
 from django.contrib.auth.models import Group
+from .mail_report_settings import parse_email_addresses
+
+
+class MailReportSettings(models.Model):
+    code = models.CharField('Rapor kodu', max_length=50, unique=True,
+                            choices=[('sevkiyat', 'Sevkiyat Raporu')])
+    name = models.CharField('Rapor adı', max_length=150)
+    is_active = models.BooleanField('Gönderim aktif', default=True, help_text=(
+        'Pasifken gelen bildirimler rapor üretmez. Yeniden etkinleştirmek geçmiş bildirimleri tekrar göndermez.'
+    ))
+    to_addresses = models.TextField('Alıcılar (TO)', blank=True,
+                                    help_text='Her satıra bir e-posta adresi yazın. Virgül ve noktalı virgül de kullanılabilir.')
+    cc_addresses = models.TextField('Bilgi (CC)', blank=True,
+                                    help_text='Her satıra bir e-posta adresi yazın. Boş bırakılabilir.')
+    sender_addresses = models.TextField('İzin verilen göndericiler', blank=True,
+                                        help_text='Raporu tetikleyebilecek adresler. Konu ve içerik koşulları da aranır.')
+    test_sender_addresses = models.TextField('Deneme göndericileri', blank=True, help_text=(
+        'İzin verilen göndericilerden seçin. Bu adreslerden gelen bildirimlerde TO ve CC '
+        'yalnızca bildirimi gönderen adres olur; normal dağıtım listesine gönderilmez.'
+    ))
+    updated_at = models.DateTimeField('Son güncelleme', auto_now=True)
+
+    class Meta:
+        verbose_name = 'Mail raporu ayarı'
+        verbose_name_plural = 'Mail raporu ayarları'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def addresses(self, field):
+        return parse_email_addresses(getattr(self, field))
+
+    def clean(self):
+        super().clean()
+        parsed = {}
+        errors = {}
+        for field in ('to_addresses', 'cc_addresses', 'sender_addresses', 'test_sender_addresses'):
+            try:
+                parsed[field] = self.addresses(field)
+                setattr(self, field, '\n'.join(parsed[field]))
+            except ValidationError as exc:
+                errors[field] = exc.messages
+        if self.is_active:
+            for field in ('to_addresses', 'sender_addresses'):
+                if field in parsed and not parsed[field]:
+                    errors[field] = 'Gönderim aktifken en az bir adres girilmelidir.'
+        if 'sender_addresses' in parsed and 'test_sender_addresses' in parsed:
+            if not set(parsed['test_sender_addresses']).issubset(parsed['sender_addresses']):
+                errors['test_sender_addresses'] = 'Deneme göndericilerini izin verilen göndericilere de ekleyin.'
+        if errors:
+            raise ValidationError(errors)
 
 # Create your models here.
 class Location(models.Model):

@@ -7,8 +7,8 @@ from django.core.management.base import BaseCommand, CommandError
 from exchangelib import Account, Configuration, Credentials, DELEGATE
 
 from ArslanTakipApp.models import LastProcessEmail
+from ArslanTakipApp.mail_report_settings import get_sevkiyat_settings
 from ArslanTakipApp.sevkiyat_report import (
-    SEVKIYAT_SENDERS, SEVKIYAT_REPORT_TO, SEVKIYAT_REPORT_CC, SEVKIYAT_TEST_SENDER,
     get_monthly_shipped_kg, get_daily_shipped_kg, get_daily_shipment_breakdown,
     get_monthly_top_shipment_firms, is_sevkiyat_completed,
 )
@@ -27,10 +27,16 @@ class Command(BaseCommand):
         mailbox = os.environ.get('AI_EMAIL_USER', 'ai@arslanaluminyum.com')
         password = os.environ.get('AI_EMAIL_PASSWORD', '')
         self.stdout.write(f'Izlenen gelen kutusu: {mailbox}')
-        self.stdout.write('Beklenen gonderenler: ' + ', '.join(SEVKIYAT_SENDERS))
-        self.stdout.write('Rapor alicilari: ' + ', '.join(SEVKIYAT_REPORT_TO))
-        self.stdout.write('Rapor CC: ' + ', '.join(SEVKIYAT_REPORT_CC))
-        self.stdout.write(f'Deneme gondereni {SEVKIYAT_TEST_SENDER}: TO ve CC yalnizca bu adres.')
+        try:
+            report_settings = get_sevkiyat_settings()
+        except Exception as exc:
+            raise CommandError(f'Admin mail ayarlari okunamadi: {exc}') from exc
+        self.stdout.write(f'Admin rapor aktif: {report_settings.is_active}')
+        self.stdout.write('Beklenen gonderenler: ' + ', '.join(report_settings.addresses('sender_addresses')))
+        self.stdout.write('Rapor alicilari: ' + ', '.join(report_settings.addresses('to_addresses')))
+        self.stdout.write('Rapor CC: ' + ', '.join(report_settings.addresses('cc_addresses')))
+        self.stdout.write('Deneme gonderenleri (TO ve CC yalnizca kendisi): '
+                          + ', '.join(report_settings.addresses('test_sender_addresses')))
         self.stdout.write('Konu: sevkiyat | Icerik: sevkiyat tamam (imza/ek metin olmamali)')
         if not password:
             raise CommandError('AI_EMAIL_PASSWORD tanimli degil veya bos.')

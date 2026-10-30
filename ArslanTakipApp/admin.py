@@ -46,3 +46,25 @@ class YudaFormAdmin(GuardedModelAdmin):
     search_fields = ('YudaNo', 'MusteriFirmaAdi')  # Example: Add search fields
 
 admin.site.register(YudaForm, YudaFormAdmin)
+
+
+@admin.register(MailReportSettings)
+class MailReportSettingsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'updated_at')
+    list_filter = ('is_active',)
+    search_fields = ('name', 'to_addresses', 'cc_addresses', 'sender_addresses')
+    readonly_fields = ('code', 'updated_at')
+    fieldsets = (
+        (None, {'fields': ('code', 'name', 'is_active')}),
+        ('Dağıtım listesi', {'fields': ('to_addresses', 'cc_addresses')}),
+        ('Tetikleme ve deneme', {'fields': ('sender_addresses', 'test_sender_addresses')}),
+        ('Kayıt bilgisi', {'fields': ('updated_at',)}),
+    )
+
+    def has_add_permission(self, request):
+        # Desteklenen raporlar migration ile oluşturulur.
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        # Ayar kaydını silmek yerine gönderim pasife alınabilir.
+        return False
