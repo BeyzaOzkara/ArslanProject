@@ -159,12 +159,13 @@
         </div>
         <div class="callout callout-info col-12 col-md-12 col-lg-2 order-2 order-md-1" style="height: 255px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
           <p style="font-weight: bold;">ONAY ANKETİ</p>
+      {% include 'ArslanTakipApp/yudaPollGroups.html' %}
           <div style="display: inline-block;">
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected %} checked {% endif %} > ONAY
+              <input type="radio" name="onay" id="onayRadio" value="onay"  > ONAY
             </label>
             <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret" {% if not Selected %} checked {% endif %} > RET 
+              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret"  > RET
             </label>
             <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
           </div>
@@ -600,36 +601,7 @@
   });
   
 
-  var anketSecimi  = "";
-  // Use event delegation for dynamically added elements
-  $(document).on('change', 'input[type=radio][name=onay]', function() {
-      document.getElementById("btnOnayAnket").disabled = false;
-      anketSecimi = this.value;
-  });
-
-  function onayAnketGonder() {
-
-    const params = {
-          yId: data[0].id,
-          secim: anketSecimi,
-    };
-
-    $.ajax({
-        url: `/yudaDetailAnket`,
-        method: 'GET',
-        data: { params: JSON.stringify(params)},
-        dataType: 'json',
-        success: function (sonuc) {
-            //canvas data değişecek
-            voteChart.data.datasets[0].data = [sonuc.onay, sonuc.ret];
-            voteChart.update();
-        },
-        error: function (error) {
-            console.error('Error loading poll results:', error);
-        }
-    });
-
-  }
+  {% include 'ArslanTakipApp/yudaPollScript.html' %}
 
   const onayVotes = JSON.parse('{{ onay|escapejs }}');
   const retVotes = JSON.parse('{{ ret|escapejs }}');

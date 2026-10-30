@@ -1,0 +1,12 @@
+{{ voting_groups|json_script:"yuda-voting-groups" }}
+<div class="mb-3">
+  <label for="yudaVotingGroup">Hangi bölüm adına oy veriyorsunuz?</label>
+  <select id="yudaVotingGroup" class="form-control" {% if not voting_groups %}disabled{% endif %}>
+    {% if voting_groups|length != 1 %}<option value="">Bölüm seçiniz</option>{% endif %}
+    {% for group in voting_groups %}
+      <option value="{{ group.id }}">{{ group.name }}</option>
+    {% endfor %}
+  </select>
+  {% if not voting_groups %}<small>Oy verebileceğiniz bir bölüm bulunmuyor.</small>{% endif %}
+  <div id="yudaVoteStatus" class="mt-2" role="status" aria-live="polite"></div>
+</div>

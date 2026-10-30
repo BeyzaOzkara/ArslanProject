@@ -3455,6 +3455,36 @@ def format_row(row):
 
     return formatted_data
 
+YUDA_VOTING_GROUP_NAMES = [
+    'Ust Yonetim Bolumu',
+    'Planlama Bolumu',
+    'Kalite Bolumu',
+    'Kaliphane Bolumu',
+    'Pres Bolumu',
+    'Paketleme Bolumu',
+    'Yurt Disi Satis Bolumu',
+    'Yurt Ici Satis Bolumu',
+    'Eloksal Bolumu',
+    'Ahsap Kaplama Bolumu',
+    'Boyahane Bolumu',
+    'Mekanik Islem Bolumu',
+]
+
+
+def get_yuda_voting_groups(user):
+    return user.groups.filter(name__in=YUDA_VOTING_GROUP_NAMES).order_by('name')
+
+
+def yuda_poll_context(user, yuda_id):
+    groups = list(get_yuda_voting_groups(user).values('id', 'name'))
+    votes = dict(YudaOnay.objects.filter(
+        Yuda_id=yuda_id, Group_id__in=[group['id'] for group in groups]
+    ).order_by('pk').values_list('Group_id', 'OnayDurumu'))
+    for group in groups:
+        group['vote'] = votes.get(group['id'])
+    return {'voting_groups': groups}
+
+
 @login_required
 def yudaDetail(request, yId):
     yudaD = YudaForm.objects.filter(id=yId)
@@ -3479,12 +3509,6 @@ def yudaDetail(request, yId):
     
     onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
     retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
-    user_group = request.user.groups.first()
-    if not YudaOnay.objects.filter(Yuda_id = yId, Group = user_group).first():
-        secim =""
-    else:
-        secim = YudaOnay.objects.get(Yuda_id = yId, Group = user_group).OnayDurumu
-    
     satis_onay = YudaOnay.objects.filter(Q(Group=19) | Q(Group=20),Yuda_id=yId,OnayDurumu=True).exists()
     if satis_onay and yudaDetails[0]['YeniKalipNo'] != None:
         satis_onay == False
@@ -3493,8 +3517,8 @@ def yudaDetail(request, yId):
     kaliphane_onay = YudaOnay.objects.filter(Group__name='Kaliphane Bolumu', Yuda_id=yId, OnayDurumu=True).exists()
 
     kalip_onay = False #satis_onay and kaliphane_grup and kaliphane_onay
-    # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
-    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim, 'kalip_onay':kalip_onay})
+    # return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, **yuda_poll_context(request.user, yId)})
+    return render(request, 'ArslanTakipApp/yudaDetail.html', {'yuda_json':data, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, **yuda_poll_context(request.user, yId), 'kalip_onay':kalip_onay})
 
 def yudaDetail_kalipno(request):
     kalip_no = request.POST.get('kalip_no')
@@ -3537,14 +3561,9 @@ def yudaDetail2(request, yId):
 
     onayCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=True).count()
     retCount = YudaOnay.objects.filter(Yuda_id=yId, OnayDurumu=False).count()
-    if not YudaOnay.objects.filter(Yuda_id = yId, Group = request.user.groups.first()).first():
-        secim =""
-    else:
-        secim = YudaOnay.objects.get(Yuda_id = yId, Group = request.user.groups.first()).OnayDurumu
-    
     formatted_data2 = json.dumps(formatted_data, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
     svgData = json.dumps(svgData, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
-    return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'svgData': svgData, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, 'Selected':secim})
+    return render(request, 'ArslanTakipApp/yudaDetail2.html', {'yuda_json':data, 'svgData': svgData, 'data2':formatted_data2, 'files_json':files, 'comment_json':comments, 'onay':onayCount, 'ret': retCount, **yuda_poll_context(request.user, yId)})
 
 @transaction.atomic
 def yudaDetailComment(request):
@@ -3712,78 +3731,82 @@ def checkYudaOnayDurum(request):
             yuda.OnayDurumu = onay_durumu
             yuda.save()
 
+@login_required
 def yudaDetailAnket(request):
-    params = json.loads(unquote(request.GET.get('params', '{}')))
-    yudaId = params.get("yId")
-    secim = params.get("secim")
-    if secim == "onay":
-        secim = True
-    else:
-        secim = False
-    predefined_group_names = [
-        'Ust Yonetim Bolumu',
-        'Planlama Bolumu',
-        'Kalite Bolumu',
-        'Kaliphane Bolumu',
-        'Pres Bolumu',
-        'Paketleme Bolumu',
-        'Yurt Disi Satis Bolumu',
-        'Yurt Ici Satis Bolumu',
-        'Eloksal Bolumu',
-        'Ahsap Kaplama Bolumu',
-        'Boyahane Bolumu',
-        'Mekanik Islem Bolumu',
-    ]
-
-    user_group = None
-    for group_name in predefined_group_names:
-        group = Group.objects.get(name=group_name)
-        if request.user.groups.filter(name=group_name).exists():
-            user_group = group
-            break
-
-    if user_group is None:
-        return JsonResponse({'error': 'User does not belong to any predefined group'}, status=400)
-
-    # groups.first() şeklinde yapmak çok sağlıklı olmayabilir.
-    # Update or create YudaOnay entry
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST isteği gereklidir.'}, status=405)
     try:
-        # Check if the users group has already voted for this Yuda_id
-        group_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Group=user_group).first()
+        params = json.loads(request.POST.get('params', '{}'))
+        if not isinstance(params, dict):
+            raise ValueError
+    except (ValueError, TypeError):
+        return JsonResponse({'error': 'Geçersiz anket verisi.'}, status=400)
+    try:
+        yudaId = int(params.get('yId'))
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Geçersiz YUDA numarası.'}, status=400)
+    secim = params.get("secim")
+    if secim not in ('onay', 'ret'):
+        return JsonResponse({'error': 'Onay veya ret seçiniz.'}, status=400)
+    secim = secim == 'onay'
+    groups = get_yuda_voting_groups(request.user)
+    group_id = params.get('group_id')
+    if group_id is None:
+        if groups.count() != 1:
+            return JsonResponse({'error': 'Oy verilecek bölümü seçiniz.'}, status=400)
+        user_group = groups.first()
+    else:
+        try:
+            user_group = groups.filter(pk=int(group_id)).first()
+        except (ValueError, TypeError):
+            user_group = None
+    if user_group is None:
+        return JsonResponse({'error': 'Bu bölüm adına oy verme yetkiniz yok.'}, status=403)
 
-        if group_vote:
-            # If the group has already voted, update their vote
-            group_vote.OnayDurumu = secim
-            group_vote.save()
-        else:
-            # If the group hasn't voted, create a new vote record
-            YudaOnay.objects.create(
-                Group=user_group,
-                Yuda_id=yudaId,
-                OnayDurumu=secim
-            ) # 
+    try:
+        with transaction.atomic():
+            # Serialize votes for this YUDA, including first votes for a department.
+            yuda = YudaForm.objects.select_for_update().get(id=yudaId)
+            if yuda.Silindi:
+                return JsonResponse({'error': 'Bu YUDA kaydı silinmiş.'}, status=400)
+            # Check if the users group has already voted for this Yuda_id
+            group_vote = YudaOnay.objects.filter(Yuda_id=yudaId, Group=user_group).first()
+
+            if group_vote:
+                # If the group has already voted, update their vote
+                group_vote.OnayDurumu = secim
+                group_vote.save()
+            else:
+                # If the group hasn't voted, create a new vote record
+                YudaOnay.objects.create(
+                    Group=user_group,
+                    Yuda_id=yudaId,
+                    OnayDurumu=secim
+                )
         
-        yuda = YudaForm.objects.get(id=yudaId)
-        yuda_onay_durumu = YudaOnayDurum.objects.filter(yuda_id=yudaId).values("kaliphane_onay_durumu", "mekanik_islem_onay_durumu", "satis_onay_durumu")[0]
+            yuda_onay_durumu = YudaOnayDurum.objects.filter(yuda_id=yudaId).values("kaliphane_onay_durumu", "mekanik_islem_onay_durumu", "satis_onay_durumu")[0]
         
-        kh_durum = yuda_onay_durumu["kaliphane_onay_durumu"] # değer 1 ise null, 2 ise True, 3 ise False
-        satis_durum = yuda_onay_durumu["satis_onay_durumu"] # değer 1 ise null, 2 ise True, 3 ise False
-        mekanik_durum = yuda_onay_durumu["mekanik_islem_onay_durumu"] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
-        durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
+            kh_durum = yuda_onay_durumu["kaliphane_onay_durumu"] # değer 1 ise null, 2 ise True, 3 ise False
+            satis_durum = yuda_onay_durumu["satis_onay_durumu"] # değer 1 ise null, 2 ise True, 3 ise False
+            mekanik_durum = yuda_onay_durumu["mekanik_islem_onay_durumu"] # değer 0 ise mekanik işlem yok, 1 ise null, 2 ise True, 3 ise False
+            durumlar = {'kaliphane': kh_durum, 'mekanik': mekanik_durum, 'satis': satis_durum}
         
-        onay_durumu = determine_onay_durumu(durumlar) # 
-        # print(f"yuda: {yuda.YudaNo}, durumlar: {durumlar}, onay_durumu: {onay_durumu}")
-        yuda.OnayDurumu = onay_durumu
-        yuda.save()
+            onay_durumu = determine_onay_durumu(durumlar)
+            # print(f"yuda: {yuda.YudaNo}, durumlar: {durumlar}, onay_durumu: {onay_durumu}")
+            yuda.OnayDurumu = onay_durumu
+            yuda.save()
 
-        # Calculate counts for true and false votes for the Yuda_id
-        onay_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=True).count()
-        ret_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).count()
+            # Calculate counts for true and false votes for the Yuda_id
+            onay_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=True).count()
+            ret_count = YudaOnay.objects.filter(Yuda_id=yudaId, OnayDurumu=False).count()
 
-        return JsonResponse({'onay': onay_count, 'ret': ret_count})
+            return JsonResponse({'onay': onay_count, 'ret': ret_count, 'group_id': user_group.pk, 'vote': secim})
 
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+    except YudaForm.DoesNotExist:
+        return JsonResponse({'error': 'YUDA bulunamadı.'}, status=404)
+    except Exception:
+        logging.exception('YUDA anket oyu kaydedilemedi')
+        return JsonResponse({'error': 'Oy kaydedilemedi. Lütfen tekrar deneyiniz.'}, status=500)
    
 def yudaDetailSvg(request, path):
     areas, perimeters, paths = dxf_file_area_calculation(path)

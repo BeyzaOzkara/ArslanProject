@@ -1,0 +1,55 @@
+  const yudaVotingGroups = JSON.parse(document.getElementById('yuda-voting-groups').textContent);
+  const yudaGroupSelect = document.getElementById('yudaVotingGroup');
+  let yudaVotePending = false;
+
+  function updateYudaVoteSelection() {
+    const group = yudaVotingGroups.find(group => String(group.id) === yudaGroupSelect.value);
+    document.getElementById('onayRadio').checked = !!group && group.vote === true;
+    document.getElementById('redRadio').checked = !!group && group.vote === false;
+    document.querySelectorAll('input[name="onay"]').forEach(input => {
+      input.disabled = !group || yudaVotePending;
+    });
+    document.getElementById('btnOnayAnket').disabled = true;
+    document.getElementById('yudaVoteStatus').textContent = !group ? '' :
+      group.vote === true ? 'Bu bölümün mevcut kararı: ONAY' :
+      group.vote === false ? 'Bu bölümün mevcut kararı: RET' : 'Bu bölüm henüz oy vermedi.';
+  }
+
+  yudaGroupSelect.addEventListener('change', updateYudaVoteSelection);
+  $(document).on('change', 'input[type=radio][name=onay]', function() {
+    document.getElementById('btnOnayAnket').disabled = !yudaGroupSelect.value || yudaVotePending;
+  });
+  updateYudaVoteSelection();
+
+  function onayAnketGonder() {
+    const selected = document.querySelector('input[name="onay"]:checked');
+    if (!selected || !yudaGroupSelect.value || yudaVotePending) return;
+    const groupId = yudaGroupSelect.value;
+    yudaVotePending = true;
+    yudaGroupSelect.disabled = true;
+    document.getElementById('btnOnayAnket').disabled = true;
+    document.querySelectorAll('input[name="onay"]').forEach(input => { input.disabled = true; });
+    $.ajax({
+      url: '/yudaDetailAnket',
+      method: 'POST',
+      data: {
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        params: JSON.stringify({yId: data[0].id, secim: selected.value, group_id: groupId})
+      },
+      dataType: 'json',
+      success: function(sonuc) {
+        const group = yudaVotingGroups.find(group => String(group.id) === String(sonuc.group_id));
+        group.vote = sonuc.vote;
+        voteChart.data.datasets[0].data = [sonuc.onay, sonuc.ret];
+        voteChart.update();
+      },
+      error: function(response) {
+        alert(response.responseJSON && response.responseJSON.error || 'Oy kaydedilemedi. Lütfen tekrar deneyiniz.');
+      },
+      complete: function() {
+        yudaVotePending = false;
+        yudaGroupSelect.disabled = yudaVotingGroups.length === 0;
+        updateYudaVoteSelection();
+      }
+    });
+  }

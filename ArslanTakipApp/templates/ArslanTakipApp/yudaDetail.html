@@ -568,12 +568,13 @@ body{
       <h3 class="card-title">Onay Anketi</h3>
     </div>
     <div class="card-body yuda-comment-poll">
+      {% include 'ArslanTakipApp/yudaPollGroups.html' %}
       <div class="d-flex flex-wrap align-items-center justify-content-center mb-3">
         <label class="mb-0 mr-3" for="onayRadio">
-          <input type="radio" name="onay" id="onayRadio" value="onay" {% if Selected == True %} checked {% endif %}> ONAY
+          <input type="radio" name="onay" id="onayRadio" value="onay" > ONAY
         </label>
         <label class="mb-0 mr-3" for="redRadio">
-          <input type="radio" name="onay" id="redRadio" value="ret" {% if Selected == False %} checked {% endif %}> RET
+          <input type="radio" name="onay" id="redRadio" value="ret" > RET
         </label>
         <button type="button" class="btn btn-sm btn-outline-primary" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>Oy Gönder</button>
       </div>
@@ -1651,36 +1652,7 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
   LoadComments(comments);
   loadVisibilityLists();
 
-  var anketSecimi  = "";
-  // Use event delegation for dynamically added elements
-  $(document).on('change', 'input[type=radio][name=onay]', function() {
-      document.getElementById("btnOnayAnket").disabled = false;
-      anketSecimi = this.value;
-  });
-
-  function onayAnketGonder() {
-
-    const params = {
-          yId: data[0].id,
-          secim: anketSecimi,
-    };
-
-    $.ajax({
-        url: `/yudaDetailAnket`,
-        method: 'GET',
-        data: { params: JSON.stringify(params)},
-        dataType: 'json',
-        success: function (sonuc) {
-            //canvas data değişecek
-            voteChart.data.datasets[0].data = [sonuc.onay, sonuc.ret];
-            voteChart.update();
-        },
-        error: function (error) {
-            console.error('Error loading poll results:', error);
-        }
-    });
-
-  }
+  {% include 'ArslanTakipApp/yudaPollScript.html' %}
 
   const onayVotes = JSON.parse('{{ onay|escapejs }}');
   const retVotes = JSON.parse('{{ ret|escapejs }}');
