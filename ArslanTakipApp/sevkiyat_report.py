@@ -47,6 +47,7 @@ SEVKIYAT_REPORT_TO = [
     'argemuhendisi2@arslanaluminyum.com',
     'export@arslanaluminyum.com',
     'huseyindogruoz@arslanaluminyum.com',
+    'kevsermolla@arslanaluminyum.com'
 ]
 SEVKIYAT_REPORT_CC = [
     'ersoy@arslanaluminyum.com',
