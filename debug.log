@@ -1257,3 +1257,25 @@ RuntimeError: Sevkiyat raporu gönderilemedi.
 2026-10-30 14:10:13,148 INFO ArslanTakipApp.mail_report_settings SCHEDULED REPORT SKIP code=daily_test disabled in admin
 2026-10-30 14:10:13,148 INFO ArslanTakipApp.mail_report_settings SCHEDULED REPORT SKIP code=profiles_without_orders disabled in admin
 2026-10-30 14:10:13,177 INFO ArslanTakipApp.mail_report_settings EVENT REPORT SKIP code=die_transfer route=1100-1 disabled
+2026-10-31 08:12:29,738 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient1@example.com', 'recipient2@example.com'] cc=['cc@example.com']
+2026-10-31 08:12:29,739 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-26 generated_at=2026-10-27 17:00:00+03:00
+2026-10-31 08:12:30,039 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-27_17-00.pdf bytes=43601
+2026-10-31 08:12:30,039 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['recipient1@example.com', 'recipient2@example.com']
+2026-10-31 08:12:30,040 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['yazilim@arslanaluminyum.com'] cc=['yazilim@arslanaluminyum.com']
+2026-10-31 08:12:30,040 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-31 generated_at=2026-10-31 08:12:30.040115+03:00
+2026-10-31 08:12:30,054 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-31_08-12.pdf bytes=43604
+2026-10-31 08:12:30,055 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['yazilim@arslanaluminyum.com']
+2026-10-31 08:12:30,055 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient1@example.com', 'recipient2@example.com'] cc=['cc@example.com']
+2026-10-31 08:12:30,055 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-31 generated_at=2026-10-31 08:12:30.055063+03:00
+2026-10-31 08:12:30,069 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-31_08-12.pdf bytes=43604
+2026-10-31 08:12:30,069 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['recipient1@example.com', 'recipient2@example.com']
+2026-10-31 08:12:30,069 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['recipient1@example.com', 'recipient2@example.com'] cc=['cc@example.com']
+2026-10-31 08:12:30,069 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-31 generated_at=2026-10-31 08:12:30.069884+03:00
+2026-10-31 08:12:30,084 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-31_08-12.pdf bytes=43604
+2026-10-31 08:12:30,085 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['recipient1@example.com', 'recipient2@example.com']
+2026-10-31 08:12:30,085 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT START recipients=['new-recipient@example.com'] cc=['new-copy@example.com']
+2026-10-31 08:12:30,085 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT shipment_date=2026-10-31 generated_at=2026-10-31 08:12:30.085246+03:00
+2026-10-31 08:12:30,099 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT PDF READY name=Sevkiyat_Raporu_2026-10-31_08-12.pdf bytes=43604
+2026-10-31 08:12:30,099 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT REPORT SENT recipients=['new-recipient@example.com']
+2026-10-31 08:12:30,102 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT SKIP sender=sender@example.com expected=['other@example.com']
+2026-10-31 08:12:30,102 INFO ArslanTakipApp.sevkiyat_report SEVKIYAT MATCH body_matches=True body_length=14 (imza/ek metin eslesmeyi engeller)
