@@ -83,9 +83,68 @@ class YudaPollTests(SimpleTestCase):
         groups = views.yuda_poll_context(SimpleNamespace(), 42)['voting_groups']
         self.assertEqual([group['vote'] for group in groups], [True, False])
 
-    def test_templates_render_department_selector(self):
+    def test_templates_render_one_independent_card_per_department(self):
         for count in (0, 1, 2):
             groups = [{'id': i, 'name': 'Bölüm', 'vote': None} for i in range(count)]
             html = render_to_string('ArslanTakipApp/yudaPollGroups.html', {'voting_groups': groups})
-            self.assertIn('yudaVotingGroup', html)
-            self.assertEqual('Bölüm seçiniz' in html, count != 1)
+            self.assertEqual(html.count('data-yuda-vote-card='), count)
+            self.assertEqual(html.count('data-vote-submit'), count)
+            self.assertNotIn('<select', html)
+            for group in groups:
+                self.assertEqual(html.count('name="yudaVote%s"' % group['id']), 2)
+
+    def test_cards_render_saved_decisions_and_unvoted_state(self):
+        html = render_to_string('ArslanTakipApp/yudaPollGroups.html', {'voting_groups': [
+            {'id': 20, 'name': 'Boyahane Bolumu', 'vote': True},
+            {'id': 30, 'name': 'Paketleme Bolumu', 'vote': False},
+            {'id': 40, 'name': 'Kalite Bolumu', 'vote': None},
+        ]})
+        from html.parser import HTMLParser
+
+        class CheckedInputs(HTMLParser):
+            checked = []
+
+            def handle_starttag(self, tag, attrs):
+                attrs = dict(attrs)
+                if tag == 'input' and 'checked' in attrs:
+                    self.checked.append(attrs['id'])
+
+        parser = CheckedInputs()
+        parser.feed(html)
+        self.assertEqual(parser.checked, ['yudaOnay20', 'yudaRet30'])
+
+    def test_successive_votes_for_two_departments_remain_independent(self):
+        departments = {
+            20: SimpleNamespace(pk=20, name='Boyahane Bolumu'),
+            30: SimpleNamespace(pk=30, name='Paketleme Bolumu'),
+        }
+        stored_votes = {}
+        self.groups.filter.side_effect = lambda pk: SimpleNamespace(first=lambda: departments.get(pk))
+
+        def create_vote(Group, Yuda_id, OnayDurumu):
+            vote = SimpleNamespace(OnayDurumu=OnayDurumu, save=lambda: None)
+            stored_votes[(Yuda_id, Group.pk)] = vote
+            return vote
+
+        def filter_votes(Yuda_id, Group=None, OnayDurumu=None):
+            if Group is not None:
+                return SimpleNamespace(first=lambda: stored_votes.get((Yuda_id, Group.pk)))
+            return SimpleNamespace(count=lambda: sum(
+                vote.OnayDurumu is OnayDurumu
+                for (yuda_id, _), vote in stored_votes.items() if yuda_id == Yuda_id
+            ))
+
+        self.votes.create.side_effect = create_vote
+        self.votes.filter.side_effect = filter_votes
+        first = self.vote(group_id=20)
+        self.assertEqual(first.status_code, 200)
+        second = self.vote(group_id=30)
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(json.loads(second.content)['onay'], 2)
+        third = self.vote(group_id=30, secim='ret')
+        self.assertEqual(third.status_code, 200)
+        result = json.loads(third.content)
+        self.assertEqual((result['onay'], result['ret']), (1, 1))
+        self.assertIs(stored_votes[(42, 20)].OnayDurumu, True)
+        self.assertIs(stored_votes[(42, 30)].OnayDurumu, False)
+        self.assertEqual(len(stored_votes), 2)

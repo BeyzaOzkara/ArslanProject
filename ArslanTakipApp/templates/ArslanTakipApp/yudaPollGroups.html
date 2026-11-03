@@ -1,12 +1,28 @@
 {{ voting_groups|json_script:"yuda-voting-groups" }}
-<div class="mb-3">
-  <label for="yudaVotingGroup">Hangi bölüm adına oy veriyorsunuz?</label>
-  <select id="yudaVotingGroup" class="form-control" {% if not voting_groups %}disabled{% endif %}>
-    {% if voting_groups|length != 1 %}<option value="">Bölüm seçiniz</option>{% endif %}
-    {% for group in voting_groups %}
-      <option value="{{ group.id }}">{{ group.name }}</option>
-    {% endfor %}
-  </select>
-  {% if not voting_groups %}<small>Oy verebileceğiniz bir bölüm bulunmuyor.</small>{% endif %}
-  <div id="yudaVoteStatus" class="mt-2" role="status" aria-live="polite"></div>
+<div class="row">
+  {% for group in voting_groups %}
+    <div class="col-12 col-md-6 col-xl-4 mb-3">
+      <section class="card h-100 mb-0" data-yuda-vote-card="{{ group.id }}" aria-labelledby="yudaVoteTitle{{ group.id }}">
+        <div class="card-header">
+          <h4 class="card-title" id="yudaVoteTitle{{ group.id }}">{{ group.name }}</h4>
+        </div>
+        <div class="card-body">
+          <p data-vote-status role="status" aria-live="polite">{% if group.vote == True %}Mevcut karar: ONAY{% elif group.vote == False %}Mevcut karar: RET{% else %}Henüz oy verilmedi.{% endif %}</p>
+          <fieldset class="border-0 p-0 m-0">
+            <legend class="sr-only">{{ group.name }} için kararınız</legend>
+            <label class="mr-3" for="yudaOnay{{ group.id }}">
+              <input type="radio" id="yudaOnay{{ group.id }}" name="yudaVote{{ group.id }}" value="onay" {% if group.vote == True %}checked{% endif %}> ONAY
+            </label>
+            <label for="yudaRet{{ group.id }}">
+              <input type="radio" id="yudaRet{{ group.id }}" name="yudaVote{{ group.id }}" value="ret" {% if group.vote == False %}checked{% endif %}> RET
+            </label>
+          </fieldset>
+          <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-vote-submit disabled>Oy Gönder</button>
+          <p class="mt-2 mb-0" data-vote-feedback role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+  {% empty %}
+    <div class="col-12">Oy verebileceğiniz bir bölüm bulunmuyor.</div>
+  {% endfor %}
 </div>

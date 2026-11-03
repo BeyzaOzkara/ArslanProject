@@ -35,10 +35,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    #onayChart {
-      width: 50px;
-      height: 50px;
-    }
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
@@ -383,20 +379,6 @@ body{
     max-width: 100%;
     margin-bottom: 0;
 }
-.yuda-comment-poll {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 255px;
-    margin-bottom: 1rem;
-}
-.yuda-comment-poll .chart-container {
-    position: relative;
-    height: 150px;
-    width: 200px;
-    max-width: 100%;
-}
 @media (max-width: 991.98px) {
     #yorumCard .visibility-selector-wrapper > div,
     #yorumCard .visibility-selector-wrapper select {
@@ -567,20 +549,8 @@ body{
     <div class="card-header">
       <h3 class="card-title">Onay Anketi</h3>
     </div>
-    <div class="card-body yuda-comment-poll">
+    <div class="card-body">
       {% include 'ArslanTakipApp/yudaPollGroups.html' %}
-      <div class="d-flex flex-wrap align-items-center justify-content-center mb-3">
-        <label class="mb-0 mr-3" for="onayRadio">
-          <input type="radio" name="onay" id="onayRadio" value="onay" > ONAY
-        </label>
-        <label class="mb-0 mr-3" for="redRadio">
-          <input type="radio" name="onay" id="redRadio" value="ret" > RET
-        </label>
-        <button type="button" class="btn btn-sm btn-outline-primary" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>Oy Gönder</button>
-      </div>
-      <div class="chart-container">
-        <canvas id="onayChart"></canvas>
-      </div>
     </div>
   </div>
 
@@ -1654,28 +1624,6 @@ function processCommentSpoilers(commentContent, commentAuthorId) {
 
   {% include 'ArslanTakipApp/yudaPollScript.html' %}
 
-  const onayVotes = JSON.parse('{{ onay|escapejs }}');
-  const retVotes = JSON.parse('{{ ret|escapejs }}');
-  const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
-
-  const voteChart = new Chart(voteChartCanvas, {
-      type: 'pie',
-      data: {
-          labels: ['ONAY', 'RET'],
-          datasets: [{
-              label: 'Vote Rates',
-              data: [onayVotes, retVotes],
-              backgroundColor: [
-                  'rgba(54, 162, 235, 0.8)', // Blue color for ONAY renkleri değiştir!!
-                  'rgba(255, 99, 132, 0.8)' // Red color for RET ne renk olsa
-              ],
-              borderWidth: 1
-          }]
-      },
-      options: {
-        resize: true,
-      }
-  });
 
 </script>
 {% endblock %}

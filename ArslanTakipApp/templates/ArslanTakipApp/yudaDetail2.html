@@ -36,10 +36,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    #onayChart {
-      width: 50px;
-      height: 50px;
-    }
     .nested-replies {
         margin-left: 20px; /* Adjust the indentation level as needed */
     }
@@ -140,7 +136,7 @@
       </div>
     </div> <!-- yorum cardına bir bölüm daha eklenecek onay anket -->
     <div class="card-body" id="yorumCard">
-      <div class="row" style="height: 265px;">
+      <div class="row">
         <div class="col-12 col-md-12 col-lg-10 order-2 order-md-1" id="yorumTextCol">
           <textarea class="textarea" name="yorumText" id="yorumText" placeholder=" . . . "
                           style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
@@ -157,22 +153,9 @@
           </div>
           <div id="fileTitles" class="form-group border border-secondary rounded" style="height: 215px ;overflow-y: scroll; overflow-x:hidden;"></div>
         </div>
-        <div class="callout callout-info col-12 col-md-12 col-lg-2 order-2 order-md-1" style="height: 255px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div class="callout callout-info col-12 order-2 order-md-1 mt-3">
           <p style="font-weight: bold;">ONAY ANKETİ</p>
-      {% include 'ArslanTakipApp/yudaPollGroups.html' %}
-          <div style="display: inline-block;">
-            <label style="display: inline-block;">
-              <input type="radio" name="onay" id="onayRadio" value="onay"  > ONAY
-            </label>
-            <label style="display: inline-block;">
-              <input type="radio" name="onay" id="redRadio" class="ml-2" value="ret"  > RET
-            </label>
-            <button type="button" class="btn btn-sm btn-outline-primary ml-2" id="btnOnayAnket" onclick="onayAnketGonder()" disabled>gönder</button>
-          </div>
-          <br/>
-          <div class="chart-container" style="position: relative; height:150px; width:200px;">
-            <canvas id="onayChart"></canvas>
-          </div>
+          {% include 'ArslanTakipApp/yudaPollGroups.html' %}
         </div>
       </div>
       <i class="fas fa-link ml-1 mr-2" onclick="DosyaEkle()"></i>
@@ -356,7 +339,7 @@
     const replyFormCollapse = $(`<div class="collapse" id="replyComment${reply.id}"></div>`).html(`
           <form>
               <div class="form-group">
-                <div class="row" style="height: 265px;">
+                <div class="row">
                   <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${reply.id}">
                     <textarea class="textarea" name="yorumText" id="yorumText${reply.id}" placeholder=" . . . "
                                     style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
@@ -414,7 +397,7 @@
           <form>
               <div class="form-group">
 
-                <div class="row" style="height: 265px;">
+                <div class="row">
                   <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1" id="yorumTextCol${comment.id}">
                     <textarea class="textarea" name="yorumText" id="yorumText${comment.id}" placeholder=" . . . "
                                     style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
@@ -603,28 +586,6 @@
 
   {% include 'ArslanTakipApp/yudaPollScript.html' %}
 
-  const onayVotes = JSON.parse('{{ onay|escapejs }}');
-  const retVotes = JSON.parse('{{ ret|escapejs }}');
-  const voteChartCanvas = document.getElementById('onayChart').getContext('2d');
-
-  const voteChart = new Chart(voteChartCanvas, {
-      type: 'pie',
-      data: {
-          labels: ['ONAY', 'RET'],
-          datasets: [{
-              label: 'Vote Rates',
-              data: [onayVotes, retVotes],
-              backgroundColor: [
-                  'rgba(54, 162, 235, 0.8)', // Blue color for ONAY renkleri değiştir!!
-                  'rgba(255, 99, 132, 0.8)' // Red color for RET ne renk olsa
-              ],
-              borderWidth: 1
-          }]
-      },
-      options: {
-        resize: true,
-      }
-  });
 
 </script>
 {% endblock %}
